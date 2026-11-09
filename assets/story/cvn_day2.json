@@ -1,0 +1,120 @@
+{
+  "conversation_id": "cvn_day2",
+  "chapter": "Day 2",
+  "title": "The Café",
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 2,
+    "time": "09:15",
+    "background": "bg_restaurant.png",
+    "music": "sunny.mp3"
+  },
+  "conversations": [
+    { "type": "NARRATION", "text": "Day 2, 9:15 AM. The café from the photo. Nora insisted on coming along." },
+    {
+      "type": "TEXT",
+      "text": "So this is the place? It looks exactly like the picture.",
+      "profile": "123aaa:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": "You must be the one Miki wrote about.",
+      "profile": "123ccc:0",
+      "position": "right",
+      "voice": "vo_luna_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": "(She can't see me. Please... tell her.)",
+      "profile": "123bbb:1",
+      "position": "center"
+    },
+    {
+      "type": "TEXT",
+      "text": "{{NAME}}? Who are you staring at?",
+      "profile": "123aaa:1"
+    },
+    {
+      "type": "CHOICE",
+      "text": "What do you tell Luna?",
+      "variable": "TOLD",
+      "profile": "123ccc:0",
+      "choices": [
+        {
+          "text": "Miki is sorry. She wanted you to know.",
+          "value": "apology",
+          "effects": [
+            { "variable": "miki_trust", "op": "add", "value": 10 },
+            { "variable": "luna_affection", "op": "add", "value": 10 }
+          ]
+        },
+        {
+          "text": "Nothing. It's not my place.",
+          "value": "silent",
+          "effects": [{ "variable": "miki_trust", "op": "subtract", "value": 5 }]
+        },
+        {
+          "text": "[Show Luna's photo] She kept this.",
+          "value": "photo",
+          "condition": "has_cafe_photo == true",
+          "effects": [
+            { "variable": "miki_trust", "op": "add", "value": 10 },
+            { "variable": "luna_affection", "op": "add", "value": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TOLD == 'silent'",
+      "text": "...I see. Excuse me.",
+      "profile": "123ccc:1"
+    },
+    {
+      "type": "MEDIA",
+      "condition": "TOLD != 'silent'",
+      "media_type": "CG",
+      "uri": "cg_luna_cafe.png",
+      "caption": "For the first time in months, Luna smiles.",
+      "unlock_id": "cg_luna_cafe"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TOLD != 'silent'",
+      "text": "We had a code for our diary. If you really talked to her, you'll know it.",
+      "profile": "123ccc:2"
+    },
+    {
+      "type": "INPUT",
+      "condition": "TOLD != 'silent'",
+      "text": "Luna slides a napkin over: \"Our year.\" (Did Miki mention one?)",
+      "variable": "PASSCODE",
+      "default_value": "????",
+      "profile": "123ccc:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "PASSCODE == '2019'",
+      "text": "...2019. Then you really did talk to her.",
+      "profile": "123ccc:2",
+      "effects": [{ "variable": "knows_passcode", "op": "set", "value": true }]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TOLD != 'silent' && !knows_passcode",
+      "text": "No... that's not it. But thank you for coming.",
+      "profile": "123ccc:1"
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        { "condition": "knows_passcode == true && luna_affection >= 15", "target": "ending_secret" },
+        { "condition": "miki_trust >= 20", "target": "ending_true" },
+        { "condition": "miki_trust >= 10", "target": "ending_good" }
+      ],
+      "fallback_target": "ending_bad"
+    }
+  ]
+}

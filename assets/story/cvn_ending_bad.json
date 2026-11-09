@@ -1,0 +1,19 @@
+{
+  "conversation_id": "cvn_ending_bad",
+  "chapter": "Ending",
+  "title": "Blocked",
+  "scene": { "mode": "CHAT", "channel_id": "thread_miki", "day": 2, "time": "23:59", "music": "night_ambience.mp3" },
+  "conversations": [
+    { "type": "NARRATION", "style": "timestamp", "text": "Day 2 — 11:59 PM" },
+    { "type": "TEXT", "text": "you didn't tell her.", "profile": "123bbb:1", "typing_delay_ms": 2500, "sfx": "sfx_msg_receive.mp3" },
+    { "type": "TEXT", "text": "it's ok. i'll find someone else.", "profile": "123bbb:0", "typing_delay_ms": 1800, "sfx": "sfx_msg_receive.mp3" },
+    { "type": "NARRATION", "style": "system", "text": "This number is no longer available." },
+    {
+      "type": "ENDING",
+      "ending_id": "end_03_bad",
+      "title": "Ending 3: Blocked",
+      "category": "BAD",
+      "summary": "Miki's message never reached Luna. The unknown number went quiet for good."
+    }
+  ]
+}

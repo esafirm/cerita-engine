@@ -11,34 +11,44 @@ class ProfileData {
       list.map((item) => Profile.fromJson(item as Map<String, dynamic>)).toList(),
     );
   }
+
+  Profile? byId(String id) => profiles.where((element) => element.id == id).firstOrNull;
 }
 
 class Profile {
   final String id;
   final String name;
-  final String avatar;
+  final String? handle;
+  final String? bio;
+  final String? avatar;
   final List<String> sprites;
 
   const Profile({
     required this.id,
     required this.name,
-    required this.avatar,
-    required this.sprites,
+    this.handle,
+    this.bio,
+    this.avatar,
+    this.sprites = const [],
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
-    final spritesList = json["sprites"] as List<dynamic>;
+    final spritesList = json["sprites"] as List<dynamic>? ?? const [];
     return Profile(
       id: json["id"] as String,
       name: json["name"] as String,
-      avatar: json["avatar"] as String,
+      handle: json["handle"] as String?,
+      bio: json["bio"] as String?,
+      avatar: json["avatar"] as String?,
       sprites: spritesList.map((item) => item.toString()).toList(),
     );
   }
 
-  String getSprite(ProfileInfo info) {
-    final index = int.parse(info.sprite);
-    return sprites[index];
+  bool get isPlayer => id == ProfileInfo.playerId;
+
+  String? getSprite(ProfileInfo info) {
+    if (sprites.isEmpty) return null;
+    final index = info.spriteIndex;
+    return sprites[index.clamp(0, sprites.length - 1)];
   }
 }
-

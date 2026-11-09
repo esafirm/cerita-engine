@@ -1,131 +1,145 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:fsse/src/engine/data/item_result.dart';
-import 'package:fsse/src/engine/data/profile.dart';
-
+import 'data/channel.dart';
 import 'data/conversation.dart';
+import 'data/item_result.dart';
 import 'data/items/base.dart';
+import 'data/items/branch.dart';
+import 'data/items/choice.dart';
+import 'data/items/ending.dart';
+import 'data/items/input.dart';
+import 'data/items/media.dart';
+import 'data/items/profile_info.dart';
+import 'data/profile.dart';
 import 'data/scene.dart';
+import 'loader.dart';
+import 'state/meta_state.dart';
+import 'state/save_slot.dart';
+import 'state/story_storage.dart';
+import 'state/transcript.dart';
+import 'utils/condition_evaluator.dart';
 
-class EnginePackage {
-  final Conversation conversation;
-  final ProfileData profiles;
-
-  const EnginePackage({required this.conversation, required this.profiles});
-
-  factory EnginePackage.fromJsonFiles(Map<String, dynamic> profiles, Map<String, dynamic> conversation) {
-    return EnginePackage(
-      conversation: Conversation.fromJson(conversation),
-      profiles: ProfileData.fromJson(profiles),
-    );
-  }
-}
-
-abstract class EngineLoader {
-  Future<EnginePackage> initialLoad();
-
-  Future<Conversation> loadConversation(String conversationId);
-}
+export 'loader.dart';
 
 abstract class FsseEngine {
-  /// Proceed to next item. You can provide the previous result of item type
-  /// This result object can have a data that will be stored in data map
-  /// or will load next conversation
+  /// Advance to the next eligible item, optionally applying [prevResult]
+  /// from an INPUT or CHOICE item.
   Future<ItemType> next({ItemResult? prevResult});
 
-  /// Get current item of item type.
+  /// Return the current active item without advancing the index.
   Future<ItemType> get();
 
-  /// Get data map from engine container map
+  /// Read the current playthrough's variable and stats store.
   Map<String, dynamic> getDataMap();
 
-  /// Get profile for item type
+  /// Resolve the character Profile for a given [itemType].
   Profile? getProfile(ItemType itemType);
 }
 
-abstract class EngineListener {
-  /// Called when new scene (background and or music) is available
+abstract mixin class EngineListener {
+  /// Called when a new conversation starts with its scene (mode, background, music...).
   void onNewScene(Scene scene);
+
+  void onConversationStarted(Conversation conversation) {}
+
+  void onMediaUnlocked(String unlockId) {}
+
+  void onEndingUnlocked(EndingItemType ending) {}
+
+  void onCheckpointUnlocked(Checkpoint checkpoint) {}
 }
 
-class LoaderConfig {
-  final String storyDir;
-  final String musicDir;
-  final String spritesDir;
-  final String bgDir;
+/// Thrown by [FsseEngine.next] when a conversation runs out of items without a target.
+class EndOfStoryException implements Exception {
+  final String conversationKey;
 
-  const LoaderConfig({
-    this.storyDir = "assets/story",
-    this.musicDir = "assets/story/music",
-    this.spritesDir = "assets/story/sprites",
-    this.bgDir = "assets/story/bg",
-  });
+  const EndOfStoryException(this.conversationKey);
+
+  @override
+  String toString() => "EndOfStoryException: no more items in '$conversationKey'";
 }
 
 /* Impl */
 /* ------------------------------------------ */
 
-class AssetEngineLoader extends EngineLoader {
-  final LoaderConfig config;
-
-  static const String _prefixConversation = "cvn_";
-
-  AssetEngineLoader(this.config);
-
-  @override
-  Future<EnginePackage> initialLoad() async {
-    final profileString = await rootBundle.loadString("${config.storyDir}/profiles.json");
-    final conversationString = await rootBundle.loadString("${config.storyDir}/index.json");
-
-    return EnginePackage.fromJsonFiles(
-      jsonDecode(profileString) as Map<String, dynamic>,
-      jsonDecode(conversationString) as Map<String, dynamic>,
-    );
-  }
-
-  @override
-  Future<Conversation> loadConversation(String conversationId) async {
-    final newConversation = await rootBundle.loadString("${config.storyDir}/$_prefixConversation$conversationId.json");
-    return Conversation.fromJson(jsonDecode(newConversation) as Map<String, dynamic>);
-  }
-}
-
 class RealFsseEngine extends FsseEngine {
   static const _tag = "FSSE";
+  static const _maxJumps = 64;
 
   final EngineLoader loader;
-  final EngineListener? listener;
+  final StoryStorage? storage;
+  final ConditionEvaluator evaluator;
+  EngineListener? listener;
 
-  RealFsseEngine(this.loader) : listener = null;
+  RealFsseEngine(this.loader, {this.listener, this.storage, this.evaluator = const ConditionEvaluator()});
 
-  RealFsseEngine.withListener(this.loader, this.listener);
+  RealFsseEngine.withListener(this.loader, this.listener)
+      : storage = null,
+        evaluator = const ConditionEvaluator();
 
   late ProfileData profileData;
+  List<Channel> channels = const [];
+  GlobalMetaState meta = GlobalMetaState();
 
   Conversation? currentConversation;
   int dialogIndex = 0;
 
-  final Map<String, String> dataMap = {};
+  final Map<String, dynamic> dataMap = {};
+  final List<TranscriptEntry> _history = [];
+
+  /// Whether the last item returned by [next] had been delivered in an earlier playthrough.
+  bool lastItemPreviouslySeen = false;
+
+  /// True while the last returned item is a CHOICE / INPUT waiting for its [ItemResult].
+  bool _awaitingResult = false;
+
+  bool _started = false;
+
+  List<TranscriptEntry> get history => List.unmodifiable(_history);
+
+  Scene? get currentScene => currentConversation?.scene;
+
+  /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
+  Future<void> start({SaveSlot? save, Checkpoint? checkpoint}) async {
+    final package = await loader.initialLoad();
+    profileData = package.profiles;
+    channels = package.channels;
+    meta = await storage?.loadMeta() ?? meta;
+
+    dataMap.clear();
+    _history.clear();
+    _awaitingResult = false;
+    _started = true;
+
+    if (save != null) {
+      dataMap.addAll(save.dataMap);
+      _history.addAll(save.history);
+      await _enterConversation(await loader.loadConversation(save.conversationKey), index: save.dialogIndex);
+    } else if (checkpoint != null) {
+      dataMap.addAll(checkpoint.dataMap);
+      await _enterConversation(await loader.loadConversation(checkpoint.conversationKey));
+    } else {
+      await _enterConversation(package.conversation);
+    }
+    developer.log("Package loaded", name: _tag);
+  }
 
   @override
   Future<ItemType> next({ItemResult? prevResult}) async {
     developer.log("Request next with index: $dialogIndex", name: _tag);
 
-    await _loadPackageIfNeeded();
+    await _ensureStarted();
     await _handleResult(prevResult);
 
-    final result = await _getCurrentItemType();
-    dialogIndex += 1;
-    return result;
+    final item = await _resolveCurrentItem();
+    return _execute(item);
   }
 
   @override
   Future<ItemType> get() async {
     developer.log("Request get with index: $dialogIndex", name: _tag);
-    await _loadPackageIfNeeded();
-    return _getCurrentItemType();
+    await _ensureStarted();
+    return _prepare(await _resolveCurrentItem());
   }
 
   @override
@@ -134,63 +148,173 @@ class RealFsseEngine extends FsseEngine {
   @override
   Profile? getProfile(ItemType itemType) {
     final info = itemType.getProfileInfo();
-    if (info == null) {
-      return null;
-    }
-    return profileData.profiles.where((element) => element.id == info.id).firstOrNull;
+    return info == null ? null : getProfileById(info.id);
   }
 
-  Future<ItemType> _getCurrentItemType() {
-    final conversation = currentConversation;
-    if (conversation == null) {
-      return Future.error(Exception("Empty conversation. Are you already load the assets?"));
+  Profile? getProfileById(String id) {
+    if (id == ProfileInfo.playerId) {
+      return Profile(id: ProfileInfo.playerId, name: dataMap["NAME"]?.toString() ?? "You");
     }
+    return profileData.byId(id);
+  }
 
-    if (dialogIndex >= conversation.conversations.length) {
-      return Future.error(Exception("End of conversations"));
+  Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull;
+
+  bool evaluate(String? condition) => evaluator.evaluate(condition, dataMap);
+
+  /// Current playthrough state. A pending CHOICE / INPUT is rewound so it is asked again on restore.
+  SaveSlot snapshot({int slotId = SaveSlot.autoSlotId}) {
+    final conversation = currentConversation!;
+    var index = dialogIndex;
+    var history = _history.toList();
+    if (_awaitingResult) {
+      index -= 1;
+      if (history.isNotEmpty && !history.last.isPlayer) history.removeLast();
     }
+    return SaveSlot(
+      slotId: slotId,
+      conversationKey: conversation.key,
+      dialogIndex: index,
+      dataMap: Map.of(dataMap),
+      history: history,
+      updatedAt: DateTime.now(),
+      chapter: conversation.chapter,
+      title: conversation.title,
+    );
+  }
 
-    final newData = conversation.conversations[dialogIndex].cloneWithData(dataMap);
-    return Future.value(newData);
+  Future<void> saveTo(int slotId) async {
+    final storage = this.storage;
+    if (storage == null) return;
+    await storage.saveSlot(snapshot(slotId: slotId));
+    await storage.saveMeta(meta);
+  }
+
+  Future<void> _ensureStarted() async {
+    if (!_started) await start();
+  }
+
+  /// Skips items whose condition fails and follows BRANCH routers.
+  Future<ItemType> _resolveCurrentItem() async {
+    for (var jumps = 0; jumps < _maxJumps;) {
+      final conversation = currentConversation;
+      if (conversation == null) {
+        throw Exception("Empty conversation. Are you already load the assets?");
+      }
+      if (dialogIndex >= conversation.conversations.length) {
+        throw EndOfStoryException(conversation.key);
+      }
+
+      final item = conversation.conversations[dialogIndex];
+      if (!evaluate(item.condition)) {
+        dialogIndex += 1;
+        continue;
+      }
+
+      if (item is BranchItemType) {
+        final target =
+            item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
+        if (target == null) {
+          dialogIndex += 1;
+          continue;
+        }
+        await _enterConversation(await loader.loadConversation(target));
+        jumps++;
+        continue;
+      }
+      return item;
+    }
+    throw Exception("Too many BRANCH jumps. Is there a loop in the story?");
+  }
+
+  ItemType _prepare(ItemType item) {
+    final cloned = item.cloneWithData(dataMap);
+    return cloned is ChoiceItemType ? cloned.withAvailability(evaluate) : cloned;
+  }
+
+  Future<ItemType> _execute(ItemType item) async {
+    for (final effect in item.effects) {
+      effect.apply(dataMap);
+    }
+    final prepared = _prepare(item);
+    final conversation = currentConversation!;
+
+    _history.add(TranscriptEntry(
+      conversationKey: conversation.key,
+      mode: conversation.scene.mode,
+      channelId: conversation.scene.channelId,
+      item: prepared.toJson(),
+    ));
+    lastItemPreviouslySeen = !meta.seenItems.add("${conversation.key}#$dialogIndex");
+    _awaitingResult = prepared is ChoiceItemType || prepared is InputItemType;
+    dialogIndex += 1;
+
+    await _registerUnlocks(prepared);
+    return prepared;
+  }
+
+  Future<void> _registerUnlocks(ItemType item) async {
+    if (item is MediaItemType && item.unlockId != null && meta.unlockedMediaIds.add(item.unlockId!)) {
+      await storage?.saveMeta(meta);
+      listener?.onMediaUnlocked(item.unlockId!);
+    }
+    if (item is EndingItemType) {
+      meta.unlockedEndingIds.add(item.endingId);
+      await storage?.saveMeta(meta);
+      listener?.onEndingUnlocked(item);
+    }
   }
 
   Future<void> _handleResult(ItemResult? itemResult) async {
     if (itemResult == null) return;
+    _awaitingResult = false;
 
-    // Handle data map
     if (itemResult.variable != null) {
       if (itemResult.value == null) {
         throw Exception("Variable exits but value is null");
       }
-      dataMap[itemResult.variable!] = itemResult.value!;
+      dataMap[itemResult.variable!] = itemResult.value;
     }
 
-    // Handle target
+    for (final effect in itemResult.effects) {
+      effect.apply(dataMap);
+    }
+
+    final scene = currentConversation?.scene;
+    if (itemResult.text != null && scene != null) {
+      _history.add(TranscriptEntry(
+        conversationKey: currentConversation!.key,
+        mode: scene.mode,
+        channelId: scene.channelId,
+        playerText: itemResult.text,
+      ));
+    }
+
     final target = itemResult.target;
     if (target != null) {
-      final conversation = await loader.loadConversation(target);
-      _onNewConversation(conversation);
-      dialogIndex = 0;
+      await _enterConversation(await loader.loadConversation(target));
     }
   }
 
-  Future<bool> _loadPackageIfNeeded() async {
-    if (currentConversation == null) {
-      final package = await loader.initialLoad();
-      profileData = package.profiles;
-      _onNewConversation(package.conversation);
-
-      developer.log("Package loaded", name: _tag);
-      return true;
-    }
-    return false;
-  }
-
-  /// This is called after initial load
-  /// and after new conversation is loaded
-  void _onNewConversation(Conversation conversation) {
+  /// Called after initial load and after a new conversation is loaded.
+  Future<void> _enterConversation(Conversation conversation, {int index = 0}) async {
     currentConversation = conversation;
+    dialogIndex = index;
     listener?.onNewScene(conversation.scene);
+    listener?.onConversationStarted(conversation);
+
+    if (conversation.checkpoint && index == 0) {
+      final checkpoint = Checkpoint(
+        conversationKey: conversation.key,
+        chapter: conversation.chapter,
+        title: conversation.title,
+        day: conversation.scene.day,
+        dataMap: Map.of(dataMap),
+        unlockedAt: DateTime.now(),
+      );
+      meta.unlockedCheckpoints[conversation.key] = checkpoint;
+      await storage?.saveMeta(meta);
+      listener?.onCheckpointUnlocked(checkpoint);
+    }
   }
 }
-

@@ -1,24 +1,28 @@
 {
   "profiles": [
     {
-      "id": "123bbb",
-      "name": "Miki",
-      "avatar": "https://sample.com/images/200/300.jpg",
-      "sprites": [
-        "miki_open.png",
-        "miki_frown.png",
-        "miki_smile.png"
-      ]
-    },
-    {
       "id": "123aaa",
       "name": "Nora",
-      "avatar": "https://sample.com/images/200/300.jpg",
-      "sprites": [
-        "nora_open.png",
-        "nora_frown.png",
-        "nora_smile.png"
-      ]
+      "handle": "@nora_w",
+      "bio": "Busy chasing deadlines ☕",
+      "avatar": "assets/story/sprites/nora_avatar.png",
+      "sprites": ["nora_open.png", "nora_frown.png", "nora_smile.png"]
+    },
+    {
+      "id": "123bbb",
+      "name": "Miki",
+      "handle": "@miki_ghost",
+      "bio": "Can anyone read this?",
+      "avatar": "assets/story/sprites/miki_avatar.png",
+      "sprites": ["miki_open.png", "miki_frown.png", "miki_smile.png"]
+    },
+    {
+      "id": "123ccc",
+      "name": "Luna",
+      "handle": "@luna.moth",
+      "bio": "Table by the window, always.",
+      "avatar": "assets/story/sprites/luna_avatar.png",
+      "sprites": ["luna_open.png", "luna_frown.png", "luna_smile.png"]
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "conversation_id": "cvn_ending_good",
+  "chapter": "Ending",
+  "title": "Almost There",
+  "scene": { "mode": "CHAT", "channel_id": "thread_nora", "day": 2, "time": "20:10", "music": "night_ambience.mp3" },
+  "conversations": [
+    { "type": "NARRATION", "style": "timestamp", "text": "Day 2 — 8:10 PM" },
+    { "type": "TEXT", "text": "so... are you going to explain what happened at the café today?", "profile": "123aaa:0", "typing_delay_ms": 1400, "sfx": "sfx_msg_receive.mp3" },
+    { "type": "TEXT", "text": "long story. i think i helped someone.", "profile": "player", "sfx": "sfx_msg_send.mp3" },
+    { "type": "TEXT", "text": "Luna messaged me. she said thank you. and that she still wonders what Miki really wanted to say 🥲", "profile": "123aaa:2", "typing_delay_ms": 2000, "sfx": "sfx_msg_receive.mp3" },
+    {
+      "type": "ENDING",
+      "ending_id": "end_02_good",
+      "title": "Ending 2: Almost There",
+      "category": "GOOD",
+      "summary": "Luna found some peace, but Miki's full message stayed unsaid."
+    }
+  ]
+}

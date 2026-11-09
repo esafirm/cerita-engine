@@ -1,0 +1,18 @@
+{
+  "channels": [
+    {
+      "id": "thread_miki",
+      "name": "Unknown Number",
+      "avatar": "assets/story/sprites/miki_avatar.png",
+      "status": "last seen a long time ago",
+      "members": ["123bbb"]
+    },
+    {
+      "id": "thread_nora",
+      "name": "Nora",
+      "avatar": "assets/story/sprites/nora_avatar.png",
+      "status": "online",
+      "members": ["123aaa"]
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "conversation_id": "cvn_day1",
+  "chapter": "Day 1",
+  "title": "Wrong Number",
+  "checkpoint": true,
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_miki",
+    "day": 1,
+    "time": "23:45",
+    "music": "night_ambience.mp3"
+  },
+  "conversations": [
+    { "type": "NARRATION", "style": "timestamp", "text": "Day 1 — 11:45 PM" },
+    { "type": "NARRATION", "style": "system", "text": "Unknown number added you to contacts." },
+    {
+      "type": "TEXT",
+      "text": "hey... are you there?",
+      "profile": "123bbb:0",
+      "typing_delay_ms": 1200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": "please answer. it's about Luna.",
+      "profile": "123bbb:1",
+      "typing_delay_ms": 1600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": "How do you reply?",
+      "variable": "FIRST_REPLY",
+      "profile": "123bbb:0",
+      "timeout_ms": 10000,
+      "default_choice": 1,
+      "choices": [
+        {
+          "text": "Who is Luna? Tell me everything.",
+          "value": "curious",
+          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }]
+        },
+        {
+          "text": "Wrong number. Who is this?",
+          "value": "dismissive",
+          "effects": [{ "variable": "miki_trust", "op": "subtract", "value": 5 }]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "FIRST_REPLY == 'curious'",
+      "text": "thank you, {{NAME}}. nobody answers this number anymore.",
+      "profile": "123bbb:2",
+      "typing_delay_ms": 1400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FIRST_REPLY == 'curious'",
+      "text": "wait. how do you know my name??",
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FIRST_REPLY == 'dismissive'",
+      "text": "please don't block me. just look at this.",
+      "profile": "123bbb:1",
+      "typing_delay_ms": 1400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_luna_cafe.png",
+      "caption": "this is Luna. found it in her old drawer...",
+      "profile": "123bbb:0",
+      "unlock_id": "photo_luna_cafe",
+      "typing_delay_ms": 1500,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [{ "variable": "has_cafe_photo", "op": "set", "value": true }]
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "AUDIO",
+      "uri": "voice_miki_01.mp3",
+      "transcript": "If you're hearing this, please. Tell Luna I'm sorry. She'll know what it means. The café. Our table by the window.",
+      "profile": "123bbb:1",
+      "unlock_id": "voice_miki_01",
+      "typing_delay_ms": 1000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    { "type": "NARRATION", "style": "system", "text": "Miki is offline" },
+    {
+      "type": "WAIT",
+      "duration_ms": 3000,
+      "notification_text": "Miki sent you a new message!"
+    },
+    { "type": "NARRATION", "style": "timestamp", "text": "Day 1 — 11:58 PM" },
+    {
+      "type": "MEDIA",
+      "media_type": "VIDEO",
+      "uri": "clip_last_evening.mp4",
+      "caption": "the last evening i saw her",
+      "profile": "123bbb:0",
+      "unlock_id": "video_last_evening",
+      "typing_delay_ms": 1200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "condition": "miki_trust > 0",
+      "media_type": "IMAGE",
+      "uri": "photo_unsent_note.png",
+      "caption": "i never sent this.",
+      "profile": "123bbb:1",
+      "unlock_id": "photo_unsent_note",
+      "typing_delay_ms": 1200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": "What now?",
+      "variable": "PLAN",
+      "profile": "123bbb:0",
+      "choices": [
+        {
+          "text": "📞 Let me call you.",
+          "value": "call",
+          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }],
+          "target": "call_miki"
+        },
+        {
+          "text": "I'll find Luna tomorrow.",
+          "value": "meet",
+          "target": "day2"
+        },
+        {
+          "text": "Is that the café on 5th street? I know it.",
+          "value": "knows_cafe",
+          "condition": "curiosity >= 5 && miki_trust > 0",
+          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }],
+          "target": "day2"
+        }
+      ]
+    }
+  ]
+}

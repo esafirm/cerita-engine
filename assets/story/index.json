@@ -1,41 +1,78 @@
 {
   "conversation_id": "cvn_qxfOhN",
+  "chapter": "Prologue",
+  "title": "A Quiet Evening",
+  "checkpoint": true,
   "scene": {
+    "mode": "VN",
+    "day": 0,
+    "time": "21:00",
     "background": "bg_sitting_room.png",
     "music": "sunny.mp3"
   },
   "conversations": [
     {
+      "type": "NARRATION",
+      "text": "A quiet evening at Nora's place. Your phone has been buzzing all day, all from your old number."
+    },
+    {
       "type": "TEXT",
-      "text": "Hello, what is your name?",
-      "profile": "123aaa:0"
+      "text": "Hey! You're finally here.",
+      "profile": "123aaa:2",
+      "position": "center",
+      "voice": "vo_nora_01.mp3"
     },
     {
       "type": "INPUT",
-      "text": "What is your name?",
-      "variable": "NAME"
+      "text": "Nora squints at you. \"Remind me, what should I call you?\"",
+      "variable": "NAME",
+      "default_value": "Alex",
+      "profile": "123aaa:0"
     },
     {
       "type": "TEXT",
-      "text": "Nice to e-meet you {{NAME}} 🙏",
+      "text": "Nice to e-meet you {{NAME}} 🙏 ...kidding. Sit down.",
+      "profile": "123aaa:2",
+      "effects": [{ "variable": "met_nora", "op": "set", "value": true }]
+    },
+    {
+      "type": "TEXT",
+      "text": "So you got a new number, but someone keeps texting the old one?",
       "profile": "123aaa:0"
     },
     {
       "type": "CHOICE",
-      "text": "Blue pill or red pill?",
-      "variable": "PILL",
+      "text": "\"Are you going to check it?\"",
+      "variable": "CURIOSITY",
       "profile": "123aaa:0",
       "choices": [
         {
-          "text": "Blue of course.",
-          "value": "Blue",
-          "target": "qxfOhA"
+          "text": "Yeah, let me look.",
+          "value": "eager",
+          "effects": [{ "variable": "curiosity", "op": "add", "value": 5 }],
+          "target": "day1"
         },
         {
-          "text": "I like red",
-          "value": "Red"
+          "text": "Nah. Probably spam.",
+          "value": "wary"
         }
       ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "CURIOSITY == 'wary'",
+      "text": "Your phone is buzzing again. You should really look.",
+      "profile": "123aaa:1",
+      "voice": "vo_nora_02.mp3"
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 1500,
+      "notification_text": "New message from an unknown number"
+    },
+    {
+      "type": "BRANCH",
+      "fallback_target": "day1"
     }
   ]
 }

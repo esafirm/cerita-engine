@@ -1,12 +1,19 @@
+/// Parsed `<id>:<sprite_index>` profile reference. `player` refers to the player character.
 class ProfileInfo {
-  final String id;
-  final String sprite;
+  static const playerId = "player";
 
-  const ProfileInfo(this.id, this.sprite);
+  final String id;
+  final int spriteIndex;
+
+  const ProfileInfo(this.id, [this.spriteIndex = 0]);
 
   factory ProfileInfo.fromIdentifier(String identifier) {
     final items = identifier.split(":");
-    return ProfileInfo(items[0], items[1]);
+    return ProfileInfo(items[0], items.length > 1 ? int.tryParse(items[1]) ?? 0 : 0);
   }
-}
 
+  static ProfileInfo? parse(dynamic identifier) =>
+      identifier is String && identifier.isNotEmpty ? ProfileInfo.fromIdentifier(identifier) : null;
+
+  bool get isPlayer => id == playerId;
+}

@@ -1,0 +1,55 @@
+{
+  "conversation_id": "cvn_call_miki",
+  "chapter": "Day 1",
+  "title": "Midnight Call",
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_miki",
+    "day": 1,
+    "time": "23:59",
+    "background": "bg_sitting_room_night.png",
+    "music": "night_ambience.mp3"
+  },
+  "conversations": [
+    { "type": "NARRATION", "style": "system", "text": "Calling…", "sfx": "sfx_phone_ring.mp3" },
+    { "type": "WAIT", "duration_ms": 2400 },
+    { "type": "NARRATION", "style": "system", "text": "Connected" },
+    {
+      "type": "TEXT",
+      "text": "...you actually called. I didn't think anyone would.",
+      "profile": "123bbb:0",
+      "voice": "vo_miki_call_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": "Luna was my best friend. I never got to say sorry.",
+      "profile": "123bbb:1",
+      "voice": "vo_miki_call_02.mp3",
+      "effects": [{ "variable": "heard_story", "op": "set", "value": true }]
+    },
+    {
+      "type": "TEXT",
+      "text": "We met at that café in 2019. She still goes there every morning.",
+      "profile": "123bbb:0"
+    },
+    {
+      "type": "CHOICE",
+      "text": "Say something",
+      "profile": "123bbb:1",
+      "choices": [
+        {
+          "text": "I'll tell her for you.",
+          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }]
+        },
+        { "text": "Why can't you tell her yourself?" }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": "Because she can't hear me anymore. Tomorrow. The café. Please.",
+      "profile": "123bbb:2"
+    },
+    { "type": "NARRATION", "style": "system", "text": "Call ended · 00:42" },
+    { "type": "BRANCH", "fallback_target": "day2" }
+  ]
+}

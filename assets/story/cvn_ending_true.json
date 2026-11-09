@@ -1,0 +1,18 @@
+{
+  "conversation_id": "cvn_ending_true",
+  "chapter": "Ending",
+  "title": "Unsent Apology",
+  "scene": { "mode": "VN", "day": 2, "time": "10:02", "background": "bg_restaurant.png", "music": "sunny.mp3" },
+  "conversations": [
+    { "type": "TEXT", "text": "Tell her... thank you. I can go now.", "profile": "123bbb:2", "position": "center" },
+    { "type": "TEXT", "text": "It's warm in here all of a sudden. Is that strange?", "profile": "123ccc:2", "position": "right" },
+    { "type": "NARRATION", "text": "Your phone buzzes one last time. The unknown number is gone from your contacts." },
+    {
+      "type": "ENDING",
+      "ending_id": "end_01_true",
+      "title": "Ending 1: Unsent Apology",
+      "category": "TRUE",
+      "summary": "You delivered Miki's apology. Luna finally got to let her go."
+    }
+  ]
+}
