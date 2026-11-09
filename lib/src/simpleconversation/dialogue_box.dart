@@ -1,15 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import 'package:animated_text_kit/animated_text_kit.dart';
-
-import 'dart:developer' as developer;
 
 class DialogueBox extends StatelessWidget {
   final String _text;
 
-  const DialogueBox(this._text, {Key? key}) : super(key: key);
+  const DialogueBox(this._text, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +11,7 @@ class DialogueBox extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(160),
-        border: Border.all(color: Colors.blue, width: 2, style: BorderStyle.solid),
+        border: Border.all(color: Colors.blue, width: 2),
         borderRadius: const BorderRadius.all(Radius.circular(8)),
       ),
       child: Text(
@@ -27,3 +21,4 @@ class DialogueBox extends StatelessWidget {
     );
   }
 }
+

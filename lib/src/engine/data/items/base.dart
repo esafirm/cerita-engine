@@ -1,6 +1,8 @@
 import 'package:fsse/src/engine/data/items/profile_info.dart';
 
 abstract class ItemType {
+  const ItemType();
+
   String? getText();
 
   String getType();
@@ -9,3 +11,4 @@ abstract class ItemType {
 
   ItemType cloneWithData(Map<String, String> data);
 }
+

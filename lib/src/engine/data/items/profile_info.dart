@@ -1,10 +1,12 @@
 class ProfileInfo {
-  late String id;
-  late String sprite;
+  final String id;
+  final String sprite;
 
-  ProfileInfo.fromIdentifier(String identifier) {
+  const ProfileInfo(this.id, this.sprite);
+
+  factory ProfileInfo.fromIdentifier(String identifier) {
     final items = identifier.split(":");
-    id = items[0];
-    sprite = items[1];
+    return ProfileInfo(items[0], items[1]);
   }
 }
+

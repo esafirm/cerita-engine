@@ -5,27 +5,32 @@ import 'items/text.dart';
 import 'scene.dart';
 
 class Conversation {
-  late String conversationId;
-  late List<ItemType> conversations;
-  late Scene scene;
+  final String conversationId;
+  final List<ItemType> conversations;
+  final Scene scene;
 
-  Conversation.fromJson(Map<String, dynamic> json) {
-    conversationId = json["conversation_id"];
-    scene = Scene.fromJson(json["scene"]);
+  const Conversation({
+    required this.conversationId,
+    required this.conversations,
+    required this.scene,
+  });
 
-    List<dynamic> jsonConv = json["conversations"];
-    conversations = jsonConv.map((item) {
-      String type = item["type"];
-      switch (type) {
-        case ChoiceItemType.type:
-          return ChoiceItemType.fromJson(item);
-        case TextItemType.type:
-          return TextItemType.fromJson(item);
-        case InputItemType.type:
-          return InputItemType.fromJson(item);
-        default:
-          throw Exception("Can't handle $type in conversation");
-      }
-    }).toList();
+  factory Conversation.fromJson(Map<String, dynamic> json) {
+    final jsonConv = json["conversations"] as List<dynamic>;
+    return Conversation(
+      conversationId: json["conversation_id"] as String,
+      scene: Scene.fromJson(json["scene"] as Map<String, dynamic>),
+      conversations: jsonConv.map((raw) {
+        final item = raw as Map<String, dynamic>;
+        final type = item["type"] as String?;
+        return switch (type) {
+          ChoiceItemType.type => ChoiceItemType.fromJson(item),
+          TextItemType.type => TextItemType.fromJson(item),
+          InputItemType.type => InputItemType.fromJson(item),
+          _ => throw Exception("Can't handle $type in conversation"),
+        };
+      }).toList(),
+    );
   }
 }
+

@@ -1,24 +1,24 @@
-import 'base.dart';
-
-import 'package:fsse/src/engine/utils/var_replacer.dart';
 import 'package:fsse/src/engine/data/items/profile_info.dart';
+import 'package:fsse/src/engine/utils/var_replacer.dart';
+
+import 'base.dart';
 
 class InputItemType extends ItemType {
   static const type = "INPUT";
 
-  late String text, variable;
-  ProfileInfo? profile;
+  final String text;
+  final String variable;
+  final ProfileInfo? profile;
 
-  InputItemType(this.text, this.variable, this.profile);
+  const InputItemType(this.text, this.variable, this.profile);
 
-  InputItemType.fromJson(Map<String, dynamic> json) {
-    text = json["text"];
-    variable = json["variable"];
-
-    String? profileIdentifier = json["profile"];
-    if (profileIdentifier != null) {
-      profile = ProfileInfo.fromIdentifier(profileIdentifier);
-    }
+  factory InputItemType.fromJson(Map<String, dynamic> json) {
+    final profileIdentifier = json["profile"] as String?;
+    return InputItemType(
+      json["text"] as String,
+      json["variable"] as String,
+      profileIdentifier != null ? ProfileInfo.fromIdentifier(profileIdentifier) : null,
+    );
   }
 
   @override
@@ -35,3 +35,4 @@ class InputItemType extends ItemType {
     return InputItemType(text.replaceWithVars(data), variable, profile);
   }
 }
+

@@ -1,9 +1,10 @@
 class ItemResult {
-  String? variable;
-  String? value;
-  String? target;
+  final String? variable;
+  final String? value;
+  final String? target;
 
-  ItemResult.input(this.variable, this.value);
+  const ItemResult.input(this.variable, this.value) : target = null;
 
-  ItemResult.choice(this.variable, this.value, this.target);
+  const ItemResult.choice(this.variable, this.value, this.target);
 }
+

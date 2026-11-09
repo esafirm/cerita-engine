@@ -1,31 +1,27 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:fsse/src/engine/fsse_engine.dart';
-
 import 'dart:developer' as developer;
 
+import 'package:flutter/material.dart';
 import 'package:fsse/src/engine/data/item_result.dart';
 import 'package:fsse/src/engine/data/items/choice.dart';
 import 'package:fsse/src/engine/data/items/input.dart';
 import 'package:fsse/src/engine/data/scene.dart';
-
+import 'package:fsse/src/engine/fsse_engine.dart';
 import 'package:fsse/src/simpleconversation/audio_helper.dart';
 import 'package:fsse/src/simpleconversation/dialogue_box.dart';
 import 'package:fsse/src/simpleconversation/poi.dart';
 
 class SimpleConversation extends StatefulWidget {
-  const SimpleConversation({Key? key}) : super(key: key);
+  const SimpleConversation({super.key});
 
   @override
-  State<StatefulWidget> createState() => SimpleConversationState();
+  State<SimpleConversation> createState() => SimpleConversationState();
 }
 
 class SimpleConversationState extends State<SimpleConversation> implements EngineListener {
-  AudioHelper audioPlayer = AudioHelper();
-  LoaderConfig config = LoaderConfig(musicDir: "story/music");
+  final AudioHelper audioPlayer = AudioHelper();
+  final LoaderConfig config = const LoaderConfig(musicDir: "story/music");
 
-  late FsseEngine engine;
+  late final FsseEngine engine;
   String? currentText;
 
   String? profileImage;
@@ -43,8 +39,8 @@ class SimpleConversationState extends State<SimpleConversation> implements Engin
 
   @override
   void dispose() {
-    super.dispose();
     audioPlayer.removeObserver();
+    super.dispose();
   }
 
   @override
@@ -57,18 +53,6 @@ class SimpleConversationState extends State<SimpleConversation> implements Engin
     setState(() {
       backgroundImage = "${config.bgDir}/${scene.background}";
     });
-  }
-
-  Widget buildItem(BuildContext context, String label, Function() onPressed) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ElevatedButton(
-          child: Text(label),
-          onPressed: onPressed,
-        ),
-      ),
-    );
   }
 
   Future<ItemResult?> getItemResult() async {
@@ -85,37 +69,7 @@ class SimpleConversationState extends State<SimpleConversation> implements Engin
     return null;
   }
 
-  Widget buildButtons(BuildContext context) {
-    return Row(
-      children: [
-        buildItem(context, "Proceed", () async {
-          final itemResult = await getItemResult();
-          final nextItem = await engine.next(prevResult: itemResult);
-          final profile = engine.getProfile(nextItem);
-
-          developer.log("Prev result is $itemResult");
-          developer.log("Next item is $nextItem");
-
-          setState(() {
-            currentText = nextItem.getText();
-
-            if (profile != null) {
-              final spriteName = profile.getSprite(nextItem.getProfileInfo()!);
-              profileImage = "${config.spritesDir}/$spriteName";
-            }
-          });
-        }),
-        buildItem(context, "Print Data", () async {
-          final dataMap = engine.getDataMap();
-
-          developer.log("Inspecting data map: ${jsonEncode(dataMap)}");
-          developer.inspect(dataMap);
-        }),
-      ],
-    );
-  }
-
-  void proceedToNextItem() async {
+  Future<void> proceedToNextItem() async {
     final itemResult = await getItemResult();
     final nextItem = await engine.next(prevResult: itemResult);
     final profile = engine.getProfile(nextItem);
@@ -137,33 +91,33 @@ class SimpleConversationState extends State<SimpleConversation> implements Engin
   Widget build(BuildContext context) {
     final isPoiAvailable = backgroundImage != null || profileImage != null;
 
-    final children = [
-      Expanded(
-        child: InkWell(
-          onTap: proceedToNextItem,
-          child: Stack(
-            children: [
-              isPoiAvailable ? Poi(backgroundImage!, profileImage!) : const SizedBox.shrink(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: currentText != null ? DialogueBox(currentText!) : const SizedBox.shrink(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      )
-    ].whereType<Widget>().toList();
-
     return MaterialApp(
       theme: ThemeData(),
       home: Scaffold(
         body: Column(
-          children: children,
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: proceedToNextItem,
+                child: Stack(
+                  children: [
+                    if (isPoiAvailable) Poi(backgroundImage, profileImage),
+                    if (currentText != null)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: DialogueBox(currentText!),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+

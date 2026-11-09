@@ -1,33 +1,28 @@
 import 'package:fsse/src/engine/data/items/profile_info.dart';
+import 'package:fsse/src/engine/utils/var_replacer.dart';
 
 import 'base.dart';
-import 'package:fsse/src/engine/utils/var_replacer.dart';
 
 class ChoiceItemType extends ItemType {
   static const type = "CHOICE";
 
-  late String text;
-  String? variable;
-  ProfileInfo? profile;
+  final String text;
+  final String? variable;
+  final ProfileInfo? profile;
+  final List<Choice> choices;
 
-  late List<Choice> choices;
+  const ChoiceItemType(this.text, this.variable, this.profile, this.choices);
 
-  ChoiceItemType(this.text, this.variable, this.profile, this.choices);
+  factory ChoiceItemType.fromJson(Map<String, dynamic> json) {
+    final jsonChoices = json["choices"] as List<dynamic>;
+    final profileIdentifier = json["profile"] as String?;
 
-  ChoiceItemType.fromJson(Map<String, dynamic> json) {
-    text = json["text"];
-    variable = json["variable"];
-
-    List<dynamic> jsonChoices = json["choices"];
-
-    choices = jsonChoices.map((element) {
-      return Choice.fromJson(element);
-    }).toList();
-
-    String? profileIdentifier = json["profile"];
-    if (profileIdentifier != null) {
-      profile = ProfileInfo.fromIdentifier(profileIdentifier);
-    }
+    return ChoiceItemType(
+      json["text"] as String,
+      json["variable"] as String?,
+      profileIdentifier != null ? ProfileInfo.fromIdentifier(profileIdentifier) : null,
+      jsonChoices.map((e) => Choice.fromJson(e as Map<String, dynamic>)).toList(),
+    );
   }
 
   @override
@@ -48,15 +43,18 @@ class ChoiceItemType extends ItemType {
 }
 
 class Choice {
-  late String text;
-  String? value;
-  String? target;
+  final String text;
+  final String? value;
+  final String? target;
 
-  Choice(this.text, this.value, this.target);
+  const Choice(this.text, this.value, this.target);
 
-  Choice.fromJson(Map<String, dynamic> json) {
-    text = json["text"];
-    value = json["value"];
-    target = json["target"];
+  factory Choice.fromJson(Map<String, dynamic> json) {
+    return Choice(
+      json["text"] as String,
+      json["value"] as String?,
+      json["target"] as String?,
+    );
   }
 }
+

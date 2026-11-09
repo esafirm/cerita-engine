@@ -1,23 +1,25 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:fsse/src/engine/data/item_result.dart';
 import 'package:fsse/src/engine/data/profile.dart';
 
 import 'data/conversation.dart';
-import 'data/scene.dart';
 import 'data/items/base.dart';
-
-import 'package:flutter/services.dart' show rootBundle;
-
-import 'dart:developer' as developer;
+import 'data/scene.dart';
 
 class EnginePackage {
-  late Conversation conversation;
-  late ProfileData profiles;
+  final Conversation conversation;
+  final ProfileData profiles;
 
-  EnginePackage.fromJsonFiles(dynamic profiles, dynamic conversation) {
-    this.conversation = Conversation.fromJson(conversation);
-    this.profiles = ProfileData.fromJson(profiles);
+  const EnginePackage({required this.conversation, required this.profiles});
+
+  factory EnginePackage.fromJsonFiles(Map<String, dynamic> profiles, Map<String, dynamic> conversation) {
+    return EnginePackage(
+      conversation: Conversation.fromJson(conversation),
+      profiles: ProfileData.fromJson(profiles),
+    );
   }
 }
 
@@ -49,23 +51,24 @@ abstract class EngineListener {
 }
 
 class LoaderConfig {
-  late String storyDir;
-  late String musicDir;
-  late String spritesDir;
-  late String bgDir;
+  final String storyDir;
+  final String musicDir;
+  final String spritesDir;
+  final String bgDir;
 
-  LoaderConfig(
-      {this.storyDir = "assets/story",
-      this.musicDir = "assets/story/music",
-      this.spritesDir = "assets/story/sprites",
-      this.bgDir = "assets/story/bg"});
+  const LoaderConfig({
+    this.storyDir = "assets/story",
+    this.musicDir = "assets/story/music",
+    this.spritesDir = "assets/story/sprites",
+    this.bgDir = "assets/story/bg",
+  });
 }
 
 /* Impl */
 /* ------------------------------------------ */
 
 class AssetEngineLoader extends EngineLoader {
-  late LoaderConfig config;
+  final LoaderConfig config;
 
   static const String _prefixConversation = "cvn_";
 
@@ -73,26 +76,29 @@ class AssetEngineLoader extends EngineLoader {
 
   @override
   Future<EnginePackage> initialLoad() async {
-    String profileString = await rootBundle.loadString("${config.storyDir}/profiles.json");
-    String conversationString = await rootBundle.loadString("${config.storyDir}/index.json");
+    final profileString = await rootBundle.loadString("${config.storyDir}/profiles.json");
+    final conversationString = await rootBundle.loadString("${config.storyDir}/index.json");
 
-    return EnginePackage.fromJsonFiles(jsonDecode(profileString), jsonDecode(conversationString));
+    return EnginePackage.fromJsonFiles(
+      jsonDecode(profileString) as Map<String, dynamic>,
+      jsonDecode(conversationString) as Map<String, dynamic>,
+    );
   }
 
   @override
   Future<Conversation> loadConversation(String conversationId) async {
-    String newConversation = await rootBundle.loadString("${config.storyDir}/$_prefixConversation$conversationId.json");
-    return Conversation.fromJson(jsonDecode(newConversation));
+    final newConversation = await rootBundle.loadString("${config.storyDir}/$_prefixConversation$conversationId.json");
+    return Conversation.fromJson(jsonDecode(newConversation) as Map<String, dynamic>);
   }
 }
 
 class RealFsseEngine extends FsseEngine {
   static const _tag = "FSSE";
 
-  late EngineLoader loader;
-  EngineListener? listener;
+  final EngineLoader loader;
+  final EngineListener? listener;
 
-  RealFsseEngine(this.loader);
+  RealFsseEngine(this.loader) : listener = null;
 
   RealFsseEngine.withListener(this.loader, this.listener);
 
@@ -101,14 +107,14 @@ class RealFsseEngine extends FsseEngine {
   Conversation? currentConversation;
   int dialogIndex = 0;
 
-  Map<String, String> dataMap = {};
+  final Map<String, String> dataMap = {};
 
   @override
   Future<ItemType> next({ItemResult? prevResult}) async {
     developer.log("Request next with index: $dialogIndex", name: _tag);
 
     await _loadPackageIfNeeded();
-    _handleResult(prevResult);
+    await _handleResult(prevResult);
 
     final result = await _getCurrentItemType();
     dialogIndex += 1;
@@ -131,11 +137,7 @@ class RealFsseEngine extends FsseEngine {
     if (info == null) {
       return null;
     }
-    try {
-      return profileData.profiles.firstWhere((element) => element.id == info.id);
-    } catch (e) {
-      return null;
-    }
+    return profileData.profiles.where((element) => element.id == info.id).firstOrNull;
   }
 
   Future<ItemType> _getCurrentItemType() {
@@ -152,7 +154,7 @@ class RealFsseEngine extends FsseEngine {
     return Future.value(newData);
   }
 
-  void _handleResult(ItemResult? itemResult) async {
+  Future<void> _handleResult(ItemResult? itemResult) async {
     if (itemResult == null) return;
 
     // Handle data map
@@ -160,7 +162,7 @@ class RealFsseEngine extends FsseEngine {
       if (itemResult.value == null) {
         throw Exception("Variable exits but value is null");
       }
-      dataMap[itemResult.variable!] = itemResult.value ?? "";
+      dataMap[itemResult.variable!] = itemResult.value!;
     }
 
     // Handle target
@@ -168,8 +170,6 @@ class RealFsseEngine extends FsseEngine {
     if (target != null) {
       final conversation = await loader.loadConversation(target);
       _onNewConversation(conversation);
-
-      // Change with thread-safe operation
       dialogIndex = 0;
     }
   }
@@ -178,10 +178,9 @@ class RealFsseEngine extends FsseEngine {
     if (currentConversation == null) {
       final package = await loader.initialLoad();
       profileData = package.profiles;
-      final conversation = package.conversation;
-      _onNewConversation(conversation);
+      _onNewConversation(package.conversation);
 
-      developer.log("Package loaded", name: "FSSE");
+      developer.log("Package loaded", name: _tag);
       return true;
     }
     return false;
@@ -194,3 +193,4 @@ class RealFsseEngine extends FsseEngine {
     listener?.onNewScene(conversation.scene);
   }
 }
+

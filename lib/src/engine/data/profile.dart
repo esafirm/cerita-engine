@@ -1,29 +1,39 @@
 import 'items/profile_info.dart';
 
 class ProfileData {
-  late List<Profile> profiles;
+  final List<Profile> profiles;
 
-  ProfileData.fromJson(Map<String, dynamic> json) {
-    profiles = json["profiles"].map<Profile>((item) {
-      return Profile.fromJson(item);
-    }).toList();
+  const ProfileData(this.profiles);
+
+  factory ProfileData.fromJson(Map<String, dynamic> json) {
+    final list = json["profiles"] as List<dynamic>;
+    return ProfileData(
+      list.map((item) => Profile.fromJson(item as Map<String, dynamic>)).toList(),
+    );
   }
 }
 
 class Profile {
-  late String id;
-  late String name;
-  late String avatar;
-  late List<String> sprites;
+  final String id;
+  final String name;
+  final String avatar;
+  final List<String> sprites;
 
-  Profile.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    name = json["name"];
-    avatar = json["avatar"];
+  const Profile({
+    required this.id,
+    required this.name,
+    required this.avatar,
+    required this.sprites,
+  });
 
-    sprites = json["sprites"].map<String>((item) {
-      return item.toString();
-    }).toList();
+  factory Profile.fromJson(Map<String, dynamic> json) {
+    final spritesList = json["sprites"] as List<dynamic>;
+    return Profile(
+      id: json["id"] as String,
+      name: json["name"] as String,
+      avatar: json["avatar"] as String,
+      sprites: spritesList.map((item) => item.toString()).toList(),
+    );
   }
 
   String getSprite(ProfileInfo info) {
@@ -31,3 +41,4 @@ class Profile {
     return sprites[index];
   }
 }
+

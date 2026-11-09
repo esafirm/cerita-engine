@@ -1,38 +1,34 @@
-import 'package:flutter/widgets.dart';
-
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/widgets.dart';
 
 /// Helper class to handle background music in the widget
 /// It automatically stop the last sound and it also
 /// react to [AppLifecycleState]
 class AudioHelper with WidgetsBindingObserver {
-  AudioCache audioCache = AudioCache();
-  AudioPlayer? audioPlayer;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   void addObserver() {
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   void removeObserver() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
+    _audioPlayer.dispose();
   }
 
-  void play(String audioFile) async {
-    await audioPlayer?.stop();
-    audioPlayer = await audioCache.loop(audioFile);
+  Future<void> play(String audioFile) async {
+    await _audioPlayer.stop();
+    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    await _audioPlayer.play(AssetSource(audioFile));
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _handleLifecycle(state);
-  }
-
-  void _handleLifecycle(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      audioPlayer?.resume();
-    }
-    if (state == AppLifecycleState.paused) {
-      audioPlayer?.pause();
+      _audioPlayer.resume();
+    } else if (state == AppLifecycleState.paused) {
+      _audioPlayer.pause();
     }
   }
 }
+
