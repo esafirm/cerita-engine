@@ -94,6 +94,28 @@ void main() {
     expect(engine.dataMap["miki_trust"], -10);
   });
 
+  test('prologue hub: the "once" question loops back and disappears, runs are counted across games', () async {
+    final storage = InMemoryStoryStorage();
+    final asked = <List<String>>[];
+    await _play(
+      storage: storage,
+      pick: (item) {
+        if (item.text == "\"Are you going to check it?\"") {
+          asked.add(item.choices.map((c) => c.text).toList());
+          return asked.length == 1 ? "Who had" : "Nah";
+        }
+        return "";
+      },
+    );
+    expect(asked, hasLength(2));
+    expect(asked[0], hasLength(3));
+    expect(asked[1], isNot(contains(startsWith("Who had"))));
+    expect((await storage.loadMeta()).persistent["runs"], 1);
+
+    final (_, replay) = await _play(storage: storage, pick: (_) => "");
+    expect(replay.state["persistent.runs"], 2);
+  });
+
   test('catalog lists every collectible, ending and checkpoint', () async {
     final catalog = await StoryCatalog.load(AssetEngineLoader(const LoaderConfig()));
     expect(catalog.media, hasLength(5));

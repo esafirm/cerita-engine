@@ -38,4 +38,13 @@ class Scene {
       time: json["time"] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "mode": mode.key,
+        "background": ?background,
+        "music": ?music,
+        "channel_id": ?channelId,
+        "day": ?day,
+        "time": ?time,
+      };
 }

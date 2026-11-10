@@ -5,9 +5,11 @@ import 'package:cerita_core/src/utils/var_replacer.dart';
 import 'branch.dart';
 import 'choice.dart';
 import 'ending.dart';
+import 'flow.dart';
 import 'input.dart';
 import 'media.dart';
 import 'narration.dart';
+import 'stage.dart';
 import 'text.dart';
 import 'wait.dart';
 
@@ -29,6 +31,11 @@ abstract class ItemType {
       BranchItemType.type => BranchItemType.fromJson(json),
       WaitItemType.type => WaitItemType.fromJson(json),
       EndingItemType.type => EndingItemType.fromJson(json),
+      JumpItemType.type => JumpItemType.fromJson(json),
+      CallItemType.type => CallItemType.fromJson(json),
+      ReturnItemType.type => ReturnItemType.fromJson(json),
+      SetItemType.type => SetItemType.fromJson(json),
+      StageItemType.type => StageItemType.fromJson(json),
       _ => throw Exception("Can't handle $type in conversation"),
     };
   }

@@ -18,7 +18,7 @@ enum StoryPhase {
   choice,
   input,
 
-  /// A WAIT item is running.
+  /// A WAIT item or a STAGE direction is running.
   waiting,
   ending,
 
@@ -70,9 +70,9 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// Banner text of the running WAIT item.
   String? notification;
 
-  /// VN sprite slots and the active speaker.
-  final Map<SpritePosition, ProfileInfo> stage = {};
-  String? speakerId;
+  /// The STAGE item being played, so the stage can use its transitions and camera cues.
+  /// Cleared by the next item.
+  StageItemType? direction;
 
   bool autoMode = false;
   bool skipMode = false;
@@ -88,6 +88,9 @@ class StoryController extends ChangeNotifier with EngineListener {
   Timer? _autoTimer;
 
   List<TranscriptEntry> get history => engine.history;
+
+  /// VN background, characters, music, weather and zoom.
+  StageState get stage => engine.stage;
 
   Map<String, dynamic> get dataMap => engine.dataMap;
 
@@ -108,6 +111,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> start({SaveSlot? save, Checkpoint? checkpoint}) async {
     audio.addObserver();
     await engine.start(save: save, checkpoint: checkpoint);
+    _playMusic();
 
     if (save == null) {
       await advance();
@@ -124,7 +128,6 @@ class StoryController extends ChangeNotifier with EngineListener {
     } else {
       current = item;
       currentProfile = engine.getProfile(item);
-      _updateStage(item);
       phase = item is EndingItemType ? StoryPhase.ending : StoryPhase.showing;
       _notify();
       _scheduleAutoAdvance();
@@ -186,8 +189,12 @@ class StoryController extends ChangeNotifier with EngineListener {
 
     if (phase != StoryPhase.typing) await engine.saveTo(SaveSlot.autoSlotId);
     if (phase == StoryPhase.waiting) {
-      final wait = current as WaitItemType;
-      await Future.delayed(Duration(milliseconds: skipMode ? 200 : wait.durationMs));
+      final duration = switch (current) {
+        WaitItemType(:final durationMs) => skipMode ? 200 : durationMs,
+        StageItemType item => skipMode ? 0 : item.effectiveWaitMs,
+        _ => 0,
+      };
+      await Future.delayed(Duration(milliseconds: duration));
       if (_disposed) return;
       notification = null;
       phase = StoryPhase.showing;
@@ -228,37 +235,41 @@ class StoryController extends ChangeNotifier with EngineListener {
     await audio.stopVoice();
     if (item is TextItemType && item.voice != null && !skipMode) audio.playVoice(config.music(item.voice!));
 
+    direction = item is StageItemType ? item : null;
+    if (item is StageItemType) _playStageAudio(item);
+
     current = item;
     currentProfile = profile;
-    _updateStage(item);
     phase = switch (item) {
       ChoiceItemType() => StoryPhase.choice,
       InputItemType() => StoryPhase.input,
-      WaitItemType() => StoryPhase.waiting,
+      WaitItemType() || StageItemType() => StoryPhase.waiting,
       EndingItemType() => StoryPhase.ending,
       _ => StoryPhase.showing,
     };
     if (item is WaitItemType) notification = item.notificationText;
-    if (phase != StoryPhase.showing) {
+    // Stage directions keep Auto / Skip running. Anything else that is not a line stops them.
+    if (phase != StoryPhase.showing && item is! StageItemType) {
       autoMode = false;
       skipMode = false;
     }
     _notify();
   }
 
-  /// Places the speaker in its slot: the item's `position`, its current slot, or center.
-  void _updateStage(ItemType item) {
-    final info = item.getProfileInfo();
-    if (info == null || info.isPlayer) {
-      speakerId = null;
-      return;
+  void _playStageAudio(StageItemType item) {
+    for (final action in item.actions) {
+      switch (action) {
+        case MusicAction():
+          _playMusic();
+        case SoundAction(:final file) when !skipMode:
+          audio.playSfx(config.music(file));
+        default:
+          break;
+      }
     }
-    final existing = stage.entries.where((entry) => entry.value.id == info.id).firstOrNull?.key;
-    final position = (item is TextItemType ? item.position : null) ?? existing ?? SpritePosition.center;
-    if (existing != null) stage.remove(existing);
-    stage[position] = info;
-    speakerId = info.id;
   }
+
+  void _playMusic() => audio.playBgm(stage.music == null ? null : config.music(stage.music!));
 
   /// Pauses chat pacing, e.g. while a chapter card covers the thread.
   void holdPacing(bool held) {
@@ -290,10 +301,8 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   @override
   void onNewScene(Scene scene) {
-    final sceneChanged = scene.background != this.scene.background || scene.mode != this.scene.mode;
     this.scene = scene;
-    if (sceneChanged) stage.clear();
-    audio.playBgm(scene.music == null ? null : config.music(scene.music!));
+    _playMusic();
     // No notify: the new scene is shown together with its first item in [_present]. Showing it now
     // would build the incoming scene around the previous scene's item.
   }

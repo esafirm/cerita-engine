@@ -9,15 +9,25 @@ class GlobalMetaState {
   /// `<conversation_key>#<index>` of every line ever delivered. Powers VN "Skip".
   final Set<String> seenItems;
 
+  /// `<conversation_key>#<index>#<choice_index>` of every choice ever picked.
+  final Set<String> chosenChoices;
+
+  /// `persistent.*` variables, stored without the prefix.
+  final Map<String, dynamic> persistent;
+
   GlobalMetaState({
     Set<String>? unlockedMediaIds,
     Set<String>? unlockedEndingIds,
     Map<String, Checkpoint>? unlockedCheckpoints,
     Set<String>? seenItems,
+    Set<String>? chosenChoices,
+    Map<String, dynamic>? persistent,
   })  : unlockedMediaIds = unlockedMediaIds ?? {},
         unlockedEndingIds = unlockedEndingIds ?? {},
         unlockedCheckpoints = unlockedCheckpoints ?? {},
-        seenItems = seenItems ?? {};
+        seenItems = seenItems ?? {},
+        chosenChoices = chosenChoices ?? {},
+        persistent = persistent ?? {};
 
   factory GlobalMetaState.fromJson(Map<String, dynamic> json) {
     Set<String> stringSet(String key) => (json[key] as List<dynamic>? ?? const []).map((e) => e.toString()).toSet();
@@ -26,6 +36,8 @@ class GlobalMetaState {
       unlockedMediaIds: stringSet("unlocked_media_ids"),
       unlockedEndingIds: stringSet("unlocked_ending_ids"),
       seenItems: stringSet("seen_items"),
+      chosenChoices: stringSet("chosen_choices"),
+      persistent: Map<String, dynamic>.from(json["persistent"] as Map? ?? const {}),
       unlockedCheckpoints: checkpoints.map(
         (key, value) => MapEntry(key, Checkpoint.fromJson(Map<String, dynamic>.from(value as Map))),
       ),
@@ -36,6 +48,8 @@ class GlobalMetaState {
         "unlocked_media_ids": unlockedMediaIds.toList(),
         "unlocked_ending_ids": unlockedEndingIds.toList(),
         "seen_items": seenItems.toList(),
+        "chosen_choices": chosenChoices.toList(),
+        "persistent": persistent,
         "unlocked_checkpoints": unlockedCheckpoints.map((key, value) => MapEntry(key, value.toJson())),
       };
 }

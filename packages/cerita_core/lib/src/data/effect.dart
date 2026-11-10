@@ -1,16 +1,22 @@
+import '../utils/condition_evaluator.dart';
+
 /// A state mutation applied to the engine data map.
 class Effect {
   final String variable;
   final EffectOp op;
   final dynamic value;
 
-  const Effect(this.variable, this.op, [this.value]);
+  /// Expression evaluated when the effect runs. Its result replaces [value].
+  final String? expr;
+
+  const Effect(this.variable, this.op, [this.value, this.expr]);
 
   factory Effect.fromJson(Map<String, dynamic> json) {
     return Effect(
       json["variable"] as String,
       EffectOp.fromName(json["op"] as String? ?? "set"),
       json["value"],
+      json["expr"] as String?,
     );
   }
 
@@ -19,7 +25,8 @@ class Effect {
     return json.map((e) => Effect.fromJson(Map<String, dynamic>.from(e as Map))).toList();
   }
 
-  void apply(Map<String, dynamic> dataMap) {
+  void apply(Map<String, dynamic> dataMap, [ConditionEvaluator evaluator = const ConditionEvaluator()]) {
+    final value = expr == null ? this.value : evaluator.value(expr!, dataMap);
     switch (op) {
       case EffectOp.set:
         dataMap[variable] = value;

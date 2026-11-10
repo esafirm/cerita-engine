@@ -9,11 +9,14 @@ See [`specs/`](specs/README.md) for the full specification.
 
 | Capability | Where |
 | :--- | :--- |
-| VN stage (backgrounds, 3 sprite slots, typewriter, CG) | Prologue, Day 2, VN endings |
+| VN stage (backgrounds, 5 sprite slots, typewriter, CG) | Prologue, Day 2, VN endings |
+| `STAGE` direction (show / hide / move, transitions, shake, flash, zoom, weather, music) | Prologue, Day 2, true ending |
 | Messenger (typing, system pills, photo / voice note / video) | Day 1, chat endings |
 | Call mode | Day 1 → "Let me call you" |
 | `TEXT` `NARRATION` `MEDIA` `CHOICE` `INPUT` `BRANCH` `WAIT` `ENDING` | All chapters |
-| Conditions, effects, `{{VAR}}` interpolation | Choices, Day 2 ending router |
+| Labels, `JUMP`, `CALL` / `RETURN`, `SET`, `once` choices | Prologue question hub, shared phone buzz |
+| Conditions, effects, expressions (`random()`, arithmetic), `{{VAR}}` interpolation | Choices, Day 2 greeting and ending router |
+| `persistent.*` variables | Prologue run counter |
 | Autosave, save slots, gallery, endings, chapter checkpoints | Title screen and in-game menu |
 
 The title screen's **Features** page lists each feature and where to see it.

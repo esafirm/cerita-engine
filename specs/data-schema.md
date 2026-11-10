@@ -97,12 +97,14 @@ Each conversation file represents a scene, chat session, or story chapter.
 | `day` | `int` | No | In-game day number (e.g., `1` to `7`). |
 | `time` | `String` | No | In-game timestamp displayed in UI headers (e.g., `"23:45"`). |
 
+A conversation **without** a `scene` object continues the current scene and stage. Use it for shared `CALL` subroutines that should not reset the background or characters.
+
 ---
 
 ## 4. Conversation Item Types (`conversations`)
 
 Every element in `conversations` shares common optional metadata:
-- `id` (`String?`): Optional unique step ID within the conversation.
+- `id` (`String?`): Optional unique step ID within the conversation. It doubles as a **label** that `target` fields can jump to (see [Targets](#5-targets--labels)).
 - `condition` (`String?`): Boolean expression evaluated against `dataMap`. If `false`, the engine skips this item.
 - `effects` (`List<Effect>?`): State mutations applied when this item is executed.
 
@@ -120,7 +122,7 @@ Displays a character line in the VN dialogue box or a message bubble in Chat mod
   "voice": "vo_nora_01.mp3"
 }
 ```
-- `position` (`"left"` \| `"center"` \| `"right"`): Sprite slot in VN mode.
+- `position` (`"far_left"` \| `"left"` \| `"center"` \| `"right"` \| `"far_right"`): Sprite slot in VN mode. Defaults to the speaker's current slot, or `"center"`.
 - `typing_delay_ms` (`int?`): Simulated `"is typing..."` duration in Chat mode before the bubble appears.
 
 ### 4.2 `NARRATION` — Third-Person Narration or System Event
@@ -183,10 +185,17 @@ Presents interactive options to the player. Choices can mutate state variables, 
       "text": "[Show Luna's Photo] Is this her?",
       "condition": "has_cafe_photo == true",
       "target": "secret_route"
+    },
+    {
+      "text": "Ask about the photo again",
+      "once": true,
+      "target": "#ask_photo"
     }
   ]
 }
 ```
+- `once` (`bool`, default `false`): The choice disappears for the rest of the playthrough after it is picked, for "ask everything" hub menus that loop back on themselves. A `CHOICE` left with no visible options is skipped.
+- Choices picked in any earlier playthrough are flagged `chosen` so the UI can mark them.
 
 ### 4.5 `INPUT` — Free-Text Player Input
 Prompts the player to enter custom text (e.g., player name, passcodes, or puzzle answers) and stores it in `dataMap[variable]`.
@@ -238,3 +247,79 @@ Marks the conclusion of a narrative route, recording the unlocked ending in the 
 }
 ```
 - `category`: `"TRUE"` \| `"GOOD"` \| `"NORMAL"` \| `"BAD"` \| `"SECRET"`.
+
+### 4.9 `JUMP` — Unconditional Jump
+Silently continues at `target`. Item `effects` are applied first.
+
+```json
+{ "type": "JUMP", "target": "#hub" }
+```
+
+### 4.10 `CALL` / `RETURN` — Subroutines
+`CALL` jumps to `target` and remembers the item after it. `RETURN` (or running out of items in the called conversation) goes back there. Calls nest. The call stack is saved with the playthrough.
+
+```json
+{ "type": "CALL", "target": "shared#phone_rings" }
+{ "type": "RETURN" }
+```
+
+### 4.11 `SET` — Silent State Change
+Applies its `effects` without showing anything.
+
+```json
+{
+  "type": "SET",
+  "effects": [
+    { "variable": "coin", "op": "set", "expr": "random(0, 1)" },
+    { "variable": "persistent.runs", "op": "add", "value": 1 }
+  ]
+}
+```
+
+### 4.12 `STAGE` — Stage Direction (VN)
+Runs a list of `actions` on the VN stage at once, then continues by itself once the longest action is done (`wait_ms` overrides that, `0` continues immediately). The dialogue box is hidden meanwhile.
+
+```json
+{
+  "type": "STAGE",
+  "actions": [
+    { "action": "background", "image": "bg_rooftop.png", "transition": "fade_black", "duration_ms": 1200 },
+    { "action": "show", "profile": "123aaa:2", "position": "left", "transition": "slide_left" },
+    { "action": "move", "profile": "123bbb", "position": "far_right", "duration_ms": 600 },
+    { "action": "weather", "name": "sakura" },
+    { "action": "shake", "intensity": 8, "duration_ms": 400 }
+  ]
+}
+```
+
+| `action` | Fields | Effect |
+| :--- | :--- | :--- |
+| `show` | `profile` (`<id>:<sprite>`), `position`?, `transition`? | Shows a character, or changes its expression / slot. |
+| `hide` | `profile` (`<id>`), `transition`? | Removes a character. |
+| `clear` | `transition`? | Removes every character. |
+| `move` | `profile` (`<id>`), `position` | Slides a character to another slot. |
+| `background` | `image` (null for black), `transition`? | Changes the background without starting a new conversation. |
+| `music` | `file` (null stops) | Changes the looping BGM. |
+| `sound` | `file` | Plays a one-shot sound effect. |
+| `weather` | `name`: `"rain"` \| `"snow"` \| `"sakura"` \| null | Particle layer over the stage. Null clears it. |
+| `shake` | `intensity` (px, default `10`) | Shakes the stage. |
+| `flash` | `color` (`"#RRGGBB"`, default white) | Flashes the screen. |
+| `zoom` | `scale` (default `1`), `focus` (a `position`, default `"center"`) | Zooms the camera. Stays until the next `zoom` or a new background. |
+
+Every action takes an optional `duration_ms`. `transition` is one of `"fade"` (default), `"dissolve"`, `"fade_black"` (backgrounds), `"slide_left"`, `"slide_right"`, `"slide_up"`, `"zoom"`, `"wipe_left"`, `"wipe_right"` or `"none"`.
+
+The stage (background, characters, music, weather, zoom) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene.
+
+---
+
+## 5. Targets & Labels
+
+Every `target` field (`CHOICE`, `BRANCH`, `JUMP`, `CALL`) accepts:
+
+| Form | Meaning |
+| :--- | :--- |
+| `"day2"` | Start of `cvn_day2.json` (`"index"` is `index.json`). |
+| `"#hub"` | The item with `"id": "hub"` in the current conversation. |
+| `"day2#hub"` | The item with `"id": "hub"` in `cvn_day2.json`. |
+
+A jump into the middle of a conversation does not unlock its checkpoint.

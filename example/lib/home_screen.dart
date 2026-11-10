@@ -68,11 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
           subtitle: "A Cerita Engine demo",
           art: Poi(
             background: config.bg("bg_sitting_room_night.png"),
-            sprites: {
-              SpritePosition.left: config.sprite("nora_smile.png"),
-              SpritePosition.center: config.sprite("miki_open.png"),
-              SpritePosition.right: config.sprite("luna_smile.png"),
-            },
+            actors: [
+              PoiActor(id: "nora", sprite: config.sprite("nora_smile.png"), position: SpritePosition.left),
+              PoiActor(id: "miki", sprite: config.sprite("miki_open.png"), position: SpritePosition.center),
+              PoiActor(id: "luna", sprite: config.sprite("luna_smile.png"), position: SpritePosition.right),
+            ],
           ),
           primary: [
             if (save != null)

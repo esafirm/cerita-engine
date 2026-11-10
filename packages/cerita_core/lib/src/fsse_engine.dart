@@ -7,14 +7,21 @@ import 'data/items/base.dart';
 import 'data/items/branch.dart';
 import 'data/items/choice.dart';
 import 'data/items/ending.dart';
+import 'data/items/flow.dart';
 import 'data/items/input.dart';
 import 'data/items/media.dart';
+import 'data/items/narration.dart';
+import 'data/items/stage.dart';
+import 'data/items/text.dart';
 import 'data/items/profile_info.dart';
 import 'data/profile.dart';
+import 'data/effect.dart';
 import 'data/scene.dart';
 import 'loader.dart';
 import 'state/meta_state.dart';
 import 'state/save_slot.dart';
+import 'state/stage_state.dart';
+import 'state/story_state.dart';
 import 'state/story_storage.dart';
 import 'state/transcript.dart';
 import 'utils/condition_evaluator.dart';
@@ -84,8 +91,21 @@ class RealFsseEngine extends FsseEngine {
   Conversation? currentConversation;
   int dialogIndex = 0;
 
+  /// Scene of [currentConversation], or the one it continues when it has no `scene`.
+  Scene? _scene;
+
+  /// Playthrough variables. Expressions see them through [state], together with `persistent.*`.
   final Map<String, dynamic> dataMap = {};
+  late final StoryState state = StoryState(dataMap, () => meta.persistent);
+
+  /// The VN stage. Saved with the playthrough.
+  StageState stage = StageState();
+
   final List<TranscriptEntry> _history = [];
+  final List<CallFrame> _callStack = [];
+
+  /// `once` choices picked in this playthrough.
+  final Set<String> _chosen = {};
 
   /// Whether the last item returned by [next] had been delivered in an earlier playthrough.
   bool lastItemPreviouslySeen = false;
@@ -93,11 +113,15 @@ class RealFsseEngine extends FsseEngine {
   /// True while the last returned item is a CHOICE / INPUT waiting for its [ItemResult].
   bool _awaitingResult = false;
 
+  /// `<conversation_key>#<index>` of the last returned item.
+  String? _lastItemKey;
+
+  bool _metaDirty = false;
   bool _started = false;
 
   List<TranscriptEntry> get history => List.unmodifiable(_history);
 
-  Scene? get currentScene => currentConversation?.scene;
+  Scene? get currentScene => _scene;
 
   /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
   Future<void> start({SaveSlot? save, Checkpoint? checkpoint}) async {
@@ -108,13 +132,25 @@ class RealFsseEngine extends FsseEngine {
 
     dataMap.clear();
     _history.clear();
+    _callStack.clear();
+    _chosen.clear();
+    stage = StageState();
+    currentConversation = null;
+    _scene = null;
     _awaitingResult = false;
     _started = true;
 
     if (save != null) {
       dataMap.addAll(save.dataMap);
       _history.addAll(save.history);
-      await _enterConversation(await loader.loadConversation(save.conversationKey), index: save.dialogIndex);
+      _callStack.addAll(save.callStack);
+      _chosen.addAll(save.chosen);
+      _scene = save.scene;
+      final conversation = await loader.loadConversation(save.conversationKey);
+      await _enterConversation(conversation, index: save.dialogIndex);
+      // A conversation without a scene kept the saved one, but the listener has not seen it yet.
+      if (!conversation.hasScene && _scene != null) listener?.onNewScene(_scene!);
+      if (save.stage != null) stage = _copyStage(save.stage!);
     } else if (checkpoint != null) {
       dataMap.addAll(checkpoint.dataMap);
       await _enterConversation(await loader.loadConversation(checkpoint.conversationKey));
@@ -132,14 +168,18 @@ class RealFsseEngine extends FsseEngine {
     await _handleResult(prevResult);
 
     final item = await _resolveCurrentItem();
-    return _execute(item);
+    final executed = await _execute(item);
+    await _flushMeta();
+    return executed;
   }
 
   @override
   Future<ItemType> get() async {
     developer.log("Request get with index: $dialogIndex", name: _tag);
     await _ensureStarted();
-    return _prepare(await _resolveCurrentItem());
+    final item = _prepare(await _resolveCurrentItem());
+    await _flushMeta();
+    return item;
   }
 
   @override
@@ -160,7 +200,7 @@ class RealFsseEngine extends FsseEngine {
 
   Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull;
 
-  bool evaluate(String? condition) => evaluator.evaluate(condition, dataMap);
+  bool evaluate(String? condition) => evaluator.evaluate(condition, state);
 
   /// Current playthrough state. A pending CHOICE / INPUT is rewound so it is asked again on restore.
   SaveSlot snapshot({int slotId = SaveSlot.autoSlotId}) {
@@ -178,6 +218,10 @@ class RealFsseEngine extends FsseEngine {
       dataMap: Map.of(dataMap),
       history: history,
       updatedAt: DateTime.now(),
+      callStack: _callStack.toList(),
+      chosen: _chosen.toSet(),
+      stage: _copyStage(stage),
+      scene: _scene,
       chapter: conversation.chapter,
       title: conversation.title,
     );
@@ -194,7 +238,23 @@ class RealFsseEngine extends FsseEngine {
     if (!_started) await start();
   }
 
-  /// Skips items whose condition fails and follows BRANCH routers.
+  StageState _copyStage(StageState stage) => StageState.fromJson(stage.toJson());
+
+  void _applyEffects(List<Effect> effects) {
+    for (final effect in effects) {
+      effect.apply(state, evaluator);
+    }
+  }
+
+  Future<void> _flushMeta() async {
+    if (!_metaDirty && !state.persistentDirty) return;
+    _metaDirty = false;
+    state.persistentDirty = false;
+    await storage?.saveMeta(meta);
+  }
+
+  /// Skips items whose condition fails or that have nothing to pick, and follows
+  /// BRANCH / JUMP / CALL / RETURN / SET.
   Future<ItemType> _resolveCurrentItem() async {
     for (var jumps = 0; jumps < _maxJumps;) {
       final conversation = currentConversation;
@@ -202,7 +262,10 @@ class RealFsseEngine extends FsseEngine {
         throw Exception("Empty conversation. Are you already load the assets?");
       }
       if (dialogIndex >= conversation.conversations.length) {
-        throw EndOfStoryException(conversation.key);
+        if (_callStack.isEmpty) throw EndOfStoryException(conversation.key);
+        await _return();
+        jumps++;
+        continue;
       }
 
       final item = conversation.conversations[dialogIndex];
@@ -211,46 +274,93 @@ class RealFsseEngine extends FsseEngine {
         continue;
       }
 
-      if (item is BranchItemType) {
-        final target =
-            item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
-        if (target == null) {
+      switch (item) {
+        case BranchItemType():
+          final target =
+              item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
+          if (target == null) {
+            dialogIndex += 1;
+          } else {
+            await _jump(target);
+            jumps++;
+          }
+          continue;
+        case FlowItemType():
+          _applyEffects(item.effects);
+          dialogIndex += 1;
+          switch (item) {
+            case JumpItemType(:final target):
+              await _jump(target);
+              jumps++;
+            case CallItemType(:final target):
+              _callStack.add(CallFrame(conversation.key, dialogIndex));
+              await _jump(target);
+              jumps++;
+            case ReturnItemType():
+              if (_callStack.isEmpty) throw EndOfStoryException(conversation.key);
+              await _return();
+              jumps++;
+          }
+          continue;
+        case ChoiceItemType() when (_prepare(item) as ChoiceItemType).availableChoices.isEmpty:
           dialogIndex += 1;
           continue;
-        }
-        await _enterConversation(await loader.loadConversation(target));
-        jumps++;
-        continue;
       }
       return item;
     }
-    throw Exception("Too many BRANCH jumps. Is there a loop in the story?");
+    throw Exception("Too many jumps. Is there a loop in the story?");
   }
 
+  /// Interpolates [item] and, for a CHOICE, hides picked `once` choices and flags locked / chosen ones.
+  /// Must be called while [dialogIndex] points at [item].
   ItemType _prepare(ItemType item) {
-    final cloned = item.cloneWithData(dataMap);
-    return cloned is ChoiceItemType ? cloned.withAvailability(evaluate) : cloned;
+    final cloned = item.cloneWithData(state);
+    if (cloned is! ChoiceItemType) return cloned;
+    final itemKey = "${currentConversation!.key}#$dialogIndex";
+    return cloned.withChoices([
+      for (final choice in cloned.choices)
+        if (!(choice.once && _chosen.contains("$itemKey#${choice.index}")))
+          choice.copyWith(
+            locked: !evaluate(choice.condition),
+            chosen: meta.chosenChoices.contains("$itemKey#${choice.index}"),
+          ),
+    ]);
   }
 
   Future<ItemType> _execute(ItemType item) async {
-    for (final effect in item.effects) {
-      effect.apply(dataMap);
-    }
+    _applyEffects(item.effects);
     final prepared = _prepare(item);
     final conversation = currentConversation!;
+    _lastItemKey = "${conversation.key}#$dialogIndex";
 
-    _history.add(TranscriptEntry(
-      conversationKey: conversation.key,
-      mode: conversation.scene.mode,
-      channelId: conversation.scene.channelId,
-      item: prepared.toJson(),
-    ));
-    lastItemPreviouslySeen = !meta.seenItems.add("${conversation.key}#$dialogIndex");
+    if (prepared is StageItemType) {
+      prepared.actions.forEach(stage.apply);
+    } else {
+      _placeSpeaker(prepared);
+      _history.add(TranscriptEntry(
+        conversationKey: conversation.key,
+        mode: _scene!.mode,
+        channelId: _scene!.channelId,
+        item: prepared.toJson(),
+      ));
+    }
+    lastItemPreviouslySeen = !meta.seenItems.add(_lastItemKey!);
     _awaitingResult = prepared is ChoiceItemType || prepared is InputItemType;
     dialogIndex += 1;
 
     await _registerUnlocks(prepared);
     return prepared;
+  }
+
+  /// Puts the speaking character on stage: at the item's `position`, its current slot, or center.
+  void _placeSpeaker(ItemType item) {
+    final info = item.getProfileInfo();
+    if (info == null || info.isPlayer || item is NarrationItemType) {
+      stage.speakerId = null;
+      return;
+    }
+    stage.place(info, item is TextItemType ? item.position : null);
+    stage.speakerId = info.id;
   }
 
   Future<void> _registerUnlocks(ItemType item) async {
@@ -273,14 +383,19 @@ class RealFsseEngine extends FsseEngine {
       if (itemResult.value == null) {
         throw Exception("Variable exits but value is null");
       }
-      dataMap[itemResult.variable!] = itemResult.value;
+      state[itemResult.variable!] = itemResult.value;
     }
 
-    for (final effect in itemResult.effects) {
-      effect.apply(dataMap);
+    final choiceIndex = itemResult.choiceIndex;
+    if (choiceIndex != null && _lastItemKey != null) {
+      final key = "$_lastItemKey#$choiceIndex";
+      _chosen.add(key);
+      if (meta.chosenChoices.add(key)) _metaDirty = true;
     }
 
-    final scene = currentConversation?.scene;
+    _applyEffects(itemResult.effects);
+
+    final scene = _scene;
     if (itemResult.text != null && scene != null) {
       _history.add(TranscriptEntry(
         conversationKey: currentConversation!.key,
@@ -291,16 +406,48 @@ class RealFsseEngine extends FsseEngine {
     }
 
     final target = itemResult.target;
-    if (target != null) {
-      await _enterConversation(await loader.loadConversation(target));
+    if (target != null) await _jump(target);
+  }
+
+  /// Continues at [target]: `conv`, `#label` (current conversation) or `conv#label`.
+  Future<void> _jump(String target) async {
+    final hash = target.indexOf("#");
+    final key = hash < 0 ? target : target.substring(0, hash);
+    final label = hash < 0 ? null : target.substring(hash + 1);
+
+    final conversation = key.isEmpty ? currentConversation! : await loader.loadConversation(key);
+    var index = 0;
+    if (label != null) {
+      index = conversation.conversations.indexWhere((item) => item.id == label);
+      if (index < 0) throw Exception("No item with id '$label' in '${conversation.key}' (target '$target')");
+    }
+
+    if (key.isEmpty) {
+      dialogIndex = index;
+    } else {
+      await _enterConversation(conversation, index: index);
+    }
+  }
+
+  Future<void> _return() async {
+    final frame = _callStack.removeLast();
+    if (frame.conversationKey == currentConversation?.key) {
+      dialogIndex = frame.dialogIndex;
+    } else {
+      await _enterConversation(await loader.loadConversation(frame.conversationKey), index: frame.dialogIndex);
     }
   }
 
   /// Called after initial load and after a new conversation is loaded.
   Future<void> _enterConversation(Conversation conversation, {int index = 0}) async {
+    final previous = _scene;
     currentConversation = conversation;
     dialogIndex = index;
-    listener?.onNewScene(conversation.scene);
+    if (conversation.hasScene || previous == null) {
+      _scene = conversation.scene;
+      stage.enterScene(conversation.scene, previous: previous);
+      listener?.onNewScene(conversation.scene);
+    }
     listener?.onConversationStarted(conversation);
 
     if (conversation.checkpoint && index == 0) {
@@ -308,7 +455,7 @@ class RealFsseEngine extends FsseEngine {
         conversationKey: conversation.key,
         chapter: conversation.chapter,
         title: conversation.title,
-        day: conversation.scene.day,
+        day: _scene!.day,
         dataMap: Map.of(dataMap),
         unlockedAt: DateTime.now(),
       );

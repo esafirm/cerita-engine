@@ -11,9 +11,16 @@
     "music": "sunny.mp3"
   },
   "conversations": [
+    { "type": "SET", "effects": [{ "variable": "persistent.runs", "op": "add", "value": 1 }] },
     {
       "type": "NARRATION",
       "text": "A quiet evening at Nora's place. Your phone has been buzzing all day, all from your old number."
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        { "action": "show", "profile": "123aaa:2", "position": "center", "transition": "slide_up", "duration_ms": 700 }
+      ]
     },
     {
       "type": "TEXT",
@@ -37,11 +44,18 @@
     },
     {
       "type": "TEXT",
+      "condition": "persistent.runs > 1",
+      "text": "...Weird. I feel like we've done this before. Run number {{persistent.runs}}?",
+      "profile": "123aaa:1"
+    },
+    {
+      "type": "TEXT",
       "text": "So you got a new number, but someone keeps texting the old one?",
       "profile": "123aaa:0"
     },
     {
       "type": "CHOICE",
+      "id": "ask",
       "text": "\"Are you going to check it?\"",
       "variable": "CURIOSITY",
       "profile": "123aaa:0",
@@ -55,7 +69,22 @@
         {
           "text": "Nah. Probably spam.",
           "value": "wary"
+        },
+        {
+          "text": "Who had this number before you?",
+          "value": "asked",
+          "once": true,
+          "target": "#old_number"
         }
+      ]
+    },
+    {
+      "type": "STAGE",
+      "condition": "CURIOSITY == 'wary'",
+      "actions": [
+        { "action": "background", "image": "bg_sitting_room_night.png", "transition": "fade_black", "duration_ms": 1400 },
+        { "action": "music", "file": "night_ambience.mp3" },
+        { "action": "move", "profile": "123aaa", "position": "left", "duration_ms": 800 }
       ]
     },
     {
@@ -65,6 +94,7 @@
       "profile": "123aaa:1",
       "voice": "vo_nora_02.mp3"
     },
+    { "type": "CALL", "target": "shared#phone_buzz" },
     {
       "type": "WAIT",
       "duration_ms": 1500,
@@ -73,6 +103,15 @@
     {
       "type": "BRANCH",
       "fallback_target": "day1"
-    }
+    },
+    {
+      "type": "TEXT",
+      "id": "old_number",
+      "text": "No idea. The shop said it was \"recently freed up\". Creepy, right?",
+      "profile": "123aaa:1"
+    },
+    { "type": "CALL", "target": "shared#phone_buzz" },
+    { "type": "TEXT", "text": "...See? It's doing it again.", "profile": "123aaa:0" },
+    { "type": "JUMP", "target": "#ask" }
   ]
 }

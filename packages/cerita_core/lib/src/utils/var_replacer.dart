@@ -1,4 +1,4 @@
-final variablePattern = RegExp(r"{{([a-zA-Z0-9_]+)}}");
+final variablePattern = RegExp(r"{{([a-zA-Z0-9_.]+)}}");
 
 extension VariableReplacer on String {
   String replaceWithVars(Map<String, dynamic> dataMap) {

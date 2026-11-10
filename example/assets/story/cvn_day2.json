@@ -18,8 +18,10 @@
       "profile": "123aaa:0",
       "position": "left"
     },
+    { "type": "SET", "effects": [{ "variable": "greeting", "op": "set", "expr": "random(1, 2)" }] },
     {
       "type": "TEXT",
+      "condition": "greeting == 1",
       "text": "You must be the one Miki wrote about.",
       "profile": "123ccc:0",
       "position": "right",
@@ -27,9 +29,23 @@
     },
     {
       "type": "TEXT",
+      "condition": "greeting == 2",
+      "text": "You're the one Miki kept writing about, aren't you?",
+      "profile": "123ccc:0",
+      "position": "right",
+      "voice": "vo_luna_01.mp3"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        { "action": "flash", "color": "#E6E0FF", "duration_ms": 600 },
+        { "action": "show", "profile": "123bbb:1", "position": "far_right", "transition": "dissolve", "duration_ms": 900 }
+      ]
+    },
+    {
+      "type": "TEXT",
       "text": "(She can't see me. Please... tell her.)",
-      "profile": "123bbb:1",
-      "position": "center"
+      "profile": "123bbb:1"
     },
     {
       "type": "TEXT",
@@ -106,6 +122,12 @@
       "condition": "TOLD != 'silent' && !knows_passcode",
       "text": "No... that's not it. But thank you for coming.",
       "profile": "123ccc:1"
+    },
+    { "type": "SET", "effects": [{ "variable": "bond", "op": "set", "expr": "miki_trust + luna_affection" }] },
+    {
+      "type": "NARRATION",
+      "condition": "bond >= 25",
+      "text": "For a moment the café is very quiet, as if someone just let out a long breath."
     },
     {
       "type": "BRANCH",

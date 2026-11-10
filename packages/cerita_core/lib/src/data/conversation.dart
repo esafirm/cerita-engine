@@ -12,6 +12,10 @@ class Conversation {
   final String? title;
   final bool checkpoint;
   final Scene scene;
+
+  /// False when the JSON has no `scene`: the conversation continues the current scene and stage,
+  /// e.g. a `CALL` subroutine shared by several chapters.
+  final bool hasScene;
   final List<ItemType> conversations;
 
   const Conversation({
@@ -19,6 +23,7 @@ class Conversation {
     required this.conversationId,
     required this.conversations,
     this.scene = const Scene(),
+    this.hasScene = true,
     this.chapter,
     this.title,
     this.checkpoint = false,
@@ -33,6 +38,7 @@ class Conversation {
       title: json["title"] as String?,
       checkpoint: json["checkpoint"] as bool? ?? false,
       scene: Scene.fromJson(json["scene"] as Map<String, dynamic>?),
+      hasScene: json["scene"] != null,
       conversations: jsonConv.map((raw) => ItemType.fromJson(Map<String, dynamic>.from(raw as Map))).toList(),
     );
   }

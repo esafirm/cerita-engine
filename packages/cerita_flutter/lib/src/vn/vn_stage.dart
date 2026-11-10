@@ -40,20 +40,17 @@ class _VnStageState extends State<VnStage> {
     controller.advance();
   }
 
-  Map<SpritePosition, String> _sprites() {
-    final sprites = <SpritePosition, String>{};
-    controller.stage.forEach((position, info) {
-      final sprite = controller.profileById(info.id)?.getSprite(info);
-      if (sprite != null) sprites[position] = config.sprite(sprite);
-    });
-    return sprites;
-  }
+  List<PoiActor> _actors() => [
+        for (final MapEntry(key: position, value: info) in controller.stage.sprites.entries)
+          if (controller.profileById(info.id)?.getSprite(info) case final sprite?)
+            PoiActor(id: info.id, sprite: config.sprite(sprite), position: position),
+      ];
 
   @override
   Widget build(BuildContext context) {
     final item = controller.current;
     final scene = controller.scene;
-    final speakerSlot = controller.stage.entries.where((e) => e.value.id == controller.speakerId).firstOrNull?.key;
+    final stage = controller.stage;
 
     final (String? text, bool italic) = switch (item) {
       TextItemType(:final text) => (text, false),
@@ -73,9 +70,14 @@ class _VnStageState extends State<VnStage> {
         fit: StackFit.expand,
         children: [
           Poi(
-            background: scene.background == null ? null : config.bg(scene.background!),
-            sprites: _sprites(),
-            speaker: item is NarrationItemType ? null : speakerSlot,
+            background: stage.background == null ? null : config.bg(stage.background!),
+            actors: _actors(),
+            speakerId: item is NarrationItemType ? null : stage.speakerId,
+            direction: controller.direction,
+            zoom: stage.zoom,
+            zoomFocus: stage.zoomFocus,
+            weather: stage.weather,
+            instant: controller.skipMode,
           ),
           if (item is MediaItemType) _MediaOverlay(item: item, setup: widget.setup, controller: controller),
           if (text != null && item is! MediaItemType)

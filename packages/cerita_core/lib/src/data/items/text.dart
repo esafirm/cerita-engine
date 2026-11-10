@@ -1,14 +1,7 @@
 import 'package:cerita_core/src/data/items/profile_info.dart';
 
 import 'base.dart';
-
-enum SpritePosition {
-  left,
-  center,
-  right;
-
-  static SpritePosition? fromName(String? name) => values.where((e) => e.name == name).firstOrNull;
-}
+import 'sprite_position.dart';
 
 /// A spoken line in VN mode or a message bubble in chat mode.
 class TextItemType extends ItemType {

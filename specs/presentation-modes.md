@@ -39,9 +39,15 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Full-screen scene background (`scene.background`) with cross-fade transitions when changing scenes.
   - Full-screen overlay support for `MEDIA` items of type `"CG"`.
 - **Character Sprite Stage (`Poi`)**:
-  - Supports up to 3 simultaneous character slots (`left`, `center`, `right`).
+  - Supports up to 5 simultaneous character slots (`far_left`, `left`, `center`, `right`, `far_right`). The 3 inner slots keep their wide spacing until a `far_*` slot is used.
+  - Characters are tracked by profile id, so moving one to another slot slides it across instead of fading it out and in.
   - Active speaker is rendered at full opacity and slight scale-up; inactive sprites on stage are dimmed.
   - Smooth sprite swapping when a character changes expression (`123aaa:0` -> `123aaa:2`).
+- **Stage Direction (`STAGE` items)**:
+  - Character and background `transition`s: `fade`, `dissolve`, `fade_black`, `slide_*`, `zoom`, `wipe_*`, `none`. Without one, the skin's default transition is used.
+  - Camera: `shake` and `flash` play once; `zoom` scales the background and characters towards a slot.
+  - Weather: a particle layer (`rain`, `snow`, `sakura`) between the characters and the dialogue box.
+  - In Skip mode stage directions apply instantly.
 - **Dialogue Box (`DialogueBox`)**:
   - Positioned at the bottom of the screen.
   - Speaker nameplate badge showing `Profile.name`.

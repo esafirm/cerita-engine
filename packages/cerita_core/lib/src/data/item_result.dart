@@ -11,16 +11,21 @@ class ItemResult {
   /// Text shown as the player's outgoing message (chat transcript / backlog).
   final String? text;
 
-  const ItemResult({this.variable, this.value, this.effects = const [], this.target, this.text});
+  /// [Choice.index] of the picked choice.
+  final int? choiceIndex;
+
+  const ItemResult({this.variable, this.value, this.effects = const [], this.target, this.text, this.choiceIndex});
 
   const ItemResult.input(this.variable, String this.value)
       : effects = const [],
         target = null,
-        text = value;
+        text = value,
+        choiceIndex = null;
 
   ItemResult.choice(this.variable, Choice choice)
       : value = choice.value ?? choice.text,
         effects = choice.effects,
         target = choice.target,
-        text = choice.text;
+        text = choice.text,
+        choiceIndex = choice.index;
 }

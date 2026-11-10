@@ -1,18 +1,36 @@
-/// Evaluates boolean expressions such as `miki_trust >= 10 && PILL == 'Blue'`
+import 'dart:math';
+
+/// Evaluates expressions such as `miki_trust >= 10 && PILL == 'Blue'` or `(a + b) * 2`
 /// against the engine data map.
 ///
-/// Supports `==`, `!=`, `>`, `>=`, `<`, `<=`, `&&`, `||`, `!`, parentheses,
-/// numbers, `'single'`/`"double"` quoted strings, `true` and `false`.
+/// Supports `==`, `!=`, `>`, `>=`, `<`, `<=`, `&&`, `||`, `!`, `+`, `-`, `*`, `/`, `%`,
+/// parentheses, numbers, `'single'`/`"double"` quoted strings, `true`, `false` and the functions
+/// `random(min, max)`, `min`, `max`, `abs`, `floor`, `ceil` and `round`.
 /// Unset variables compare as `0` against numbers and `false` against booleans.
 class ConditionEvaluator {
-  const ConditionEvaluator();
+  static final _defaultRandom = Random();
 
+  final Random? _random;
+
+  const ConditionEvaluator([this._random]);
+
+  /// Evaluates [expression] as a condition. Empty or null expressions are true.
   bool evaluate(String? expression, Map<String, dynamic> dataMap) {
     if (expression == null || expression.trim().isEmpty) return true;
-    final parser = _Parser(_tokenize(expression), dataMap, expression);
+    return _truthy(_run(expression, dataMap));
+  }
+
+  /// Evaluates [expression] to its value. Unset variables evaluate to null.
+  dynamic value(String expression, Map<String, dynamic> dataMap) {
+    final result = _run(expression, dataMap);
+    return result is _Unset ? null : result;
+  }
+
+  dynamic _run(String expression, Map<String, dynamic> dataMap) {
+    final parser = _Parser(_tokenize(expression), dataMap, expression, _random ?? _defaultRandom);
     final result = parser.parseOr();
     parser.expectEnd();
-    return _truthy(result);
+    return result;
   }
 }
 
@@ -40,7 +58,7 @@ bool _truthy(dynamic value) => switch (value) {
       _ => true,
     };
 
-enum _TokenType { number, string, identifier, op, lParen, rParen }
+enum _TokenType { number, string, identifier, op, lParen, rParen, comma }
 
 class _Token {
   final _TokenType type;
@@ -49,7 +67,7 @@ class _Token {
   const _Token(this.type, this.text);
 }
 
-const _operators = ["==", "!=", ">=", "<=", "&&", "||", ">", "<", "!"];
+const _operators = ["==", "!=", ">=", "<=", "&&", "||", ">", "<", "!", "+", "-", "*", "/", "%"];
 
 List<_Token> _tokenize(String source) {
   final tokens = <_Token>[];
@@ -60,8 +78,15 @@ List<_Token> _tokenize(String source) {
       i++;
       continue;
     }
-    if (char == "(" || char == ")") {
-      tokens.add(_Token(char == "(" ? _TokenType.lParen : _TokenType.rParen, char));
+    if (char == "(" || char == ")" || char == ",") {
+      tokens.add(_Token(
+        switch (char) {
+          "(" => _TokenType.lParen,
+          ")" => _TokenType.rParen,
+          _ => _TokenType.comma,
+        },
+        char,
+      ));
       i++;
       continue;
     }
@@ -78,13 +103,13 @@ List<_Token> _tokenize(String source) {
       i += op.length;
       continue;
     }
-    final number = RegExp(r"-?\d+(\.\d+)?").matchAsPrefix(source, i);
+    final number = RegExp(r"\d+(\.\d+)?").matchAsPrefix(source, i);
     if (number != null) {
       tokens.add(_Token(_TokenType.number, number.group(0)!));
       i = number.end;
       continue;
     }
-    final identifier = RegExp(r"[a-zA-Z_][a-zA-Z0-9_]*").matchAsPrefix(source, i);
+    final identifier = RegExp(r"[a-zA-Z_][a-zA-Z0-9_.]*").matchAsPrefix(source, i);
     if (identifier != null) {
       tokens.add(_Token(_TokenType.identifier, identifier.group(0)!));
       i = identifier.end;
@@ -99,9 +124,10 @@ class _Parser {
   final List<_Token> tokens;
   final Map<String, dynamic> dataMap;
   final String source;
+  final Random random;
   int pos = 0;
 
-  _Parser(this.tokens, this.dataMap, this.source);
+  _Parser(this.tokens, this.dataMap, this.source, this.random);
 
   _Token? get _peek => pos < tokens.length ? tokens[pos] : null;
 
@@ -112,6 +138,11 @@ class _Parser {
       return true;
     }
     return false;
+  }
+
+  void _expect(_TokenType type, String what) {
+    if (_peek?.type != type) throw ConditionException("Missing '$what' in '$source'");
+    pos++;
   }
 
   void expectEnd() {
@@ -142,13 +173,51 @@ class _Parser {
   }
 
   dynamic parseComparison() {
-    final left = parsePrimary();
+    final left = parseAdditive();
     final token = _peek;
     if (token == null || token.type != _TokenType.op) return left;
     const comparators = {"==", "!=", ">", ">=", "<", "<="};
     if (!comparators.contains(token.text)) return left;
     pos++;
-    return _compare(left, token.text, parsePrimary());
+    return _compare(left, token.text, parseAdditive());
+  }
+
+  dynamic parseAdditive() {
+    var left = parseMultiplicative();
+    while (true) {
+      if (_matchOp("+")) {
+        final right = parseMultiplicative();
+        left = left is String || right is String
+            ? "${_display(left)}${_display(right)}"
+            : _number(left, "+") + _number(right, "+");
+      } else if (_matchOp("-")) {
+        left = _number(left, "-") - _number(parseMultiplicative(), "-");
+      } else {
+        return left;
+      }
+    }
+  }
+
+  dynamic parseMultiplicative() {
+    var left = parseUnary();
+    while (true) {
+      final token = _peek;
+      if (token == null || token.type != _TokenType.op || !{"*", "/", "%"}.contains(token.text)) return left;
+      pos++;
+      final a = _number(left, token.text);
+      final b = _number(parseUnary(), token.text);
+      left = switch (token.text) {
+        "*" => a * b,
+        "/" => b == 0 ? throw ConditionException("Division by zero in '$source'") : _whole(a / b),
+        _ => a % b,
+      };
+    }
+  }
+
+  dynamic parseUnary() {
+    if (_matchOp("-")) return -_number(parseUnary(), "-");
+    if (_matchOp("!")) return !_truthy(parseUnary());
+    return parsePrimary();
   }
 
   dynamic parsePrimary() {
@@ -163,16 +232,64 @@ class _Parser {
       case _TokenType.identifier:
         if (token.text == "true") return true;
         if (token.text == "false") return false;
+        if (_peek?.type == _TokenType.lParen) return _call(token.text);
         return dataMap.containsKey(token.text) ? dataMap[token.text] : _unset;
       case _TokenType.lParen:
         final value = parseOr();
-        if (_peek?.type != _TokenType.rParen) throw ConditionException("Missing ')' in '$source'");
-        pos++;
+        _expect(_TokenType.rParen, ")");
         return value;
       default:
         throw ConditionException("Unexpected '${token.text}' in '$source'");
     }
   }
+
+  dynamic _call(String name) {
+    _expect(_TokenType.lParen, "(");
+    final args = <num>[];
+    if (_peek?.type != _TokenType.rParen) {
+      args.add(_number(parseOr(), name));
+      while (_peek?.type == _TokenType.comma) {
+        pos++;
+        args.add(_number(parseOr(), name));
+      }
+    }
+    _expect(_TokenType.rParen, ")");
+
+    void arity(int count) {
+      if (args.length != count) throw ConditionException("$name() takes $count argument(s) in '$source'");
+    }
+
+    switch (name) {
+      case "random":
+        arity(2);
+        final low = args[0].floor(), high = args[1].floor();
+        if (high < low) throw ConditionException("random($low, $high) has an empty range in '$source'");
+        return low + random.nextInt(high - low + 1);
+      case "min" || "max":
+        if (args.isEmpty) throw ConditionException("$name() needs arguments in '$source'");
+        return args.reduce(name == "min" ? min : max);
+      case "abs":
+        arity(1);
+        return args[0].abs();
+      case "floor" || "ceil" || "round":
+        arity(1);
+        return switch (name) { "floor" => args[0].floor(), "ceil" => args[0].ceil(), _ => args[0].round() };
+      default:
+        throw ConditionException("Unknown function '$name' in '$source'");
+    }
+  }
+
+  /// Unset variables count as `0` in arithmetic.
+  num _number(dynamic value, String op) => switch (value) {
+        num n => n,
+        _Unset() || null => 0,
+        _ => throw ConditionException("Can't use '$value' with '$op' in '$source'"),
+      };
+
+  /// Keeps `4 / 2` an int, so it can be compared and shown as `2`.
+  num _whole(double value) => value == value.truncateToDouble() ? value.toInt() : value;
+
+  String _display(dynamic value) => value is _Unset || value == null ? "" : value.toString();
 
   bool _compare(dynamic left, String op, dynamic right) {
     left = _coerceUnset(left, right);

@@ -8,7 +8,7 @@ class CapabilitiesScreen extends StatelessWidget {
     (
       "Presentation modes",
       [
-        ("VN stage", "Prologue & Day 2: backgrounds, 3 sprite slots, speaker focus, typewriter, CG overlay."),
+        ("VN stage", "Prologue & Day 2: backgrounds, 5 sprite slots, speaker focus, typewriter, CG overlay."),
         ("Messenger", "Day 1: chat thread, typing indicator, system pills, photo / voice note / video bubbles."),
         ("Call", "Pick \"Let me call you\" on Day 1: caller card, call timer, voice-over captions."),
         ("Mode switching", "Prologue (VN) → Day 1 (Chat) → Call → Day 2 (VN) → Chat or VN endings."),
@@ -25,6 +25,19 @@ class CapabilitiesScreen extends StatelessWidget {
         ("BRANCH", "Prologue fallback route and the Day 2 ending router."),
         ("WAIT", "Real-time pause with an in-app notification banner."),
         ("ENDING", "Four endings: TRUE, GOOD, BAD and SECRET."),
+        ("JUMP & labels", "Prologue: \"Who had this number before you?\" jumps to #old_number and back to the #ask menu."),
+        ("CALL / RETURN", "The phone buzz is a shared subroutine in cvn_shared.json, called from the prologue."),
+        ("SET", "Silent state changes: run counter, a random greeting on Day 2, the Day 2 bond score."),
+      ],
+    ),
+    (
+      "Stage direction",
+      [
+        ("Show / hide / move", "Nora slides up in the prologue and walks left at night. Miki fades in beside Luna on Day 2."),
+        ("Background transitions", "Prologue: fade through black to night (pick \"Nah\")."),
+        ("Camera", "Shake when the phone buzzes, a lavender flash for Miki, a slow zoom in the true ending."),
+        ("Weather", "Sakura petals as Miki leaves in the true ending."),
+        ("Music & sound", "The night switches the music to the ambience track. Stage state is saved with the slot."),
       ],
     ),
     (
@@ -33,6 +46,9 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Conditions", "Item and choice conditions with ==, !=, >=, &&, ||, ! and unset defaults."),
         ("Effects", "set / add / subtract on miki_trust, luna_affection, flags. See Menu → Story variables."),
         ("Interpolation", "{{NAME}} in dialogue, choices and chat bubbles."),
+        ("Expressions", "Day 2: random(1, 2) picks Luna's greeting, bond = miki_trust + luna_affection."),
+        ("Persistent variables", "persistent.runs counts new games. Start a second one and Nora notices."),
+        ("Once choices", "The prologue question disappears after you ask it. Choices picked before get a check mark."),
       ],
     ),
     (

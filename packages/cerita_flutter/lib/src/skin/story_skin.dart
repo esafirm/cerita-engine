@@ -74,7 +74,7 @@ class StorySkin {
   }
 
   /// One option of a choice list. [index] is its position, handy for staggered entrances.
-  /// [onTap] is null for locked choices.
+  /// [onTap] is null for locked choices. [Choice.chosen] marks options picked in an earlier playthrough.
   Widget choiceButton(BuildContext context, Choice choice, int index, VoidCallback? onTap, {required bool dark}) {
     final scheme = Theme.of(context).colorScheme;
     final background = dark ? Colors.black.withAlpha(150) : scheme.surfaceContainerHighest;
@@ -102,6 +102,8 @@ class StorySkin {
                   style: TextStyle(color: choice.locked ? foreground.withAlpha(120) : foreground, fontSize: 15),
                 ),
               ),
+              // Picked in an earlier playthrough.
+              if (choice.chosen && !choice.locked) Icon(Icons.check, size: 18, color: foreground.withAlpha(150)),
             ],
           ),
         ),

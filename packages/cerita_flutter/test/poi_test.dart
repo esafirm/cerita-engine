@@ -1,0 +1,74 @@
+import 'package:cerita_flutter/cerita_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+
+PoiActor _actor(String id, SpritePosition position, [String sprite = "x.png"]) =>
+    PoiActor(id: id, sprite: sprite, position: position);
+
+StageItemType _direction(List<Map<String, dynamic>> actions) =>
+    StageItemType.fromJson({"type": "STAGE", "actions": actions});
+
+Alignment _alignmentOf(WidgetTester tester, String id) =>
+    tester.widget<AnimatedAlign>(find.byKey(ValueKey(id))).alignment as Alignment;
+
+void main() {
+  testWidgets('a moved character keeps its widget and slides to the new slot', (tester) async {
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.left)])));
+    final element = tester.element(find.byKey(const ValueKey("nora")));
+    expect(_alignmentOf(tester, "nora").x, -1.3);
+
+    await tester.pumpWidget(_wrap(Poi(
+      actors: [_actor("nora", SpritePosition.right)],
+      direction: _direction([{"action": "move", "profile": "nora", "position": "right", "duration_ms": 600}]),
+    )));
+    expect(tester.element(find.byKey(const ValueKey("nora"))), same(element));
+    expect(_alignmentOf(tester, "nora").x, 1.3);
+    expect(tester.widget<AnimatedAlign>(find.byKey(const ValueKey("nora"))).duration, const Duration(milliseconds: 600));
+  });
+
+  testWidgets('far slots switch to the five slot layout', (tester) async {
+    await tester.pumpWidget(_wrap(Poi(actors: [
+      _actor("nora", SpritePosition.left),
+      _actor("miki", SpritePosition.farRight),
+    ])));
+    expect(_alignmentOf(tester, "nora").x, -0.75);
+    expect(_alignmentOf(tester, "miki").x, 1.5);
+  });
+
+  testWidgets('a hidden character plays its exit transition, or leaves at once when instant', (tester) async {
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
+    await tester.pumpWidget(_wrap(Poi(
+      direction: _direction([{"action": "hide", "profile": "nora", "transition": "slide_left", "duration_ms": 800}]),
+    )));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey("nora")), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey("nora")), findsNothing);
+
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("miki", SpritePosition.center)])));
+    await tester.pumpWidget(_wrap(const Poi(instant: true)));
+    expect(find.byKey(const ValueKey("miki")), findsNothing);
+  });
+
+  testWidgets('weather, shake, flash and zoom render', (tester) async {
+    await tester.pumpWidget(_wrap(const Poi()));
+    await tester.pumpWidget(_wrap(Poi(
+      weather: "rain",
+      zoom: 1.3,
+      zoomFocus: SpritePosition.left,
+      direction: _direction([
+        {"action": "shake", "intensity": 8},
+        {"action": "flash", "color": "#FF0000"},
+        {"action": "weather", "name": "rain"},
+        {"action": "zoom", "scale": 1.3, "focus": "left"},
+      ]),
+    )));
+    expect(find.byType(WeatherLayer), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byWidgetPredicate((w) => w is ColoredBox && w.color.r == 1 && w.color.a > 0), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(tester.takeException(), isNull);
+  });
+}

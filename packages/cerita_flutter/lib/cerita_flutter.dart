@@ -26,4 +26,6 @@ export 'src/story_screen.dart';
 export 'src/story_setup.dart';
 export 'src/vn/dialogue_box.dart';
 export 'src/vn/poi.dart';
+export 'src/vn/stage_transitions.dart';
 export 'src/vn/vn_stage.dart';
+export 'src/vn/weather_layer.dart';
