@@ -150,7 +150,8 @@ Preferences live outside both scopes, so resetting progress keeps them. `StorySt
 | `text_ms_per_char` | `40` | Typewriter speed. `0` shows lines at once. |
 | `auto_delay_ms` | `1200` | Auto mode pause after a line, before the per-character reading time (which scales with it). |
 | `skip_unread` | `false` | Skip mode also fast-forwards lines never seen before. |
-| `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. |
+| `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. Ambience follows `sound_volume`. |
+| `voice_volumes` | `{}` | Per-character voice volume by profile id, `0.0` to `1.0`, on top of `voice_volume`. Missing characters play at `1.0`. |
 
 ---
 
@@ -162,11 +163,16 @@ The VN stage is engine state, so a loaded save looks the way it did when it was 
 | :--- | :--- |
 | `background` | The conversation `scene.background`, then `STAGE` `background` actions. |
 | `music` | The conversation `scene.music`, then `STAGE` `music` actions. |
+| `ambience` | The conversation `scene.ambience`, then `STAGE` `ambience` actions. |
+| `textbox` | `adv` or `nvl`: the conversation `scene.textbox`, then `STAGE` `textbox` actions. |
+| `page_start` | Transcript index where the current NVL page starts. Set when a conversation with a `scene` starts, when the text box switches to `nvl`, and by `STAGE` `page` actions. |
 | `sprites` | `position → <id>:<sprite>`. `STAGE` `show` / `hide` / `move` / `clear`, and the speaker of every `TEXT` / `CHOICE` (placed at its `position`, its current slot, or `center`). |
 | `speaker` | Profile id of the last speaking character. Narration clears it. |
 | `weather`, `zoom`, `zoom_focus` | `STAGE` `weather` and `zoom` actions. |
 
 Entering a conversation whose background or mode differs from the previous one clears the sprites, weather and zoom.
+
+The NVL page shows the VN transcript lines from `page_start` on (`TEXT`, `NARRATION`, `CHOICE` / `INPUT` prompts and the player's answers). Rollback and saves restore it with the rest of the stage.
 
 ---
 

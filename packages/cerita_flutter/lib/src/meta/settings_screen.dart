@@ -5,10 +5,18 @@ import '../player_prefs.dart';
 import '../vn/dialogue_box.dart';
 
 /// Text speed, auto-forward delay, skip and volumes. Changes are saved and applied right away.
+/// With a [loader], each character with voiced lines gets its own voice volume.
 class SettingsScreen extends StatefulWidget {
   final PlayerPrefs settings;
+  final EngineLoader? loader;
 
-  const SettingsScreen({super.key, required this.settings});
+  const SettingsScreen({super.key, required this.settings, this.loader});
+
+  /// Characters with voiced lines in the story of [loader].
+  static Future<List<Profile>> voicedCharacters(EngineLoader loader) async {
+    final (package, catalog) = (await loader.initialLoad(), await StoryCatalog.load(loader));
+    return [for (final id in catalog.voicedProfiles) ?package.profiles.byId(id)];
+  }
 
   /// Typewriter speeds, slowest first. 0 is instant.
   static const textSpeeds = [80, 60, 40, 25, 15, 0];
@@ -22,6 +30,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const _preview = "The phone buzzes again. This time, you read the message.";
 
   PlayerPrefs get prefs => widget.settings;
+
+  late final Future<List<Profile>> _voiced = switch (widget.loader) {
+    final loader? => SettingsScreen.voicedCharacters(loader).catchError((_) => <Profile>[]),
+    null => Future.value(const <Profile>[]),
+  };
 
   @override
   void initState() {
@@ -126,6 +139,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   (value) => settings.copyWith(soundVolume: value)),
               volume("Voice", Icons.record_voice_over_outlined, settings.voiceVolume,
                   (value) => settings.copyWith(voiceVolume: value)),
+              FutureBuilder(
+                future: _voiced,
+                builder: (context, snapshot) {
+                  final characters = snapshot.data ?? const <Profile>[];
+                  if (characters.isEmpty) return const SizedBox.shrink();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      header("Character voices"),
+                      for (final profile in characters)
+                        volume(profile.name, Icons.person_outline, settings.voiceVolumes[profile.id] ?? 1,
+                            (value) => settings.copyWith(voiceVolumes: {...settings.voiceVolumes, profile.id: value})),
+                    ],
+                  );
+                },
+              ),
             ],
           );
         },

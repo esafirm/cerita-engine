@@ -44,12 +44,17 @@
     },
     {
       "type": "TEXT",
-      "text": "(She can't see me. Please... tell her.)",
+      "text": "{color=#B9A8FF}(She can't see me.{w=500} Please...{w} {wave}tell her.{/wave}){/color}",
       "profile": "123bbb:1"
     },
     {
       "type": "TEXT",
-      "text": "{{NAME}}? Who are you staring at?",
+      "text": "{{NAME}}? Hello? Are you even list-{nw}",
+      "profile": "123aaa:1"
+    },
+    {
+      "type": "TEXT",
+      "text": "...{w=300}{b}Who{/b} are you staring at?",
       "profile": "123aaa:1"
     },
     {

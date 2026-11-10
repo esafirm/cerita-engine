@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../common/avatar.dart';
 import '../common/media_widgets.dart';
+import '../common/tagged_text.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
@@ -47,7 +48,9 @@ class MessageBubble extends StatelessWidget {
 
     final content = switch (item) {
       MediaItemType() => _MediaContent(item: item, setup: setup, controller: controller, textColor: textColor),
-      _ => Text(entry.playerText ?? item?.getText() ?? "", style: TextStyle(color: textColor, fontSize: 15)),
+      // Player answers are shown as typed.
+      _ when entry.isPlayer => Text(entry.playerText ?? "", style: TextStyle(color: textColor, fontSize: 15)),
+      _ => TaggedText(item?.getText() ?? "", style: TextStyle(color: textColor, fontSize: 15)),
     };
 
     final bubble = Container(
@@ -126,7 +129,7 @@ class _SystemPill extends StatelessWidget {
             color: timestamp ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(
+          child: TaggedText(
             item.text,
             textAlign: TextAlign.center,
             style: TextStyle(

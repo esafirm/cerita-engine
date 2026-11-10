@@ -432,7 +432,10 @@ class RealFsseEngine extends FsseEngine {
     _lastItemKey = "${conversation.key}#$dialogIndex";
 
     if (prepared is StageItemType) {
-      prepared.actions.forEach(stage.apply);
+      for (final action in prepared.actions) {
+        if (stage.startsPage(action)) stage.pageStart = _history.length;
+        stage.apply(action);
+      }
       _hearMusic();
     } else {
       _placeSpeaker(prepared);
@@ -549,6 +552,7 @@ class RealFsseEngine extends FsseEngine {
     if (conversation.hasScene || previous == null) {
       _scene = conversation.scene;
       stage.enterScene(conversation.scene, previous: previous);
+      stage.pageStart = _history.length;
       _hearMusic();
       listener?.onNewScene(conversation.scene);
     }

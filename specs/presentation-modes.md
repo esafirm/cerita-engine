@@ -51,12 +51,18 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 - **Dialogue Box (`DialogueBox`)**:
   - Positioned at the bottom of the screen.
   - Speaker nameplate badge showing `Profile.name`.
-  - Typewriter text animation (`animated_text_kit`) with tap-to-complete (first tap finishes the typewriter animation; second tap advances to `engine.next()`).
+  - Typewriter text animation with tap-to-complete (first tap finishes the typewriter animation; second tap advances to `engine.next()`).
+  - Text tags (data schema §6): styles, `{shake}` / `{wave}` letters, speed changes and pauses. At a `{w}` the box shows its "next" indicator, and a tap types the rest of the line. The text keeps its final layout while it types, so words don't jump between lines.
 - **Interactive Overlays**:
   - **`CHOICE` Modal**: Centered or bottom-anchored list of choice buttons over a dimmed stage; locked choices (failing `condition`) can either be hidden or shown disabled with a lock icon.
   - **`INPUT` Dialog**: Prompt modal with text field and confirmation button.
+- **NVL Page** (`textbox: "nvl"`):
+  - The lines of the current page fill a dimmed full-screen panel over the stage, newest at the bottom, older ones scrolling off the top. Characters stay visible behind the panel.
+  - Speaker lines start with the character's name. Narration is plain. The player's answers are shown too.
+  - Only the newest line types out. Choices and the input prompt appear over the page.
+  - `STAGE` `page` actions and new conversations start a new page.
 - **VN Quick Controls**:
-  - **Backlog / History**: View recently spoken lines. Lines that can be rolled back to have a rewind button.
+  - **Backlog / History**: View recently spoken lines. Lines that can be rolled back to have a rewind button, and voiced lines a button to play their voice again.
   - **Back**: Rolls back to the previous line (engine §7). A mouse wheel scroll up does the same. Rolled-back lines and stage changes show instantly.
   - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
   - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
@@ -66,13 +72,17 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 
 ## 3. Audio System (`AudioHelper`)
 
-- **Volumes**: Music, sound and voice volumes come from the player settings. Ducking lowers the music relative to its setting.
+- **Channels**: music, ambience, sound effects and voice. Music, sound and voice volumes come from the player settings, ambience follows the sound volume, and each character's voice can be turned down on its own. Ducking lowers the music relative to its setting.
 - **Background Music (BGM)**:
   - Loops `scene.music` via `AudioHelper`.
   - Avoids restarting the track if the new scene specifies the same `music` file already playing.
+  - A track change fades the old track out and the new one in (`fade_ms`, default 1 s). Stopping fades out too.
+- **Ambience**: Loops `scene.ambience` / `STAGE` `ambience` under the music, with the same fades and lifecycle.
   - Automatically pauses on `AppLifecycleState.paused` and resumes on `AppLifecycleState.resumed`.
 - **Sound Effects (SFX) & Voice Notes**:
   - Separate audio channel for one-shot UI/message sounds (`item.sfx`) and voice-overs/voice notes (`item.voice` or `MEDIA` audio) so BGM continues uninterrupted (or ducks slightly in volume).
+  - Sound effects can overlap: a few players take turns.
+  - A voice line stops when the story moves on. Its speaker's voice volume applies.
 
 ---
 
@@ -93,3 +103,4 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - Every track of the story, in story order. Tracks in `heard_music` can be played, the rest are locked.
 6. **Settings**:
    - Text speed (with a preview line), auto-forward delay, skip unread text, and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.
+   - A voice volume for each character with voiced lines.

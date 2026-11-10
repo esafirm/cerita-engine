@@ -2,6 +2,7 @@ import 'data/conversation.dart';
 import 'data/items/ending.dart';
 import 'data/items/media.dart';
 import 'data/items/stage.dart';
+import 'data/items/text.dart';
 import 'loader.dart';
 
 /// Every collectible, ending and checkpoint declared across the story files.
@@ -34,6 +35,13 @@ class StoryCatalog {
             for (final action in item.actions.whereType<MusicAction>())
               if (action.file != null) action.file!,
         ],
+      }.toList();
+
+  /// Profile ids of the characters with voiced lines, in file order.
+  List<String> get voicedProfiles => {
+        for (final conversation in conversations)
+          for (final item in conversation.conversations.whereType<TextItemType>())
+            if (item.voice != null && item.profile != null && !item.profile!.isPlayer) item.profile!.id,
       }.toList();
 
   List<Conversation> get checkpoints => conversations.where((conversation) => conversation.checkpoint).toList()

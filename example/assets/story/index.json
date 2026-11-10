@@ -8,17 +8,18 @@
     "day": 0,
     "time": "21:00",
     "background": "bg_sitting_room.png",
-    "music": "sunny.mp3"
+    "music": "sunny.mp3",
+    "textbox": "nvl"
   },
   "conversations": [
     { "type": "SET", "effects": [{ "variable": "persistent.runs", "op": "add", "value": 1 }] },
-    {
-      "type": "NARRATION",
-      "text": "A quiet evening at Nora's place. Your phone has been buzzing all day, all from your old number."
-    },
+    { "type": "NARRATION", "text": "A quiet evening at Nora's place." },
+    { "type": "NARRATION", "text": "Your phone has been buzzing all day.{w=500} All of it to your {i}old{/i} number." },
+    { "type": "NARRATION", "text": "You switched numbers a week ago.{w} Whoever is texting doesn't know that." },
     {
       "type": "STAGE",
       "actions": [
+        { "action": "textbox", "style": "adv" },
         { "action": "show", "profile": "123aaa:2", "position": "center", "transition": "slide_up", "duration_ms": 700 }
       ]
     },
@@ -83,14 +84,15 @@
       "condition": "CURIOSITY == 'wary'",
       "actions": [
         { "action": "background", "image": "bg_sitting_room_night.png", "transition": "fade_black", "duration_ms": 1400 },
-        { "action": "music", "file": "night_ambience.mp3" },
+        { "action": "music", "file": null, "fade_ms": 2000 },
+        { "action": "ambience", "file": "night_ambience.mp3", "fade_ms": 3000 },
         { "action": "move", "profile": "123aaa", "position": "left", "duration_ms": 800 }
       ]
     },
     {
       "type": "TEXT",
       "condition": "CURIOSITY == 'wary'",
-      "text": "Your phone is buzzing again. You should really look.",
+      "text": "Your phone is buzzing again.{w=400} You should {i}really{/i} look.",
       "profile": "123aaa:1",
       "voice": "vo_nora_02.mp3"
     },
@@ -107,7 +109,7 @@
     {
       "type": "TEXT",
       "id": "old_number",
-      "text": "No idea. The shop said it was \"recently freed up\". Creepy, right?",
+      "text": "No idea.{w} The shop said it was {i}\"recently freed up\"{/i}. {shake}Creepy{/shake}, right?",
       "profile": "123aaa:1"
     },
     { "type": "CALL", "target": "shared#phone_buzz" },

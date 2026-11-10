@@ -37,7 +37,18 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Background transitions", "Prologue: fade through black to night (pick \"Nah\")."),
         ("Camera", "Shake when the phone buzzes, a lavender flash for Miki, a slow zoom in the true ending."),
         ("Weather", "Sakura petals as Miki leaves in the true ending."),
-        ("Music & sound", "The night switches the music to the ambience track. Stage state is saved with the slot."),
+        ("Music & sound", "Prologue, pick \"Nah\": the music fades out and the night ambience fades in under it. Saved with the slot."),
+      ],
+    ),
+    (
+      "Text & audio",
+      [
+        ("Text tags", "Prologue & Day 2: {i}, {b}, {color}, {shake}, {wave}, timed pauses {w=…} and tap-to-continue {w}."),
+        ("Interrupted lines", "Day 2: Nora gets cut off mid-sentence with {nw}."),
+        ("NVL mode", "The prologue opens as a full-screen page, then switches to the dialogue box. The secret ending is a diary page."),
+        ("Music fades & ambience", "Track changes fade. Prologue, pick \"Nah\": a looping ambience track plays under the stage."),
+        ("Voices", "LOG → speaker button replays a voiced line. Settings → Character voices sets each character's volume."),
+        ("Sound effects", "Several can play at once instead of cutting each other off."),
       ],
     ),
     (
@@ -61,7 +72,7 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Endings", "Collection with unlocked / total progress."),
         ("Chapters", "Jump back to Prologue, Day 1 or Day 2 with the variables you had there."),
         ("Scene replay", "Chapters → replay button: plays only that chapter, then comes back. Saves are untouched."),
-        ("Music room", "Title → Music: every track you have heard. The night ambience unlocks in the prologue."),
+        ("Music room", "Title → Music: every track you have heard. The night track unlocks on Day 1."),
       ],
     ),
     (

@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TitleMenuEntry(
               label: "Settings",
               icon: Icons.tune,
-              onTap: () => _push(SettingsScreen(settings: setup.settings)),
+              onTap: () => _push(SettingsScreen(settings: setup.settings, loader: setup.loader)),
             ),
             TitleMenuEntry(label: "Features", icon: Icons.checklist, onTap: () => _push(const CapabilitiesScreen())),
             TitleMenuEntry(label: "Reset", icon: Icons.restart_alt, onTap: _resetProgress),

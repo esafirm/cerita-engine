@@ -30,4 +30,5 @@ export 'src/state/story_state.dart';
 export 'src/state/transcript.dart';
 export 'src/story_catalog.dart';
 export 'src/utils/condition_evaluator.dart';
+export 'src/utils/text_markup.dart';
 export 'src/utils/var_replacer.dart';

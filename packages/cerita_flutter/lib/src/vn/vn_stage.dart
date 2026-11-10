@@ -6,13 +6,15 @@ import '../common/backlog_sheet.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
 import '../common/media_widgets.dart';
+import '../common/tagged_text.dart';
 import '../skin/story_skin.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 import 'dialogue_box.dart';
+import 'nvl_page.dart';
 import 'poi.dart';
 
-/// Visual Novel stage: background, sprite slots, dialogue box, CG overlays,
+/// Visual Novel stage: background, sprite slots, dialogue box or NVL page, CG overlays,
 /// choice / input overlays and quick controls (backlog, auto, skip, menu, back, quick save / load, hide).
 /// A mouse wheel scroll up rolls back.
 class VnStage extends StatefulWidget {
@@ -28,6 +30,7 @@ class VnStage extends StatefulWidget {
 
 class _VnStageState extends State<VnStage> {
   final _dialogueKey = GlobalKey<DialogueBoxState>();
+  final _nvlKey = GlobalKey<TypewriterTextState>();
 
   /// The item whose line is fully shown. Choices and the input prompt wait for it, so they
   /// don't cover a question that is still being asked.
@@ -46,7 +49,15 @@ class _VnStageState extends State<VnStage> {
       return;
     }
     if (_dialogueKey.currentState?.complete() ?? false) return;
+    if (_nvlKey.currentState?.complete() ?? false) return;
     controller.advance();
+  }
+
+  /// The line of [item] is fully shown: choices can appear, auto mode can count, and `{nw}` lines move on.
+  void _lineTyped(ItemType? item, String text) {
+    if (!identical(_typedItem, item)) setState(() => _typedItem = item);
+    controller.lineTyped();
+    if (TextMarkup.parse(text).noWait && !controller.rolledBack && !controller.skipMode) controller.advance();
   }
 
   void _onPointerSignal(PointerSignalEvent event) {
@@ -77,6 +88,9 @@ class _VnStageState extends State<VnStage> {
     final asked = text == null || item is MediaItemType || identical(_typedItem, item);
     // Rolled-back lines and their stage show at once, like skipped ones.
     final instant = controller.skipMode || controller.rolledBack;
+    final nvl = stage.textbox == TextboxStyle.nvl;
+    final msPerChar = controller.settings.value.textMsPerChar;
+    final autoResume = controller.autoMode ? Duration(milliseconds: controller.settings.value.autoDelayMs) : null;
 
     return Listener(
       onPointerSignal: _onPointerSignal,
@@ -103,7 +117,16 @@ class _VnStageState extends State<VnStage> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  if (text != null && item is! MediaItemType)
+                  if (nvl && item is! MediaItemType)
+                    NvlPage(
+                      controller: controller,
+                      typewriterKey: _nvlKey,
+                      instant: instant,
+                      msPerChar: msPerChar,
+                      autoResume: autoResume,
+                      onTyped: () => _lineTyped(item, item?.getText() ?? ""),
+                    ),
+                  if (!nvl && text != null && item is! MediaItemType)
                     Positioned(
                       left: 12,
                       right: 12,
@@ -114,10 +137,9 @@ class _VnStageState extends State<VnStage> {
                         speaker: item is NarrationItemType ? null : controller.currentProfile?.name,
                         italic: italic,
                         instant: instant,
-                        msPerChar: controller.settings.value.textMsPerChar,
-                        onTyped: () {
-                          if (!identical(_typedItem, item)) setState(() => _typedItem = item);
-                        },
+                        msPerChar: msPerChar,
+                        autoResume: autoResume,
+                        onTyped: () => _lineTyped(item, text),
                       ),
                     ),
                   if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)

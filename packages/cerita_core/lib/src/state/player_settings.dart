@@ -13,6 +13,9 @@ class PlayerSettings {
   final double soundVolume;
   final double voiceVolume;
 
+  /// Voice volume of single characters by profile id, on top of [voiceVolume]. Missing ones play at 1.
+  final Map<String, double> voiceVolumes;
+
   const PlayerSettings({
     this.textMsPerChar = 40,
     this.autoDelayMs = 1200,
@@ -20,7 +23,11 @@ class PlayerSettings {
     this.musicVolume = 1,
     this.soundVolume = 1,
     this.voiceVolume = 1,
+    this.voiceVolumes = const {},
   });
+
+  /// Voice volume of the character [profileId].
+  double voiceVolumeOf(String? profileId) => voiceVolume * (voiceVolumes[profileId] ?? 1);
 
   /// Reading time of [characters] in auto mode.
   int autoDelayFor(int characters) => autoDelayMs + characters * autoDelayMs * 45 ~/ 1200;
@@ -32,6 +39,7 @@ class PlayerSettings {
     double? musicVolume,
     double? soundVolume,
     double? voiceVolume,
+    Map<String, double>? voiceVolumes,
   }) =>
       PlayerSettings(
         textMsPerChar: textMsPerChar ?? this.textMsPerChar,
@@ -40,11 +48,13 @@ class PlayerSettings {
         musicVolume: musicVolume ?? this.musicVolume,
         soundVolume: soundVolume ?? this.soundVolume,
         voiceVolume: voiceVolume ?? this.voiceVolume,
+        voiceVolumes: voiceVolumes ?? this.voiceVolumes,
       );
 
   factory PlayerSettings.fromJson(Map<String, dynamic> json) {
     const defaults = PlayerSettings();
-    double volume(String key, double fallback) => ((json[key] as num?)?.toDouble() ?? fallback).clamp(0.0, 1.0);
+    double clamp(Object? value, double fallback) => ((value as num?)?.toDouble() ?? fallback).clamp(0.0, 1.0);
+    double volume(String key, double fallback) => clamp(json[key], fallback);
     return PlayerSettings(
       textMsPerChar: (json["text_ms_per_char"] as num?)?.toInt() ?? defaults.textMsPerChar,
       autoDelayMs: (json["auto_delay_ms"] as num?)?.toInt() ?? defaults.autoDelayMs,
@@ -52,6 +62,10 @@ class PlayerSettings {
       musicVolume: volume("music_volume", defaults.musicVolume),
       soundVolume: volume("sound_volume", defaults.soundVolume),
       voiceVolume: volume("voice_volume", defaults.voiceVolume),
+      voiceVolumes: {
+        for (final MapEntry(:key, :value) in Map<String, dynamic>.from(json["voice_volumes"] as Map? ?? const {}).entries)
+          key: clamp(value, 1),
+      },
     );
   }
 
@@ -62,6 +76,7 @@ class PlayerSettings {
         "music_volume": musicVolume,
         "sound_volume": soundVolume,
         "voice_volume": voiceVolume,
+        if (voiceVolumes.isNotEmpty) "voice_volumes": voiceVolumes,
       };
 
   @override
@@ -72,8 +87,20 @@ class PlayerSettings {
       other.skipUnread == skipUnread &&
       other.musicVolume == musicVolume &&
       other.soundVolume == soundVolume &&
-      other.voiceVolume == voiceVolume;
+      other.voiceVolume == voiceVolume &&
+      _sameVolumes(other.voiceVolumes, voiceVolumes);
+
+  static bool _sameVolumes(Map<String, double> a, Map<String, double> b) =>
+      a.length == b.length && a.entries.every((entry) => b[entry.key] == entry.value);
 
   @override
-  int get hashCode => Object.hash(textMsPerChar, autoDelayMs, skipUnread, musicVolume, soundVolume, voiceVolume);
+  int get hashCode => Object.hash(
+        textMsPerChar,
+        autoDelayMs,
+        skipUnread,
+        musicVolume,
+        soundVolume,
+        voiceVolume,
+        Object.hashAllUnordered(voiceVolumes.entries.map((entry) => Object.hash(entry.key, entry.value))),
+      );
 }

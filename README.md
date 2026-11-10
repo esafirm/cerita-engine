@@ -20,6 +20,8 @@ See [`specs/`](specs/README.md) for the full specification.
 | Autosave, save slots with thumbnails, gallery, endings, chapter checkpoints | Title screen and in-game menu |
 | Rollback (also from the backlog), quick save / load, hide UI | VN quick controls |
 | Settings (text speed, auto delay, skip unread, volumes), music room, chapter replay | Title screen and in-game menu |
+| Text tags (`{b}` `{i}` `{color}` `{shake}` `{wave}` `{speed}` `{w}` `{nw}`), NVL page | Prologue opening, Day 2, secret ending |
+| Music fades, ambience loop, overlapping sounds, per-character voice volume, voice replay | Prologue → "Nah", settings, backlog |
 
 The title screen's **Features** page lists each feature and where to see it.
 

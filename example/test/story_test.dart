@@ -32,6 +32,19 @@ Future<(EndingItemType, RealFsseEngine)> _play({
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  test('every text tag in the story is a known tag', () async {
+    final loader = AssetEngineLoader(const LoaderConfig());
+    final catalog = await StoryCatalog.load(loader);
+    for (final conversation in catalog.conversations) {
+      for (final item in conversation.conversations) {
+        // Variables are filled in before the tags are read.
+        final text = item.getText()?.replaceAll(variablePattern, "");
+        if (text == null) continue;
+        expect(TextMarkup.plain(text), isNot(contains("{")), reason: "'$text' in ${conversation.key}");
+      }
+    }
+  });
+
   test('secret ending: curious, call, photo and the right passcode', () async {
     final storage = InMemoryStoryStorage();
     final (ending, engine) = await _play(

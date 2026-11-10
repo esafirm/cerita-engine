@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
+import '../common/tagged_text.dart';
 import '../skin/chapter_card_overlay.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
@@ -156,7 +157,7 @@ class _InteractionTray extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Text(item.text, style: Theme.of(context).textTheme.labelLarge),
+              child: TaggedText(item.text, style: Theme.of(context).textTheme.labelLarge),
             ),
             ChoiceList(key: ValueKey(item), item: item, onSelected: controller.choose),
           ],

@@ -88,6 +88,9 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// The current line was restored by a rollback, so it is shown without animating.
   bool rolledBack = false;
 
+  /// False while the VN line on screen is still typing out. Auto mode waits for it, see [lineTyped].
+  bool _lineTyped = true;
+
   /// One-off messages (unlocks, saves) for the UI to show as toasts.
   final StreamController<String> _toasts = StreamController.broadcast();
 
@@ -176,6 +179,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     direction = null;
     await audio.stopVoice();
     _playMusic();
+    _playAmbience();
     rolledBack = true;
     _show(item);
     if (!replay) await engine.saveTo(SaveSlot.autoSlotId);
@@ -196,6 +200,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     await audio.stopVoice();
     await engine.start(save: save, checkpoint: checkpoint, replay: replay);
     _playMusic();
+    _playAmbience();
 
     if (save == null) {
       await advance();
@@ -212,6 +217,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     } else {
       current = item;
       currentProfile = engine.getProfile(item);
+      _lineTyped = !_typesOut(item);
       phase = item is EndingItemType ? StoryPhase.ending : StoryPhase.showing;
       _notify();
       _scheduleAutoAdvance();
@@ -222,10 +228,30 @@ class StoryController extends ChangeNotifier with EngineListener {
   void _show(ItemType item) {
     current = item;
     currentProfile = engine.getProfile(item);
+    _lineTyped = !_typesOut(item);
     phase = _phaseOf(item);
     _notify();
     _scheduleAutoAdvance();
   }
+
+  /// Whether the VN stage types [item] out and reports it through [lineTyped].
+  bool _typesOut(ItemType item) => scene.mode == SceneMode.vn && (item is TextItemType || item is NarrationItemType);
+
+  /// Called by the VN stage once the current line is fully shown. Auto mode counts its delay from here.
+  void lineTyped() {
+    if (_lineTyped) return;
+    _lineTyped = true;
+    _scheduleAutoAdvance();
+  }
+
+  /// Plays the voice of a line again, e.g. from the backlog.
+  Future<void> replayVoice(TextItemType item) async {
+    final voice = item.voice;
+    if (voice == null) return;
+    await audio.playVoice(config.music(voice), character: _characterVolume(item));
+  }
+
+  double _characterVolume(ItemType item) => settings.value.voiceVolumes[item.getProfileInfo()?.id] ?? 1;
 
   static StoryPhase _phaseOf(ItemType item) => switch (item) {
         ChoiceItemType() => StoryPhase.choice,
@@ -321,7 +347,7 @@ class StoryController extends ChangeNotifier with EngineListener {
         typingDelayMs,
       // Incoming messages without an explicit delay still take a moment to type.
       TextItemType(:final text) when scene.mode == SceneMode.chat && !(profile?.isPlayer ?? true) =>
-        min(_typingDelayMs + text.length * _typingDelayPerCharMs, _maxTypingDelayMs),
+        min(_typingDelayMs + TextMarkup.plain(text).length * _typingDelayPerCharMs, _maxTypingDelayMs),
       MediaItemType() when scene.mode == SceneMode.chat && !(profile?.isPlayer ?? true) => _typingDelayMs * 2,
       _ => null,
     };
@@ -343,7 +369,9 @@ class StoryController extends ChangeNotifier with EngineListener {
     };
     if (sfx != null) audio.playSfx(config.music(sfx));
     await audio.stopVoice();
-    if (item is TextItemType && item.voice != null && !skipMode) audio.playVoice(config.music(item.voice!));
+    if (item is TextItemType && item.voice != null && !skipMode) {
+      audio.playVoice(config.music(item.voice!), character: _characterVolume(item));
+    }
 
     direction = item is StageItemType ? item : null;
     if (item is StageItemType) _playStageAudio(item);
@@ -351,6 +379,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     current = item;
     currentProfile = profile;
     rolledBack = false;
+    _lineTyped = !_typesOut(item);
     phase = _phaseOf(item);
     if (item is WaitItemType) notification = item.notificationText;
     // Stage directions keep Auto / Skip running. Anything else that is not a line stops them.
@@ -364,8 +393,10 @@ class StoryController extends ChangeNotifier with EngineListener {
   void _playStageAudio(StageItemType item) {
     for (final action in item.actions) {
       switch (action) {
-        case MusicAction():
-          _playMusic();
+        case MusicAction(:final fadeMs):
+          _playMusic(fadeMs: fadeMs);
+        case AmbienceAction(:final fadeMs):
+          _playAmbience(fadeMs: fadeMs);
         case SoundAction(:final file) when !skipMode:
           audio.playSfx(config.music(file));
         default:
@@ -374,7 +405,11 @@ class StoryController extends ChangeNotifier with EngineListener {
     }
   }
 
-  void _playMusic() => audio.playBgm(stage.music == null ? null : config.music(stage.music!));
+  void _playMusic({int? fadeMs}) =>
+      audio.playBgm(stage.music == null ? null : config.music(stage.music!), fadeMs: fadeMs);
+
+  void _playAmbience({int? fadeMs}) =>
+      audio.playAmbience(stage.ambience == null ? null : config.music(stage.ambience!), fadeMs: fadeMs);
 
   void _applySettings() {
     final value = settings.value;
@@ -399,13 +434,14 @@ class StoryController extends ChangeNotifier with EngineListener {
       return;
     }
     if (!autoMode && !skipMode) return;
+    if (autoMode && !_lineTyped) return;
     if (skipMode && !engine.lastItemPreviouslySeen && !settings.value.skipUnread) {
       // Skip only fast-forwards text read in an earlier playthrough, unless the player skips unread text too.
       skipMode = false;
       _notify();
       return;
     }
-    final length = current?.getText()?.length ?? 0;
+    final length = TextMarkup.plain(current?.getText() ?? "").length;
     final delay = skipMode ? 120 : settings.value.autoDelayFor(length);
     _autoTimer = Timer(Duration(milliseconds: delay), advance);
   }
@@ -414,6 +450,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   void onNewScene(Scene scene) {
     this.scene = scene;
     _playMusic();
+    _playAmbience();
     // No notify: the new scene is shown together with its first item in [_present]. Showing it now
     // would build the incoming scene around the previous scene's item.
   }

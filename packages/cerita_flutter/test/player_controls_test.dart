@@ -1,27 +1,8 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class _FakeEngineLoader extends EngineLoader {
-  final Map<String, Map<String, dynamic>> files;
-
-  _FakeEngineLoader(this.files);
-
-  @override
-  Future<EnginePackage> initialLoad() async => EnginePackage(
-        profiles: ProfileData.fromJson({
-          "profiles": [
-            {"id": "nora", "name": "Nora", "sprites": ["nora.png"]},
-          ],
-        }),
-        conversation: await loadConversation(Conversation.indexKey),
-      );
-
-  @override
-  Future<Conversation> loadConversation(String conversationId) async =>
-      Conversation.fromJson(files[conversationId]!, key: conversationId);
-}
+import 'support.dart';
 
 Map<String, dynamic> _text(String text) => {"type": "TEXT", "text": text, "profile": "nora:0"};
 
@@ -47,57 +28,15 @@ final _story = {
   },
 };
 
-/// The audio plugin doesn't exist in widget tests, and audioplayers keeps its init state across tests.
-/// Nothing is played, the players are only created.
-class _SilentAudio extends AudioHelper {
-  @override
-  Future<void> playBgm(String? path) async {}
-
-  @override
-  Future<void> playSfx(String path) async {}
-
-  @override
-  Future<void> playVoice(String path) async {}
-
-  @override
-  Future<void> stopVoice() async {}
-
-  @override
-  Future<void> stopAll() async {}
-
-  @override
-  void setVolumes({required double music, required double sound, required double voice}) {}
-
-  @override
-  void duck() {}
-
-  @override
-  void unduck() {}
-
-  @override
-  void addObserver() {}
-
-  @override
-  void removeObserver() {}
-}
-
-/// Answers the plugin calls of the players [_SilentAudio] creates.
-void _mockAudio() {
-  final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-  for (final channel in ["xyz.luan/audioplayers", "xyz.luan/audioplayers.global"]) {
-    messenger.setMockMethodCallHandler(MethodChannel(channel), (_) async => null);
-  }
-}
-
 void main() {
-  setUp(_mockAudio);
+  setUp(mockAudioChannels);
 
   Future<(StoryController, StorySetup)> pumpStory(WidgetTester tester, {StoryStorage? storage}) async {
     final setup = StorySetup(
       config: const LoaderConfig(),
-      loader: _FakeEngineLoader(_story),
+      loader: FakeEngineLoader(_story),
       storage: storage ?? InMemoryStoryStorage(),
-      audio: _SilentAudio.new,
+      audio: SilentAudio.new,
     );
     await tester.pumpWidget(MaterialApp(home: StoryScreen(setup: setup)));
     await tester.pumpAndSettle();
@@ -239,7 +178,7 @@ void main() {
       StageState(sprites: {SpritePosition.center: ProfileInfo.fromIdentifier("nora:0")}),
     ));
     await storage.saveSlot(slot(1, const Scene(mode: SceneMode.chat), StageState()));
-    final setup = StorySetup(config: const LoaderConfig(), loader: _FakeEngineLoader(_story), storage: storage);
+    final setup = StorySetup(config: const LoaderConfig(), loader: FakeEngineLoader(_story), storage: storage);
 
     await tester.pumpWidget(MaterialApp(home: SaveSlotsScreen(setup: setup, onLoad: (_) {})));
     await tester.pumpAndSettle();

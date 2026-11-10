@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../common/tagged_text.dart';
 import '../skin/chapter_card_overlay.dart';
 import '../skin/story_skin.dart';
 
-/// Bottom dialogue box with typewriter text, drawn by [StorySkin.dialogueFrame].
-/// [complete] finishes the animation; it returns false if it was already done.
+/// Bottom dialogue box with typewriter text and text tags, drawn by [StorySkin.dialogueFrame].
+/// [complete] finishes the animation or continues after a `{w}`; it returns false if the line was already shown.
 class DialogueBox extends StatefulWidget {
   final String text;
   final String? speaker;
@@ -16,6 +17,9 @@ class DialogueBox extends StatefulWidget {
   /// Typewriter speed. 0 shows the line at once.
   final int msPerChar;
 
+  /// Continues after a `{w}` by itself after this long (auto mode).
+  final Duration? autoResume;
+
   /// Called once [text] is fully shown, typed out or completed by a tap.
   final VoidCallback? onTyped;
 
@@ -26,6 +30,7 @@ class DialogueBox extends StatefulWidget {
     this.italic = false,
     this.instant = false,
     this.msPerChar = 40,
+    this.autoResume,
     this.onTyped,
   });
 
@@ -33,88 +38,34 @@ class DialogueBox extends StatefulWidget {
   State<DialogueBox> createState() => DialogueBoxState();
 }
 
-class DialogueBoxState extends State<DialogueBox> with SingleTickerProviderStateMixin {
-  late final AnimationController _typewriter = AnimationController(vsync: this)
-    ..addStatusListener((status) {
-      if (status.isCompleted) _typed();
-    });
+class DialogueBoxState extends State<DialogueBox> {
+  final _typewriter = GlobalKey<TypewriterTextState>();
 
-  /// A chapter card is up: the box stays hidden and the line waits for it.
-  bool _held = false;
-  bool _pending = true;
+  bool complete() => _typewriter.currentState?.complete() ?? false;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _held = ChapterCardOverlay.holdsDialogue(context);
-    if (!_held && _pending) _start();
-  }
-
-  @override
-  void didUpdateWidget(DialogueBox oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.text == widget.text) {
-      // The same line again: no new animation, so report it as shown right away.
-      if (_typewriter.isCompleted) _typed();
-      return;
-    }
-    _pending = true;
-    if (!_held) _start();
-  }
-
-  void _start() {
-    _pending = false;
-    _typewriter.duration = Duration(milliseconds: widget.text.characters.length * widget.msPerChar);
-    if (widget.instant || widget.msPerChar == 0) {
-      final wasCompleted = _typewriter.isCompleted;
-      _typewriter.value = 1;
-      if (wasCompleted) _typed();
-    } else {
-      _typewriter.forward(from: 0);
-    }
-  }
-
-  /// Runs after the frame: the line can be shown during a build, and the listener rebuilds its parent.
-  void _typed() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) widget.onTyped?.call();
-    });
-  }
-
-  bool get isTyping => _typewriter.isAnimating;
-
-  bool complete() {
-    if (!isTyping) return false;
-    _typewriter.value = 1;
-    return true;
-  }
-
-  @override
-  void dispose() {
-    _typewriter.dispose();
-    super.dispose();
-  }
+  /// The text shown so far.
+  String get visibleText => _typewriter.currentState?.visibleText ?? "";
 
   @override
   Widget build(BuildContext context) {
-    final characters = widget.text.characters;
-    final box = AnimatedBuilder(
-      animation: _typewriter,
-      builder: (context, _) {
-        final visible = (characters.length * _typewriter.value).round();
-        return StorySkin.of(context).dialogueFrame(
+    // A chapter card is up: the box stays hidden and the line waits for it.
+    final held = ChapterCardOverlay.holdsDialogue(context);
+    return AnimatedOpacity(
+      opacity: held ? 0 : 1,
+      duration: const Duration(milliseconds: 250),
+      child: TypewriterText(
+        widget.text,
+        key: _typewriter,
+        style: TextStyle(fontStyle: widget.italic ? FontStyle.italic : null),
+        instant: widget.instant,
+        msPerChar: widget.msPerChar,
+        autoResume: widget.autoResume,
+        onTyped: widget.onTyped,
+        builder: (context, text, done) => StorySkin.of(context).dialogueFrame(
           context,
-          DialogueFrame(
-            speaker: widget.speaker,
-            done: _typewriter.value == 1,
-            body: Text(
-              characters.take(visible).toString(),
-              style: TextStyle(fontStyle: widget.italic ? FontStyle.italic : null),
-            ),
-          ),
-        );
-      },
+          DialogueFrame(speaker: widget.speaker, done: done, body: text),
+        ),
+      ),
     );
-    return AnimatedOpacity(opacity: _held ? 0 : 1, duration: const Duration(milliseconds: 250), child: box);
   }
 }

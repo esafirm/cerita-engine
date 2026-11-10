@@ -2,8 +2,10 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../story_controller.dart';
+import 'tagged_text.dart';
 
-/// Scrollable backlog of the delivered transcript. Lines that can be rolled back to have a rewind button.
+/// Scrollable backlog of the delivered transcript. Lines that can be rolled back to have a rewind button,
+/// and voiced lines a button to play their voice again.
 class BacklogSheet extends StatelessWidget {
   final StoryController controller;
 
@@ -55,24 +57,33 @@ class BacklogSheet extends StatelessWidget {
                 children: [
                   if (speaker != null)
                     Text(speaker, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
-                  Text(
+                  TaggedText(
                     text,
                     style: item is NarrationItemType ? const TextStyle(fontStyle: FontStyle.italic) : null,
                   ),
                 ],
               );
-              if (!controller.canRollbackTo(historyIndex)) return line;
+              final voiced = item is TextItemType && item.voice != null;
+              final rewind = controller.canRollbackTo(historyIndex);
+              if (!voiced && !rewind) return line;
               return Row(
                 children: [
                   Expanded(child: line),
-                  IconButton(
-                    tooltip: "Go back to this line",
-                    icon: const Icon(Icons.fast_rewind_outlined),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      controller.rollback(historyIndex: historyIndex);
-                    },
-                  ),
+                  if (voiced)
+                    IconButton(
+                      tooltip: "Play voice",
+                      icon: const Icon(Icons.volume_up_outlined),
+                      onPressed: () => controller.replayVoice(item),
+                    ),
+                  if (rewind)
+                    IconButton(
+                      tooltip: "Go back to this line",
+                      icon: const Icon(Icons.fast_rewind_outlined),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        controller.rollback(historyIndex: historyIndex);
+                      },
+                    ),
                 ],
               );
             },

@@ -59,12 +59,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump(const Duration(milliseconds: 1000));
     final box = find.descendant(of: find.byType(DialogueBox), matching: find.byType(AnimatedOpacity));
+    String visible() => tester.state<DialogueBoxState>(find.byType(DialogueBox)).visibleText;
     expect(tester.widget<AnimatedOpacity>(box).opacity, 0);
-    expect(find.text("Hi"), findsNothing);
+    expect(visible(), isEmpty);
 
     await tester.pump(const Duration(milliseconds: 1500));
     await tester.pump(const Duration(seconds: 1));
     expect(tester.widget<AnimatedOpacity>(box).opacity, 1);
-    expect(find.text("Hi"), findsOneWidget);
+    expect(visible(), "Hi");
   });
 }

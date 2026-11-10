@@ -116,7 +116,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 leading: const Icon(Icons.tune),
                 title: const Text("Settings"),
                 onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => SettingsScreen(settings: widget.setup.settings),
+                      builder: (_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader),
                     ))),
               ),
               ListTile(

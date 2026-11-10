@@ -11,10 +11,10 @@ void main() {
       await tester.pumpWidget(_wrap(DialogueBox('Hello there', key: key, speaker: 'Nora')));
 
       expect(find.text('Nora'), findsOneWidget);
-      expect(find.text('Hello there'), findsNothing);
+      expect(key.currentState!.visibleText, isEmpty);
       expect(key.currentState!.complete(), isTrue);
       await tester.pump();
-      expect(find.text('Hello there'), findsOneWidget);
+      expect(key.currentState!.visibleText, 'Hello there');
       expect(key.currentState!.complete(), isFalse);
     });
 

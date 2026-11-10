@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
+import '../common/tagged_text.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
@@ -108,7 +109,7 @@ class _CallViewState extends State<CallView> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
-                      child: Text(
+                      child: TaggedText(
                         caption,
                         key: ValueKey(caption),
                         textAlign: TextAlign.center,

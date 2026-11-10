@@ -1,3 +1,4 @@
+import '../scene.dart';
 import 'base.dart';
 import 'profile_info.dart';
 import 'sprite_position.dart';
@@ -83,7 +84,13 @@ sealed class StageAction {
       "clear" => HideAction(null, transition: transition, durationMs: durationMs),
       "move" => MoveAction(profileId(), position()!, durationMs: durationMs),
       "background" => BackgroundAction(json["image"] as String?, transition: transition, durationMs: durationMs),
-      "music" => MusicAction(json["file"] as String?),
+      "music" => MusicAction(json["file"] as String?, fadeMs: (json["fade_ms"] as num?)?.toInt()),
+      "ambience" => AmbienceAction(json["file"] as String?, fadeMs: (json["fade_ms"] as num?)?.toInt()),
+      "textbox" => TextboxAction(
+          TextboxStyle.fromName(json["style"] as String?) ??
+              (throw Exception("Unknown textbox style '${json["style"]}', use 'adv' or 'nvl'")),
+        ),
+      "page" => const PageAction(),
       "sound" => SoundAction(json["file"] as String),
       "weather" => WeatherAction(json["name"] as String?),
       "shake" => ShakeAction(intensity: (json["intensity"] as num? ?? 10).toDouble(), durationMs: duration ?? 400),
@@ -131,7 +138,31 @@ class MusicAction extends StageAction {
   /// Null stops the music.
   final String? file;
 
-  const MusicAction(this.file) : super(durationMs: 0);
+  /// Fade between the old and the new track. Null uses the player's default.
+  final int? fadeMs;
+
+  const MusicAction(this.file, {this.fadeMs}) : super(durationMs: 0);
+}
+
+/// Changes the looping background sound.
+class AmbienceAction extends StageAction {
+  /// Null stops it.
+  final String? file;
+  final int? fadeMs;
+
+  const AmbienceAction(this.file, {this.fadeMs}) : super(durationMs: 0);
+}
+
+/// Switches between the dialogue box and the NVL page.
+class TextboxAction extends StageAction {
+  final TextboxStyle style;
+
+  const TextboxAction(this.style) : super(durationMs: 0);
+}
+
+/// Starts a new NVL page.
+class PageAction extends StageAction {
+  const PageAction() : super(durationMs: 0);
 }
 
 class SoundAction extends StageAction {

@@ -78,7 +78,9 @@ Each conversation file represents a scene, chat session, or story chapter.
     "day": 1,
     "time": "23:45",
     "background": "bg_sitting_room.png",
-    "music": "sunny.mp3"
+    "music": "sunny.mp3",
+    "ambience": "rain_loop.mp3",
+    "textbox": "adv"
   },
   "conversations": [
     /* Ordered list of ItemType objects */
@@ -93,6 +95,8 @@ Each conversation file represents a scene, chat session, or story chapter.
 | `mode` | `"VN"` \| `"CHAT"` \| `"CALL"` | No (defaults to `"VN"`) | Active presentation mode for this conversation. |
 | `background` | `String` | No | Background image filename in `bgDir`. |
 | `music` | `String` | No | Looping BGM filename in `musicDir`. |
+| `ambience` | `String` | No | Looping background sound (rain, crowd, café) in `musicDir`, played under the music. |
+| `textbox` | `"adv"` \| `"nvl"` | No (defaults to `"adv"`) | VN text display: one line in the dialogue box (`adv`), or a full-screen page of lines (`nvl`). |
 | `channel_id` | `String` | For `"CHAT"` | Identifier of the messaging thread or contact. |
 | `day` | `int` | No | In-game day number (e.g., `1` to `7`). |
 | `time` | `String` | No | In-game timestamp displayed in UI headers (e.g., `"23:45"`). |
@@ -124,6 +128,7 @@ Displays a character line in the VN dialogue box or a message bubble in Chat mod
 ```
 - `position` (`"far_left"` \| `"left"` \| `"center"` \| `"right"` \| `"far_right"`): Sprite slot in VN mode. Defaults to the speaker's current slot, or `"center"`.
 - `typing_delay_ms` (`int?`): Simulated `"is typing..."` duration in Chat mode before the bubble appears.
+- `text` can use [text tags](#6-text-tags), like `NARRATION` text and the prompt of `CHOICE` / `INPUT`.
 
 ### 4.2 `NARRATION` — Third-Person Narration or System Event
 Renders unattributed narrative text in VN mode or system/status banners in Chat mode (e.g., `"Miki is online"`, `"Day 1 - 11:45 PM"`, `"Missed voice call"`).
@@ -299,16 +304,19 @@ Runs a list of `actions` on the VN stage at once, then continues by itself once 
 | `clear` | `transition`? | Removes every character. |
 | `move` | `profile` (`<id>`), `position` | Slides a character to another slot. |
 | `background` | `image` (null for black), `transition`? | Changes the background without starting a new conversation. |
-| `music` | `file` (null stops) | Changes the looping BGM. |
-| `sound` | `file` | Plays a one-shot sound effect. |
+| `music` | `file` (null stops), `fade_ms`? | Changes the looping BGM. The old track fades out and the new one fades in, over `fade_ms` (default `1000`, `0` cuts). |
+| `ambience` | `file` (null stops), `fade_ms`? | Changes the looping background sound, faded like `music`. |
+| `sound` | `file` | Plays a one-shot sound effect. Sounds can overlap. |
 | `weather` | `name`: `"rain"` \| `"snow"` \| `"sakura"` \| null | Particle layer over the stage. Null clears it. |
 | `shake` | `intensity` (px, default `10`) | Shakes the stage. |
 | `flash` | `color` (`"#RRGGBB"`, default white) | Flashes the screen. |
 | `zoom` | `scale` (default `1`), `focus` (a `position`, default `"center"`) | Zooms the camera. Stays until the next `zoom` or a new background. |
+| `textbox` | `style`: `"adv"` \| `"nvl"` | Switches between the dialogue box and the full-screen NVL page. Switching to `nvl` starts a new page. |
+| `page` | | Starts a new NVL page: the lines shown so far are cleared. |
 
 Every action takes an optional `duration_ms`. `transition` is one of `"fade"` (default), `"dissolve"`, `"fade_black"` (backgrounds), `"slide_left"`, `"slide_right"`, `"slide_up"`, `"zoom"`, `"wipe_left"`, `"wipe_right"` or `"none"`.
 
-The stage (background, characters, music, weather, zoom) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene.
+The stage (background, characters, music, ambience, weather, zoom, text box and NVL page) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene.
 
 ---
 
@@ -323,3 +331,38 @@ Every `target` field (`CHOICE`, `BRANCH`, `JUMP`, `CALL`) accepts:
 | `"day2#hub"` | The item with `"id": "hub"` in `cvn_day2.json`. |
 
 A jump into the middle of a conversation does not unlock its checkpoint.
+
+---
+
+## 6. Text Tags
+
+`TEXT` and `NARRATION` text, and the prompt of `CHOICE` and `INPUT`, can style parts of a line and control how it types out. Tags are applied after `{{variable}}` interpolation.
+
+```json
+{
+  "type": "TEXT",
+  "profile": "123aaa:1",
+  "text": "Wait.{w=600} You {i}kept{/i} the photo?{w} {shake}{color=#E05050}Why?!{/color}{/shake}"
+}
+```
+
+| Tag | Effect |
+| :--- | :--- |
+| `{b}`…`{/b}` | Bold. |
+| `{i}`…`{/i}` | Italic. |
+| `{u}`…`{/u}` | Underline. |
+| `{s}`…`{/s}` | Strikethrough. |
+| `{color=#RRGGBB}`…`{/color}` | Text colour (`#AARRGGBB` also works). |
+| `{size=1.4}`…`{/size}` | Text size relative to the dialogue text. |
+| `{shake}`…`{/shake}` | Letters tremble. |
+| `{wave}`…`{/wave}` | Letters bob up and down. |
+| `{speed=2}`…`{/speed}` | Types this part at a multiple of the player's text speed (`0.5` is half as fast). |
+| `{w}` | Stops typing until the player taps, then continues the same line. |
+| `{w=800}` | Pauses typing for 800 ms. |
+| `{nw}` | Moves on as soon as the line is typed out, without a tap. For interrupted lines. |
+
+- Closing tags are optional at the end of the line. Tags can nest.
+- A `{` that does not start a known tag is shown as written, so `{draft}` is just text.
+- `{w}`, `{w=…}`, `{speed}` and `{nw}` only affect the VN dialogue box and NVL page. Skip mode and rolled-back lines show the whole line at once and ignore them.
+- Chat bubbles, the call view and the backlog show the styles without the pauses. Choice options are shown as written.
+- Reading time in auto mode counts only the visible characters.
