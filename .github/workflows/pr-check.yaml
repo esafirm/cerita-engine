@@ -16,11 +16,22 @@ jobs:
         with:
           channel: stable
 
-      - name: Analyze
-        run: flutter analyze
+      - name: Get dependencies
+        run: flutter pub get
 
-      - name: Test
-        run: flutter test
+      - name: Analyze
+        run: flutter analyze packages example
+
+      - name: Test core
+        working-directory: packages/cerita_core
+        run: dart test
+
+      - name: Test Flutter packages and example
+        run: |
+          for dir in packages/cerita_flutter packages/cerita_ui example; do
+            (cd "$dir" && flutter test)
+          done
 
       - name: Build web
+        working-directory: example
         run: flutter build web
