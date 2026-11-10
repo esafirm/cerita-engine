@@ -5,6 +5,7 @@ import 'transcript.dart';
 /// Playthrough state: active pointer, variables and transcript.
 class SaveSlot {
   static const autoSlotId = 0;
+  static const quickSlotId = -1;
 
   final int slotId;
   final String conversationKey;

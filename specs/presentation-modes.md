@@ -56,13 +56,17 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **`CHOICE` Modal**: Centered or bottom-anchored list of choice buttons over a dimmed stage; locked choices (failing `condition`) can either be hidden or shown disabled with a lock icon.
   - **`INPUT` Dialog**: Prompt modal with text field and confirmation button.
 - **VN Quick Controls**:
-  - **Backlog / History**: View recently spoken lines.
-  - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text.
+  - **Backlog / History**: View recently spoken lines. Lines that can be rolled back to have a rewind button.
+  - **Back**: Rolls back to the previous line (engine §7). A mouse wheel scroll up does the same. Rolled-back lines and stage changes show instantly.
+  - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
+  - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
+  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back.
 
 ---
 
 ## 3. Audio System (`AudioHelper`)
 
+- **Volumes**: Music, sound and voice volumes come from the player settings. Ducking lowers the music relative to its setting.
 - **Background Music (BGM)**:
   - Loops `scene.music` via `AudioHelper`.
   - Avoids restarting the track if the new scene specifies the same `music` file already playing.
@@ -81,3 +85,11 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - Displays all story endings (`unlocked_ending_ids` vs. total endings), showing the ending badge (`TRUE`, `GOOD`, `BAD`, `SECRET`), title, and summary for completed routes.
 3. **Chapter / Day Timeline**:
    - Visual node graph or Day list (`Day 1` ... `Day 7`) allowing players to jump to any unlocked checkpoint to try different choices without replaying from the beginning.
+   - **Replay** plays only that chapter (engine §8) and returns when it ends, without touching the saves.
+4. **Save / Load Slots**:
+   - Autosave, quick save and manual slots with chapter, title and time.
+   - Each slot has a thumbnail drawn from its saved stage (background and characters). Chat and call saves show the mode instead.
+5. **Music Room**:
+   - Every track of the story, in story order. Tracks in `heard_music` can be played, the rest are locked.
+6. **Settings**:
+   - Text speed (with a preview line), auto-forward delay, skip unread text, and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.

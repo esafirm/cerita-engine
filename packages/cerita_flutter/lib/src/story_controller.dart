@@ -5,6 +5,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/foundation.dart';
 
 import 'audio_helper.dart';
+import 'player_prefs.dart';
 
 enum StoryPhase {
   /// Nothing delivered yet.
@@ -27,11 +28,8 @@ enum StoryPhase {
 }
 
 /// UI-side runner shared by every presentation mode: drives [RealFsseEngine],
-/// paces typing / waits, plays audio, tracks the VN sprite stage and autosaves.
+/// paces typing / waits, plays audio, autosaves, and handles rollback and quick save / load.
 class StoryController extends ChangeNotifier with EngineListener {
-  static const _readingDelayMs = 1200;
-  static const _readingDelayPerCharMs = 45;
-
   // Typing time of incoming chat messages that set no `typing_delay_ms`.
   static const _typingDelayMs = 900;
   static const _typingDelayPerCharMs = 35;
@@ -45,9 +43,16 @@ class StoryController extends ChangeNotifier with EngineListener {
   final RealFsseEngine engine;
   final LoaderConfig config;
   final AudioHelper audio;
+  final PlayerPrefs settings;
 
-  StoryController({required EngineLoader loader, required StoryStorage storage, required this.config, AudioHelper? audio})
-      : audio = audio ?? AudioHelper(),
+  StoryController({
+    required EngineLoader loader,
+    required StoryStorage storage,
+    required this.config,
+    AudioHelper? audio,
+    PlayerPrefs? settings,
+  })  : audio = audio ?? AudioHelper(),
+        settings = settings ?? PlayerPrefs(storage),
         engine = RealFsseEngine(loader, storage: storage) {
     engine.listener = this;
   }
@@ -77,6 +82,12 @@ class StoryController extends ChangeNotifier with EngineListener {
   bool autoMode = false;
   bool skipMode = false;
 
+  /// Replaying a single chapter: nothing is saved.
+  bool replay = false;
+
+  /// The current line was restored by a rollback, so it is shown without animating.
+  bool rolledBack = false;
+
   /// One-off messages (unlocks, saves) for the UI to show as toasts.
   final StreamController<String> _toasts = StreamController.broadcast();
 
@@ -86,6 +97,9 @@ class StoryController extends ChangeNotifier with EngineListener {
   bool _disposed = false;
   bool _pacingHeld = false;
   Timer? _autoTimer;
+
+  /// Bumped when a load or rollback replaces the state, so pending waits of the old state stop.
+  int _epoch = 0;
 
   List<TranscriptEntry> get history => engine.history;
 
@@ -108,9 +122,79 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   bool get canAdvance => !_busy && (phase == StoryPhase.idle || phase == StoryPhase.showing);
 
-  Future<void> start({SaveSlot? save, Checkpoint? checkpoint}) async {
+  /// Whether [rollback] has a line to go back to.
+  bool get canRollback => _canRewind && engine.canRollback();
+
+  /// Whether the transcript line at [historyIndex] can be rolled back to.
+  bool canRollbackTo(int historyIndex) => _canRewind && engine.canRollback(historyIndex: historyIndex);
+
+  bool get _canRewind =>
+      !_busy && phase != StoryPhase.idle && phase != StoryPhase.typing && phase != StoryPhase.waiting;
+
+  /// Starts the story fresh, from a [save] or from a [checkpoint]. With [replay], only the checkpoint's
+  /// chapter is played and nothing is saved.
+  Future<void> start({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     audio.addObserver();
-    await engine.start(save: save, checkpoint: checkpoint);
+    await settings.load();
+    _applySettings();
+    settings.addListener(_applySettings);
+    await _begin(save: save, checkpoint: checkpoint, replay: replay);
+  }
+
+  /// Replaces the running story with [save].
+  Future<void> load(SaveSlot save) async {
+    if (_busy) return;
+    await _begin(save: save);
+  }
+
+  Future<void> quickSave() async {
+    if (replay) return;
+    await saveTo(SaveSlot.quickSlotId);
+  }
+
+  Future<void> quickLoad() async {
+    final save = await engine.storage?.loadSlot(SaveSlot.quickSlotId);
+    if (save == null) {
+      _toasts.add("No quick save yet");
+      return;
+    }
+    await load(save);
+    _toasts.add("Quick loaded");
+  }
+
+  /// Goes back to the previous line, or to the transcript line at [historyIndex]. A choice there can be
+  /// picked again.
+  Future<void> rollback({int? historyIndex}) async {
+    if (!_canRewind) return;
+    final item = engine.rollback(historyIndex: historyIndex);
+    if (item == null) return;
+    _epoch++;
+    _autoTimer?.cancel();
+    autoMode = false;
+    skipMode = false;
+    notification = null;
+    direction = null;
+    await audio.stopVoice();
+    _playMusic();
+    rolledBack = true;
+    _show(item);
+    if (!replay) await engine.saveTo(SaveSlot.autoSlotId);
+  }
+
+  Future<void> _begin({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
+    _epoch++;
+    _autoTimer?.cancel();
+    this.replay = replay;
+    autoMode = false;
+    skipMode = false;
+    rolledBack = false;
+    notification = null;
+    direction = null;
+    typingProfile = null;
+    _typingEntry = null;
+    phase = StoryPhase.idle;
+    await audio.stopVoice();
+    await engine.start(save: save, checkpoint: checkpoint, replay: replay);
     _playMusic();
 
     if (save == null) {
@@ -133,6 +217,23 @@ class StoryController extends ChangeNotifier with EngineListener {
       _scheduleAutoAdvance();
     }
   }
+
+  /// Shows [item] again, as restored by a rollback.
+  void _show(ItemType item) {
+    current = item;
+    currentProfile = engine.getProfile(item);
+    phase = _phaseOf(item);
+    _notify();
+    _scheduleAutoAdvance();
+  }
+
+  static StoryPhase _phaseOf(ItemType item) => switch (item) {
+        ChoiceItemType() => StoryPhase.choice,
+        InputItemType() => StoryPhase.input,
+        WaitItemType() || StageItemType() => StoryPhase.waiting,
+        EndingItemType() => StoryPhase.ending,
+        _ => StoryPhase.showing,
+      };
 
   /// Requests the next item. Ignored while an interaction or delivery is pending.
   Future<void> advance() async {
@@ -168,11 +269,20 @@ class StoryController extends ChangeNotifier with EngineListener {
   }
 
   Future<void> saveTo(int slotId) async {
+    if (replay) return;
     await engine.saveTo(slotId);
-    if (slotId != SaveSlot.autoSlotId) _toasts.add("Saved to slot $slotId");
+    switch (slotId) {
+      case SaveSlot.autoSlotId:
+        break;
+      case SaveSlot.quickSlotId:
+        _toasts.add("Quick saved");
+      default:
+        _toasts.add("Saved to slot $slotId");
+    }
   }
 
   Future<void> _next([ItemResult? result]) async {
+    final epoch = _epoch;
     _busy = true;
     _autoTimer?.cancel();
     try {
@@ -187,7 +297,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     }
     if (_disposed) return;
 
-    if (phase != StoryPhase.typing) await engine.saveTo(SaveSlot.autoSlotId);
+    if (phase != StoryPhase.typing && !replay) await engine.saveTo(SaveSlot.autoSlotId);
     if (phase == StoryPhase.waiting) {
       final duration = switch (current) {
         WaitItemType(:final durationMs) => skipMode ? 200 : durationMs,
@@ -195,7 +305,7 @@ class StoryController extends ChangeNotifier with EngineListener {
         _ => 0,
       };
       await Future.delayed(Duration(milliseconds: duration));
-      if (_disposed) return;
+      if (_disposed || epoch != _epoch) return;
       notification = null;
       phase = StoryPhase.showing;
       await advance();
@@ -240,13 +350,8 @@ class StoryController extends ChangeNotifier with EngineListener {
 
     current = item;
     currentProfile = profile;
-    phase = switch (item) {
-      ChoiceItemType() => StoryPhase.choice,
-      InputItemType() => StoryPhase.input,
-      WaitItemType() || StageItemType() => StoryPhase.waiting,
-      EndingItemType() => StoryPhase.ending,
-      _ => StoryPhase.showing,
-    };
+    rolledBack = false;
+    phase = _phaseOf(item);
     if (item is WaitItemType) notification = item.notificationText;
     // Stage directions keep Auto / Skip running. Anything else that is not a line stops them.
     if (phase != StoryPhase.showing && item is! StageItemType) {
@@ -271,6 +376,12 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   void _playMusic() => audio.playBgm(stage.music == null ? null : config.music(stage.music!));
 
+  void _applySettings() {
+    final value = settings.value;
+    audio.setVolumes(music: value.musicVolume, sound: value.soundVolume, voice: value.voiceVolume);
+    _notify();
+  }
+
   /// Pauses chat pacing, e.g. while a chapter card covers the thread.
   void holdPacing(bool held) {
     if (_pacingHeld == held) return;
@@ -288,14 +399,14 @@ class StoryController extends ChangeNotifier with EngineListener {
       return;
     }
     if (!autoMode && !skipMode) return;
-    if (skipMode && !engine.lastItemPreviouslySeen) {
-      // Skip only fast-forwards text read in an earlier playthrough.
+    if (skipMode && !engine.lastItemPreviouslySeen && !settings.value.skipUnread) {
+      // Skip only fast-forwards text read in an earlier playthrough, unless the player skips unread text too.
       skipMode = false;
       _notify();
       return;
     }
     final length = current?.getText()?.length ?? 0;
-    final delay = skipMode ? 120 : _readingDelayMs + length * _readingDelayPerCharMs;
+    final delay = skipMode ? 120 : settings.value.autoDelayFor(length);
     _autoTimer = Timer(Duration(milliseconds: delay), advance);
   }
 
@@ -328,6 +439,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   void dispose() {
     _disposed = true;
     _autoTimer?.cancel();
+    settings.removeListener(_applySettings);
     _toasts.close();
     audio.removeObserver();
     super.dispose();

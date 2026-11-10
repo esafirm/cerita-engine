@@ -1,0 +1,135 @@
+import 'package:cerita_core/cerita_core.dart';
+import 'package:flutter/material.dart';
+
+import '../player_prefs.dart';
+import '../vn/dialogue_box.dart';
+
+/// Text speed, auto-forward delay, skip and volumes. Changes are saved and applied right away.
+class SettingsScreen extends StatefulWidget {
+  final PlayerPrefs settings;
+
+  const SettingsScreen({super.key, required this.settings});
+
+  /// Typewriter speeds, slowest first. 0 is instant.
+  static const textSpeeds = [80, 60, 40, 25, 15, 0];
+  static const textSpeedLabels = ["Slowest", "Slow", "Normal", "Fast", "Faster", "Instant"];
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  static const _preview = "The phone buzzes again. This time, you read the message.";
+
+  PlayerPrefs get prefs => widget.settings;
+
+  @override
+  void initState() {
+    super.initState();
+    prefs.load();
+  }
+
+  void _update(PlayerSettings Function(PlayerSettings settings) change) => prefs.update(change(prefs.value));
+
+  /// Index in [SettingsScreen.textSpeeds] of the speed nearest to [msPerChar].
+  int _speedIndex(int msPerChar) {
+    var best = 0;
+    for (final (index, speed) in SettingsScreen.textSpeeds.indexed) {
+      if ((speed - msPerChar).abs() < (SettingsScreen.textSpeeds[best] - msPerChar).abs()) best = index;
+    }
+    return best;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    Widget header(String text) => Padding(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+          child: Text(text, style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary)),
+        );
+
+    Widget volume(String label, IconData icon, double value, PlayerSettings Function(double value) change) =>
+        ListTile(
+          leading: Icon(icon),
+          title: Text(label),
+          subtitle: Slider(
+            value: value,
+            divisions: 10,
+            label: "${(value * 100).round()}%",
+            onChanged: (value) => prefs.update(change(value)),
+          ),
+          trailing: SizedBox(width: 40, child: Text("${(value * 100).round()}%", textAlign: TextAlign.end)),
+        );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Settings"),
+        actions: [
+          TextButton(onPressed: () => prefs.update(const PlayerSettings()), child: const Text("Reset")),
+        ],
+      ),
+      body: ValueListenableBuilder(
+        valueListenable: prefs,
+        builder: (context, settings, _) {
+          final speed = _speedIndex(settings.textMsPerChar);
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              header("Text"),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 20, 12, 8),
+                // Keyed by speed, so the preview types out again when it changes.
+                child: DialogueBox(
+                  _preview,
+                  key: ValueKey(settings.textMsPerChar),
+                  speaker: "Preview",
+                  msPerChar: settings.textMsPerChar,
+                ),
+              ),
+              ListTile(
+                title: const Text("Text speed"),
+                subtitle: Slider(
+                  value: speed.toDouble(),
+                  max: SettingsScreen.textSpeeds.length - 1.0,
+                  divisions: SettingsScreen.textSpeeds.length - 1,
+                  label: SettingsScreen.textSpeedLabels[speed],
+                  onChanged: (value) =>
+                      _update((s) => s.copyWith(textMsPerChar: SettingsScreen.textSpeeds[value.round()])),
+                ),
+                trailing: SizedBox(width: 56, child: Text(SettingsScreen.textSpeedLabels[speed], textAlign: TextAlign.end)),
+              ),
+              ListTile(
+                title: const Text("Auto-forward delay"),
+                subtitle: Slider(
+                  value: settings.autoDelayMs.clamp(400, 3000).toDouble(),
+                  min: 400,
+                  max: 3000,
+                  divisions: 13,
+                  label: "${(settings.autoDelayMs / 1000).toStringAsFixed(1)} s",
+                  onChanged: (value) => _update((s) => s.copyWith(autoDelayMs: value.round())),
+                ),
+                trailing: SizedBox(
+                  width: 56,
+                  child: Text("${(settings.autoDelayMs / 1000).toStringAsFixed(1)} s", textAlign: TextAlign.end),
+                ),
+              ),
+              SwitchListTile(
+                title: const Text("Skip unread text"),
+                subtitle: const Text("Skip also fast-forwards lines you haven't read yet."),
+                value: settings.skipUnread,
+                onChanged: (value) => _update((s) => s.copyWith(skipUnread: value)),
+              ),
+              header("Sound"),
+              volume("Music", Icons.music_note_outlined, settings.musicVolume,
+                  (value) => settings.copyWith(musicVolume: value)),
+              volume("Sound effects", Icons.notifications_none, settings.soundVolume,
+                  (value) => settings.copyWith(soundVolume: value)),
+              volume("Voice", Icons.record_voice_over_outlined, settings.voiceVolume,
+                  (value) => settings.copyWith(voiceVolume: value)),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

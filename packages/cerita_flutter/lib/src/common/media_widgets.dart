@@ -65,6 +65,7 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
   @override
   void initState() {
     super.initState();
+    _player.setVolume(widget.audio?.voiceVolume ?? 1);
     _player.setSource(AssetSource(widget.asset)).then((_) async {
       final duration = await _player.getDuration();
       if (mounted && duration != null) setState(() => _duration = duration);
@@ -256,7 +257,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     _controller.initialize().then((_) {
       if (!mounted) return;
       setState(() {});
-      _controller.play();
+      _controller
+        ..setVolume(widget.audio?.voiceVolume ?? 1)
+        ..play();
     });
     _controller.addListener(() {
       if (mounted) setState(() {});

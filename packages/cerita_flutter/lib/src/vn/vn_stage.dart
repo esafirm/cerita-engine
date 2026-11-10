@@ -1,4 +1,5 @@
 import 'package:cerita_core/cerita_core.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../common/backlog_sheet.dart';
@@ -12,7 +13,8 @@ import 'dialogue_box.dart';
 import 'poi.dart';
 
 /// Visual Novel stage: background, sprite slots, dialogue box, CG overlays,
-/// choice / input overlays and quick controls (backlog, auto, skip, menu).
+/// choice / input overlays and quick controls (backlog, auto, skip, menu, back, quick save / load, hide).
+/// A mouse wheel scroll up rolls back.
 class VnStage extends StatefulWidget {
   final StoryController controller;
   final StorySetup setup;
@@ -31,13 +33,24 @@ class _VnStageState extends State<VnStage> {
   /// don't cover a question that is still being asked.
   ItemType? _typedItem;
 
+  /// The dialogue box, overlays and controls are hidden to look at the stage.
+  bool _hidden = false;
+
   StoryController get controller => widget.controller;
 
   LoaderConfig get config => widget.setup.config;
 
   void _onTap() {
+    if (_hidden) {
+      setState(() => _hidden = false);
+      return;
+    }
     if (_dialogueKey.currentState?.complete() ?? false) return;
     controller.advance();
+  }
+
+  void _onPointerSignal(PointerSignalEvent event) {
+    if (event is PointerScrollEvent && event.scrollDelta.dy < 0 && !_hidden) controller.rollback();
   }
 
   List<PoiActor> _actors() => [
@@ -62,77 +75,96 @@ class _VnStageState extends State<VnStage> {
     };
 
     final asked = text == null || item is MediaItemType || identical(_typedItem, item);
+    // Rolled-back lines and their stage show at once, like skipped ones.
+    final instant = controller.skipMode || controller.rolledBack;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _onTap,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Poi(
-            background: stage.background == null ? null : config.bg(stage.background!),
-            actors: _actors(),
-            speakerId: item is NarrationItemType ? null : stage.speakerId,
-            direction: controller.direction,
-            zoom: stage.zoom,
-            zoomFocus: stage.zoomFocus,
-            weather: stage.weather,
-            instant: controller.skipMode,
-          ),
-          if (item is MediaItemType) _MediaOverlay(item: item, setup: widget.setup, controller: controller),
-          if (text != null && item is! MediaItemType)
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 16,
-              child: DialogueBox(
-                text,
-                key: _dialogueKey,
-                speaker: item is NarrationItemType ? null : controller.currentProfile?.name,
-                italic: italic,
-                instant: controller.skipMode,
-                onTyped: () {
-                  if (!identical(_typedItem, item)) setState(() => _typedItem = item);
-                },
+    return Listener(
+      onPointerSignal: _onPointerSignal,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _onTap,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Poi(
+              background: stage.background == null ? null : config.bg(stage.background!),
+              actors: _actors(),
+              speakerId: item is NarrationItemType ? null : stage.speakerId,
+              direction: controller.direction,
+              zoom: stage.zoom,
+              zoomFocus: stage.zoomFocus,
+              weather: stage.weather,
+              instant: instant,
+            ),
+            if (item is MediaItemType) _MediaOverlay(item: item, setup: widget.setup, controller: controller),
+            // Offstage rather than removed, so the line doesn't type out again when it comes back.
+            Offstage(
+              offstage: _hidden,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (text != null && item is! MediaItemType)
+                    Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 16,
+                      child: DialogueBox(
+                        text,
+                        key: _dialogueKey,
+                        speaker: item is NarrationItemType ? null : controller.currentProfile?.name,
+                        italic: italic,
+                        instant: instant,
+                        msPerChar: controller.settings.value.textMsPerChar,
+                        onTyped: () {
+                          if (!identical(_typedItem, item)) setState(() => _typedItem = item);
+                        },
+                      ),
+                    ),
+                  if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
+                    _Dimmed(
+                      child: ChoiceList(key: ValueKey(item), item: item, dark: true, onSelected: controller.choose),
+                    ),
+                  if (controller.phase == StoryPhase.input && item is InputItemType && asked)
+                    _Dimmed(
+                      liftAboveKeyboard: true,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: InputPrompt(item: item, onSubmit: controller.submitInput),
+                        ),
+                      ),
+                    ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: StorySkin.of(context).vnHud(
+                      context,
+                      VnHud(
+                        label: scene.day != null || scene.time != null
+                            ? [
+                                if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
+                                if (scene.time != null) scene.time!,
+                              ].join(" · ")
+                            : null,
+                        autoMode: controller.autoMode,
+                        skipMode: controller.skipMode,
+                        onBacklog: () => BacklogSheet.show(context, controller),
+                        onAuto: controller.toggleAuto,
+                        onSkip: controller.toggleSkip,
+                        onMenu: widget.onMenu,
+                        onBack: controller.canRollback ? controller.rollback : null,
+                        onQuickSave: controller.replay ? null : controller.quickSave,
+                        onQuickLoad: controller.replay ? null : controller.quickLoad,
+                        onHide: () => setState(() => _hidden = true),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
-            _Dimmed(
-              child: ChoiceList(key: ValueKey(item), item: item, dark: true, onSelected: controller.choose),
-            ),
-          if (controller.phase == StoryPhase.input && item is InputItemType && asked)
-            _Dimmed(
-              liftAboveKeyboard: true,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: InputPrompt(item: item, onSubmit: controller.submitInput),
-                ),
-              ),
-            ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: StorySkin.of(context).vnHud(
-              context,
-              VnHud(
-                label: scene.day != null || scene.time != null
-                    ? [
-                        if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
-                        if (scene.time != null) scene.time!,
-                      ].join(" · ")
-                    : null,
-                autoMode: controller.autoMode,
-                skipMode: controller.skipMode,
-                onBacklog: () => BacklogSheet.show(context, controller),
-                onAuto: controller.toggleAuto,
-                onSkip: controller.toggleSkip,
-                onMenu: widget.onMenu,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

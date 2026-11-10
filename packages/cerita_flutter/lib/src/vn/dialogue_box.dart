@@ -13,6 +13,9 @@ class DialogueBox extends StatefulWidget {
   /// Skips the typewriter animation (skip mode, restored lines).
   final bool instant;
 
+  /// Typewriter speed. 0 shows the line at once.
+  final int msPerChar;
+
   /// Called once [text] is fully shown, typed out or completed by a tap.
   final VoidCallback? onTyped;
 
@@ -22,6 +25,7 @@ class DialogueBox extends StatefulWidget {
     this.speaker,
     this.italic = false,
     this.instant = false,
+    this.msPerChar = 40,
     this.onTyped,
   });
 
@@ -30,8 +34,6 @@ class DialogueBox extends StatefulWidget {
 }
 
 class DialogueBoxState extends State<DialogueBox> with SingleTickerProviderStateMixin {
-  static const _msPerChar = 40;
-
   late final AnimationController _typewriter = AnimationController(vsync: this)
     ..addStatusListener((status) {
       if (status.isCompleted) _typed();
@@ -62,8 +64,8 @@ class DialogueBoxState extends State<DialogueBox> with SingleTickerProviderState
 
   void _start() {
     _pending = false;
-    _typewriter.duration = Duration(milliseconds: widget.text.characters.length * _msPerChar);
-    if (widget.instant) {
+    _typewriter.duration = Duration(milliseconds: widget.text.characters.length * widget.msPerChar);
+    if (widget.instant || widget.msPerChar == 0) {
       final wasCompleted = _typewriter.isCompleted;
       _typewriter.value = 1;
       if (wasCompleted) _typed();

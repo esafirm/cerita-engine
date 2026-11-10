@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'meta_state.dart';
+import 'player_settings.dart';
 import 'save_slot.dart';
 
 /// Persists the global meta-state and playthrough save slots.
@@ -17,8 +18,15 @@ abstract class StoryStorage {
 
   Future<void> deleteSlot(int slotId);
 
-  /// Wipes meta-state and every save slot.
+  /// Wipes meta-state and every save slot. Player settings stay.
   Future<void> clear();
+
+  /// Player settings. Storages that don't override these keep them in memory only.
+  Future<PlayerSettings> loadSettings() async => _settings;
+
+  Future<void> saveSettings(PlayerSettings settings) async => _settings = settings;
+
+  PlayerSettings _settings = const PlayerSettings();
 }
 
 class InMemoryStoryStorage extends StoryStorage {

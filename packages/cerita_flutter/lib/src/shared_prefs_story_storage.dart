@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefsStoryStorage extends StoryStorage {
   static const _metaKey = "fsse.meta";
   static const _slotPrefix = "fsse.slot.";
+  static const _settingsKey = "fsse.settings";
 
   final String namespace;
 
@@ -16,6 +17,8 @@ class SharedPrefsStoryStorage extends StoryStorage {
   String get _meta => "$_metaKey.$namespace";
 
   String _slot(int id) => "$_slotPrefix$namespace.$id";
+
+  String get _settings => "$_settingsKey.$namespace";
 
   @override
   Future<GlobalMetaState> loadMeta() async {
@@ -50,6 +53,16 @@ class SharedPrefsStoryStorage extends StoryStorage {
 
   @override
   Future<void> deleteSlot(int slotId) async => (await _prefs).remove(_slot(slotId));
+
+  @override
+  Future<PlayerSettings> loadSettings() async {
+    final raw = (await _prefs).getString(_settings);
+    return raw == null ? const PlayerSettings() : PlayerSettings.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> saveSettings(PlayerSettings settings) async =>
+      (await _prefs).setString(_settings, jsonEncode(settings.toJson()));
 
   @override
   Future<void> clear() async {

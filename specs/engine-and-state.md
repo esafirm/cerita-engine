@@ -108,6 +108,7 @@ erDiagram
         Set_String unlocked_checkpoints
         Set_String chosen_choices
         Map_String_Dynamic persistent
+        Set_String heard_music
     }
     SAVE_SLOT {
         int slot_id
@@ -129,6 +130,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Unlocked Checkpoints (`unlocked_checkpoints`)**: Stores variable snapshots at major Day/Chapter boundaries so players can jump back to a specific Day to explore alternate branches.
 - **Chosen Choices (`chosen_choices`)**: `<conversation_key>#<item_index>#<choice_index>` of every choice ever picked, so menus can mark them.
 - **Persistent Variables (`persistent`)**: The `persistent.*` variables.
+- **Heard Music (`heard_music`)**: Every track the stage has played (scene `music` and `STAGE` `music` actions). Powers the music room.
 
 ### 5.2 Playthrough Save State (Auto-Save & Manual Slots)
 - **Active Pointer**: `conversation_id` and `dialogIndex`.
@@ -137,6 +139,18 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Call Stack (`call_stack`)**: Return points of pending `CALL`s.
 - **Chosen (`chosen`)**: `once` choices already picked in this playthrough.
 - **Stage (`stage`)**: See §6.
+
+Slot ids: `0` is the autosave, written after every delivered item. `-1` is the quick save slot. `1` and up are manual slots.
+
+### 5.3 Player Settings
+Preferences live outside both scopes, so resetting progress keeps them. `StoryStorage.loadSettings` / `saveSettings` store them; storages that don't override them keep the defaults in memory.
+
+| Field | Default | Meaning |
+| :--- | :--- | :--- |
+| `text_ms_per_char` | `40` | Typewriter speed. `0` shows lines at once. |
+| `auto_delay_ms` | `1200` | Auto mode pause after a line, before the per-character reading time (which scales with it). |
+| `skip_unread` | `false` | Skip mode also fast-forwards lines never seen before. |
+| `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. |
 
 ---
 
@@ -153,3 +167,21 @@ The VN stage is engine state, so a loaded save looks the way it did when it was 
 | `weather`, `zoom`, `zoom_focus` | `STAGE` `weather` and `zoom` actions. |
 
 Entering a conversation whose background or mode differs from the previous one clears the sprites, weather and zoom.
+
+---
+
+## 7. Rollback
+
+The engine remembers the last 100 delivered items with the full playthrough state after each one: pointer, variables, transcript length, call stack, `chosen`, scene and stage. Rolling back restores one of those states and returns its item, so the UI shows that line again. The next `next()` continues from there, and a CHOICE or INPUT can be answered differently.
+
+- Rollback targets are lines (`TEXT`, `NARRATION`, `MEDIA`, `CHOICE`, `INPUT`) delivered in a `VN` scene. `STAGE` and `WAIT` items are passed over. Chat and call threads move on by themselves, so they are not rollback targets.
+- `rollback()` goes back one line. `rollbackTo(historyIndex)` goes back to the line at that transcript index (the backlog uses it).
+- The global meta-state is not rolled back: seen lines, unlocks and `persistent.*` variables stay.
+- `random()` is evaluated again when the story moves forward after a rollback.
+- The rollback log is not saved. After loading a save, the loaded line is the first rollback target.
+
+---
+
+## 8. Scene Replay
+
+`start(checkpoint: ..., replay: true)` plays one chapter from an unlocked checkpoint with its saved variables. The replay ends with `EndOfStoryException` when the story enters a conversation with a different `chapter` (conversations without a `chapter`, like shared subroutines, don't end it). The UI does not autosave or offer saving during a replay.

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../story_controller.dart';
 
-/// Scrollable backlog of the delivered transcript.
+/// Scrollable backlog of the delivered transcript. Lines that can be rolled back to have a rewind button.
 class BacklogSheet extends StatelessWidget {
   final StoryController controller;
 
@@ -20,7 +20,9 @@ class BacklogSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lines = controller.history.where((entry) {
+    // With their transcript index, which rollback uses.
+    final lines = controller.history.indexed.where((line) {
+      final (_, entry) = line;
       final item = entry.itemType;
       return entry.isPlayer || item is TextItemType || item is NarrationItemType || item is MediaItemType;
     }).toList();
@@ -36,7 +38,7 @@ class BacklogSheet extends StatelessWidget {
             itemCount: lines.length,
             separatorBuilder: (_, _) => const Divider(height: 20),
             itemBuilder: (context, index) {
-              final entry = lines[lines.length - 1 - index];
+              final (historyIndex, entry) = lines[lines.length - 1 - index];
               final item = entry.itemType;
               final speaker = entry.isPlayer
                   ? controller.profileById(ProfileInfo.playerId)?.name
@@ -48,7 +50,7 @@ class BacklogSheet extends StatelessWidget {
                     MediaItemType(:final mediaType, :final caption) => "[${mediaType.key}] ${caption ?? ""}",
                     _ => item?.getText() ?? "",
                   };
-              return Column(
+              final line = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (speaker != null)
@@ -56,6 +58,20 @@ class BacklogSheet extends StatelessWidget {
                   Text(
                     text,
                     style: item is NarrationItemType ? const TextStyle(fontStyle: FontStyle.italic) : null,
+                  ),
+                ],
+              );
+              if (!controller.canRollbackTo(historyIndex)) return line;
+              return Row(
+                children: [
+                  Expanded(child: line),
+                  IconButton(
+                    tooltip: "Go back to this line",
+                    icon: const Icon(Icons.fast_rewind_outlined),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      controller.rollback(historyIndex: historyIndex);
+                    },
                   ),
                 ],
               );

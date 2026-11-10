@@ -72,6 +72,7 @@ class EndOfStoryException implements Exception {
 class RealFsseEngine extends FsseEngine {
   static const _tag = "FSSE";
   static const _maxJumps = 64;
+  static const _maxRollback = 100;
 
   final EngineLoader loader;
   final StoryStorage? storage;
@@ -107,6 +108,14 @@ class RealFsseEngine extends FsseEngine {
   /// `once` choices picked in this playthrough.
   final Set<String> _chosen = {};
 
+  /// State after each recently delivered item, oldest first. The last one is the current state.
+  final List<_Frame> _frames = [];
+
+  bool _replay = false;
+
+  /// The chapter being replayed. Entering a conversation of another chapter ends the replay.
+  String? _replayChapter;
+
   /// Whether the last item returned by [next] had been delivered in an earlier playthrough.
   bool lastItemPreviouslySeen = false;
 
@@ -123,8 +132,13 @@ class RealFsseEngine extends FsseEngine {
 
   Scene? get currentScene => _scene;
 
+  /// True while replaying a single chapter, see [start].
+  bool get replaying => _replay;
+
   /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
-  Future<void> start({SaveSlot? save, Checkpoint? checkpoint}) async {
+  /// With [replay], only the [checkpoint]'s chapter is played: entering a conversation of another
+  /// chapter throws [EndOfStoryException].
+  Future<void> start({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     final package = await loader.initialLoad();
     profileData = package.profiles;
     channels = package.channels;
@@ -134,6 +148,9 @@ class RealFsseEngine extends FsseEngine {
     _history.clear();
     _callStack.clear();
     _chosen.clear();
+    _frames.clear();
+    _replay = false;
+    _replayChapter = null;
     stage = StageState();
     currentConversation = null;
     _scene = null;
@@ -151,9 +168,19 @@ class RealFsseEngine extends FsseEngine {
       // A conversation without a scene kept the saved one, but the listener has not seen it yet.
       if (!conversation.hasScene && _scene != null) listener?.onNewScene(_scene!);
       if (save.stage != null) stage = _copyStage(save.stage!);
+      _hearMusic();
+      // The loaded line is the first rollback target.
+      final last = _history.lastWhere((entry) => !entry.isPlayer && entry.conversationKey == conversation.key,
+          orElse: () => TranscriptEntry(conversationKey: conversation.key, mode: SceneMode.vn));
+      if (last.itemType case final item?) _pushFrame(item);
     } else if (checkpoint != null) {
       dataMap.addAll(checkpoint.dataMap);
-      await _enterConversation(await loader.loadConversation(checkpoint.conversationKey));
+      final conversation = await loader.loadConversation(checkpoint.conversationKey);
+      if (replay) {
+        _replay = true;
+        _replayChapter = conversation.chapter;
+      }
+      await _enterConversation(conversation);
     } else {
       await _enterConversation(package.conversation);
     }
@@ -169,8 +196,73 @@ class RealFsseEngine extends FsseEngine {
 
     final item = await _resolveCurrentItem();
     final executed = await _execute(item);
+    _pushFrame(executed);
     await _flushMeta();
     return executed;
+  }
+
+  /// Whether [rollback] has a line to go back to. With [historyIndex], whether the line at that
+  /// transcript index can be rolled back to.
+  bool canRollback({int? historyIndex}) => _rollbackTarget(historyIndex) != null;
+
+  /// Restores the state right after the previous line was delivered, or after the line at transcript
+  /// [historyIndex], and returns that line. Null if there is none. The meta-state is not rolled back.
+  ItemType? rollback({int? historyIndex}) {
+    final index = _rollbackTarget(historyIndex);
+    if (index == null) return null;
+    final frame = _frames[index];
+    _frames.removeRange(index + 1, _frames.length);
+
+    final previousScene = _scene;
+    final previousConversation = currentConversation;
+    currentConversation = frame.conversation;
+    dialogIndex = frame.dialogIndex;
+    _scene = frame.scene;
+    dataMap
+      ..clear()
+      ..addAll(frame.dataMap);
+    _history.removeRange(frame.historyLength, _history.length);
+    _callStack
+      ..clear()
+      ..addAll(frame.callStack);
+    _chosen
+      ..clear()
+      ..addAll(frame.chosen);
+    stage = _copyStage(frame.stage);
+    _awaitingResult = frame.awaitingResult;
+    _lastItemKey = frame.lastItemKey;
+    lastItemPreviouslySeen = frame.previouslySeen;
+
+    if (!identical(previousScene, _scene) && _scene != null) listener?.onNewScene(_scene!);
+    if (!identical(previousConversation, currentConversation)) listener?.onConversationStarted(frame.conversation);
+    return frame.item;
+  }
+
+  /// Index in [_frames] of the newest line before the current one (or at [historyIndex]).
+  int? _rollbackTarget(int? historyIndex) {
+    for (var i = _frames.length - 2; i >= 0; i--) {
+      final frame = _frames[i];
+      if (frame.isTarget && (historyIndex == null || frame.historyLength - 1 == historyIndex)) return i;
+    }
+    return null;
+  }
+
+  void _pushFrame(ItemType item) {
+    _frames.add(_Frame(
+      item: item,
+      conversation: currentConversation!,
+      dialogIndex: dialogIndex,
+      scene: _scene,
+      dataMap: Map.of(dataMap),
+      historyLength: _history.length,
+      callStack: _callStack.toList(),
+      chosen: _chosen.toSet(),
+      stage: _copyStage(stage),
+      awaitingResult: _awaitingResult,
+      lastItemKey: _lastItemKey,
+      previouslySeen: lastItemPreviouslySeen,
+    ));
+    if (_frames.length > _maxRollback) _frames.removeAt(0);
   }
 
   @override
@@ -239,6 +331,12 @@ class RealFsseEngine extends FsseEngine {
   }
 
   StageState _copyStage(StageState stage) => StageState.fromJson(stage.toJson());
+
+  /// Records the stage music for the music room.
+  void _hearMusic() {
+    final music = stage.music;
+    if (music != null && meta.heardMusic.add(music)) _metaDirty = true;
+  }
 
   void _applyEffects(List<Effect> effects) {
     for (final effect in effects) {
@@ -335,6 +433,7 @@ class RealFsseEngine extends FsseEngine {
 
     if (prepared is StageItemType) {
       prepared.actions.forEach(stage.apply);
+      _hearMusic();
     } else {
       _placeSpeaker(prepared);
       _history.add(TranscriptEntry(
@@ -440,12 +539,17 @@ class RealFsseEngine extends FsseEngine {
 
   /// Called after initial load and after a new conversation is loaded.
   Future<void> _enterConversation(Conversation conversation, {int index = 0}) async {
+    final chapter = _replayChapter;
+    if (chapter != null && conversation.chapter != null && conversation.chapter != chapter) {
+      throw EndOfStoryException(conversation.key);
+    }
     final previous = _scene;
     currentConversation = conversation;
     dialogIndex = index;
     if (conversation.hasScene || previous == null) {
       _scene = conversation.scene;
       stage.enterScene(conversation.scene, previous: previous);
+      _hearMusic();
       listener?.onNewScene(conversation.scene);
     }
     listener?.onConversationStarted(conversation);
@@ -464,4 +568,45 @@ class RealFsseEngine extends FsseEngine {
       listener?.onCheckpointUnlocked(checkpoint);
     }
   }
+}
+
+/// Playthrough state right after [item] was delivered. See [RealFsseEngine.rollback].
+class _Frame {
+  final ItemType item;
+  final Conversation conversation;
+  final int dialogIndex;
+  final Scene? scene;
+  final Map<String, dynamic> dataMap;
+  final int historyLength;
+  final List<CallFrame> callStack;
+  final Set<String> chosen;
+  final StageState stage;
+  final bool awaitingResult;
+  final String? lastItemKey;
+  final bool previouslySeen;
+
+  const _Frame({
+    required this.item,
+    required this.conversation,
+    required this.dialogIndex,
+    required this.scene,
+    required this.dataMap,
+    required this.historyLength,
+    required this.callStack,
+    required this.chosen,
+    required this.stage,
+    required this.awaitingResult,
+    required this.lastItemKey,
+    required this.previouslySeen,
+  });
+
+  /// A line of a VN scene. Stage directions and waits are passed over, and chat / call threads
+  /// move on by themselves.
+  bool get isTarget =>
+      scene?.mode == SceneMode.vn &&
+      (item is TextItemType ||
+          item is NarrationItemType ||
+          item is MediaItemType ||
+          item is ChoiceItemType ||
+          item is InputItemType);
 }

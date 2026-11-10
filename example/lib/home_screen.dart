@@ -101,6 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ChaptersScreen(
                   setup: setup,
                   onSelect: (checkpoint) => _replaceWithStory(checkpoint: checkpoint),
+                  // On top of the chapter list, so the replay comes back to it.
+                  onReplay: (checkpoint) => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => StoryScreen(setup: setup, checkpoint: checkpoint, replay: true),
+                  )),
                 ),
               ),
             ),
@@ -113,6 +117,16 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Endings",
               icon: Icons.emoji_events_outlined,
               onTap: () => _push(EndingsScreen(setup: setup)),
+            ),
+            TitleMenuEntry(
+              label: "Music",
+              icon: Icons.library_music_outlined,
+              onTap: () => _push(MusicRoomScreen(setup: setup)),
+            ),
+            TitleMenuEntry(
+              label: "Settings",
+              icon: Icons.tune,
+              onTap: () => _push(SettingsScreen(settings: setup.settings)),
             ),
             TitleMenuEntry(label: "Features", icon: Icons.checklist, onTap: () => _push(const CapabilitiesScreen())),
             TitleMenuEntry(label: "Reset", icon: Icons.restart_alt, onTap: _resetProgress),

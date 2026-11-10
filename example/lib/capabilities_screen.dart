@@ -55,11 +55,24 @@ class CapabilitiesScreen extends StatelessWidget {
       "Persistence & meta",
       [
         ("Autosave & slots", "Continue from the title, or save to 3 manual slots from the in-game menu."),
+        ("Save thumbnails", "Each slot shows its saved stage: background and characters."),
         ("Transcript", "Chat history and VN backlog survive app restarts."),
         ("Gallery", "Locked silhouettes with unlock hints; photos, voice notes and videos replay any time."),
         ("Endings", "Collection with unlocked / total progress."),
         ("Chapters", "Jump back to Prologue, Day 1 or Day 2 with the variables you had there."),
-        ("Auto / Skip", "VN quick controls; Skip only fast-forwards lines read in an earlier playthrough."),
+        ("Scene replay", "Chapters → replay button: plays only that chapter, then comes back. Saves are untouched."),
+        ("Music room", "Title → Music: every track you have heard. The night ambience unlocks in the prologue."),
+      ],
+    ),
+    (
+      "Player controls",
+      [
+        ("Rollback", "BACK (or scroll up) returns to the previous line. Back at the prologue menu, pick another answer."),
+        ("Backlog jump", "LOG: the rewind button next to a VN line goes straight back to it."),
+        ("Quick save / load", "Q.SAVE and Q.LOAD on the VN stage."),
+        ("Hide", "HIDE clears the dialogue box and controls to look at the stage or a CG. Tap to bring them back."),
+        ("Auto / Skip", "VN quick controls. Skip only fast-forwards lines read before, unless the setting says otherwise."),
+        ("Settings", "Title → Settings or Menu → Settings: text speed with a preview, auto delay, skip unread, volumes."),
       ],
     ),
   ];

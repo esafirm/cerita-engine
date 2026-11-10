@@ -151,19 +151,37 @@ class AnimeVnSkin extends StorySkin {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (hud.label != null) _HudLabel(hud.label!),
-            const Spacer(),
+            Row(
+              children: [
+                if (hud.label != null) _HudLabel(hud.label!),
+                const Spacer(),
+                _Glass(
+                  radius: 999,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _HudButton("LOG", onTap: hud.onBacklog),
+                      _HudButton("AUTO", active: hud.autoMode, onTap: hud.onAuto),
+                      _HudButton("SKIP", active: hud.skipMode, onTap: hud.onSkip),
+                      _HudButton("MENU", onTap: hud.onMenu),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
             _Glass(
               radius: 999,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _HudButton("LOG", onTap: hud.onBacklog),
-                  _HudButton("AUTO", active: hud.autoMode, onTap: hud.onAuto),
-                  _HudButton("SKIP", active: hud.skipMode, onTap: hud.onSkip),
-                  _HudButton("MENU", onTap: hud.onMenu),
+                  _HudButton("BACK", onTap: hud.onBack),
+                  _HudButton("Q.SAVE", onTap: hud.onQuickSave),
+                  _HudButton("Q.LOAD", onTap: hud.onQuickLoad),
+                  _HudButton("HIDE", onTap: hud.onHide),
                 ],
               ),
             ),
@@ -383,7 +401,9 @@ class _HudLabel extends StatelessWidget {
 class _HudButton extends StatelessWidget {
   final String label;
   final bool active;
-  final VoidCallback onTap;
+
+  /// Null shows the button disabled.
+  final VoidCallback? onTap;
 
   const _HudButton(this.label, {this.active = false, required this.onTap});
 
@@ -397,7 +417,9 @@ class _HudButton extends StatelessWidget {
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
-            color: active ? CeritaColors.blossom : CeritaColors.moon.withAlpha(200),
+            color: active
+                ? CeritaColors.blossom
+                : CeritaColors.moon.withAlpha(onTap == null ? 80 : 200),
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,

@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import '../story_setup.dart';
 import 'meta_loader.dart';
 
-/// Chapter / Day timeline. Unlocked checkpoints can be replayed with their saved variables.
+/// Chapter / Day timeline. The story can be continued from an unlocked checkpoint with its saved
+/// variables ([onSelect]), or just that chapter replayed ([onReplay]).
 class ChaptersScreen extends StatelessWidget {
   final StorySetup setup;
   final ValueChanged<Checkpoint> onSelect;
 
-  const ChaptersScreen({super.key, required this.setup, required this.onSelect});
+  /// Null hides the replay button.
+  final ValueChanged<Checkpoint>? onReplay;
+
+  const ChaptersScreen({super.key, required this.setup, required this.onSelect, this.onReplay});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +61,15 @@ class ChaptersScreen extends StatelessWidget {
                           enabled: unlocked,
                           title: Text(conversation.chapter ?? conversation.key),
                           subtitle: Text(unlocked ? (conversation.title ?? "") : "Not reached yet"),
-                          trailing: unlocked ? const Icon(Icons.play_arrow) : null,
+                          trailing: switch (onReplay) {
+                            final onReplay? when unlocked => IconButton(
+                                tooltip: "Replay this chapter",
+                                icon: const Icon(Icons.replay),
+                                onPressed: () => onReplay(checkpoint),
+                              ),
+                            _ when unlocked => const Icon(Icons.play_arrow),
+                            _ => null,
+                          },
                           onTap: unlocked ? () => onSelect(checkpoint) : null,
                         ),
                       ),

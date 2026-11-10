@@ -2,8 +2,9 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../story_setup.dart';
+import '../vn/poi.dart';
 
-/// Lists the autosave and manual slots. Saves when [onSave] is set, loads via [onLoad] otherwise.
+/// Lists the autosave, quick save and manual slots. Saves when [onSave] is set, loads via [onLoad] otherwise.
 class SaveSlotsScreen extends StatefulWidget {
   static const manualSlots = [1, 2, 3];
 
@@ -20,6 +21,10 @@ class SaveSlotsScreen extends StatefulWidget {
 class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
   late Future<List<SaveSlot>> _slots = widget.setup.storage.listSlots();
 
+  /// For the thumbnails. Null if the story can't be loaded, then the thumbnails show the mode only.
+  late final Future<ProfileData?> _profiles =
+      widget.setup.loader.initialLoad().then<ProfileData?>((package) => package.profiles).catchError((_) => null);
+
   bool get _saving => widget.onSave != null;
 
   String _describe(SaveSlot slot) {
@@ -30,40 +35,125 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
 
   String _two(int value) => value.toString().padLeft(2, "0");
 
+  String _name(int id) => switch (id) {
+        SaveSlot.autoSlotId => "Autosave",
+        SaveSlot.quickSlotId => "Quick save",
+        _ => "Slot $id",
+      };
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(_saving ? "Save game" : "Load game")),
       body: FutureBuilder(
-        future: _slots,
+        future: Future.wait([_slots, _profiles]),
         builder: (context, snapshot) {
-          final slots = {for (final slot in snapshot.data ?? const <SaveSlot>[]) slot.slotId: slot};
-          final ids = [if (!_saving) SaveSlot.autoSlotId, ...SaveSlotsScreen.manualSlots];
+          final data = snapshot.data;
+          final slots = {for (final slot in data?[0] as List<SaveSlot>? ?? const <SaveSlot>[]) slot.slotId: slot};
+          final profiles = data?[1] as ProfileData?;
+          final ids = [if (!_saving) ...[SaveSlot.autoSlotId, SaveSlot.quickSlotId], ...SaveSlotsScreen.manualSlots];
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
               for (final id in ids)
                 Card(
-                  child: ListTile(
-                    isThreeLine: slots[id] != null,
-                    leading: Icon(id == SaveSlot.autoSlotId ? Icons.autorenew : Icons.bookmark_outline),
-                    title: Text(id == SaveSlot.autoSlotId ? "Autosave" : "Slot $id"),
-                    subtitle: Text(slots[id] == null ? "Empty" : _describe(slots[id]!)),
-                    enabled: _saving || slots[id] != null,
-                    onTap: () async {
-                      if (_saving) {
-                        await widget.onSave!(id);
-                        setState(() => _slots = widget.setup.storage.listSlots());
-                      } else {
-                        widget.onLoad?.call(slots[id]!);
-                      }
-                    },
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: _saving || slots[id] != null
+                        ? () async {
+                            if (_saving) {
+                              await widget.onSave!(id);
+                              setState(() => _slots = widget.setup.storage.listSlots());
+                            } else {
+                              widget.onLoad?.call(slots[id]!);
+                            }
+                          }
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        children: [
+                          SaveThumbnail(slot: slots[id], setup: widget.setup, profiles: profiles),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(_name(id), style: theme.textTheme.titleMedium),
+                                const SizedBox(height: 4),
+                                Text(
+                                  slots[id] == null ? "Empty" : _describe(slots[id]!),
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+/// A save slot's stage in miniature: background and characters as they were saved.
+/// Chat and call saves, and saves without a stage, show the mode instead.
+class SaveThumbnail extends StatelessWidget {
+  static const size = Size(64, 96);
+
+  final SaveSlot? slot;
+  final StorySetup setup;
+  final ProfileData? profiles;
+
+  const SaveThumbnail({super.key, required this.slot, required this.setup, this.profiles});
+
+  @override
+  Widget build(BuildContext context) {
+    final slot = this.slot;
+    final stage = slot?.stage;
+    final mode = slot?.scene?.mode ?? SceneMode.vn;
+    final scheme = Theme.of(context).colorScheme;
+
+    final Widget child;
+    if (slot == null || stage == null || mode != SceneMode.vn) {
+      child = ColoredBox(
+        color: scheme.surfaceContainerHighest,
+        child: Icon(
+          switch (slot) {
+            null => Icons.bookmark_outline,
+            _ when mode == SceneMode.chat => Icons.chat_bubble_outline,
+            _ when mode == SceneMode.call => Icons.call_outlined,
+            _ => Icons.auto_stories_outlined,
+          },
+          color: scheme.outline,
+        ),
+      );
+    } else {
+      final config = setup.config;
+      child = IgnorePointer(
+        child: Poi(
+          background: stage.background == null ? null : config.bg(stage.background!),
+          actors: [
+            for (final MapEntry(key: position, value: info) in stage.sprites.entries)
+              if (profiles?.byId(info.id)?.getSprite(info) case final sprite?)
+                PoiActor(id: info.id, sprite: config.sprite(sprite), position: position),
+          ],
+          speakerId: stage.speakerId,
+          zoom: stage.zoom,
+          zoomFocus: stage.zoomFocus,
+          instant: true,
+        ),
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox.fromSize(size: size, child: child),
     );
   }
 }

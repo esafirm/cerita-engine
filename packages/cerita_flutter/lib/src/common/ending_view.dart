@@ -1,13 +1,22 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
-/// Ending summary overlay. Without an [ending] it shows a plain "The End".
+/// Ending summary overlay. Without an [ending] it shows [title], "The End" by default.
 class EndingView extends StatelessWidget {
   final EndingItemType? ending;
+  final String title;
+  final String backLabel;
   final VoidCallback onTitle;
   final VoidCallback? onEndings;
 
-  const EndingView({super.key, this.ending, required this.onTitle, this.onEndings});
+  const EndingView({
+    super.key,
+    this.ending,
+    this.title = "The End",
+    this.backLabel = "Back to title",
+    required this.onTitle,
+    this.onEndings,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +37,7 @@ class EndingView extends StatelessWidget {
                   if (ending != null) EndingBadge(category: ending.category),
                   const SizedBox(height: 16),
                   Text(
-                    ending?.title ?? "The End",
+                    ending?.title ?? title,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                   ),
@@ -50,7 +59,7 @@ class EndingView extends StatelessWidget {
                           style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
                           child: const Text("All endings"),
                         ),
-                      FilledButton(onPressed: onTitle, child: const Text("Back to title")),
+                      FilledButton(onPressed: onTitle, child: Text(backLabel)),
                     ],
                   ),
                 ],

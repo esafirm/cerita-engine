@@ -1,6 +1,7 @@
 import 'data/conversation.dart';
 import 'data/items/ending.dart';
 import 'data/items/media.dart';
+import 'data/items/stage.dart';
 import 'loader.dart';
 
 /// Every collectible, ending and checkpoint declared across the story files.
@@ -24,6 +25,16 @@ class StoryCatalog {
       .fold(<String, CatalogEntry<EndingItemType>>{}, (map, entry) => map..putIfAbsent(entry.item.endingId, () => entry))
       .values
       .toList();
+
+  /// Music files in file order: scene music and `STAGE` music actions.
+  List<String> get music => {
+        for (final conversation in conversations) ...[
+          if (conversation.hasScene && conversation.scene.music != null) conversation.scene.music!,
+          for (final item in conversation.conversations.whereType<StageItemType>())
+            for (final action in item.actions.whereType<MusicAction>())
+              if (action.file != null) action.file!,
+        ],
+      }.toList();
 
   List<Conversation> get checkpoints => conversations.where((conversation) => conversation.checkpoint).toList()
     ..sort((a, b) => (a.scene.day ?? 0).compareTo(b.scene.day ?? 0));

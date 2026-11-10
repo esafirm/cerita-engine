@@ -111,7 +111,8 @@ class StorySkin {
     );
   }
 
-  /// The VN overlay with the chapter label and the backlog / auto / skip / menu controls.
+  /// The VN overlay with the chapter label and the quick controls: backlog, auto, skip and menu,
+  /// then back, quick save, quick load and hide. A null callback means the control is unavailable.
   Widget vnHud(BuildContext context, VnHud hud) {
     Widget toggle(String label, bool active, VoidCallback onTap) => Padding(
           padding: const EdgeInsets.only(left: 4),
@@ -123,18 +124,39 @@ class StorySkin {
           ),
         );
 
+    Widget button(String tooltip, IconData icon, VoidCallback? onPressed) => IconButton.filledTonal(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          visualDensity: VisualDensity.compact,
+          icon: Icon(icon),
+        );
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (hud.label != null) Chip(visualDensity: VisualDensity.compact, label: Text(hud.label!)),
-            const Spacer(),
-            IconButton.filledTonal(tooltip: "Backlog", onPressed: hud.onBacklog, icon: const Icon(Icons.history)),
-            toggle("Auto", hud.autoMode, hud.onAuto),
-            toggle("Skip", hud.skipMode, hud.onSkip),
-            IconButton.filledTonal(tooltip: "Menu", onPressed: hud.onMenu, icon: const Icon(Icons.menu)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (hud.label != null) Chip(visualDensity: VisualDensity.compact, label: Text(hud.label!)),
+                const Spacer(),
+                button("Backlog", Icons.history, hud.onBacklog),
+                toggle("Auto", hud.autoMode, hud.onAuto),
+                toggle("Skip", hud.skipMode, hud.onSkip),
+                button("Menu", Icons.menu, hud.onMenu),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                button("Back", Icons.undo, hud.onBack),
+                button("Quick save", Icons.bookmark_add_outlined, hud.onQuickSave),
+                button("Quick load", Icons.bookmark_outline, hud.onQuickLoad),
+                button("Hide", Icons.visibility_off_outlined, hud.onHide),
+              ],
+            ),
           ],
         ),
       ),
@@ -174,6 +196,16 @@ class VnHud {
   final VoidCallback onSkip;
   final VoidCallback onMenu;
 
+  /// Rolls back to the previous line. Null when there is none.
+  final VoidCallback? onBack;
+
+  /// Null while saving is unavailable, e.g. during a replay.
+  final VoidCallback? onQuickSave;
+  final VoidCallback? onQuickLoad;
+
+  /// Hides the dialogue box and the controls until the next tap.
+  final VoidCallback onHide;
+
   const VnHud({
     required this.label,
     required this.autoMode,
@@ -182,5 +214,9 @@ class VnHud {
     required this.onAuto,
     required this.onSkip,
     required this.onMenu,
+    required this.onHide,
+    this.onBack,
+    this.onQuickSave,
+    this.onQuickLoad,
   });
 }

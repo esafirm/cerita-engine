@@ -10,6 +10,7 @@ import 'common/ending_view.dart';
 import 'meta/endings_screen.dart';
 import 'meta/gallery_screen.dart';
 import 'meta/save_slots_screen.dart';
+import 'meta/settings_screen.dart';
 import 'scene_switcher.dart';
 import 'skin/chapter_card_overlay.dart';
 import 'story_controller.dart';
@@ -17,12 +18,14 @@ import 'story_setup.dart';
 import 'vn/vn_stage.dart';
 
 /// Plays a story and switches presentation mode whenever the scene changes.
+/// With [replay], only the [checkpoint]'s chapter is played and nothing is saved.
 class StoryScreen extends StatefulWidget {
   final StorySetup setup;
   final SaveSlot? save;
   final Checkpoint? checkpoint;
+  final bool replay;
 
-  const StoryScreen({super.key, required this.setup, this.save, this.checkpoint});
+  const StoryScreen({super.key, required this.setup, this.save, this.checkpoint, this.replay = false});
 
   @override
   State<StoryScreen> createState() => _StoryScreenState();
@@ -33,6 +36,8 @@ class _StoryScreenState extends State<StoryScreen> {
     loader: widget.setup.loader,
     storage: widget.setup.storage,
     config: widget.setup.config,
+    settings: widget.setup.settings,
+    audio: widget.setup.audio(),
   );
   StreamSubscription<String>? _toasts;
   Object? _error;
@@ -50,7 +55,9 @@ class _StoryScreenState extends State<StoryScreen> {
           duration: const Duration(seconds: 2),
         ));
     });
-    _controller.start(save: widget.save, checkpoint: widget.checkpoint).catchError((Object error) {
+    _controller
+        .start(save: widget.save, checkpoint: widget.checkpoint, replay: widget.replay)
+        .catchError((Object error) {
       if (mounted) setState(() => _error = error);
     });
   }
@@ -79,17 +86,38 @@ class _StoryScreenState extends State<StoryScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (!_controller.replay)
+                ListTile(
+                  leading: const Icon(Icons.save_outlined),
+                  title: const Text("Save game"),
+                  onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
+                      ))),
+                ),
               ListTile(
-                leading: const Icon(Icons.save_outlined),
-                title: const Text("Save game"),
+                leading: const Icon(Icons.folder_open),
+                title: const Text("Load game"),
                 onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
+                      builder: (route) => SaveSlotsScreen(
+                        setup: widget.setup,
+                        onLoad: (save) {
+                          Navigator.of(route).pop();
+                          _controller.load(save);
+                        },
+                      ),
                     ))),
               ),
               ListTile(
                 leading: const Icon(Icons.history),
                 title: const Text("Backlog"),
                 onTap: () => close(() => BacklogSheet.show(context, _controller)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.tune),
+                title: const Text("Settings"),
+                onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => SettingsScreen(settings: widget.setup.settings),
+                    ))),
               ),
               ListTile(
                 leading: const Icon(Icons.data_object),
@@ -204,7 +232,9 @@ class _StoryScreenState extends State<StoryScreen> {
                   onTitle: () => Navigator.of(context).pop(),
                 ),
               if (controller.phase == StoryPhase.finished)
-                EndingView(onTitle: () => Navigator.of(context).pop()),
+                controller.replay
+                    ? EndingView(title: "End of replay", backLabel: "Back", onTitle: () => Navigator.of(context).pop())
+                    : EndingView(onTitle: () => Navigator.of(context).pop()),
             ],
           ),
         );

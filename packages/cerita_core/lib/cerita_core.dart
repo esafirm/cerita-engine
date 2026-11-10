@@ -22,6 +22,7 @@ export 'src/data/profile.dart';
 export 'src/data/scene.dart';
 export 'src/fsse_engine.dart';
 export 'src/state/meta_state.dart';
+export 'src/state/player_settings.dart';
 export 'src/state/save_slot.dart';
 export 'src/state/stage_state.dart';
 export 'src/state/story_storage.dart';
