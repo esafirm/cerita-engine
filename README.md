@@ -82,3 +82,5 @@ make install DEVICE=emulator-5554   # profile build, install (keeping saves) and
 ```
 
 `example/test/story_test.dart` plays the bundled story headlessly to all four endings.
+
+Keep tests focused on behaviour a player or writer would notice: story flow, saves, rollback, what the screens show. Don't add low-value tests, like ones for trivial helpers, getters or formatting, or ones that repeat what another test already covers.
