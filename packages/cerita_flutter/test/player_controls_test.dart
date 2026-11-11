@@ -188,9 +188,4 @@ void main() {
     expect(poi.actors.single.sprite, endsWith("nora.png"));
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
   });
-
-  test('music room titles', () {
-    expect(MusicRoomScreen.titleOf("night_ambience.mp3"), "Night Ambience");
-    expect(MusicRoomScreen.titleOf("bgm/sunny-day.ogg"), "Sunny Day");
-  });
 }

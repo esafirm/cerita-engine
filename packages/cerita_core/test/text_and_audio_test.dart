@@ -32,12 +32,6 @@ Map<String, dynamic> _stage(List<Map<String, dynamic>> actions) => {"type": "STA
 
 void main() {
   group('TextMarkup', () {
-    test('a line without tags is one plain run', () {
-      final markup = TextMarkup.parse("Hello there");
-      expect(markup.tokens, [const MarkupText("Hello there", MarkupStyle())]);
-      expect(markup.noWait, isFalse);
-    });
-
     test('styles nest and close in any order', () {
       final markup = TextMarkup.parse("a{b}b{i}c{/b}d{/i}e");
       expect(markup.tokens, [

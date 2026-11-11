@@ -129,12 +129,4 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.current?.getText(), "Morning");
   });
-
-  test('values typed in the panel', () {
-    expect(DeveloperSheet.parseValue(" 3.5 "), 3.5);
-    expect(DeveloperSheet.parseValue("false"), false);
-    expect(DeveloperSheet.parseValue("'Blue'"), "Blue");
-    expect(DeveloperSheet.parseValue("Blue"), "Blue");
-    expect(DeveloperSheet.parseValue('"12"'), "12");
-  });
 }

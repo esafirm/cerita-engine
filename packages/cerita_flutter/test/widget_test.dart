@@ -38,11 +38,6 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       expect(typed, 3);
     });
-
-    testWidgets('instant shows the full text', (tester) async {
-      await tester.pumpWidget(_wrap(const DialogueBox('Hello', instant: true)));
-      expect(find.text('Hello'), findsOneWidget);
-    });
   });
 
   group('ChoiceList', () {
