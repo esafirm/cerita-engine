@@ -1,5 +1,6 @@
 import 'data/channel.dart';
 import 'data/conversation.dart';
+import 'data/items/media.dart';
 import 'data/profile.dart';
 
 class EnginePackage {
@@ -19,6 +20,13 @@ abstract class EngineLoader {
 
   /// Keys of every conversation in the story. Used to build the gallery / endings catalog.
   Future<List<String>> listConversationKeys() async => const [Conversation.indexKey];
+
+  /// Forgets cached story files, so the next loads read them again (developer reload).
+  void clearCache() {}
+
+  /// Tells whether a file (a [LoaderConfig] path) exists, for [StoryLinter.assetExists]. Null when the
+  /// loader can't tell.
+  Future<bool Function(String path)?> assetChecker() async => null;
 }
 
 class LoaderConfig {
@@ -43,6 +51,9 @@ class LoaderConfig {
   String music(String name) => "$musicDir/$name";
 
   String media(String name) => "$mediaDir/$name";
+
+  /// CGs live in `bg/`; photos, voice notes and videos in `media/`.
+  String mediaPath(MediaItemType item) => item.mediaType == MediaType.cg ? bg(item.uri) : media(item.uri);
 
   /// Avatars may be full asset paths (as in the spec) or bare sprite file names.
   String avatar(String path) => path.startsWith("assets/") ? path : sprite(path);

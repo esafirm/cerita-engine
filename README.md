@@ -22,6 +22,7 @@ See [`specs/`](specs/README.md) for the full specification.
 | Settings (text speed, auto delay, skip unread, volumes), music room, chapter replay | Title screen and in-game menu |
 | Text tags (`{b}` `{i}` `{color}` `{shake}` `{wave}` `{speed}` `{w}` `{nw}`), NVL page | Prologue opening, Day 2, secret ending |
 | Music fades, ambience loop, overlapping sounds, per-character voice volume, voice replay | Prologue → "Nah", settings, backlog |
+| Developer panel (edit variables, jump to any label, story check, reload on hot reload) | In-game menu → Developer, debug builds |
 
 The title screen's **Features** page lists each feature and where to see it.
 

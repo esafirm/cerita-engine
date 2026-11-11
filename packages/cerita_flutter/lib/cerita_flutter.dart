@@ -17,6 +17,7 @@ export 'src/common/input_prompt.dart';
 export 'src/common/media_widgets.dart';
 export 'src/common/tagged_text.dart';
 export 'src/meta/chapters_screen.dart';
+export 'src/meta/developer_sheet.dart';
 export 'src/meta/endings_screen.dart';
 export 'src/meta/gallery_screen.dart';
 export 'src/meta/music_room_screen.dart';

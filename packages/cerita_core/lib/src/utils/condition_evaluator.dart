@@ -26,6 +26,38 @@ class ConditionEvaluator {
     return result is _Unset ? null : result;
   }
 
+  /// Variables [expression] reads, without function names. Empty if it doesn't tokenize.
+  static Set<String> variablesOf(String expression) {
+    final List<_Token> tokens;
+    try {
+      tokens = _tokenize(expression);
+    } on ConditionException {
+      return const {};
+    }
+    return {
+      for (final (index, token) in tokens.indexed)
+        if (token.type == _TokenType.identifier &&
+            token.text != "true" &&
+            token.text != "false" &&
+            (index + 1 >= tokens.length || tokens[index + 1].type != _TokenType.lParen))
+          token.text,
+    };
+  }
+
+  /// Why [expression] can't be evaluated whatever the variables hold: bad syntax, an unknown function
+  /// or wrong arguments. Null when it is fine. Errors that depend on the values (division by zero,
+  /// comparing a string with a number) are not reported.
+  static String? syntaxError(String expression) {
+    try {
+      const ConditionEvaluator().value(expression, const {});
+      return null;
+    } on ConditionException catch (error) {
+      const valueErrors = ["Division by zero", "Can't compare", "Can't use"];
+      final dependsOnValues = valueErrors.any(error.message.startsWith) || error.message.contains("empty range");
+      return dependsOnValues ? null : error.message;
+    }
+  }
+
   dynamic _run(String expression, Map<String, dynamic> dataMap) {
     final parser = _Parser(_tokenize(expression), dataMap, expression, _random ?? _defaultRandom);
     final result = parser.parseOr();

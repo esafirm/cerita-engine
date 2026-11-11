@@ -76,6 +76,15 @@ class CapabilitiesScreen extends StatelessWidget {
       ],
     ),
     (
+      "Authoring tools",
+      [
+        ("Story linter", "make lint-story: broken targets, unknown characters and tags, unset variables, missing files."),
+        ("Story graph", "make story-graph prints the routes as a Mermaid flowchart."),
+        ("Developer panel", "Debug builds, Menu → Developer: edit variables, jump to any conversation or label, check the story."),
+        ("Story hot reload", "Edit a story file and hot reload: the story reads it again and stays on the line."),
+      ],
+    ),
+    (
       "Player controls",
       [
         ("Rollback", "BACK (or scroll up) returns to the previous line. Back at the prologue menu, pick another answer."),

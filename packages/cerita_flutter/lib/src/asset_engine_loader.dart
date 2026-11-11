@@ -42,6 +42,17 @@ class AssetEngineLoader extends EngineLoader {
     return Conversation.fromJson(await _loadJson("${config.storyDir}/$file"), key: key);
   }
 
+  /// Clears the bundle's cache. With `flutter run`, a hot reload has copied the edited files already.
+  @override
+  void clearCache() => bundle.clear();
+
+  /// The bundled files, from the asset manifest.
+  @override
+  Future<bool Function(String path)?> assetChecker() async {
+    final assets = (await AssetManifest.loadFromAssetBundle(bundle)).listAssets().toSet();
+    return assets.contains;
+  }
+
   @override
   Future<List<String>> listConversationKeys() async {
     final manifest = await AssetManifest.loadFromAssetBundle(bundle);

@@ -40,8 +40,7 @@
     {
       "type": "TEXT",
       "text": "Nice to e-meet you {{NAME}} 🙏 ...kidding. Sit down.",
-      "profile": "123aaa:2",
-      "effects": [{ "variable": "met_nora", "op": "set", "value": true }]
+      "profile": "123aaa:2"
     },
     {
       "type": "TEXT",

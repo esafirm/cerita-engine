@@ -8,7 +8,7 @@ ADB := adb $(if $(DEVICE),-s $(DEVICE),)
 APP_ID := id.twk.fsse
 
 .DEFAULT_GOAL := help
-.PHONY: help get analyze test test-core test-flutter check run install apk web clean
+.PHONY: help get analyze test test-core test-flutter lint-story story-graph check run install apk web clean
 
 help: ## List the available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-14s %s\n", $$1, $$2}'
@@ -27,7 +27,13 @@ test-core: get ## Test the pure Dart engine
 test-flutter: get ## Test the Flutter packages and the example
 	@set -e; for dir in $(FLUTTER_PACKAGES); do echo "==> $$dir"; (cd $$dir && flutter test); done
 
-check: analyze test ## Analyze and test, like CI
+lint-story: get ## Check the demo story for broken targets, typos and missing files
+	dart run cerita_core:cerita lint --strict example/assets/story
+
+story-graph: get ## Print the demo story as a Mermaid flowchart
+	@dart run cerita_core:cerita graph example/assets/story
+
+check: analyze test lint-story ## Analyze, test and lint the story, like CI
 
 run: get ## Run the demo app (DEVICE=<id> to pick a device)
 	cd example && flutter run $(DEVICE_FLAG)

@@ -201,6 +201,48 @@ class RealFsseEngine extends FsseEngine {
     return executed;
   }
 
+  /// Continues the story at [target] (`conv`, `#label` or `conv#label`), keeping the variables. For the
+  /// developer panel: the next [next] returns the item there.
+  Future<void> jumpTo(String target) async {
+    await _ensureStarted();
+    _awaitingResult = false;
+    await _jump(target);
+  }
+
+  /// Reads the current conversation again and returns the current item as it is written now, for a
+  /// developer reload. Its effects are not applied again, and its transcript line is replaced. The
+  /// pointer stays, so if items were added or removed above it, this may be another item. Null when
+  /// there is no current item.
+  Future<ItemType?> reloadCurrent() async {
+    final current = currentConversation;
+    if (current == null) return null;
+    final conversation = await loader.loadConversation(current.key);
+    currentConversation = conversation;
+    final index = dialogIndex - 1;
+    if (index < 0 || index >= conversation.conversations.length) return null;
+
+    dialogIndex = index;
+    final item = _prepare(conversation.conversations[index]);
+    dialogIndex = index + 1;
+    final last = _history.lastOrNull;
+    if (item is! StageItemType && last != null && !last.isPlayer && last.conversationKey == conversation.key) {
+      _history[_history.length - 1] = TranscriptEntry(
+        conversationKey: last.conversationKey,
+        mode: last.mode,
+        channelId: last.channelId,
+        item: item.toJson(),
+      );
+    }
+    _awaitingResult = item is ChoiceItemType || item is InputItemType;
+    return item;
+  }
+
+  /// Sets [variable], a playthrough or `persistent.*` one, from the developer panel.
+  Future<void> setVariable(String variable, dynamic value) async {
+    state[variable] = value;
+    await _flushMeta();
+  }
+
   /// Whether [rollback] has a line to go back to. With [historyIndex], whether the line at that
   /// transcript index can be rolled back to.
   bool canRollback({int? historyIndex}) => _rollbackTarget(historyIndex) != null;

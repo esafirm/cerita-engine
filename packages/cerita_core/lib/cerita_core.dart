@@ -29,6 +29,8 @@ export 'src/state/story_storage.dart';
 export 'src/state/story_state.dart';
 export 'src/state/transcript.dart';
 export 'src/story_catalog.dart';
+export 'src/tools/story_graph.dart';
+export 'src/tools/story_linter.dart';
 export 'src/utils/condition_evaluator.dart';
 export 'src/utils/text_markup.dart';
 export 'src/utils/var_replacer.dart';

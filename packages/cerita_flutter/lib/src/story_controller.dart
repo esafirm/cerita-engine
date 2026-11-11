@@ -165,6 +165,45 @@ class StoryController extends ChangeNotifier with EngineListener {
     _toasts.add("Quick loaded");
   }
 
+  /// Developer panel: continues the story at [target], keeping the variables.
+  Future<void> jumpTo(String target) async {
+    if (_busy) return;
+    _epoch++;
+    _autoTimer?.cancel();
+    autoMode = false;
+    skipMode = false;
+    notification = null;
+    rolledBack = false;
+    phase = StoryPhase.idle;
+    await audio.stopVoice();
+    await engine.jumpTo(target);
+    await _next();
+  }
+
+  /// Developer panel: sets a playthrough or `persistent.*` variable.
+  Future<void> setVariable(String variable, dynamic value) async {
+    await engine.setVariable(variable, value);
+    _notify();
+  }
+
+  /// Reads the story files again and shows the current item as it is written now, see
+  /// [RealFsseEngine.reloadCurrent]. Runs on a Flutter hot reload, so edits to the story show up without
+  /// restarting it.
+  Future<void> reloadStory() async {
+    if (_busy || phase == StoryPhase.idle) return;
+    engine.loader.clearCache();
+    final item = await engine.reloadCurrent();
+    if (item == null || _disposed) return;
+    _epoch++;
+    if (item is StageItemType) {
+      _notify();
+    } else {
+      rolledBack = true;
+      _show(item);
+    }
+    _toasts.add("Story reloaded");
+  }
+
   /// Goes back to the previous line, or to the transcript line at [historyIndex]. A choice there can be
   /// picked again.
   Future<void> rollback({int? historyIndex}) async {

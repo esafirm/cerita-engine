@@ -16,22 +16,28 @@ class StorySetup {
   /// Creates the audio of each story screen, which disposes it when it closes.
   final AudioHelper Function() audio;
 
+  /// Adds the developer panel to the in-game menu: variables, jumps, story check and reload.
+  /// For writers, keep it off in release builds.
+  final bool developer;
+
   StorySetup({
     required this.config,
     required this.loader,
     required this.storage,
     PlayerPrefs? settings,
     this.audio = AudioHelper.new,
+    this.developer = false,
   }) : settings = settings ?? PlayerPrefs(storage);
 
-  factory StorySetup.assets({LoaderConfig config = const LoaderConfig(), StoryStorage? storage}) {
+  factory StorySetup.assets({LoaderConfig config = const LoaderConfig(), StoryStorage? storage, bool developer = false}) {
     return StorySetup(
       config: config,
       loader: AssetEngineLoader(config),
       storage: storage ?? SharedPrefsStoryStorage(),
+      developer: developer,
     );
   }
 
   /// CGs live in `bg/`; photos, voice notes and videos in `media/`.
-  String mediaPath(MediaItemType item) => item.mediaType == MediaType.cg ? config.bg(item.uri) : config.media(item.uri);
+  String mediaPath(MediaItemType item) => config.mediaPath(item);
 }

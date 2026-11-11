@@ -7,6 +7,7 @@ import 'call/call_view.dart';
 import 'chat/chat_view.dart';
 import 'common/backlog_sheet.dart';
 import 'common/ending_view.dart';
+import 'meta/developer_sheet.dart';
 import 'meta/endings_screen.dart';
 import 'meta/gallery_screen.dart';
 import 'meta/save_slots_screen.dart';
@@ -62,6 +63,13 @@ class _StoryScreenState extends State<StoryScreen> {
     });
   }
 
+  /// A Flutter hot reload has copied edited story files: read them again.
+  @override
+  void reassemble() {
+    super.reassemble();
+    _controller.reloadStory();
+  }
+
   @override
   void dispose() {
     _toasts?.cancel();
@@ -82,66 +90,75 @@ class _StoryScreenState extends State<StoryScreen> {
           action();
         }
 
+        // Scrolls on short or landscape screens.
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!_controller.replay)
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!_controller.replay)
+                  ListTile(
+                    leading: const Icon(Icons.save_outlined),
+                    title: const Text("Save game"),
+                    onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
+                        ))),
+                  ),
                 ListTile(
-                  leading: const Icon(Icons.save_outlined),
-                  title: const Text("Save game"),
+                  leading: const Icon(Icons.folder_open),
+                  title: const Text("Load game"),
                   onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
+                        builder: (route) => SaveSlotsScreen(
+                          setup: widget.setup,
+                          onLoad: (save) {
+                            Navigator.of(route).pop();
+                            _controller.load(save);
+                          },
+                        ),
                       ))),
                 ),
-              ListTile(
-                leading: const Icon(Icons.folder_open),
-                title: const Text("Load game"),
-                onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (route) => SaveSlotsScreen(
-                        setup: widget.setup,
-                        onLoad: (save) {
-                          Navigator.of(route).pop();
-                          _controller.load(save);
-                        },
-                      ),
-                    ))),
-              ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: const Text("Backlog"),
-                onTap: () => close(() => BacklogSheet.show(context, _controller)),
-              ),
-              ListTile(
-                leading: const Icon(Icons.tune),
-                title: const Text("Settings"),
-                onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader),
-                    ))),
-              ),
-              ListTile(
-                leading: const Icon(Icons.data_object),
-                title: const Text("Story variables"),
-                onTap: () => close(_showVariables),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: const Text("Gallery"),
-                onTap: () => close(_openGallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.emoji_events_outlined),
-                title: const Text("Endings"),
-                onTap: () => close(() => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
-                    )),
-              ),
-              ListTile(
-                leading: const Icon(Icons.home_outlined),
-                title: const Text("Back to title"),
-                onTap: () => close(() => Navigator.of(context).pop()),
-              ),
-            ],
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text("Backlog"),
+                  onTap: () => close(() => BacklogSheet.show(context, _controller)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.tune),
+                  title: const Text("Settings"),
+                  onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader),
+                      ))),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.data_object),
+                  title: const Text("Story variables"),
+                  onTap: () => close(_showVariables),
+                ),
+                if (widget.setup.developer)
+                  ListTile(
+                    leading: const Icon(Icons.build_outlined),
+                    title: const Text("Developer"),
+                    onTap: () => close(() => DeveloperSheet.show(context, _controller, widget.setup)),
+                  ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text("Gallery"),
+                  onTap: () => close(_openGallery),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.emoji_events_outlined),
+                  title: const Text("Endings"),
+                  onTap: () => close(() => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
+                      )),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.home_outlined),
+                  title: const Text("Back to title"),
+                  onTap: () => close(() => Navigator.of(context).pop()),
+                ),
+              ],
+            ),
           ),
         );
       },

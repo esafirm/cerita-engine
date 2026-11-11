@@ -18,6 +18,17 @@
       "profile": "123aaa:0",
       "position": "left"
     },
+    {
+      "type": "TEXT",
+      "condition": "PLAN == 'knows_cafe'",
+      "text": "Good thing you knew the way. I'd still be wandering down 5th street.",
+      "profile": "123aaa:2"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "heard_story == true",
+      "text": "Miki's voice from last night is still in your head. {i}We met at that café in 2019.{/i}"
+    },
     { "type": "SET", "effects": [{ "variable": "greeting", "op": "set", "expr": "random(1, 2)" }] },
     {
       "type": "TEXT",
