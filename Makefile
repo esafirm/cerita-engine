@@ -8,7 +8,7 @@ ADB := adb $(if $(DEVICE),-s $(DEVICE),)
 APP_ID := id.twk.fsse
 
 .DEFAULT_GOAL := help
-.PHONY: help get analyze test test-core test-flutter lint-story story-graph check run install apk web clean
+.PHONY: help get analyze test test-core test-tools test-flutter lint-story story-graph check run install apk web clean
 
 help: ## List the available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-14s %s\n", $$1, $$2}'
@@ -19,10 +19,13 @@ get: ## Resolve dependencies for the whole workspace
 analyze: get ## Analyze every package and the example
 	flutter analyze packages example
 
-test: test-core test-flutter ## Run every test suite
+test: test-core test-tools test-flutter ## Run every test suite
 
 test-core: get ## Test the pure Dart engine
 	cd packages/cerita_core && dart test
+
+test-tools: get ## Test the story authoring toolkit (compiles Wrong Number from its script)
+	cd packages/cerita_tools && dart test
 
 test-flutter: get ## Test the Flutter packages and the example
 	@set -e; for dir in $(FLUTTER_PACKAGES); do echo "==> $$dir"; (cd $$dir && flutter test); done
@@ -52,4 +55,4 @@ web: get ## Build the demo for the web
 	cd example && flutter build web
 
 clean: ## Remove build output of every package
-	@for dir in packages/cerita_core $(FLUTTER_PACKAGES); do (cd $$dir && flutter clean); done
+	@for dir in packages/cerita_core packages/cerita_tools $(FLUTTER_PACKAGES); do (cd $$dir && flutter clean); done

@@ -32,15 +32,17 @@ The title screen's **Features** page lists each feature and where to see it.
 
 ## Layout
 
-A [pub workspace](https://dart.dev/tools/pub/workspaces) with three packages and the demo app:
+A [pub workspace](https://dart.dev/tools/pub/workspaces) with four packages and the demo app:
 
 ```text
 packages/
 ├── cerita_core/       # Pure Dart: story model, engine, conditions, state & persistence interfaces
 ├── cerita_flutter/    # Asset loader, SharedPreferences storage, StoryScreen and the default views
 │                      # (VN stage, chat, call, meta screens), restyled through StorySkin
-└── cerita_ui/         # Anime VN skin: transitions, dialogue box, choices, HUD, chapter card,
-                       # dark theme and an animated title screen
+├── cerita_ui/         # Anime VN skin: transitions, dialogue box, choices, HUD, chapter card,
+│                      # dark theme and an animated title screen
+└── cerita_tools/      # Pure Dart CLI: compiles .cerita scripts to story JSON, lints them,
+                       # estimates playtime and exports voice and asset lists
 example/               # Demo app, story in example/assets/story/ (see specs/data-schema.md)
 ```
 
@@ -105,3 +107,34 @@ make install DEVICE=emulator-5554   # profile build, install (keeping saves) and
 Known work that isn't scheduled yet is in [`BACKLOG.md`](BACKLOG.md). Judgment calls, with their reasons and when to revisit them, are in [`docs/decisions.md`](docs/decisions.md): add an entry when you make one.
 
 Keep tests focused on behaviour a player or writer would notice: story flow, saves, rollback, what the screens show. Don't add low-value tests, like ones for trivial helpers, getters or formatting, or ones that repeat what another test already covers.
+
+## Writing a story
+
+Stories can be written as readable `.cerita` scripts instead of JSON (see
+[`specs/authoring-toolkit.md`](specs/authoring-toolkit.md)):
+
+```text
+@conversation day1 chapter="Day 1" checkpoint
+@scene CHAT channel=thread_miki day=1 time=23:45
+
+miki:frown typing=2.6s
+  en: please answer. it's about Luna.
+
+choice FIRST_REPLY by=miki timeout=10s
+  en: How do you reply?
+? Who is Luna? Tell me everything.
+  +miki_trust 5
+? Wrong number. Who is this? [default]
+  -miki_trust 5
+```
+
+```sh
+dart run cerita_tools compile <story> <out>   # scripts to engine JSON (--check verifies committed files)
+dart run cerita_tools lint <story> --release  # every broken link, unknown name, missing asset and translation
+dart run cerita_tools stats <story>           # words and minutes per chapter, route and ending
+dart run cerita_tools tts-manifest <story>    # voiced lines for the voice pipeline
+dart run cerita_tools assets <story>          # files the story uses that don't exist yet
+```
+
+Wrong Number is also written as a script in `packages/cerita_tools/test/fixtures/wrong_number/`. Its tests check
+that it compiles to the hand-written JSON in `example/assets/story/` and plays to the same four endings.

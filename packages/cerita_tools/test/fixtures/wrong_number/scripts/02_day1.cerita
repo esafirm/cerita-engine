@@ -1,0 +1,61 @@
+@conversation day1 chapter="Day 1" title="Wrong Number" checkpoint
+@scene CHAT channel=thread_miki day=1 time=23:45 music=night_ambience.mp3
+
+timestamp
+  en: Day 1 — 11:45 PM
+system
+  en: Unknown number added you to contacts.
+
+miki typing=1.9s sfx=sfx_msg_receive.mp3
+  en: hey... are you there?
+miki:frown typing=2.6s sfx=sfx_msg_receive.mp3
+  en: please answer. it's about Luna.
+
+choice FIRST_REPLY by=miki timeout=10s
+  en: How do you reply?
+? Who is Luna? Tell me everything.
+  value curious
+  +miki_trust 5
+? Wrong number. Who is this? [default]
+  value dismissive
+  -miki_trust 5
+
+miki:smile typing=2.2s sfx=sfx_msg_receive.mp3 [if FIRST_REPLY == 'curious']
+  en: thank you, {{NAME}}. nobody answers this number anymore.
+player sfx=sfx_msg_send.mp3 [if FIRST_REPLY == 'curious']
+  en: wait. how do you know my name??
+miki:frown typing=2.2s sfx=sfx_msg_receive.mp3 [if FIRST_REPLY == 'dismissive']
+  en: please don't block me. just look at this.
+
+media IMAGE photo_luna_cafe.png by=miki unlock=photo_luna_cafe typing=2.4s sfx=sfx_msg_receive.mp3
+  en: this is Luna. found it in her old drawer...
+  set has_cafe_photo true
+media AUDIO voice_miki_01.mp3 by=miki:frown unlock=voice_miki_01 typing=1.6s sfx=sfx_msg_receive.mp3
+  en: If you're hearing this, please. Tell Luna I'm sorry. She'll know what it means. The café. Our table by the window.
+  delivery: quiet, hesitant, a little out of breath
+
+system
+  en: Miki is offline
+wait 3s
+  en: Miki sent you a new message!
+timestamp
+  en: Day 1 — 11:58 PM
+
+media VIDEO clip_last_evening.mp4 by=miki unlock=video_last_evening typing=1.9s sfx=sfx_msg_receive.mp3
+  en: the last evening i saw her
+media IMAGE photo_unsent_note.png by=miki:frown unlock=photo_unsent_note typing=1.9s sfx=sfx_msg_receive.mp3 [if miki_trust > 0]
+  en: i never sent this.
+
+choice PLAN by=miki
+  en: What now?
+? 📞 Let me call you.
+  value call
+  +miki_trust 5
+  -> call_miki
+? I'll find Luna tomorrow.
+  value meet
+  -> day2
+? Is that the café on 5th street? I know it. [if curiosity >= 5 && miki_trust > 0]
+  value knows_cafe
+  +miki_trust 5
+  -> day2

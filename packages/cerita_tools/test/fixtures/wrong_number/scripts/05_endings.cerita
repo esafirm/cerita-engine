@@ -1,0 +1,60 @@
+# The four endings, one conversation each.
+
+@conversation ending_bad chapter=Ending title=Blocked
+@scene CHAT channel=thread_miki day=2 time=23:59 music=night_ambience.mp3
+
+timestamp
+  en: Day 2 — 11:59 PM
+miki:frown typing=4s sfx=sfx_msg_receive.mp3
+  en: you didn't tell her.
+miki typing=2.9s sfx=sfx_msg_receive.mp3
+  en: it's ok. i'll find someone else.
+system
+  en: This number is no longer available.
+ending end_03_bad BAD
+  en: Ending 3: Blocked
+  summary en: Miki's message never reached Luna. The unknown number went quiet for good.
+
+
+@conversation ending_good chapter=Ending title="Almost There"
+@scene CHAT channel=thread_nora day=2 time=20:10 music=night_ambience.mp3
+
+timestamp
+  en: Day 2 — 8:10 PM
+nora typing=2.2s sfx=sfx_msg_receive.mp3
+  en: so... are you going to explain what happened at the café today?
+player sfx=sfx_msg_send.mp3
+  en: long story. i think i helped someone.
+nora:smile typing=3.2s sfx=sfx_msg_receive.mp3
+  en: Luna messaged me. she said thank you. and that she still wonders what Miki really wanted to say 🥲
+ending end_02_good GOOD
+  en: Ending 2: Almost There
+  summary en: Luna found some peace, but Miki's full message stayed unsaid.
+
+
+@conversation ending_secret chapter=Ending title="Our Year"
+@scene VN day=2 time=10:30 bg=cg_luna_cafe.png music=sunny.mp3
+
+narration
+  en: Luna opens the diary to the last page. Two handwritings. One of them is still wet.
+miki:smile [left]
+  en: "See you at our table, Luna. Same time next year."
+luna:smile [right]
+  en: She's here, isn't she? ...Hi, Miki.
+ending end_04_secret SECRET
+  en: Secret Ending: Our Year
+  summary en: With the photo and the passcode, you gave Miki and Luna one last morning together.
+
+
+@conversation ending_true chapter=Ending title="Unsent Apology"
+@scene VN day=2 time=10:02 bg=bg_restaurant.png music=sunny.mp3
+
+miki:smile [center]
+  en: Tell her... thank you. I can go now.
+luna:smile [right]
+  en: It's warm in here all of a sudden. Is that strange?
+narration
+  en: Your phone buzzes one last time. The unknown number is gone from your contacts.
+ending end_01_true TRUE
+  en: Ending 1: Unsent Apology
+  summary en: You delivered Miki's apology. Luna finally got to let her go.

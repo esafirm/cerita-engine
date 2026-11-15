@@ -1,0 +1,32 @@
+nora:
+  id: 123aaa
+  name: Nora
+  handle: "@nora_w"
+  bio: Busy chasing deadlines ☕
+  avatar: assets/story/sprites/nora_avatar.png
+  expressions:
+    open: nora_open.png
+    frown: nora_frown.png
+    smile: nora_smile.png
+
+miki:
+  id: 123bbb
+  name: Miki
+  handle: "@miki_ghost"
+  bio: Can anyone read this?
+  avatar: assets/story/sprites/miki_avatar.png
+  expressions:
+    open: miki_open.png
+    frown: miki_frown.png
+    smile: miki_smile.png
+
+luna:
+  id: 123ccc
+  name: Luna
+  handle: "@luna.moth"
+  bio: Table by the window, always.
+  avatar: assets/story/sprites/luna_avatar.png
+  expressions:
+    open: luna_open.png
+    frown: luna_frown.png
+    smile: luna_smile.png

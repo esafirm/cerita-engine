@@ -1,0 +1,31 @@
+@conversation call_miki chapter="Day 1" title="Midnight Call"
+@scene CALL channel=thread_miki day=1 time=23:59 bg=bg_sitting_room_night.png music=night_ambience.mp3
+
+system sfx=sfx_phone_ring.mp3
+  en: Calling…
+wait 2.4s
+system
+  en: Connected
+
+miki voice=vo_miki_call_01.mp3
+  en: ...you actually called. I didn't think anyone would.
+  delivery: surprised, almost a whisper
+miki:frown voice=vo_miki_call_02.mp3
+  en: Luna was my best friend. I never got to say sorry.
+  delivery: sad, slow
+  set heard_story true
+miki
+  en: We met at that café in 2019. She still goes there every morning.
+
+choice by=miki:frown
+  en: Say something
+? I'll tell her for you.
+  +miki_trust 5
+? Why can't you tell her yourself?
+
+miki:smile
+  en: Because she can't hear me anymore. Tomorrow. The café. Please.
+system
+  en: Call ended · 00:42
+
+-> day2

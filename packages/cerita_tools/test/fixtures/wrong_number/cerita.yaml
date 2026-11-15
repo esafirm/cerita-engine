@@ -1,0 +1,5 @@
+# Wrong Number, the demo story in example/, written as a script.
+# Compiling it gives the same JSON as the hand-written files in example/assets/story/.
+source_locale: en
+locales: [en]
+assets: ../../../../../example/assets/story

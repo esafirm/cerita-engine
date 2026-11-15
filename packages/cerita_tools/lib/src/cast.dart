@@ -1,0 +1,211 @@
+import 'package:yaml/yaml.dart';
+
+import 'config.dart';
+import 'diagnostics.dart';
+import 'model.dart';
+
+final _namePattern = RegExp(r"^[a-z_][a-z0-9_]*$");
+final _expressionPattern = RegExp(r"^[A-Za-z0-9_-]+$");
+
+/// One `profiles.yaml` entry: a character with named expressions (spec §1.2).
+class CastProfile {
+  final String key;
+  final String id;
+  final SourceSpan span;
+  final Localized? name;
+  final Localized? handle;
+  final Localized? bio;
+  final String? avatar;
+  final SourceSpan? avatarSpan;
+
+  /// Expression names in sprite order. Index in this list is the sprite index.
+  final List<String> expressions;
+  final List<String> sprites;
+  final List<SourceSpan> spriteSpans;
+
+  const CastProfile({
+    required this.key,
+    required this.id,
+    required this.span,
+    required this.expressions,
+    required this.sprites,
+    required this.spriteSpans,
+    this.name,
+    this.handle,
+    this.bio,
+    this.avatar,
+    this.avatarSpan,
+  });
+
+  /// The sprite index of [expression], or 0 when it's `null`. `null` when the expression doesn't exist.
+  int? spriteIndex(String? expression) {
+    if (expression == null) return 0;
+    final index = expressions.indexOf(expression);
+    return index < 0 ? null : index;
+  }
+}
+
+/// `profiles.yaml`, keyed by the names scripts use.
+class Cast {
+  static const fileName = "profiles.yaml";
+
+  final Map<String, CastProfile> profiles;
+
+  const Cast(this.profiles);
+
+  CastProfile? operator [](String key) => profiles[key];
+
+  static Cast parse(String? source, StoryConfig config, Diagnostics diagnostics) {
+    const file = fileName;
+    if (source == null) {
+      diagnostics.error(null, "Missing $fileName in the story folder");
+      return const Cast({});
+    }
+    final root = parseYaml(file, source, diagnostics);
+    if (root == null || root.value == null) return const Cast({});
+    if (root is! YamlMap) {
+      diagnostics.error(yamlSpan(file, root), "$fileName must map character names to profiles");
+      return const Cast({});
+    }
+
+    final profiles = <String, CastProfile>{};
+    final ids = <String, String>{};
+    root.nodes.forEach((keyNode, node) {
+      final key = (keyNode as YamlNode).value.toString();
+      final span = yamlSpan(file, keyNode);
+      if (!_namePattern.hasMatch(key)) {
+        diagnostics.error(span, "Invalid character name '$key': use lowercase letters, digits and _");
+      } else if (key == ProfileRef.player) {
+        diagnostics.error(span, "'player' is built in and can't be declared");
+      } else if (statementKeywords.contains(key)) {
+        diagnostics.error(span, "'$key' is a statement keyword and can't be a character name");
+      }
+      if (node is! YamlMap) {
+        diagnostics.error(span, "Profile '$key' must be a map");
+        return;
+      }
+      const known = {"id", "name", "handle", "bio", "avatar", "expressions"};
+      for (final field in node.nodes.keys.cast<YamlNode>()) {
+        if (!known.contains(field.value)) {
+          diagnostics.error(yamlSpan(file, field), "Unknown profile field '${field.value}'");
+        }
+      }
+
+      final id = node.nodes["id"]?.value?.toString() ?? key;
+      final previous = ids[id];
+      if (previous != null) diagnostics.error(span, "Profiles '$previous' and '$key' share the id '$id'");
+      ids[id] = key;
+
+      final name = config.localizedFromYaml(file, node.nodes["name"], diagnostics, "name");
+      if (name == null) diagnostics.error(span, "Profile '$key' has no name");
+
+      final expressions = <String>[];
+      final sprites = <String>[];
+      final spriteSpans = <SourceSpan>[];
+      final expressionsNode = node.nodes["expressions"];
+      if (expressionsNode is YamlMap) {
+        expressionsNode.nodes.forEach((nameNode, spriteNode) {
+          final expression = (nameNode as YamlNode).value.toString();
+          if (!_expressionPattern.hasMatch(expression)) {
+            diagnostics.error(yamlSpan(file, nameNode), "Invalid expression name '$expression'");
+          }
+          expressions.add(expression);
+          sprites.add(spriteNode.value?.toString() ?? "");
+          spriteSpans.add(yamlSpan(file, spriteNode));
+          if (spriteNode.value == null) diagnostics.error(yamlSpan(file, nameNode), "Expression '$expression' has no sprite");
+        });
+      } else if (expressionsNode != null && expressionsNode.value != null) {
+        diagnostics.error(yamlSpan(file, expressionsNode), "'expressions' must map names to sprite files");
+      }
+
+      final avatarNode = node.nodes["avatar"];
+      profiles[key] = CastProfile(
+        key: key,
+        id: id,
+        span: span,
+        name: name,
+        handle: config.localizedFromYaml(file, node.nodes["handle"], diagnostics, "handle"),
+        bio: config.localizedFromYaml(file, node.nodes["bio"], diagnostics, "bio"),
+        avatar: avatarNode?.value?.toString(),
+        avatarSpan: avatarNode == null ? null : yamlSpan(file, avatarNode),
+        expressions: expressions,
+        sprites: sprites,
+        spriteSpans: spriteSpans,
+      );
+    });
+    return Cast(profiles);
+  }
+}
+
+/// One `channels.yaml` entry: a chat thread (spec §1.3).
+class ChannelDef {
+  final String id;
+  final SourceSpan span;
+  final Localized? name;
+  final String? avatar;
+  final SourceSpan? avatarSpan;
+  final Localized? status;
+  final List<String> members;
+  final List<SourceSpan> memberSpans;
+
+  const ChannelDef({
+    required this.id,
+    required this.span,
+    required this.members,
+    required this.memberSpans,
+    this.name,
+    this.avatar,
+    this.avatarSpan,
+    this.status,
+  });
+
+  static const fileName = "channels.yaml";
+
+  static List<ChannelDef> parseAll(String source, StoryConfig config, Diagnostics diagnostics) {
+    const file = fileName;
+    final root = parseYaml(file, source, diagnostics);
+    if (root == null || root.value == null) return const [];
+    if (root is! YamlMap) {
+      diagnostics.error(yamlSpan(file, root), "$fileName must map thread ids to threads");
+      return const [];
+    }
+    final channels = <ChannelDef>[];
+    root.nodes.forEach((keyNode, node) {
+      final id = (keyNode as YamlNode).value.toString();
+      final span = yamlSpan(file, keyNode);
+      if (node is! YamlMap) {
+        diagnostics.error(span, "Thread '$id' must be a map");
+        return;
+      }
+      const known = {"name", "avatar", "status", "members"};
+      for (final field in node.nodes.keys.cast<YamlNode>()) {
+        if (!known.contains(field.value)) diagnostics.error(yamlSpan(file, field), "Unknown thread field '${field.value}'");
+      }
+      final name = config.localizedFromYaml(file, node.nodes["name"], diagnostics, "name");
+      if (name == null) diagnostics.error(span, "Thread '$id' has no name");
+      final membersNode = node.nodes["members"];
+      final members = <String>[];
+      final memberSpans = <SourceSpan>[];
+      if (membersNode is YamlList) {
+        for (final member in membersNode.nodes) {
+          members.add(member.value.toString());
+          memberSpans.add(yamlSpan(file, member));
+        }
+      } else if (membersNode != null && membersNode.value != null) {
+        diagnostics.error(yamlSpan(file, membersNode), "'members' must be a list of character names");
+      }
+      final avatarNode = node.nodes["avatar"];
+      channels.add(ChannelDef(
+        id: id,
+        span: span,
+        name: name,
+        avatar: avatarNode?.value?.toString(),
+        avatarSpan: avatarNode == null ? null : yamlSpan(file, avatarNode),
+        status: config.localizedFromYaml(file, node.nodes["status"], diagnostics, "status"),
+        members: members,
+        memberSpans: memberSpans,
+      ));
+    });
+    return channels;
+  }
+}

@@ -8,4 +8,5 @@ workspace:
   - packages/cerita_core
   - packages/cerita_flutter
   - packages/cerita_ui
+  - packages/cerita_tools
   - example

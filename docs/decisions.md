@@ -185,6 +185,88 @@ check) is not.
 - **Why:** it is a writing tool behind `StorySetup.developer`, off in release builds, so players never see it.
 - **Revisit if** writers on a team want it in Indonesian.
 
+## `cerita_tools` doesn't depend on the engine at runtime
+
+*2026-11-15. Authoring toolkit §4.*
+
+The toolkit has its own condition parser instead of calling `ConditionEvaluator` from cerita_core. It only needs
+to know whether a condition parses and which names it reads, and it accepts `meta.ending.*` and `meta.flag.*`
+before the engine does (CE-03). cerita_core is a dev dependency, used by the test that plays the compiled
+Wrong Number.
+
+- **Why:** CE-01 and CE-03 change cerita_core in parallel, and the toolkit must keep building and running while
+  they land. Authors also run it without Flutter.
+- **Cost:** the condition grammar exists twice.
+- **Revisit if** the grammars drift. The round-trip test catches drift only for what Wrong Number uses, so a
+  shared grammar package is the fix if conditions grow.
+
+## Text in a multi-locale story always compiles to an object
+
+*2026-11-15. Authoring toolkit §2.6, CE-01.*
+
+With one locale, script text compiles to a plain string, so Wrong Number's JSON is unchanged. With more, it's
+always `{locale: text}`, even when only the source locale is written. Plain YAML values in `profiles.yaml` and
+`channels.yaml` (names, handles) stay plain strings, since they're the same in every language.
+
+- **Why:** one shape per story is simpler for the engine and for diffs than switching shape as translations
+  arrive.
+- **Revisit if** CE-01 settles on omitting single-entry objects.
+
+## Per-locale voice clips use the localized shape too
+
+*2026-11-15. Authoring toolkit §2.2, CE-01 D5.*
+
+`voice=vo_01.{locale}.mp3` and `voice.en=` compile `voice` (and a voice note's `uri`) to
+`{"id": "...", "en": "..."}`, the same shape as localized text. A shared clip stays a plain string.
+
+- **Why:** CE-01 D5 needs a clip per language with a shared fallback, and the contract only defines the text
+  shape. Reusing it means the engine needs one resolver.
+- **Revisit when** CE-01 picks the JSON for per-language clips. This is the open contract question.
+
+## Every lint check is an error, even while drafting
+
+*2026-11-15. Authoring toolkit §3.1, PRD D2.*
+
+Only missing translations are warnings while drafting. Unreachable conversations, variables read but never set
+and missing assets fail `lint` straight away.
+
+- **Why:** PRD D2 says every check blocks release, and most of these are typos that are cheapest to fix at once.
+- **Cost:** a half-written scene that nothing links to yet fails `lint`.
+- **Revisit if** that gets in the way of drafting. Then make reachability a warning without `--release`.
+
+## Effects belong to an item
+
+*2026-11-15. Authoring toolkit §2.4.*
+
+`+trust 5`, `set`, `toggle` and `remember` are body lines of a line, choice option or other item. There is no
+standalone effect statement.
+
+- **Why:** the engine on this branch has no item that only runs effects, and inventing one would change the
+  schema. An effect on a `branch` or `->` is an error, since the engine jumps without executing it.
+- **Revisit when** the engine gets an effect-only item (`main` has `STAGE` and script flow items).
+
+## Playtime runs are bounds, not predictions
+
+*2026-11-15. Authoring toolkit §3.2, PRD D3.*
+
+The shortest run to an ending skips every conditional item, the longest shows every one and counts each loop
+once. The critical path is the longest of the longest runs.
+
+- **Why:** conditions aren't evaluated, so the toolkit can't know which conditional lines a real run shows.
+  Bounds are honest and cheap. Pacing defaults (200 wpm, 4 s per choice, 8 s per input, 4 s per media item) are
+  guesses until the M1 playtest calibrates them in `cerita.yaml`.
+- **Revisit after** the M1 playtest if real runs sit far from the middle of the bounds.
+
+## Smaller script calls
+
+*2026-11-15. Authoring toolkit §2.*
+
+- File names are written with their extension (`bg=pier_dusk.webp`). Defaulting extensions would make the
+  compiled JSON depend on a setting authors forget about.
+- `[default]` marks the timeout option instead of a number, so reordering options can't change it.
+- `compile` never deletes stale `cvn_*.json` files. It warns, and `compile --check` fails on them.
+- Asset checks are skipped with a note when no asset folder is set, and `--release` makes that an error.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

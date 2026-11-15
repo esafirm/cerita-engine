@@ -1,0 +1,50 @@
+@conversation day2 chapter="Day 2" title="The Café" checkpoint
+@scene VN day=2 time=09:15 bg=bg_restaurant.png music=sunny.mp3
+
+narration
+  en: Day 2, 9:15 AM. The café from the photo. Nora insisted on coming along.
+
+nora [left]
+  en: So this is the place? It looks exactly like the picture.
+luna [right] voice=vo_luna_01.mp3
+  en: You must be the one Miki wrote about.
+miki:frown [center]
+  en: (She can't see me. Please... tell her.)
+nora:frown
+  en: {{NAME}}? Who are you staring at?
+
+choice TOLD by=luna
+  en: What do you tell Luna?
+? Miki is sorry. She wanted you to know.
+  value apology
+  +miki_trust 10
+  +luna_affection 10
+? Nothing. It's not my place.
+  value silent
+  -miki_trust 5
+? [Show Luna's photo] She kept this. [if has_cafe_photo == true]
+  value photo
+  +miki_trust 10
+  +luna_affection 15
+
+luna:frown [if TOLD == 'silent']
+  en: ...I see. Excuse me.
+
+media CG cg_luna_cafe.png unlock=cg_luna_cafe [if TOLD != 'silent']
+  en: For the first time in months, Luna smiles.
+luna:smile [if TOLD != 'silent']
+  en: We had a code for our diary. If you really talked to her, you'll know it.
+input PASSCODE default=???? by=luna [if TOLD != 'silent']
+  en: Luna slides a napkin over: "Our year." (Did Miki mention one?)
+
+luna:smile [if PASSCODE == '2019']
+  en: ...2019. Then you really did talk to her.
+  set knows_passcode true
+luna:frown [if TOLD != 'silent' && !knows_passcode]
+  en: No... that's not it. But thank you for coming.
+
+branch
+  if knows_passcode == true && luna_affection >= 15 -> ending_secret
+  if miki_trust >= 20 -> ending_true
+  if miki_trust >= 10 -> ending_good
+  -> ending_bad

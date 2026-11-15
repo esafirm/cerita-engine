@@ -1,0 +1,35 @@
+@conversation index id=cvn_qxfOhN chapter=Prologue title="A Quiet Evening" checkpoint
+@scene VN day=0 time=21:00 bg=bg_sitting_room.png music=sunny.mp3
+
+narration
+  en: A quiet evening at Nora's place. Your phone has been buzzing all day, all from your old number.
+
+nora:smile [center] voice=vo_nora_01.mp3
+  en: Hey! You're finally here.
+
+input NAME default=Alex by=nora
+  en: Nora squints at you. "Remind me, what should I call you?"
+
+nora:smile
+  en: Nice to e-meet you {{NAME}} 🙏 ...kidding. Sit down.
+  set met_nora true
+
+nora:open
+  en: So you got a new number, but someone keeps texting the old one?
+
+choice CURIOSITY by=nora
+  en: "Are you going to check it?"
+? Yeah, let me look.
+  value eager
+  +curiosity 5
+  -> day1
+? Nah. Probably spam.
+  value wary
+
+nora:frown voice=vo_nora_02.mp3 [if CURIOSITY == 'wary']
+  en: Your phone is buzzing again. You should really look.
+
+wait 1.5s
+  en: New message from an unknown number
+
+-> day1
