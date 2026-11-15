@@ -26,6 +26,7 @@ export 'src/meta/developer_sheet.dart';
 export 'src/meta/endings_screen.dart';
 export 'src/meta/gallery_screen.dart';
 export 'src/meta/music_room_screen.dart';
+export 'src/meta/route_flowchart.dart';
 export 'src/meta/save_slots_screen.dart';
 export 'src/meta/settings_screen.dart';
 export 'src/player_prefs.dart';

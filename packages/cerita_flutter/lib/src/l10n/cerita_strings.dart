@@ -83,6 +83,12 @@ abstract class CeritaStrings {
   String get emptySlot;
   String get notReachedYet;
 
+  // Chapters flowchart.
+  String get showFlowchart;
+  String get showList;
+  String get playFromHere;
+  String endingsFound(int found, int total);
+
   // Quick save, rollback and replay.
   String get quickSave;
   String get quickLoad;
@@ -267,6 +273,14 @@ class EnglishCeritaStrings extends CeritaStrings {
   String get emptySlot => "Empty";
   @override
   String get notReachedYet => "Not reached yet";
+  @override
+  String get showFlowchart => "Show flowchart";
+  @override
+  String get showList => "Show list";
+  @override
+  String get playFromHere => "Play from here";
+  @override
+  String endingsFound(int found, int total) => "$found of $total endings found";
   @override
   String get photosAndCgs => "Photos & CGs";
   @override
@@ -484,6 +498,14 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get emptySlot => "Kosong";
   @override
   String get notReachedYet => "Belum tercapai";
+  @override
+  String get showFlowchart => "Tampilkan diagram alur";
+  @override
+  String get showList => "Tampilkan daftar";
+  @override
+  String get playFromHere => "Main dari sini";
+  @override
+  String endingsFound(int found, int total) => "$found dari $total ending ditemukan";
   @override
   String get photosAndCgs => "Foto & CG";
   @override

@@ -198,6 +198,52 @@ flowchart TD
 ''');
   });
 
+  test('the route map folds the story into checkpoints and endings', () async {
+    Map<String, dynamic> checkpoint(List<Map<String, dynamic>> items) => {..._conversation(items), "checkpoint": true};
+    Map<String, dynamic> ending(String id) =>
+        {"type": "ENDING", "ending_id": id, "title": id, "category": "GOOD", "condition": "x"};
+    Map<String, dynamic> choice(List<String> targets) => {
+          "type": "CHOICE",
+          "text": "?",
+          "choices": [for (final target in targets) {"text": target, "target": target}],
+        };
+    final loader = _FakeEngineLoader({
+      "index": checkpoint([{"type": "CALL", "target": "shared"}, {"type": "JUMP", "target": "day1"}]),
+      "day1": checkpoint([choice(["call", "network"])]),
+      "call": _conversation([{"type": "JUMP", "target": "harbor"}]),
+      "harbor": checkpoint([
+        choice(["day1", "storm"]),
+        {"type": "BRANCH", "branches": [], "fallback_target": "calm"},
+      ]),
+      "network": checkpoint([ending("end_net"), {"type": "JUMP", "target": "storm"}]),
+      "storm": _conversation([ending("end_storm")]),
+      "calm": _conversation([ending("end_calm")]),
+      "shared": {"conversation_id": "shared", "conversations": [{"type": "RETURN"}]},
+      "orphan": checkpoint([_text("never")]),
+    });
+    final map = RouteMap(StoryGraph((await StoryCatalog.load(loader)).conversations));
+
+    expect([for (final row in map.rows) "$row"], [
+      "[index]",
+      "[day1]",
+      "[harbor, network]",
+      "[ending end_calm, ending end_storm, ending end_net]",
+    ], reason: "call scenes fold into their checkpoint, endings sit below every node leading to them");
+    expect(map.edges.map((edge) => "${edge.$1} > ${edge.$2}"), isNot(contains("harbor > day1")),
+        reason: "a loop back up isn't drawn");
+    final nodes = {for (final node in map.nodes) node.id: node};
+    expect(map.endingsAfter(nodes["day1"]!), {"end_storm", "end_calm", "end_net"});
+    expect(map.endingsAfter(nodes["network"]!), {"end_net", "end_storm"});
+    expect(map.branches, isTrue);
+
+    final linear = RouteMap(StoryGraph([
+      Conversation.fromJson(checkpoint([{"type": "JUMP", "target": "end"}]), key: "index"),
+      Conversation.fromJson(_conversation([ending("end_only")]), key: "end"),
+    ]));
+    expect(linear.branches, isFalse);
+    expect(linear.nodes.map((node) => "$node"), ["index", "ending end_only"]);
+  });
+
   test('reloading keeps the variables and shows the edited item', () async {
     final files = <String, Object>{
       "index": _conversation([

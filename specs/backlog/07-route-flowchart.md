@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | In progress ([design](../presentation-modes.md#4-meta-game-screens), [route map](../authoring-tools.md#21-route-map-routemap)). Skip that stops at unseen text (10.2) and the "skip unread" setting already ship. The in-app flowchart (10.1, 10.3) remains |
+| **Status** | Done ([design](../presentation-modes.md#4-meta-game-screens), [route map](../authoring-tools.md#21-route-map-routemap)). The flowchart (10.1) and the view toggle with ending counts (10.3) ship on the Chapters screen. Skip that stops at unseen text (10.2) shipped before, and is now covered by tests |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |

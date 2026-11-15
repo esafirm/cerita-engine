@@ -45,6 +45,18 @@ void main() {
     }
   });
 
+  test('the Chapters flowchart runs Prologue, Day 1, Day 2 and the four endings', () async {
+    final catalog = await StoryCatalog.load(AssetEngineLoader(const LoaderConfig()));
+    final map = RouteMap(StoryGraph(catalog.conversations));
+    expect([for (final row in map.rows) "$row"], [
+      "[index]",
+      "[day1]",
+      "[day2]",
+      "[ending end_04_secret, ending end_01_true, ending end_02_good, ending end_03_bad]",
+    ], reason: "the call scene folds into Day 1");
+    expect(map.branches, isTrue);
+  });
+
   test('secret ending: curious, call, photo and the right passcode', () async {
     final storage = InMemoryStoryStorage();
     final (ending, engine) = await _play(

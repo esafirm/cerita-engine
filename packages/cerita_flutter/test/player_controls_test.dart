@@ -136,6 +136,24 @@ void main() {
     expect(controller.current?.getText(), "Two");
   });
 
+  testWidgets('skip stops at the first unread line, and at choices even when skipping unread text', (tester) async {
+    final storage = InMemoryStoryStorage();
+    await storage.saveMeta(GlobalMetaState(seenItems: {"index#0"}));
+    final (controller, setup) = await pumpStory(tester, storage: storage);
+    expect(controller.current?.getText(), "One");
+
+    controller.toggleSkip();
+    await tester.pumpAndSettle();
+    expect(controller.current?.getText(), "Two");
+    expect(controller.skipMode, isFalse, reason: "'Two' was never read in any run");
+
+    await setup.settings.update(setup.settings.value.copyWith(skipUnread: true));
+    controller.toggleSkip();
+    await tester.pumpAndSettle();
+    expect(controller.phase, StoryPhase.choice);
+    expect(controller.skipMode, isFalse);
+  });
+
   testWidgets('settings apply to a running story', (tester) async {
     final storage = InMemoryStoryStorage();
     final (controller, setup) = await pumpStory(tester, storage: storage);

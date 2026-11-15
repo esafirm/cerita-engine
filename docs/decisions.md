@@ -375,6 +375,33 @@ covered by widget tests with a fixture instead.
   that guess them would be wrong.
 - **Revisit when** the demo assets' sources are known: add a `credits.json` and a `roll_after` for the true ending.
 
+## The route map's nodes are checkpoints, not chapters
+
+*2026-11-15. Authoring tools §2.1, presentation modes §4. Backlog CE-07.*
+
+The Chapters flowchart draws one node per checkpoint conversation and one per `ending_id`. Conversations that
+aren't checkpoints (call scenes, shared subroutines, ending scenes) fold into the checkpoint that leads to them.
+Routes that loop back to an earlier checkpoint count for "endings found" but aren't drawn.
+
+- **Why:** a checkpoint is what the player can replay from, which is the point of the chart. Grouping by the
+  `chapter` text would merge two routes that are both called "Day 5", which is exactly the split the PRD wants
+  to show. Lines drawn back up the chart cross every row and make a phone-sized chart hard to read.
+- **Cost:** a route split inside a chapter, without a checkpoint at the split, shows as one node with several
+  endings below it. Authors put checkpoints at the major beats, as the PRD asks.
+- **Revisit if** a story needs non-checkpoint scenes on the chart, or loops matter to players. Then draw loops as
+  a side marker on the node rather than a line.
+
+## The Chapters view isn't remembered
+
+*2026-11-15. Presentation modes §4. Backlog CE-07, D1.*
+
+The flowchart/list switch lasts until the screen closes. Opening Chapters again picks the default: the flowchart
+for a branching story, the list otherwise.
+
+- **Why:** D1 sets a default per story, and a stored preference would be one more player setting for a screen
+  visited a few times per run.
+- **Revisit if** playtesters switch to the list every time.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
