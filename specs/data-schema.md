@@ -195,12 +195,25 @@ Presents interactive options to the player. Choices can mutate state variables, 
       "text": "Ask about the photo again",
       "once": true,
       "target": "#ask_photo"
+    },
+    {
+      "text": "Wasn't the boat called the Kenanga?",
+      "condition": "meta.flag.knows_boat_name && met_harbor_master",
+      "memory_marker": true,
+      "target": "harbor_lead"
     }
   ]
 }
 ```
 - `once` (`bool`, default `false`): The choice disappears for the rest of the playthrough after it is picked, for "ask everything" hub menus that loop back on themselves. A `CHOICE` left with no visible options is skipped.
 - Choices picked in any earlier playthrough are flagged `chosen` so the UI can mark them.
+- A choice whose `condition` fails is shown locked, unless the condition reads cross-playthrough memory
+  (`meta.ending.*` or `meta.flag.*`). Then it is left out, so past-run rewards don't show up as locks on a first
+  run. See engine-and-state §2 *Cross-Playthrough Memory*.
+- `memory_marker` (`bool`, default `false`): Marks the option as unlocked by past runs. While the choice is
+  available the UI shows a small marker on it (by default a sparkle, restyled or hidden through
+  `StorySkin.memoryMarker`). Use it on unlocks the player should notice. It doesn't change when the choice is
+  available: that is still up to `condition`.
 
 ### 4.5 `INPUT` — Free-Text Player Input
 Prompts the player to enter custom text (e.g., player name, passcodes, or puzzle answers) and stores it in `dataMap[variable]`.
@@ -276,10 +289,12 @@ Applies its `effects` without showing anything.
   "type": "SET",
   "effects": [
     { "variable": "coin", "op": "set", "expr": "random(0, 1)" },
-    { "variable": "persistent.runs", "op": "add", "value": 1 }
+    { "variable": "persistent.runs", "op": "add", "value": 1 },
+    { "variable": "knows_boat_name", "op": "meta_set" }
   ]
 }
 ```
+- `meta_set` remembers a fact across playthroughs, read back as `meta.flag.<name>` (engine-and-state §2).
 
 ### 4.12 `STAGE` — Stage Direction (VN)
 Runs a list of `actions` on the VN stage at once, then continues by itself once the longest action is done (`wait_ms` overrides that, `0` continues immediately). The dialogue box is hidden meanwhile.

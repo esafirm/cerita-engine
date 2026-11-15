@@ -4,12 +4,13 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
 | **Priority** | Must, needed by Last Seen M0 (the true ending depends on it) |
 | **Related features** | Endings, Gallery, Chapters and checkpoints, save slots, Reset progress, Story authoring toolkit (CE-02) |
+| **Engineering design** | [engine-and-state.md §2, Cross-Playthrough Memory](../engine-and-state.md#cross-playthrough-memory), [data-schema.md §4.4](../data-schema.md#44-choice--branching-player-decision) |
 
 ## 2. Executive summary
 

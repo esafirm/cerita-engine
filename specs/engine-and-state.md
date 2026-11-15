@@ -54,6 +54,7 @@ Effects allow choices and dialogue items to modify relationship scores, counters
 | `"add"` | `num` | Adds `value` to `dataMap[variable]` (initializes to `0` if unset). |
 | `"subtract"` | `num` | Subtracts `value` from `dataMap[variable]` (initializes to `0` if unset). |
 | `"toggle"` | `bool` | Flips boolean value of `dataMap[variable]` (initializes to `false` if unset). |
+| `"meta_set"` | — | Remembers the fact `variable` across playthroughs. Writes to the global meta-state, not `dataMap`. `value` is ignored. See *Cross-Playthrough Memory*. |
 
 Any effect can take an `expr` instead of a `value`. The expression is evaluated (§3) when the effect runs and its result is used as the value:
 
@@ -69,6 +70,60 @@ Variables named `persistent.<name>` live in the global meta-state instead of the
 { "variable": "persistent.seen_true_end", "op": "set", "value": true }
 ```
 
+### Cross-Playthrough Memory
+*Backlog CE-03.* A story can remember named facts across playthroughs and read them, together with the endings
+ever reached, from any condition. This is how a true ending can need clues from routes no single run visits.
+
+**Remembering.** The `meta_set` effect op remembers a fact. It works anywhere effects do: item `effects`
+(including `SET`), and choice `effects`.
+
+```json
+{ "variable": "knows_boat_name", "op": "meta_set" }
+```
+
+- Facts are names, not values: a fact is either remembered or not. A remembered fact can't be forgotten
+  except by Reset progress.
+- Facts live in the global meta-state (`remembered_facts`, §5.1), not in `dataMap`, so they aren't part of
+  save slots, checkpoints or rollback frames. They survive New game, loading any save and replaying from a
+  checkpoint. Loading an older save doesn't roll them back, and rolling back past a `meta_set` doesn't
+  forget the fact.
+- The meta-state is saved as soon as the item or choice that remembered a fact has run.
+- Endings are remembered automatically when an `ENDING` item is reached (`unlocked_ending_ids`), as before.
+
+**Reading.** Expressions see two read-only namespaces through `StoryState`:
+
+| Variable | Value |
+| :--- | :--- |
+| `meta.ending.<ending_id>` | `true` if an `ENDING` with that `ending_id` was ever reached, else `false` |
+| `meta.flag.<name>` | `true` if the fact `<name>` was ever remembered with `meta_set`, else `false` |
+
+They are always booleans, never unset, and combine with run variables using the usual operators:
+
+```json
+{ "condition": "meta.ending.end_storm && found_boat_name" }
+{ "condition": "meta.flag.knows_boat_name && meta.flag.knows_podcast_host" }
+{ "condition": "!meta.ending.end_storm" }
+```
+
+- Writing to a `meta.*` variable with `set`, `add`, `subtract`, `toggle` or an `INPUT` throws. Use `meta_set`.
+- Any other `meta.<namespace>.<name>` is an error when read. Plain variables named `meta` or `metadata` are
+  unaffected: only names starting with `meta.` are reserved.
+- Ending ids and fact names used here must match `[a-zA-Z0-9_]+` so the expression tokenizer reads them as one
+  name.
+- `meta.*` vs `persistent.*`: `persistent.*` holds any value and any op can change it, for counters and
+  author-managed state. `meta.flag.*` is the write-once fact list the PRD asks for, kept apart so a fact
+  can't be overwritten or decremented by mistake.
+
+**Hiding memory-gated choices.** A choice whose `condition` reads a `meta.*` variable and evaluates to
+`false` is left out of the menu instead of being shown locked. A first playthrough then looks exactly as it
+would without the feature, and a past-run reward isn't spoiled by a lock. Choices gated only on run
+variables keep the locked look.
+
+**Marking unlocked choices.** A choice can set `"memory_marker": true` (data-schema §4.4). While the choice is
+available, the UI shows a small marker on it so the player notices what past runs unlocked. The author
+decides per choice, since marking every unlock would spoil some secrets. The default `StorySkin` draws a
+sparkle icon through `StorySkin.memoryMarker`, which skins override to restyle it, or return `null` to hide it.
+
 ---
 
 ## 3. Condition Evaluator
@@ -79,6 +134,7 @@ Conditions are boolean expressions evaluated against `dataMap`. The same evaluat
 - **Arithmetic**: `+`, `-`, `*`, `/`, `%`, unary `-`, parentheses. `+` joins strings when either side is a string.
 - **Functions**: `random(min, max)` (inclusive integer), `min(a, b)`, `max(a, b)`, `abs(x)`, `floor(x)`, `ceil(x)`, `round(x)`
 - **Variables**: `[a-zA-Z_][a-zA-Z0-9_.]*`, so `persistent.runs` works.
+- **Memory**: `meta.ending.<ending_id>` and `meta.flag.<name>` read cross-playthrough memory, see §2 *Cross-Playthrough Memory*.
 - **Missing variables**: Unset numeric variables default to `0` in numeric comparisons; unset booleans default to `false`.
 
 Examples:
@@ -108,6 +164,7 @@ erDiagram
         Set_String unlocked_checkpoints
         Set_String chosen_choices
         Map_String_Dynamic persistent
+        Set_String remembered_facts
         Set_String heard_music
     }
     SAVE_SLOT {
@@ -131,6 +188,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Unlocked Checkpoints (`unlocked_checkpoints`)**: Stores variable snapshots at major Day/Chapter boundaries so players can jump back to a specific Day to explore alternate branches.
 - **Chosen Choices (`chosen_choices`)**: `<conversation_key>#<item_index>#<choice_index>` of every choice ever picked, so menus can mark them.
 - **Persistent Variables (`persistent`)**: The `persistent.*` variables.
+- **Remembered Facts (`remembered_facts`)**: Names remembered with the `meta_set` effect op, read as `meta.flag.<name>`. Meta-state saved before this field existed loads with no facts.
 - **Heard Music (`heard_music`)**: Every track the stage has played (scene `music` and `STAGE` `music` actions). Powers the music room.
 
 ### 5.2 Playthrough Save State (Auto-Save & Manual Slots)
@@ -141,6 +199,8 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Chosen (`chosen`)**: `once` choices already picked in this playthrough.
 - **Stage (`stage`)**: See §6.
 - **Rollback (`rollback`)**: The rollback frames and recorded `random()` rolls, see §7.
+
+**Reset progress** calls `StoryStorage.clear()`, which wipes the whole meta-state (gallery, endings, checkpoints, chosen choices, persistent variables, remembered facts) and every save slot.
 
 Slot ids: `0` is the autosave, written after every delivered item. `-1` is the quick save slot. `1` and up are manual slots.
 
