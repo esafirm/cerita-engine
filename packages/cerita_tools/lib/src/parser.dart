@@ -12,7 +12,7 @@ final _attrKeyPattern = RegExp(r"^([a-z_]+)(?:\.([a-z]{2,3}(?:-[A-Za-z0-9]+)?))?
 final _textLinePattern = RegExp(r"^(?:([a-z]+) )?([a-z]{2,3}(?:-[A-Za-z0-9]+)?):(?:[ \t](.*))?$");
 final _durationPattern = RegExp(r"^(\d+(?:\.\d+)?)(ms|s)?$");
 final _numberPattern = RegExp(r"^-?\d+(\.\d+)?$");
-final _effectLinePattern = RegExp(r"^([+-][A-Za-z_]|set\s|toggle\s|remember\s)");
+final _effectLinePattern = RegExp(r"^([+-][A-Za-z_]|set\s|toggle\s|remember\s|clue\s)");
 final _setBlockPattern = RegExp(r"^set(\s*$|\s+\[|\s+label=)");
 
 const _modes = {"VN", "CHAT", "CALL"};
@@ -117,7 +117,7 @@ class ScriptParser {
       "wait" => _wait(st),
       "branch" => BranchItem(span),
       "ending" => _ending(st),
-      "clue" || "evidence" => _reserved(span, word),
+      "evidence" => _evidenceItem(st),
       _ => _speakerLine(st, word),
     };
     if (item == null) return;
@@ -143,12 +143,6 @@ class ScriptParser {
       _inlineSet = set;
     }
     set.effects.add(effect);
-  }
-
-  ItemNode? _reserved(SourceSpan span, String word) {
-    final feature = word == "clue" ? "the Case Board (CE-05)" : "Present evidence (CE-06)";
-    _error(span, "'$word' is reserved for $feature and isn't supported yet");
-    return null;
   }
 
   void _conversationHeader(_Statement st, ScriptFile script) {
@@ -254,6 +248,22 @@ class ScriptParser {
       ..timeoutMs = st.duration("timeout");
   }
 
+  ItemNode? _evidenceItem(_Statement st) {
+    final variable = st.next();
+    if (variable != null && !variablePattern.hasMatch(variable)) {
+      _error(st.span, "Invalid variable name '$variable'");
+    }
+    final item = EvidenceItem(st.span, variable)
+      ..by = st.profile("by")
+      ..timeoutMs = st.duration("timeout");
+    final retries = st.take("retries");
+    if (retries != null) {
+      item.retries = int.tryParse(retries);
+      if (item.retries == null || item.retries! < 0) _error(st.span, "retries must be a whole number, not '$retries'");
+    }
+    return item;
+  }
+
   ItemNode? _input(_Statement st) {
     final variable = st.next();
     if (variable == null || !variablePattern.hasMatch(variable)) {
@@ -319,6 +329,7 @@ class ScriptParser {
       _body = _discard;
       return;
     }
+    if (choice is EvidenceItem) return _evidenceOption(choice, rest.trim(), span);
     final option = OptionNode(span);
     var text = rest.trim();
     while (text.endsWith("]")) {
@@ -353,6 +364,24 @@ class ScriptParser {
       option.texts["text"] = localized;
     }
     choice.options.add(option);
+    _body = option;
+  }
+
+  /// A `?` line under `evidence`: a clue id for a response, or `[retry]`, `[fallback]` or `[timeout]`.
+  void _evidenceOption(EvidenceItem evidence, String text, SourceSpan span) {
+    final option = OptionNode(span);
+    final outcome = RegExp(r"^\[(retry|fallback|timeout)\]$").firstMatch(text)?.group(1);
+    if (outcome != null) {
+      if (evidence.outcome(outcome) != null) _error(span, "An evidence question has only one [$outcome]");
+      option.outcome = outcome;
+    } else if (_keyPattern.hasMatch(text)) {
+      option.clue = text;
+    } else {
+      _error(span, "An evidence answer is a clue id, or [retry], [fallback] or [timeout]");
+      _body = _discard;
+      return;
+    }
+    evidence.options.add(option);
     _body = option;
   }
 
@@ -395,6 +424,14 @@ class ScriptParser {
     if (body is BranchItem) return _routeLine(body, content, span);
     if (body is StageItem && !_effectLinePattern.hasMatch(content)) return _stageAction(body, content, span);
     final holder = body as TextHolder;
+    if (holder is OptionNode && (holder.clue != null || holder.outcome != null)) {
+      if (_textLinePattern.hasMatch(content)) {
+        return _error(span, "An evidence answer has no text: the player presents the clue");
+      }
+      if (content.startsWith("value ") || content == "value") {
+        return _error(span, "value doesn't go under an evidence answer: the presented clue's id is stored");
+      }
+    }
 
     final text = _textLinePattern.firstMatch(content);
     if (text != null) return _textLine(holder, text, span);
@@ -616,6 +653,15 @@ class ScriptParser {
       if (!_checkVariable(set.group(1)!, span)) return null;
       return EffectNode(set.group(1)!, "set", span, value: parseLiteral(set.group(2)!.trim()), hasValue: true);
     }
+    final clue = RegExp(r"^clue\s+(\S+)$").firstMatch(content);
+    if (clue != null) {
+      final id = clue.group(1)!;
+      if (!_keyPattern.hasMatch(id)) {
+        _error(span, "Invalid clue id '$id': use letters, digits and _");
+        return null;
+      }
+      return EffectNode("${EffectNode.cluePrefix}$id", "set", span, value: true, hasValue: true, isClue: true);
+    }
     final single = RegExp(r"^(toggle|remember)\s+(\S+)$").firstMatch(content);
     if (single != null) {
       if (!_checkVariable(single.group(2)!, span)) return null;
@@ -645,7 +691,8 @@ class ScriptParser {
       if (problem != null) _error(item.span, "Missing text: $problem, e.g. '  ${config.sourceLocale}: ...'");
       if (item is StageItem && !_stagesWithActions.contains(item)) _error(item.span, "A stage needs at least one action");
       if (item is SetItem && item.effects.isEmpty) _error(item.span, "A set needs at least one effect");
-      if (item is ChoiceItem) {
+      // The core linter reports an evidence question without responses.
+      if (item is ChoiceItem && item is! EvidenceItem) {
         if (item.options.isEmpty) _error(item.span, "A choice needs at least one '?' option");
         for (final option in item.options) {
           if (option.texts["text"]?.values.isEmpty ?? true) _error(option.span, "Missing text: an option needs text");

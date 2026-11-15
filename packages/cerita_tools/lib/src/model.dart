@@ -80,7 +80,16 @@ class EffectNode {
   final String? expr;
   final SourceSpan span;
 
-  const EffectNode(this.variable, this.op, this.span, {this.value, this.hasValue = false, this.expr});
+  /// Written as `clue <id>`: [variable] is `clue_<id>`.
+  final bool isClue;
+
+  const EffectNode(this.variable, this.op, this.span,
+      {this.value, this.hasValue = false, this.expr, this.isClue = false});
+
+  /// The clue a `clue <id>` line awards.
+  String? get clue => isClue ? variable.substring(cluePrefix.length) : null;
+
+  static const cluePrefix = "clue_";
 }
 
 /// Something with localized text fields and effects: an item or a choice option.
@@ -179,7 +188,24 @@ class OptionNode implements TextHolder {
   bool hasValue = false;
   TargetRef? target;
 
+  /// Under an `evidence` question: the clue this response is for, or the outcome it is (`retry`, `fallback`,
+  /// `timeout`). Null on choice options.
+  String? clue;
+  String? outcome;
+
   OptionNode(this.span);
+}
+
+/// An evidence question (`CHOICE` with `"source": "clues"`, CE-06). Its [options] are the responses, one per
+/// clue, and the `retry`, `fallback` and `timeout` outcomes.
+class EvidenceItem extends ChoiceItem {
+  int? retries;
+
+  EvidenceItem(super.span, super.variable);
+
+  Iterable<OptionNode> get responses => options.where((option) => option.clue != null);
+
+  OptionNode? outcome(String name) => options.where((option) => option.outcome == name).firstOrNull;
 }
 
 class InputItem extends ItemNode {
@@ -332,8 +358,7 @@ class ScriptFile {
   ScriptFile(this.path);
 }
 
-/// Words that start a statement, so they can't be speaker names. `clue` and `evidence` are reserved for CE-05
-/// and CE-06, whose syntax isn't designed yet.
+/// Words that start a statement, so they can't be speaker names.
 const statementKeywords = {
   "narration", "system", "timestamp", "media", "choice", "input", "wait", "branch", "ending", "call", "return",
   "set", "toggle", "remember", "stage", "clue", "evidence",

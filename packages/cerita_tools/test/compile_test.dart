@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cerita_core/cerita_core.dart' as core;
 import 'package:cerita_tools/cerita_tools.dart';
 import 'package:test/test.dart';
 
@@ -205,6 +206,99 @@ return
       {"type": "JUMP", "condition": "coin == 0", "target": "next"},
       {"type": "RETURN"},
     ]);
+  });
+
+  test('clues.yaml compiles to clues.json, clue lines award clues and evidence compiles to an evidence question', () {
+    const clues = """
+show_counts: true
+clues:
+  pier_photo:
+    title: { id: Foto dermaga, en: Pier photo }
+    description: { id: Ada perahu., en: There's a boat. }
+    image: clue_pier.png
+    key: true
+    chapter: { id: Hari 2, en: Day 2 }
+  harbor_log:
+    title: Harbor log
+""";
+    final project = story({
+      "a.cerita": """
+@conversation index
+clue pier_photo
+choice
+  id: Ke mana?
+  en: Where to?
+? Pelabuhan | Harbor
+  clue harbor_log
+  -> #ask
+? Pulang | Home
+  -> #ask
+evidence PRESENTED by=nora timeout=20s retries=1 label=ask
+  id: Petunjuk mana?
+  en: Which clue?
+? harbor_log
+  -trust 2
+  -> #caught
+? pier_photo
+? [retry]
+? [fallback]
+  -trust 5
+  -> #caught
+? [timeout]
+  -> #caught
+ending caught GOOD label=caught
+  id: Ketahuan
+  en: Caught
+""",
+    }, config: _bilingual, clues: clues);
+    final result = compileStory(project);
+    expect(result.diagnostics.items, isEmpty);
+    expect(jsonDecode(result.files["clues.json"]!), {
+      "show_counts": true,
+      "clues": [
+        {
+          "id": "pier_photo",
+          "title": {"id": "Foto dermaga", "en": "Pier photo"},
+          "description": {"id": "Ada perahu.", "en": "There's a boat."},
+          "image": "clue_pier.png",
+          "key": true,
+          "chapter": {"id": "Hari 2", "en": "Day 2"},
+        },
+        {"id": "harbor_log", "title": "Harbor log"},
+      ],
+    });
+
+    final items = (jsonDecode(result.files["index.json"]!) as Map)["conversations"] as List;
+    expect(items[0], {
+      "type": "SET",
+      "effects": [{"variable": "clue_pier_photo", "op": "set", "value": true}],
+    });
+    final harbor = (items[1]["choices"] as List).first as Map;
+    expect(harbor["effects"], [{"variable": "clue_harbor_log", "op": "set", "value": true}]);
+    expect(items[2], {
+      "type": "CHOICE",
+      "id": "ask",
+      "source": "clues",
+      "text": {"id": "Petunjuk mana?", "en": "Which clue?"},
+      "variable": "PRESENTED",
+      "profile": "nora:0",
+      "timeout_ms": 20000,
+      "retries": 1,
+      "responses": [
+        {"clue": "harbor_log", "effects": [{"variable": "trust", "op": "subtract", "value": 2}], "target": "#caught"},
+        {"clue": "pier_photo"},
+      ],
+      "retry": {},
+      "fallback": {"effects": [{"variable": "trust", "op": "subtract", "value": 5}], "target": "#caught"},
+      "timeout": {"target": "#caught"},
+    });
+
+    // The engine reads it as an evidence question.
+    final question = core.ItemType.fromJson(Map<String, dynamic>.from(items[2] as Map));
+    expect(question, isA<core.EvidenceItemType>());
+    final responses = (question as core.EvidenceItemType).responses;
+    expect(responses.map((response) => response.clue), ["harbor_log", "pier_photo"]);
+    expect(question.retries, 1);
   });
 
   test('a choice timeout and [default] compile to timeout_ms and default_choice', () {

@@ -24,6 +24,7 @@ StoryProject story(
   String config = "source_locale: en\n",
   String? profiles,
   String? channels,
+  String? clues,
   Set<String>? assets,
 }) =>
     StoryProject.fromSources(
@@ -31,6 +32,7 @@ StoryProject story(
       profiles: profiles ??
           "nora:\n  name: Nora\n  expressions:\n    open: nora_open.png\n    smile: nora_smile.png\n",
       channels: channels,
+      clues: clues,
       scripts: scripts,
       assetFiles: assets,
     );

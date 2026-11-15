@@ -209,3 +209,98 @@ class ChannelDef {
     return channels;
   }
 }
+
+/// One clue in `clues.yaml` (spec §1.4).
+class ClueDef {
+  final String id;
+  final SourceSpan span;
+  final Localized? title;
+  final Localized? description;
+  final String? image;
+  final SourceSpan? imageSpan;
+  final bool key;
+  final Localized? chapter;
+
+  const ClueDef({
+    required this.id,
+    required this.span,
+    this.title,
+    this.description,
+    this.image,
+    this.imageSpan,
+    this.key = false,
+    this.chapter,
+  });
+}
+
+/// `clues.yaml`: the Case Board's clues, in story order (spec §1.4, CE-05).
+class ClueFile {
+  static const fileName = "clues.yaml";
+  static final _idPattern = RegExp(r"^[A-Za-z0-9_]+$");
+
+  final bool showCounts;
+  final List<ClueDef> clues;
+
+  const ClueFile({this.showCounts = false, this.clues = const []});
+
+  /// The clue declared as [id], if any.
+  ClueDef? operator [](String id) => clues.where((clue) => clue.id == id).firstOrNull;
+
+  static ClueFile parse(String source, StoryConfig config, Diagnostics diagnostics) {
+    const file = fileName;
+    final root = parseYaml(file, source, diagnostics);
+    if (root == null || root.value == null) return const ClueFile();
+    if (root is! YamlMap) {
+      diagnostics.error(yamlSpan(file, root), "$fileName must be a map with 'clues'");
+      return const ClueFile();
+    }
+    for (final field in root.nodes.keys.cast<YamlNode>()) {
+      if (field.value != "clues" && field.value != "show_counts") {
+        diagnostics.error(yamlSpan(file, field), "Unknown setting '${field.value}'. Clues go under 'clues'");
+      }
+    }
+    final showCounts = root.nodes["show_counts"];
+    if (showCounts != null && showCounts.value is! bool) {
+      diagnostics.error(yamlSpan(file, showCounts), "'show_counts' must be true or false");
+    }
+    final cluesNode = root.nodes["clues"];
+    final clues = <ClueDef>[];
+    if (cluesNode is YamlMap) {
+      cluesNode.nodes.forEach((keyNode, node) {
+        final id = (keyNode as YamlNode).value.toString();
+        final span = yamlSpan(file, keyNode);
+        if (!_idPattern.hasMatch(id)) diagnostics.error(span, "Clue id '$id' can only use letters, digits and _");
+        if (node is! YamlMap) {
+          diagnostics.error(span, "Clue '$id' must be a map");
+          return;
+        }
+        const known = {"title", "description", "image", "key", "chapter"};
+        for (final field in node.nodes.keys.cast<YamlNode>()) {
+          if (!known.contains(field.value)) {
+            diagnostics.error(yamlSpan(file, field), "Unknown clue field '${field.value}'");
+          }
+        }
+        final title = config.localizedFromYaml(file, node.nodes["title"], diagnostics, "title");
+        if (title == null) diagnostics.error(span, "Clue '$id' has no title");
+        final keyField = node.nodes["key"];
+        if (keyField != null && keyField.value is! bool) {
+          diagnostics.error(yamlSpan(file, keyField), "'key' must be true or false");
+        }
+        final imageNode = node.nodes["image"];
+        clues.add(ClueDef(
+          id: id,
+          span: span,
+          title: title,
+          description: config.localizedFromYaml(file, node.nodes["description"], diagnostics, "description"),
+          image: imageNode?.value?.toString(),
+          imageSpan: imageNode == null ? null : yamlSpan(file, imageNode),
+          key: keyField?.value == true,
+          chapter: config.localizedFromYaml(file, node.nodes["chapter"], diagnostics, "chapter"),
+        ));
+      });
+    } else if (cluesNode != null && cluesNode.value != null) {
+      diagnostics.error(yamlSpan(file, cluesNode), "'clues' must map clue ids to clues");
+    }
+    return ClueFile(showCounts: showCounts?.value == true, clues: clues);
+  }
+}

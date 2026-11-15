@@ -15,6 +15,9 @@ class StoryProject {
   final StoryConfig config;
   final Cast cast;
   final List<ChannelDef>? channels;
+
+  /// `clues.yaml`, when the story has one.
+  final ClueFile? clues;
   final List<ScriptFile> scripts;
 
   /// The asset folder, when known.
@@ -34,6 +37,7 @@ class StoryProject {
     required this.config,
     required this.cast,
     required this.channels,
+    required this.clues,
     required this.scripts,
     required this.assetsDir,
     required this.assetFiles,
@@ -58,6 +62,7 @@ class StoryProject {
     required String config,
     required String profiles,
     String? channels,
+    String? clues,
     required Map<String, String> scripts,
     Set<String>? assetFiles,
   }) {
@@ -70,6 +75,7 @@ class StoryProject {
       config: storyConfig,
       cast: Cast.parse(profiles, storyConfig, diagnostics),
       channels: channels == null ? null : ChannelDef.parseAll(channels, storyConfig, diagnostics),
+      clues: clues == null ? null : ClueFile.parse(clues, storyConfig, diagnostics),
       scripts: [for (final path in paths) parser.parse(path, scripts[path]!)],
       assetsDir: null,
       assetFiles: assetFiles,
@@ -87,6 +93,7 @@ class StoryProject {
 
     final config = StoryConfig.parse(read(StoryConfig.fileName), diagnostics);
     final channelsSource = read(ChannelDef.fileName);
+    final cluesSource = read(ClueFile.fileName);
     final parser = ScriptParser(config, diagnostics);
 
     final scripts = <ScriptFile>[];
@@ -134,6 +141,7 @@ class StoryProject {
       config: config,
       cast: Cast.parse(read(Cast.fileName), config, diagnostics),
       channels: channelsSource == null ? null : ChannelDef.parseAll(channelsSource, config, diagnostics),
+      clues: cluesSource == null ? null : ClueFile.parse(cluesSource, config, diagnostics),
       scripts: scripts,
       assetsDir: assetsDir,
       assetFiles: assetFiles,

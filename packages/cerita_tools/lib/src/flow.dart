@@ -89,6 +89,15 @@ class FlowGraph {
           to(route.target);
         }
         to(item.fallback);
+      case EvidenceItem():
+        // A response or outcome without a target continues after the question, and so does a wrong clue when
+        // there is no fallback. A retry without a target asks again, which adds no route.
+        for (final response in item.responses) {
+          to(response.target);
+        }
+        if (item.outcome("retry")?.target case final retry?) to(retry);
+        to(item.outcome("fallback")?.target);
+        if (item.outcome("timeout") case final timeout?) to(timeout.target);
       case ChoiceItem():
         // The engine skips a choice whose options are all hidden.
         if (item.options.every((option) => option.condition != null || option.once)) to(null);

@@ -1,3 +1,4 @@
+import 'cast.dart';
 import 'compiler.dart';
 import 'config.dart';
 import 'core_lint.dart';
@@ -48,7 +49,7 @@ class _ScriptLinter {
     _unusedCast();
     _assetFolder();
     _translations();
-    // Clue checks (CE-05) go here once clues have a syntax: declared but never found, used but not declared.
+    _withoutClues();
   }
 
   void _conversations() {
@@ -115,6 +116,30 @@ class _ScriptLinter {
     }
   }
 
+  /// Clue checks run on the compiled story, against `clues.json`. Without `clues.yaml` there is none, and the core
+  /// linter treats `clue_` variables as ordinary ones, so a `clue` line is reported here. Evidence responses are
+  /// still checked by the core linter.
+  void _withoutClues() {
+    if (project.clues != null) return;
+    void undeclared(String clue, SourceSpan span) =>
+        diagnostics.error(span, "Clue '$clue' isn't declared: add it to ${ClueFile.fileName}");
+    void effects(List<EffectNode> effects) {
+      for (final effect in effects) {
+        if (effect.clue case final clue?) undeclared(clue, effect.span);
+      }
+    }
+
+    for (final conversation in project.conversations) {
+      for (final item in conversation.items) {
+        effects(item.effects);
+        if (item is! ChoiceItem) continue;
+        for (final option in item.options) {
+          effects(option.effects);
+        }
+      }
+    }
+  }
+
   void _assetFolder() {
     if (project.assetFiles != null) return;
     final reason = project.assetsError;
@@ -149,6 +174,11 @@ class _ScriptLinter {
     for (final channel in project.channels ?? const []) {
       check(channel.name);
       check(channel.status);
+    }
+    for (final clue in project.clues?.clues ?? const <ClueDef>[]) {
+      check(clue.title);
+      check(clue.description);
+      check(clue.chapter);
     }
     for (final conversation in project.conversations) {
       check(conversation.chapter);

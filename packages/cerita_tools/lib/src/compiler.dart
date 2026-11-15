@@ -59,6 +59,8 @@ class _Compiler {
     files["profiles.json"] = encodeJson(_profiles());
     final channels = project.channels;
     if (channels != null) files["channels.json"] = encodeJson(_channels(channels));
+    final clues = project.clues;
+    if (clues != null) files["clues.json"] = encodeJson(_clues(clues));
     return Map.fromEntries(files.entries.toList()..sort((a, b) => a.key.compareTo(b.key)));
   }
 
@@ -146,6 +148,17 @@ class _Compiler {
         _put(json, "unlock_id", item.unlock);
         _put(json, "typing_delay_ms", item.typingMs);
         _put(json, "sfx", item.sfx);
+      case EvidenceItem():
+        json["source"] = "clues";
+        _put(json, "text", _required(item.texts["text"]));
+        _put(json, "variable", item.variable);
+        _put(json, "profile", _profile(item.by));
+        _put(json, "timeout_ms", item.timeoutMs);
+        _put(json, "retries", item.retries);
+        json["responses"] = [for (final response in item.responses) {"clue": response.clue, ..._outcome(response)}];
+        for (final name in const ["retry", "fallback", "timeout"]) {
+          if (item.outcome(name) case final outcome?) json[name] = _outcome(outcome);
+        }
       case ChoiceItem():
         _put(json, "text", _required(item.texts["text"]));
         _put(json, "variable", item.variable);
@@ -209,6 +222,12 @@ class _Compiler {
     return idOnly ? resolved?.split(":").first : resolved;
   }
 
+  /// The effects and target of an evidence response or outcome.
+  Map<String, Object?> _outcome(OptionNode option) => {
+        "effects": ?_effects(option.effects),
+        "target": ?option.target?.key,
+      };
+
   Map<String, Object?> _option(OptionNode option) {
     final json = <String, Object?>{"text": _required(option.texts["text"])};
     if (option.hasValue) json["value"] = option.value;
@@ -230,6 +249,21 @@ class _Compiler {
               if (profile.bio != null) "bio": _text(profile.bio),
               if (profile.avatar != null) "avatar": profile.avatar,
               if (profile.sprites.isNotEmpty) "sprites": profile.sprites,
+            },
+        ],
+      };
+
+  Map<String, Object?> _clues(ClueFile clues) => {
+        if (clues.showCounts) "show_counts": true,
+        "clues": [
+          for (final clue in clues.clues)
+            {
+              "id": clue.id,
+              "title": _required(clue.title),
+              "description": ?_text(clue.description),
+              "image": ?clue.image,
+              if (clue.key) "key": true,
+              "chapter": ?_text(clue.chapter),
             },
         ],
       };

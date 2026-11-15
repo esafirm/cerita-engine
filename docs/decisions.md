@@ -435,6 +435,33 @@ out there returns to the caller.
 - **Revisit if** authors get false warnings from `RETURN` in conversations that are both called and jumped to.
   `RETURN` counts as leading on, so a top-level `RETURN` with nothing to return to isn't reported.
 
+## Clues are declared in `clues.yaml`, and scripts only award them
+
+*2026-11-15. Authoring toolkit §1.4, §2.4. Backlog CE-02, CE-05.*
+
+A story's clues live in `clues.yaml`, in story order, and compile to `clues.json`. In a script, `clue <id>` is an
+effect line that sets `clue_<id>` to `true`, at column 0 (a `SET` where the scene finds it) or in any body that
+takes effects, such as a choice option or an evidence outcome.
+
+- **Why:** data schema §8 declares each clue once and has scenes only say it was found. A clue found on two routes,
+  or only through a choice, would need a declaration in one script and bare awards elsewhere if declarations lived
+  in the scripts. A YAML file next to `channels.yaml` keeps the board's order in one place.
+- **Cost:** the title and description of a clue sit away from the scene that finds it.
+- **Revisit if** authors keep forgetting to add new clues to `clues.yaml`. The lint error at the `clue` line
+  already names the file.
+
+## Evidence outcomes are `?` lines with a bracketed name
+
+*2026-11-15. Authoring toolkit §2.2. Backlog CE-02, CE-06.*
+
+Under `evidence`, `? <clue_id>` is a response and `? [retry]`, `? [fallback]` and `? [timeout]` are the outcomes.
+The toolkit shows `clues.yaml` in place of `clues.json` in core lint messages.
+
+- **Why:** an evidence question is a choice whose options are clues, so it reads like one. Brackets keep the
+  outcomes apart from clue ids: a clue named `retry` is still a valid id. Authors never see `clues.json`.
+- **Cost:** `[retry]` looks like the option modifiers (`[default]`, `[once]`), which don't apply here and are
+  reported as an invalid answer.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

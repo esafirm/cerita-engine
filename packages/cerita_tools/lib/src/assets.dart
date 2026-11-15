@@ -1,10 +1,11 @@
+import 'cast.dart';
 import 'diagnostics.dart';
 import 'model.dart';
 import 'project.dart';
 
 /// Asset kinds in report order (spec §3.3).
 const assetKinds = [
-  "background", "cg", "sprite", "avatar", "image", "video", "voice_note", "music", "ambience", "sfx", "voice",
+  "background", "cg", "sprite", "avatar", "image", "video", "clue", "voice_note", "music", "ambience", "sfx", "voice",
 ];
 
 /// Kinds a story can ship per locale as `name.<locale>.ext` (CE-01, data schema §5.4).
@@ -44,6 +45,9 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
   for (final channel in project.channels ?? const []) {
     final avatar = channel.avatar;
     if (avatar != null) refs.add(AssetRef("avatar", avatarPath(avatar), channel.avatarSpan ?? channel.span));
+  }
+  for (final clue in project.clues?.clues ?? const <ClueDef>[]) {
+    add("clue", "media", clue.image, clue.imageSpan ?? clue.span);
   }
 
   for (final conversation in project.conversations) {

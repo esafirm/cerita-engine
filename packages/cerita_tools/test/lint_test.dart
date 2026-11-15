@@ -83,7 +83,8 @@ void main() {
       "a.cerita:28: warning: Unknown text tag '{shaek}'",
       "a.cerita:32: warning: Never reached: it follows a JUMP or RETURN",
       "a.cerita:36: warning: No target leads to this conversation",
-      "a.cerita:37: error: 'clue' is reserved for the Case Board (CE-05) and isn't supported yet",
+      "a.cerita:37: error: Clue 'boat' isn't declared: add it to clues.yaml",
+      "a.cerita:37: warning: Variable 'clue_boat' is set but never read",
       "a.cerita:41: error: Duplicate id 'start'",
       "profiles.yaml:5: warning: Expression 'nora:smile' is never used",
       "profiles.yaml:6: error: Missing sprite file 'sprites/nora_sad.png'",
@@ -111,6 +112,74 @@ branch
       "a.cerita:5: error: Bad expression: Unknown function 'rnd' in 'rnd(1, 6)'",
       "a.cerita:8: error: Missing music file 'music/gone.mp3'",
       "a.cerita:10: error: Target 'nowhere' doesn't exist",
+    ]);
+  });
+
+  test('clue and evidence problems point at the clue line, the answer line or clues.yaml', () async {
+    const clues = "clues:\n  boat:\n    title: { id: Perahu }\n    image: clue_boat.png\n  log:\n    title: Log\n";
+    const script = '''
+@conversation index
+@scene VN bg=room.png
+evidence
+  id: Yang mana?
+  en: Which?
+? boat
+  -> nowhere
+? ghost
+  set x = rnd(1)
+? [fallback]
+  -> index
+clue phantom
+clue boat
+ending e GOOD
+  id: T
+  en: E
+''';
+    final project = story({"a.cerita": script}, config: _bilingual, clues: clues, profiles: _noCast, assets: _assets);
+    expect(await _lint(project), [
+      "a.cerita:3: error: No clue with a response can be found before this evidence question",
+      "a.cerita:7: error: Target 'nowhere' doesn't exist",
+      "a.cerita:8: error: Clue 'ghost' isn't declared in clues.yaml",
+      "a.cerita:9: error: Bad expression: Unknown function 'rnd' in 'rnd(1)'",
+      "a.cerita:9: warning: Variable 'x' is set but never read",
+      "a.cerita:12: error: Clue 'phantom' isn't declared in clues.yaml (used as 'clue_phantom')",
+      "clues.yaml:3: warning: Missing 'en' text",
+      "clues.yaml:4: error: Missing clue image file 'media/clue_boat.png'",
+      "clues.yaml:5: warning: Clue 'log' is never awarded: no effect sets 'clue_log'",
+    ]);
+  });
+
+  test('evidence syntax errors, and clues without clues.yaml', () async {
+    const script = '''
+@conversation index
+evidence
+  en: Which?
+? [fallback]
+? [fallback]
+? not a clue
+? pier
+  en: words
+  value 3
+evidence
+  en: Again?
+? [retry]
+clue bad-id
+clue boat
+ending e GOOD
+  en: E
+''';
+    expect(await _lint(story({"a.cerita": script}, profiles: _noCast, assets: {})), [
+      "a.cerita:2: error: No clue with a response can be found before this evidence question",
+      "a.cerita:5: error: An evidence question has only one [fallback]",
+      "a.cerita:6: error: An evidence answer is a clue id, or [retry], [fallback] or [timeout]",
+      "a.cerita:7: error: Clue 'pier' isn't declared in clues.yaml",
+      "a.cerita:8: error: An evidence answer has no text: the player presents the clue",
+      "a.cerita:9: error: value doesn't go under an evidence answer: the presented clue's id is stored",
+      "a.cerita:10: error: Evidence question without responses",
+      "a.cerita:10: error: No clue with a response can be found before this evidence question",
+      "a.cerita:13: error: Invalid clue id 'bad-id': use letters, digits and _",
+      "a.cerita:14: error: Clue 'boat' isn't declared: add it to clues.yaml",
+      "a.cerita:14: warning: Variable 'clue_boat' is set but never read",
     ]);
   });
 

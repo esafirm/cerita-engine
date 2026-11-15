@@ -99,11 +99,13 @@ ending end GOOD
         profiles: "nora:\n  name: Nora\n  avatar: assets/story/sprites/nora_avatar.png\n"
             "  expressions:\n    open: nora_open.png\n",
         channels: "thread:\n  name: Thread\n  avatar: thread.png\n",
+        clues: "clues:\n  boat:\n    title: Boat\n    image: clue_boat.png\n",
         assets: {"bg/room.png", "sprites/nora_open.png", "media/photo.png"},
       );
       expect([for (final ref in missingAssets(project)!) "${ref.kind} ${ref.path} ${ref.span}"], [
         "avatar sprites/nora_avatar.png profiles.yaml:3",
         "avatar sprites/thread.png channels.yaml:3",
+        "clue media/clue_boat.png clues.yaml:4",
         "music music/theme.mp3 a.cerita:2",
         "sfx music/ding.mp3 a.cerita:3",
         "voice music/vo_01.en.mp3 a.cerita:3",

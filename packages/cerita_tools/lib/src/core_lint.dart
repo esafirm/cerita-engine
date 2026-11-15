@@ -29,6 +29,9 @@ class CompiledStoryLoader extends core.EngineLoader {
         conversation: await loadConversation(core.Conversation.indexKey),
         profiles: core.ProfileData.fromJson(_json("profiles.json")),
         channels: files.containsKey("channels.json") ? core.Channel.listFromJson(_json("channels.json")) : const [],
+        clues: files.containsKey("clues.json")
+            ? core.ClueCatalog.fromJson(_json("clues.json"))
+            : core.ClueCatalog.empty,
       );
 
   @override
@@ -49,7 +52,7 @@ class CompiledStoryLoader extends core.EngineLoader {
 /// Fields that hold localized text (CE-01, data schema §5.1).
 const _localizedFields = {
   "chapter", "title", "text", "caption", "transcript", "default_value", "notification_text", "summary", "name", //
-  "bio", "status",
+  "bio", "status", "description",
 };
 
 /// [json] with every localized text object replaced by its text in [locale], falling back to [source], the way
@@ -86,7 +89,9 @@ Future<Diagnostics> lintCompiled(StoryProject project, Map<String, String> compi
       final id = [issue.severity, issue.conversationKey, issue.itemIndex, issue.part, issue.message].join("|");
       if (!seen.add(id)) continue;
       final span = _locate(project, issue);
-      issue.isError ? diagnostics.error(span, issue.message) : diagnostics.warning(span, issue.message);
+      // Script authors write clues.yaml, which compiles to clues.json.
+      final message = issue.message.replaceAll("clues.json", ClueFile.fileName);
+      issue.isError ? diagnostics.error(span, message) : diagnostics.warning(span, message);
     }
   }
   return diagnostics;
@@ -103,6 +108,7 @@ bool _assetExists(StoryProject project, Set<String> files, String path) {
 /// `profiles.json` issues.
 SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
   final key = issue.conversationKey;
+  if (issue.fileName == "clues.json") return _locateClue(project.clues, issue.message);
   if (key == null) return _locateProfile(project.cast, issue.message);
   final conversation = project.conversationsByKey[key];
   if (conversation == null) return null;
@@ -113,6 +119,16 @@ SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
   }
   final aboutScene = issue.message.contains(" file '") || issue.message.contains("CHAT") || issue.message.contains("thread");
   return aboutScene ? conversation.scene?.span ?? conversation.span : conversation.span;
+}
+
+/// The `clues.yaml` entry a `clues.json` issue names, by its clue id or image file.
+SourceSpan _locateClue(ClueFile? clues, String message) {
+  final named = RegExp(r"'([^']+)'").firstMatch(message)?.group(1);
+  for (final clue in clues?.clues ?? const <ClueDef>[]) {
+    if (clue.id == named) return clue.span;
+    if (clue.image != null && named != null && named.endsWith("/${clue.image}")) return clue.imageSpan ?? clue.span;
+  }
+  return const SourceSpan(ClueFile.fileName, 1);
 }
 
 SourceSpan _locateProfile(Cast cast, String message) {
@@ -134,6 +150,10 @@ SourceSpan? _locatePart(ItemNode item, List<Object> path) {
         _ => null,
       };
   return switch ((item, path)) {
+    (final EvidenceItem evidence, ["responses", final int at, ...final rest]) when at < evidence.responses.length =>
+      _locateAnswer(evidence.responses.elementAt(at), rest),
+    (final EvidenceItem evidence, [final String name, ...final rest]) when evidence.outcome(name) != null =>
+      _locateAnswer(evidence.outcome(name)!, rest),
     (ChoiceItem(:final options), ["choices", final int at, "target", ...]) when at < options.length =>
       options[at].target?.span ?? options[at].span,
     (ChoiceItem(:final options), ["choices", final int at, ...final rest]) when at < options.length =>
@@ -145,3 +165,10 @@ SourceSpan? _locatePart(ItemNode item, List<Object> path) {
     _ => null,
   };
 }
+
+/// An evidence response or outcome: its target line, an effect line, or its `?` line.
+SourceSpan _locateAnswer(OptionNode answer, List<Object> rest) => switch (rest) {
+      ["target", ...] => answer.target?.span ?? answer.span,
+      ["effects", final int at, ...] when at < answer.effects.length => answer.effects[at].span,
+      _ => answer.span,
+    };
