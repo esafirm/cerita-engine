@@ -303,15 +303,17 @@ It checks in two layers and reports both together:
 
 2. **Story checks**: the story is compiled, and cerita_core's `StoryLinter` runs on the JSON, once per locale
    ([authoring tools §1](authoring-tools.md#1-story-linter-storylinter)). Its errors and warnings keep their
-   severity, and each one is reported at the line of the script item it's about (the scene line for scene
-   issues, `profiles.yaml` for sprites and avatars). A script with errors is compiled without its broken
+   severity, and each one is reported at the script line it's about: the option, branch route, effect or stage
+   action when the issue names one, else the item (the scene line for scene issues, `profiles.yaml` for sprites
+   and avatars). A script with errors is compiled without its broken
    statements, so both layers are reported in one run.
 
 - `--release` fails on warnings too (PRD D2), so a release has no missing translations, unused cast or
   engine warnings.
 - Asset checks need the `assets` folder (`cerita.yaml` or `--assets`). Without it they are skipped with a
   note, and `--release` reports that as an error. A voice clip or voice note passes when its shared file
-  exists, or when every locale has its own `name.<locale>.ext`.
+  exists, or when every locale has its own `name.<locale>.ext`. cerita_core's linter applies the same rule, so
+  `cerita lint` on the compiled folder agrees.
 - Clue checks (declared but never found, used but not declared) come with CE-05: as story checks if clues get
   JSON fields, as script checks if they only exist in the script.
 

@@ -11,10 +11,12 @@ These tools work on story JSON. Stories written as `.cerita` scripts go through 
 
 Reads every conversation through an `EngineLoader` and reports issues. Pure Dart, so it runs in the CLI (§3), in tests and in the developer panel (§4).
 
-Each issue has a severity, the conversation file, the item index (when it belongs to an item) and a message:
+Each issue has a severity, the conversation file, the item index (when it belongs to an item), the part of the item
+it's about (when it names one: `choices[2]`, `branches[0]`, `fallback_target`, `effects[1]`, `actions[0]`, or nested
+like `choices[2].effects[0]`) and a message:
 
 ```text
-error   cvn_day2.json #14  Target 'ending_tru' doesn't exist
+error   cvn_day2.json #14 choices[1]  Target 'ending_tru' doesn't exist
 warning index.json #9      Variable 'curiousity' is read but never set
 ```
 
@@ -31,7 +33,7 @@ The story breaks or behaves wrongly when it gets there.
 | Duplicate label | Two items with the same `id` in one conversation. |
 | Empty choice | A `CHOICE` without options, or a `default_choice` that isn't one of them. |
 | Chat without a thread | A `CHAT` scene without `channel_id`. |
-| Missing file | A background, sprite, avatar, music, ambience, sound, voice, media or clue image file that isn't there. Only checked when the linter is told which files exist. |
+| Missing file | A background, sprite, avatar, music, ambience, sound, voice, media or clue image file that isn't there. Only checked when the linter is told which files exist. A voice clip or voice note passes with its shared file (`vo.mp3`) or with one for every story locale (`vo.id.mp3`, `vo.en.mp3`), the files the player tries (data schema §7.4). |
 | Bad `clues.json` | A clue without `id` or `title`, an `id` that isn't `[a-zA-Z0-9_]+`, or two clues with the same `id`. |
 | Undeclared clue | A `clue_<x>` variable read or set, or an evidence response for clue `x`, when `x` isn't in `clues.json`. The `clue_` variables are only checked in stories that have a `clues.json`. |
 | Bad evidence question | No `responses`, two responses for one clue, `choices` or `default_choice` on it, or negative `retries`. |
@@ -50,6 +52,7 @@ Probably a mistake, but the story still runs.
 | Dead items | Items right after a `JUMP` or `RETURN` without a condition, that no label leads to. |
 | Unknown chat thread | A `channel_id` that `channels.json` doesn't list (when the file exists). |
 | Clue never awarded | A clue in `clues.json` that no effect sets. Clue variables are not reported as "set but never read": the board reads them. |
+| Story stops | A conversation entered by a target (or `index`) can run out of items with no `ENDING`, `JUMP`, `RETURN` or `BRANCH` fallback after its last entry point (its start, or a label a target uses). The engine then ends the story without an ending. Reported at the last item. Conversations only reached through `CALL` return to their caller instead and aren't checked. A `CHOICE` leads on when every option has a target and one of them has no condition and isn't `once`. An evidence question (`"source": "clues"`) leads on when every response and its `fallback` (and `timeout`, if given) have a target. Conditions aren't evaluated. |
 
 ### 1.3 Clues awardable before an evidence question
 
@@ -116,7 +119,7 @@ dart run cerita_core:cerita graph example/assets/story > story.mmd
 
 Opened from the in-game menu when `StorySetup.developer` is true (the demo turns it on in debug builds). Never shown to players otherwise.
 
-- **Variables**: every playthrough and `persistent.*` variable with its value. Values can be edited or added (numbers, `true` / `false`, or text), and take effect right away.
+- **Variables**: every playthrough and `persistent.*` variable with its value. Values can be edited or added (numbers, `true` / `false`, or text), and take effect right away. Remembered facts (`meta.flag.*`) are listed too, read-only, since only the `meta_set` effect can remember one.
 - **Jump**: every conversation and its labels. Picking one continues the story there, keeping the variables.
 - **Check**: runs the linter (§1) on the bundled story, including missing assets.
 - **Reload story**: reads the story files again and continues at the same conversation and item. A Flutter hot reload (`r` in `flutter run`) does it automatically, so edits to the JSON show up without restarting the story. If items were added or removed above the current one, the story continues at the same position, which may be another item.
