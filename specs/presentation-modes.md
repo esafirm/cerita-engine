@@ -11,7 +11,7 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
 ### 1.1 Layout & Components
 - **Top App Bar**:
   - Displays the active contact's avatar, `name`, online status or `bio` from `Profile`, and in-game `day` / `time` from `Scene`.
-  - Action buttons for **Profile Details**, **Gallery**, and **Chapter/Settings**.
+  - Action buttons for **Profile Details**, **Gallery**, **Case Board** (stories with clues, §6) and **Chapter/Settings**.
 - **Scrollable Message Timeline**:
   - Renders the delivered transcript for the active `channel_id`.
   - **Incoming Bubbles**: Left-aligned with character avatar and name; styled according to character theme.
@@ -25,7 +25,7 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
   - **Video (`VIDEO`)**: Inline preview with play overlay.
 - **Bottom Composer / Interaction Tray**:
   - **Normal Progression**: Tap anywhere or tap the bottom "Continue" prompt to advance incoming messages.
-  - **Choice Selection (`CHOICE`)**: Expands a tray of selectable reply cards at the bottom of the chat (with an optional countdown bar if `timeout_ms` is set).
+  - **Choice Selection (`CHOICE`)**: Expands a tray of selectable reply cards at the bottom of the chat (with an optional countdown bar if `timeout_ms` is set). An evidence question shows the Case Board picker there instead (§6.3), and the presented clue is sent as a clue message (§6.4).
   - **Text Input (`INPUT`)**: Activates the message text field and Send button.
 
 ---
@@ -67,6 +67,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
   - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
   - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Auto and skip wait while the UI is hidden and carry on when it comes back.
+  - **Case Board**: Opens the board (§6) in stories with clues, with a badge counting new clues.
 
 ---
 
@@ -156,3 +157,61 @@ Chapters, Gallery, Endings, Settings and Music room screens, ending summary) com
 
 `LanguagePicker.show(context)` lists the story's `locales` by their `CeritaStrings.languageName`. The Settings
 screen shows a Language row when the story has more than one locale, and so does the demo title screen.
+
+---
+
+## 6. Case Board & Evidence
+
+*Backlog CE-05 and CE-06.* Only for stories with a `clues.json` (data-schema §8). A story without clues shows
+no board entry, button, badge or notification anywhere.
+
+### 6.1 Case Board screen (`CaseBoardScreen`)
+- **Entry points**: an in-game menu entry (with the count of new clues), a button in the VN HUD
+  (`VnHud.onCaseBoard`, with the same count as a badge) and a button in the chat top bar.
+- **Layout**: the found clues grouped by chapter, newest chapter first (data-schema §8.2). Each clue shows its
+  title, its image as a thumbnail, a marker when it is a `key` clue, and a "New" highlight until viewed. With
+  `show_counts`, each chapter heading says "3 of 5 found". Chapters with no clue found yet aren't shown.
+  Before the first clue, the board says so.
+- **Detail**: tapping a clue opens its title, image and full description. Tapping the image opens it full
+  screen with pinch to zoom.
+- **Viewed**: closing the board marks every clue it showed as viewed (engine §10.2), which clears the
+  highlights and the count.
+- **Pausing**: while the board is open the story holds: chat pacing, auto and skip wait, and a timed choice's
+  countdown stops. Closing the board resumes them.
+
+### 6.2 Clue notification
+- When a clue is found (`EngineListener.onClueFound`), a short notification slides in at the top: "Clue found:
+  Pier photo", with the clue's image if it has one. It disappears after about 3 seconds. Several clues found at
+  once queue up.
+- Tapping it opens the board at that clue's detail.
+
+### 6.3 Picker mode (evidence questions)
+- When the story reaches an evidence question, its prompt is shown as for a `CHOICE` (dialogue box, NVL page
+  or chat tray). Once the prompt has been read, the board opens in picker mode: in VN over the dimmed stage, in
+  chat in place of the reply tray.
+- The picker lists every clue found in this playthrough (PRD CE-06 D1), grouped like the board, with the
+  prompt on top. Tapping a clue opens its detail with **Present** and **Back**. Presenting needs this second
+  tap, so a stray tap can't answer.
+- With `timeout_ms`, a countdown bar runs over the picker, as for timed choices. When it runs out the picker
+  closes and the timeout outcome plays.
+- The board's normal entry points are hidden while the picker is open, and saving is unavailable, as for any
+  pending choice.
+
+### 6.4 Presented clue
+- **VN**: the backlog and the NVL page show the player's line as "Presented: Pier photo".
+- **Chat**: the clue is sent as an outgoing message: its image (tap to view full screen) with the title under
+  it, or the title alone with a clue icon when it has no image. It stays in chat history.
+- **Call**: the player's line shows "Presented: Pier photo".
+
+### 6.5 Skin hooks
+The board and the notification are drawn through `StorySkin`, so a game can make them a cork board, a notebook
+or a case file:
+
+| Hook | Draws |
+| :--- | :--- |
+| `caseBoardBackground(context, child)` | The board's backdrop behind the clue list, for the board and the picker. Default: the theme surface |
+| `clueGroupHeader(context, ClueGroupHeader)` | A chapter heading, with its found and total counts when `show_counts` is on |
+| `clueCard(context, ClueCard)` | One clue on the board or in the picker: title, image, key marker, "New" highlight and tap handler |
+| `clueNotification(context, ClueNotice)` | The "Clue found" notification |
+
+Hooks get the clue's text already resolved, the image's asset path and the callbacks.

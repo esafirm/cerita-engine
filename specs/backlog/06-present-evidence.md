@@ -4,12 +4,13 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
 | **Priority** | Must, needed by Last Seen M2 |
 | **Related features** | Choices, timed choices, Case Board (CE-05), in-game backlog, chat history, chat media messages, save slots |
+| **Engineering design** | [data-schema.md §4.4, Evidence questions](../data-schema.md#evidence-questions-source-clues), [engine-and-state.md §10](../engine-and-state.md#10-clues--evidence), [presentation-modes.md §6.3 and §6.4](../presentation-modes.md#63-picker-mode-evidence-questions), [authoring-tools.md §1.3](../authoring-tools.md#13-clues-awardable-before-an-evidence-question) |
 
 ## 2. Executive summary
 

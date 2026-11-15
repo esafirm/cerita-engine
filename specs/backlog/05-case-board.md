@@ -4,12 +4,13 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
 | **Priority** | Must, needed by Last Seen M2 |
 | **Related features** | Gallery, in-game backlog, save slots, checkpoints, in-game menu and HUD, Present evidence (CE-06), Cross-playthrough memory (CE-03), Story authoring toolkit (CE-02), skins |
+| **Engineering design** | [data-schema.md §8](../data-schema.md#8-clues-cluesjson), [engine-and-state.md §10](../engine-and-state.md#10-clues--evidence), [presentation-modes.md §6](../presentation-modes.md#6-case-board--evidence), [authoring-tools.md §1](../authoring-tools.md#1-story-linter-storylinter) |
 
 ## 2. Executive summary
 

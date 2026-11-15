@@ -177,6 +177,8 @@ erDiagram
         Set_String chosen
         StageState stage
         RollbackLog rollback
+        Set_String viewed_clues
+        Map_String_Int evidence_tries
         DateTime updated_at
     }
 ```
@@ -200,6 +202,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Stage (`stage`)**: See §6.
 - **Rollback (`rollback`)**: The rollback frames and recorded `random()` rolls, see §7.
 - **Language independence**: saves and checkpoints never depend on the active language, see §9.4.
+- **Clues (`viewed_clues`, `evidence_tries`)**: Clues already seen on the Case Board, and the retries used by pending evidence questions, see §10. Found clues are plain `clue_<id>` variables in `data_map`.
 
 **Reset progress** calls `StoryStorage.clear()`, which wipes the whole meta-state (gallery, endings, checkpoints, chosen choices, persistent variables, remembered facts) and every save slot.
 
@@ -247,6 +250,7 @@ The engine remembers the last 100 delivered items with the full playthrough stat
 - Rollback targets are lines (`TEXT`, `NARRATION`, `MEDIA`, `CHOICE`, `INPUT`) delivered in a `VN` scene. `STAGE` and `WAIT` items are passed over. Chat and call threads move on by themselves, so they are not rollback targets.
 - `rollback()` goes back one line. `rollbackTo(historyIndex)` goes back to the line at that transcript index (the backlog uses it).
 - The global meta-state is not rolled back: seen lines, unlocks and `persistent.*` variables stay.
+- Clues found and evidence retries used are part of the frame, so the Case Board rolls back too. Which clues the player has viewed is not (§10.2).
 - `random()` results are recorded. Moving forward after a rollback replays them in order, so going back and forth can't change a result. A `random()` call with another range than the recorded one (the story took another path) drops the recorded rest and rolls again.
 - Saves keep the rollback log: the frames of the rollback targets, the frame the save was made in, and the rolls they can still replay. After loading a save, rollback reaches as far back as it did when the save was made. Saves made before this keep only the loaded line as the first rollback target.
 
@@ -309,3 +313,62 @@ follow a language switch (PRD D3). `entry.itemType` keeps resolving to the sourc
 
 `EngineListener.onMediaUnlocked(MediaItemType item)` receives the unlocked item in the active language, so the
 UI can name it by its `title` (or `caption`) instead of its `unlock_id`.
+
+---
+
+## 10. Clues & Evidence
+
+*Backlog CE-05 and CE-06.* The JSON format is in data-schema §4.4 *Evidence questions* and §8.
+
+### 10.1 Types (`cerita_core`)
+
+| Type | Role |
+| :--- | :--- |
+| `Clue` | One `clues.json` entry. Keeps its raw JSON, so `title`, `description` and `chapter` stay in every language. `variable` is `clue_<id>` |
+| `ClueCatalog` | The declared clues and `show_counts`. `groups` groups them by chapter in board order (data-schema §8.2). Empty when the story has no `clues.json` |
+| `EvidenceItemType` | A `CHOICE` with `"source": "clues"`. A `ChoiceItemType` subclass with no `choices`, plus `responses`, `retries`, `retry`, `fallback` and `timeout` |
+| `EvidenceOutcome` / `EvidenceResponse` | An outcome's `effects` and `target`. A response adds its `clue` |
+
+`EngineLoader.initialLoad()` returns the catalog in `EnginePackage.clues`. Both bundled loaders read
+`clues.json` when it exists.
+
+### 10.2 Engine
+
+- **Found clues.** `RealFsseEngine.clues` is the catalog. `isClueFound(clue)` is `dataMap["clue_<id>"] ==
+  true`, and `foundClues` lists them in file order. Nothing else stores clues: the board is derived from the
+  playthrough variables, which saves, checkpoints, scene replay and rollback already restore (PRD CE-05 10.3).
+- **Notification.** `next()` compares the found clues before and after it runs and calls
+  `EngineListener.onClueFound(Clue)` for each newly found one, in file order. Loading a save, starting from a
+  checkpoint, rolling back and the developer panel don't notify: they restore or edit state, they don't
+  award.
+- **Viewed clues.** `viewedClues` holds the found clues the player has seen on the board, so new ones can be
+  highlighted and counted (PRD CE-05 10.4). `markCluesViewed(ids)` adds to it, and `newClues` is found minus
+  viewed. It is playthrough state saved in the slot (`viewed_clues`). New game starts it empty. A checkpoint,
+  and a save made before the field existed, count every clue found so far as viewed. Rollback doesn't change
+  it: a clue rolled back and found again is not new.
+- **Evidence questions.** `next()` returns an `EvidenceItemType` like a `CHOICE` and waits for its answer:
+  - `ItemResult.present(question, clue)` presents a clue. The engine writes the clue `id` to `variable`,
+    records the reply in the transcript (§10.3) and picks the outcome (data-schema §4.4): the clue's response,
+    else `retry` while retries remain, else `fallback`. It applies the outcome's `effects`, then follows its
+    `target`. A `retry` without a target asks the question again.
+  - `ItemResult.evidenceTimeout()` plays `timeout`, or `fallback`. Nothing is added to the transcript.
+  - Retries used are counted per question (`<conversation_key>#<index>`) and reset when the question gets a
+    final answer. The count is playthrough state: saved in the slot and in rollback frames
+    (`evidence_tries`).
+  - An evidence question reached with no clue found is skipped: `fallback` plays and nothing is shown
+    (PRD CE-06 open question, resolved yes).
+- An evidence question is a `ChoiceItemType`, so everything that treats a pending `CHOICE` specially
+  (saves rewind it, rollback can target it, `_awaitingResult`) handles it the same way. It isn't recorded in
+  `chosen_choices`.
+
+### 10.3 Transcript, saves and rollback
+
+- A presented clue is a player entry: `TranscriptEntry.clueId` is its `id` (`"clue"` in JSON) and
+  `playerText` its title. The UI renders it from the clue: "Presented: Pier photo" in the VN backlog and NVL
+  page, an outgoing clue message in chat (presentation-modes §1.1). Old UIs that only read `playerText` still
+  show the title.
+- `SaveSlot` adds `viewed_clues` (null in older saves) and `evidence_tries`. `RollbackFrame` adds
+  `evidence_tries`. Clue variables need nothing new.
+- Saves can't be made while the picker is open, as with any pending `CHOICE`: a save made then rewinds to the
+  question and asks it again on load. Rolling back to the question restores the clues found and the retries
+  used at that point.

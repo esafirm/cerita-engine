@@ -11,6 +11,7 @@ assets/story/
 ├── index.json              # Entry-point conversation script
 ├── profiles.json           # Cast & character profile registry
 ├── channels.json           # (Optional) Chat thread metadata for Messenger mode
+├── clues.json              # (Optional) Clues for the Case Board, see section 8
 ├── cvn_<id>.json           # Branched conversation scripts (e.g., cvn_qxfOhA.json)
 ├── bg/                     # Scene background images & event CGs
 ├── sprites/                # Character expression sprites
@@ -241,6 +242,70 @@ Presents interactive options to the player. Choices can mutate state variables, 
   `StorySkin.memoryMarker`). Use it on unlocks the player should notice. It doesn't change when the choice is
   available: that is still up to `condition`.
 
+
+#### Evidence questions (`"source": "clues"`)
+*Backlog CE-06.* A `CHOICE` with `"source": "clues"` asks the player to present one of the clues they have
+found (section 8) instead of picking a listed option. The UI opens the Case Board in picker mode. It has no
+`choices`: the options are the clues found in this playthrough, in `clues.json` order.
+
+```json
+{
+  "type": "CHOICE",
+  "id": "ask_hendra",
+  "source": "clues",
+  "text": { "id": "Petunjuk mana yang membantah dia?", "en": "Which clue contradicts him?" },
+  "profile": "hendra:1",
+  "variable": "presented_hendra",
+  "retries": 1,
+  "timeout_ms": 20000,
+  "responses": [
+    {
+      "clue": "harbor_log",
+      "effects": [{ "variable": "trust_hendra", "op": "subtract", "value": 2 }],
+      "target": "#hendra_caught"
+    },
+    { "clue": "pier_photo", "target": "#hendra_pier" }
+  ],
+  "retry": { "target": "#hendra_scoffs" },
+  "fallback": {
+    "effects": [{ "variable": "trust_hendra", "op": "subtract", "value": 5 }],
+    "target": "#hendra_leaves"
+  },
+  "timeout": { "target": "#hendra_leaves" }
+}
+```
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `source` | `"clues"` | Makes the `CHOICE` an evidence question. Any other value is an error. Without it, a normal choice. |
+| `text`, `profile`, `variable`, `timeout_ms` | | As for a normal `CHOICE`. `variable` receives the presented clue's `id`. |
+| `responses` | `List` | One outcome per specific clue: `clue` (a clue `id`), optional `effects` and `target`. At least one. |
+| `retries` | `int`, default `0` | How many times a wrong clue lets the player try again before `fallback`. |
+| `retry` | outcome | What plays after a wrong clue while retries remain: optional `effects` and `target`. |
+| `fallback` | outcome | What plays for a wrong clue once no retries remain: optional `effects` and `target`. |
+| `timeout` | outcome | What plays when `timeout_ms` runs out. Defaults to `fallback`. |
+
+An *outcome* is an object with optional `effects` and `target`, like a choice option without text. A missing
+`target` continues with the item after the question, except for `retry` (below).
+
+How the presented clue is answered:
+
+1. A clue with an entry in `responses` plays that response. This is final, whether the author wrote it as
+   the right answer or as a specific wrong one.
+2. Any other clue is a wrong answer. While retries remain, it uses one up and `retry` plays. Its `target`
+   should lead back to the question (`"target": "#hendra_scoffs"`, which ends with a `JUMP` to
+   `#ask_hendra`). Without a `retry`, or without a `target` in it, the question is asked again right away.
+3. A wrong answer with no retries left plays `fallback`. The retries are counted again from zero the next time
+   the question is reached.
+4. When `timeout_ms` runs out, `timeout` (or `fallback`) plays. It doesn't use up a retry.
+
+A specific response can also lead back to the question, so a reply to one clue lets the player try again
+without using a retry. `default_choice`, `once` and `memory_marker` don't apply to evidence questions.
+
+If the player has found no clue at all when an evidence question is reached, it isn't shown: `fallback` plays
+straight away. The linter (authoring-tools §1) reports a question that can be reached before any clue with a
+response is awarded, so this should never happen in a finished story.
+
 ### 4.5 `INPUT` — Free-Text Player Input
 Prompts the player to enter custom text (e.g., player name, passcodes, or puzzle answers) and stores it in `dataMap[variable]`.
 
@@ -439,9 +504,11 @@ A plain string is the same text in every language, so single-language stories ne
 | `ENDING` | `title`, `summary` |
 | `profiles.json` | `name`, `bio` |
 | `channels.json` | `name`, `status` |
+| `clues.json` | each clue's `title`, `description`, `chapter` |
 
 Logic fields never take a locale object: `id`, `condition`, `effects`, `variable`, `target`, `value`,
-`profile`, `uri`, `voice`, `sfx`, `music`, `background`, `unlock_id`, `ending_id`, `handle`, `scene.time`.
+`profile`, `uri`, `voice`, `sfx`, `music`, `background`, `unlock_id`, `ending_id`, `handle`, `scene.time`, and a
+clue's `id` and `image`.
 
 ### 7.2 Fallback
 
@@ -470,3 +537,69 @@ before. Give options an explicit `value` when conditions test them.
 tries `name.<locale>.mp3` (e.g. `vo_raka_04.en.mp3`) in the active locale, then `name.mp3`. A story can ship a
 clip per language, or one clip shared by every language. Other media (images, CGs, video, music, SFX) are not
 localized.
+
+---
+
+## 8. Clues (`clues.json`)
+
+*Backlog CE-05.* A mystery story declares its clues once, in an optional `clues.json` next to `index.json`.
+Scenes then only say that a clue is found. A story without the file has no clues and shows no Case Board.
+
+```json
+{
+  "show_counts": true,
+  "clues": [
+    {
+      "id": "pier_photo",
+      "title": { "id": "Foto dermaga", "en": "Pier photo" },
+      "description": {
+        "id": "Foto buram dari Tasya. Ada perahu di ujung dermaga.",
+        "en": "A blurry photo from Tasya. There's a boat at the end of the pier."
+      },
+      "image": "clue_pier_photo.png",
+      "key": true,
+      "chapter": { "id": "Hari 2", "en": "Day 2" }
+    },
+    { "id": "harbor_log", "title": "Harbor log", "description": "The boat signed out at 21:40.", "chapter": "Day 3" }
+  ]
+}
+```
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `show_counts` | `bool` | No (default `false`) | Show "3 of 5 found" for each chapter on the board (PRD CE-05 D3). |
+| `clues[].id` | `String` | Yes | Unique, `[a-zA-Z0-9_]+`. The clue is found when `clue_<id>` is `true`. |
+| `clues[].title` | text | Yes | Name on the board, in the notification, the picker and the presented-clue message. |
+| `clues[].description` | text | No | Full text in the clue's detail. |
+| `clues[].image` | `String` | No | Image file in `media/`, shown on the board and full screen in the detail. |
+| `clues[].key` | `bool` | No (default `false`) | A key clue, marked on the board. |
+| `clues[].chapter` | text | No | The day or chapter the board groups the clue under. |
+
+*text* fields are localized text (section 7): a plain string, or one string per language such as
+`{ "id": "Foto dermaga", "en": "Pier photo" }`, with the usual fallback (section 7.2).
+
+### 8.1 Finding a clue
+
+A clue is found when the playthrough variable `clue_<id>` becomes `true`. Any effect can award it, on any
+item, choice option, `SET` or evidence-question outcome:
+
+```json
+{ "variable": "clue_pier_photo", "op": "set", "value": true }
+```
+
+Conditions read it like any variable: `"condition": "clue_pier_photo == true"`, or `!clue_pier_photo` for a
+clue not found yet.
+
+- Awarding a clue that is already found changes nothing and shows no second notification.
+- The board shows the clues whose variable is `true` right now. Setting one back to `false` takes it off the
+  board, but stories shouldn't: clues are never lost (PRD CE-05). Gate on another variable instead.
+- In a story with a `clues.json`, variable names starting with `clue_` are reserved for clues. The linter
+  reports a `clue_<x>` variable when `x` isn't declared.
+- Clue variables are ordinary playthrough variables, so New game empties the board, and saves, checkpoints
+  and rollback restore it with the rest of the state (engine-and-state §10).
+
+### 8.2 Board order
+
+Clues are grouped by `chapter`. Groups keep the order in which their first clue appears in `clues.json`, and
+the board lists them newest first. Inside a group clues keep their file order. Clues without a `chapter`
+form one group without a heading, listed last. Write `clues.json` in story order.

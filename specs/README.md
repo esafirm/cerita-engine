@@ -40,7 +40,7 @@ flowchart TD
 
 ## Specification Index
 
-- **[Data & JSON Schemas](./data-schema.md)**: Directory conventions, `profiles.json`, conversation files (`index.json`, `cvn_<id>.json`), `scene` configuration, and all `ItemType` schemas.
+- **[Data & JSON Schemas](./data-schema.md)**: Directory conventions, `profiles.json`, `clues.json`, conversation files (`index.json`, `cvn_<id>.json`), `scene` configuration, and all `ItemType` schemas.
 - **[Engine, State & Persistence](./engine-and-state.md)**: `FsseEngine` contract, typed state store, `effects` and `condition` evaluation, variable interpolation, save slots, checkpoints, and global gallery unlocks.
 - **[Presentation Modes](./presentation-modes.md)**: UI/UX specifications for Messenger/Chat Mode, Visual Novel Stage Mode, audio lifecycle, and collectible Gallery/Endings screens.
 - **[Authoring Tools](./authoring-tools.md)**: Story linter, story graph, the `cerita` command line tool and the in-game developer panel.

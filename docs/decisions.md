@@ -283,6 +283,60 @@ target to a `RETURN`.
 - `compile` never deletes stale `cvn_*.json` files. It warns, and `compile --check` fails on them.
 - Asset checks are skipped with a note when no asset folder is set, and `--release` makes that an error.
 
+## A clue is found when `clue_<id>` is true
+
+*2026-11-15. Data schema §8.1, engine §10. Backlog CE-05.*
+
+Clues are declared in `clues.json`, but finding one is an ordinary effect on the playthrough variable
+`clue_<id>`. There is no new item type, effect op or clue set in the save.
+
+- **Why:** saves, checkpoints, scene replay and rollback already restore variables, which is exactly the
+  lifetime the PRD asks for (D1). Conditions like `clue_pier_photo == true` work as they are, and CE-02's
+  `clue` keyword only has to compile to one effect.
+- **Cost:** the `clue_` prefix is reserved in stories that have a `clues.json`, and a story can take a clue
+  away by setting it to `false`, which the PRD says shouldn't happen.
+- **Revisit if** authors trip over the prefix, or a story needs clues that can't be unset. Then add an
+  `award` op that only ever sets `true`, and have the linter flag other writes.
+
+## Retries only cover clues without a response
+
+*2026-11-15. Data schema §4.4. Backlog CE-06.*
+
+A clue listed in `responses` always plays its response, which is final. Only the other clues are wrong
+answers that use a retry (`retry` plays) until none remain (`fallback` plays). Running out of time plays
+`timeout` and doesn't use a retry.
+
+- **Why:** the PRD's acceptance test is "the retry plays after the first wrong clue and the fallback after the
+  second", which needs one retry outcome and one final outcome. Letting a specific response also be a retry
+  would need a second target per response, one for "ask again" and one for "no tries left".
+- **Cost:** a specific reply that leads back to the question (Tasya brushing off the pier photo) lets the
+  player try again without using a retry.
+- **Revisit if** a deduction needs a specific wrong reply that also counts against the limit. A per-response
+  `"wrong": true` could route it through the retry count.
+
+## An evidence question with no clue found plays its fallback
+
+*2026-11-15. Engine §10.2. Backlog CE-06 open question.*
+
+The question isn't shown. Its `fallback` plays straight away, as if a wrong clue was presented with no
+retries left.
+
+- **Why:** the PRD recommends it, and an empty picker would be a softlock. The linter reports questions that
+  can be reached before a clue with a response is awarded, so a finished story shouldn't hit it.
+
+## Viewed clues live in the save, not in rollback frames
+
+*2026-11-15. Engine §10.2. Backlog CE-05.*
+
+Which clues the player has seen on the board is saved per playthrough (`viewed_clues`). Closing the board
+marks everything it showed as viewed. Rollback leaves it alone, and a checkpoint or an old save counts every
+clue already found as viewed.
+
+- **Why:** "new" is about what the player has looked at, not about story state, so going back a line shouldn't
+  make a clue new again. Marking on close means the player doesn't have to open every clue to clear the badge.
+- **Revisit if** players miss clues because opening the board clears them. Then mark a clue viewed only when
+  its detail is opened.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

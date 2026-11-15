@@ -30,7 +30,11 @@ The story breaks or behaves wrongly when it gets there.
 | Duplicate label | Two items with the same `id` in one conversation. |
 | Empty choice | A `CHOICE` without options, or a `default_choice` that isn't one of them. |
 | Chat without a thread | A `CHAT` scene without `channel_id`. |
-| Missing file | A background, sprite, avatar, music, ambience, sound, voice or media file that isn't there. Only checked when the linter is told which files exist. |
+| Missing file | A background, sprite, avatar, music, ambience, sound, voice, media or clue image file that isn't there. Only checked when the linter is told which files exist. |
+| Bad `clues.json` | A clue without `id` or `title`, an `id` that isn't `[a-zA-Z0-9_]+`, or two clues with the same `id`. |
+| Undeclared clue | A `clue_<x>` variable read or set, or an evidence response for clue `x`, when `x` isn't in `clues.json`. The `clue_` variables are only checked in stories that have a `clues.json`. |
+| Bad evidence question | No `responses`, two responses for one clue, `choices` or `default_choice` on it, or negative `retries`. |
+| Evidence question without an answer | No clue with a response is awarded before the question can be reached (see below). |
 
 ### 1.2 Warnings
 Probably a mistake, but the story still runs.
@@ -43,6 +47,19 @@ Probably a mistake, but the story still runs.
 | Unreachable conversation | No `target` from `index.json` leads to it, directly or through other conversations. |
 | Dead items | Items right after a `JUMP` or `RETURN` without a condition, that no label leads to. |
 | Unknown chat thread | A `channel_id` that `channels.json` doesn't list (when the file exists). |
+| Clue never awarded | A clue in `clues.json` that no effect sets. Clue variables are not reported as "set but never read": the board reads them. |
+
+### 1.3 Clues awardable before an evidence question
+
+An evidence question needs at least one clue with a response on the board when it is asked (PRD CE-06). The
+linter checks it per question with the story graph (§2), approximating "before" as:
+
+- an award earlier in the same conversation (a lower item index, in item or choice effects), or
+- an award in any conversation that can reach the question's conversation through targets, or in a
+  conversation those `CALL`.
+
+It doesn't follow conditions, so a clue awarded on another branch of the same day still counts. A full
+path check needs the automated playthroughs of the story authoring toolkit (CE-02).
 
 ---
 
