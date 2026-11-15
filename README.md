@@ -60,6 +60,21 @@ MaterialApp(
 
 Subclass `StorySkin` (or `AnimeVnSkin`) and override only the hooks you need.
 
+## Languages
+
+A story can hold every language side by side: any player-visible text is a string or `{"id": "...", "en": "..."}`, and
+`index.json` declares `source_locale` and `locales`. Provide a `StoryLanguage` to switch story text, voice clips
+and the engine screens (Indonesian and English built in):
+
+```dart
+final language = StoryLanguage();
+await language.load(setup); // saved pick, else device language, else the source language
+// MaterialApp(builder: (context, child) => StoryLanguageScope(language: language, child: child!), ...)
+```
+
+See [data schema section 5](specs/data-schema.md#5-localized-text) and
+[presentation modes section 5](specs/presentation-modes.md#5-language).
+
 ## Using the engine
 
 ```dart

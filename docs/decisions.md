@@ -109,6 +109,81 @@ while the choice is available. Skins restyle it by overriding the hook or hide i
 
 - **Why:** an icon needs no text, so it doesn't touch the UI strings that CE-01 is localizing.
 - **Revisit when** CE-01 lands: give the marker a localized semantics label, e.g. "Unlocked by a past run".
+  Done in CE-01: `CeritaStrings.memoryMarker`.
+
+## The player's language is our own notifier, not Flutter's `Localizations`
+
+*2026-11-15. Presentation modes §5, CE-01.*
+
+`StoryLanguage` (a `ChangeNotifier` provided by `StoryLanguageScope`) holds the active locale and the engine
+strings. `MaterialApp.locale` and `LocalizationsDelegate` aren't used.
+
+- **Why:** the language is a player setting that changes mid-game, not the app's locale. Feeding `id` to
+  `MaterialApp.locale` needs `flutter_localizations` for Material's own widgets, a new dependency for strings
+  the engine barely shows.
+- **Cost:** Material's built-in text (tooltips on back buttons, date pickers) stays in the app's locale.
+- **Revisit if** an integrating app needs Material's own strings to follow the story language.
+
+## A missing locale key falls back, an empty string doesn't
+
+*2026-11-15. Data schema §5.2.*
+
+Fallback only happens when the active locale has no key in the text object. `{"id": "Halo", "en": ""}` shows an
+empty line in English.
+
+- **Why:** the shared contract defines the order by key presence. Treating `""` as missing would be a second
+  rule the authoring toolkit (CE-02) has to mirror.
+- **Revisit if** CE-02 emits empty strings for untranslated lines. Then either it omits the key or the engine
+  treats `""` as missing.
+
+## A localized choice without `value` stores its source-language text
+
+*2026-11-15. Data schema §5.3.*
+
+- **Why:** state and conditions must not depend on the language the player picked, so a save made in English
+  plays the same in Indonesian. Plain-string options keep storing their text, so Wrong Number is unchanged.
+- **Cost:** an author who wants the shown text in a variable has to interpolate it in each language.
+
+## Engine screens fall back to English, not the story's source language
+
+*2026-11-15. Presentation modes §5.2.*
+
+`CeritaStrings` lookup is the active locale, else English. Without a picked locale (no `StoryLanguageScope`,
+or before `load`) the engine screens are English and story text is in its source language.
+
+- **Why:** a player whose language has no engine strings is more likely to read English than the story's
+  source language. And apps that never set up a language keep the English screens they had before CE-01.
+- **Cost:** an English-only story must declare `"source_locale": "en"`, since the contract's default source is
+  `"id"`. Wrong Number now declares it.
+
+## The language is a player setting, not a separate store
+
+*2026-11-15. Engine §5.3, §9.4.*
+
+The active language is `PlayerSettings.locale`, saved with the other player settings and kept by "reset
+progress". `StoryLanguage` reads and writes it through `StorySetup.settings`, so the Settings screen and the
+language picker never overwrite each other.
+
+- **Why:** one settings store, and the Settings screen is where players look for it (PRD 10.3, CE-04).
+
+## Indonesian HUD labels stay short
+
+*2026-11-15. CE-01 risk "longer text overflows".*
+
+The VN HUD reads "LOG · AUTO · LEWATI · MENU" in Indonesian instead of "RIWAYAT · OTOMATIS", and the
+quick save buttons read "Q.SIMPAN · Q.MUAT". The in-game menu still says "Riwayat".
+
+- **Why:** the HUD shares one row with the chapter label, and "Auto"/"Log" are common in Indonesian games.
+
+## The developer panel stays English
+
+*2026-11-15. CE-01.*
+
+The in-game menu entry and its "story reloaded" toast are localized. The panel itself (variables, jumps, story
+check) is not.
+
+- **Why:** it is a writing tool behind `StorySetup.developer`, off in release builds, so players never see it.
+- **Revisit if** writers on a team want it in Indonesian.
 
 ## Deferred
 
@@ -120,8 +195,6 @@ while the choice is available. Skins restyle it by overriding the hook or hide i
   their pacing to pause and resume. It also needs a design for what the thread shows while paused.
 - **Remembered facts in the developer panel.** It lists run and `persistent.*` variables only. Showing
   `meta.flag.*` there needs a read-only row, since memory can only be written with `meta_set`.
-- **Reset progress wording.** The demo's confirm dialog lists saves, gallery, endings and checkpoints but not
-  remembered facts, which it also clears. CE-01 owns UI strings, so the wording waits for it.
 
 ## Device checks
 

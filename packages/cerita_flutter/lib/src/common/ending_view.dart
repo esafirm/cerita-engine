@@ -1,19 +1,22 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
-/// Ending summary overlay. Without an [ending] it shows [title], "The End" by default.
+import '../l10n/cerita_strings.dart';
+import '../l10n/story_language.dart';
+
+/// Ending summary overlay. Without an [ending] it shows [title], [CeritaStrings.theEnd] by default.
 class EndingView extends StatelessWidget {
   final EndingItemType? ending;
-  final String title;
-  final String backLabel;
+  final String? title;
+  final String? backLabel;
   final VoidCallback onTitle;
   final VoidCallback? onEndings;
 
   const EndingView({
     super.key,
     this.ending,
-    this.title = "The End",
-    this.backLabel = "Back to title",
+    this.title,
+    this.backLabel,
     required this.onTitle,
     this.onEndings,
   });
@@ -21,6 +24,7 @@ class EndingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ending = this.ending;
+    final strings = StoryLanguage.of(context).strings;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 800),
@@ -37,7 +41,7 @@ class EndingView extends StatelessWidget {
                   if (ending != null) EndingBadge(category: ending.category),
                   const SizedBox(height: 16),
                   Text(
-                    ending?.title ?? title,
+                    ending?.title ?? title ?? strings.theEnd,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                   ),
@@ -57,9 +61,9 @@ class EndingView extends StatelessWidget {
                         OutlinedButton(
                           onPressed: onEndings,
                           style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
-                          child: const Text("All endings"),
+                          child: Text(strings.allEndings),
                         ),
-                      FilledButton(onPressed: onTitle, child: Text(backLabel)),
+                      FilledButton(onPressed: onTitle, child: Text(backLabel ?? strings.backToTitle)),
                     ],
                   ),
                 ],
@@ -91,7 +95,7 @@ class EndingBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(color: colorOf(category), borderRadius: BorderRadius.circular(20)),
       child: Text(
-        "${category.key} ENDING",
+        StoryLanguage.of(context).strings.endingBadge(category),
         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12),
       ),
     );

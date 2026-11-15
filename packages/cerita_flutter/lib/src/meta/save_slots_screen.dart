@@ -1,6 +1,8 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/cerita_strings.dart';
+import '../l10n/story_language.dart';
 import '../story_setup.dart';
 import '../vn/poi.dart';
 
@@ -27,25 +29,28 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
 
   bool get _saving => widget.onSave != null;
 
-  String _describe(SaveSlot slot) {
+  String _describe(SaveSlot slot, StoryLanguage language) {
     final time = slot.updatedAt.toLocal();
     final stamp = "${time.year}-${_two(time.month)}-${_two(time.day)} ${_two(time.hour)}:${_two(time.minute)}";
-    return "${[slot.chapter, slot.title].whereType<String>().join(" · ")}\n$stamp";
+    final label = [slot.chapter, slot.title].whereType<LocalizedText>().map(language.text).join(" · ");
+    return "$label\n$stamp";
   }
 
   String _two(int value) => value.toString().padLeft(2, "0");
 
-  String _name(int id) => switch (id) {
-        SaveSlot.autoSlotId => "Autosave",
-        SaveSlot.quickSlotId => "Quick save",
-        _ => "Slot $id",
+  String _name(int id, CeritaStrings strings) => switch (id) {
+        SaveSlot.autoSlotId => strings.autosave,
+        SaveSlot.quickSlotId => strings.quickSave,
+        _ => strings.slot(id),
       };
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
     return Scaffold(
-      appBar: AppBar(title: Text(_saving ? "Save game" : "Load game")),
+      appBar: AppBar(title: Text(_saving ? strings.saveGame : strings.loadGame)),
       body: FutureBuilder(
         future: Future.wait([_slots, _profiles]),
         builder: (context, snapshot) {
@@ -80,10 +85,10 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_name(id), style: theme.textTheme.titleMedium),
+                                Text(_name(id, strings), style: theme.textTheme.titleMedium),
                                 const SizedBox(height: 4),
                                 Text(
-                                  slots[id] == null ? "Empty" : _describe(slots[id]!),
+                                  slots[id] == null ? strings.emptySlot : _describe(slots[id]!, language),
                                   style: theme.textTheme.bodySmall,
                                 ),
                               ],

@@ -143,8 +143,8 @@ history and menus at once, without touching progress.
 ### 5.2 Engine screens (`CeritaStrings`)
 
 Every string the engine draws itself (in-game menu, HUD, toasts, dialogs, chat and call chrome, Save, Load,
-Chapters, Gallery and Endings screens, ending summary) comes from `StoryLanguage.of(context).strings`, a
-`CeritaStrings`. Built in: `CeritaStrings.en` and `CeritaStrings.id`.
+Chapters, Gallery, Endings, Settings and Music room screens, ending summary) comes from
+`StoryLanguage.of(context).strings`, a `CeritaStrings`. Built in: `CeritaStrings.en` and `CeritaStrings.id`.
 
 - **More languages**: subclass `CeritaStrings` and pass `StoryLanguage(strings: {"ja": JaStrings()})`.
 - **Lookup**: the active locale, else English. Without a picked locale, English.

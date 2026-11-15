@@ -37,7 +37,7 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final item = entry.itemType;
+    final item = controller.itemOf(entry);
     if (item is NarrationItemType) return _SystemPill(item: item);
 
     final profile = item == null ? null : controller.profileOf(item);
@@ -49,7 +49,8 @@ class MessageBubble extends StatelessWidget {
     final content = switch (item) {
       MediaItemType() => _MediaContent(item: item, setup: setup, controller: controller, textColor: textColor),
       // Player answers are shown as typed.
-      _ when entry.isPlayer => Text(entry.playerText ?? "", style: TextStyle(color: textColor, fontSize: 15)),
+      _ when entry.isPlayer =>
+        Text(controller.playerTextOf(entry) ?? "", style: TextStyle(color: textColor, fontSize: 15)),
       _ => TaggedText(item?.getText() ?? "", style: TextStyle(color: textColor, fontSize: 15)),
     };
 
@@ -169,6 +170,7 @@ class _MediaContent extends StatelessWidget {
           asset: path,
           transcript: item.transcript,
           audio: controller.audio,
+          assets: setup.assets,
           color: textColor,
         ),
       MediaType.video => SizedBox(

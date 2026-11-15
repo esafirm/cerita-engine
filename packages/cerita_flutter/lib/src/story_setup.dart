@@ -1,7 +1,9 @@
 import 'package:cerita_core/cerita_core.dart';
+import 'package:flutter/services.dart' show AssetBundle;
 
 import 'asset_engine_loader.dart';
 import 'audio_helper.dart';
+import 'l10n/localized_assets.dart';
 import 'player_prefs.dart';
 import 'shared_prefs_story_storage.dart';
 
@@ -20,6 +22,9 @@ class StorySetup {
   /// For writers, keep it off in release builds.
   final bool developer;
 
+  /// Finds per-locale voice clips.
+  final LocalizedAssets assets;
+
   StorySetup({
     required this.config,
     required this.loader,
@@ -27,14 +32,22 @@ class StorySetup {
     PlayerPrefs? settings,
     this.audio = AudioHelper.new,
     this.developer = false,
-  }) : settings = settings ?? PlayerPrefs(storage);
+    LocalizedAssets? assets,
+  })  : settings = settings ?? PlayerPrefs(storage),
+        assets = assets ?? LocalizedAssets();
 
-  factory StorySetup.assets({LoaderConfig config = const LoaderConfig(), StoryStorage? storage, bool developer = false}) {
+  factory StorySetup.assets({
+    LoaderConfig config = const LoaderConfig(),
+    StoryStorage? storage,
+    bool developer = false,
+    AssetBundle? bundle,
+  }) {
     return StorySetup(
       config: config,
-      loader: AssetEngineLoader(config),
+      loader: AssetEngineLoader(config, bundle: bundle),
       storage: storage ?? SharedPrefsStoryStorage(),
       developer: developer,
+      assets: LocalizedAssets(bundle),
     );
   }
 

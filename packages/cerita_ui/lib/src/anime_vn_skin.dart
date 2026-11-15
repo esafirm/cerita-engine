@@ -152,6 +152,7 @@ class AnimeVnSkin extends StorySkin {
 
   @override
   Widget vnHud(BuildContext context, VnHud hud) {
+    final strings = StoryLanguage.of(context).strings;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -173,10 +174,10 @@ class AnimeVnSkin extends StorySkin {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _HudButton("LOG", onTap: hud.onBacklog),
-                      _HudButton("AUTO", active: hud.autoMode, onTap: hud.onAuto),
-                      _HudButton("SKIP", active: hud.skipMode, onTap: hud.onSkip),
-                      _HudButton("MENU", onTap: hud.onMenu),
+                      _HudButton(strings.log.toUpperCase(), onTap: hud.onBacklog),
+                      _HudButton(strings.auto.toUpperCase(), active: hud.autoMode, onTap: hud.onAuto),
+                      _HudButton(strings.skip.toUpperCase(), active: hud.skipMode, onTap: hud.onSkip),
+                      _HudButton(strings.menu.toUpperCase(), onTap: hud.onMenu),
                     ],
                   ),
                 ),
@@ -188,10 +189,10 @@ class AnimeVnSkin extends StorySkin {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _HudButton("BACK", onTap: hud.onBack),
-                  _HudButton("Q.SAVE", onTap: hud.onQuickSave),
-                  _HudButton("Q.LOAD", onTap: hud.onQuickLoad),
-                  _HudButton("HIDE", onTap: hud.onHide),
+                  _HudButton(strings.back.toUpperCase(), onTap: hud.onBack),
+                  _HudButton(strings.quickSaveShort.toUpperCase(), onTap: hud.onQuickSave),
+                  _HudButton(strings.quickLoadShort.toUpperCase(), onTap: hud.onQuickLoad),
+                  _HudButton(strings.hide.toUpperCase(), onTap: hud.onHide),
                 ],
               ),
             ),

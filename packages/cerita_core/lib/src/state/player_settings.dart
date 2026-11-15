@@ -16,6 +16,9 @@ class PlayerSettings {
   /// Voice volume of single characters by profile id, on top of [voiceVolume]. Missing ones play at 1.
   final Map<String, double> voiceVolumes;
 
+  /// The player's language, a story locale code. Null until the player or the device picks one.
+  final String? locale;
+
   const PlayerSettings({
     this.textMsPerChar = 40,
     this.autoDelayMs = 1200,
@@ -24,6 +27,7 @@ class PlayerSettings {
     this.soundVolume = 1,
     this.voiceVolume = 1,
     this.voiceVolumes = const {},
+    this.locale,
   });
 
   /// Voice volume of the character [profileId].
@@ -40,6 +44,7 @@ class PlayerSettings {
     double? soundVolume,
     double? voiceVolume,
     Map<String, double>? voiceVolumes,
+    String? locale,
   }) =>
       PlayerSettings(
         textMsPerChar: textMsPerChar ?? this.textMsPerChar,
@@ -49,6 +54,7 @@ class PlayerSettings {
         soundVolume: soundVolume ?? this.soundVolume,
         voiceVolume: voiceVolume ?? this.voiceVolume,
         voiceVolumes: voiceVolumes ?? this.voiceVolumes,
+        locale: locale ?? this.locale,
       );
 
   factory PlayerSettings.fromJson(Map<String, dynamic> json) {
@@ -66,6 +72,7 @@ class PlayerSettings {
         for (final MapEntry(:key, :value) in Map<String, dynamic>.from(json["voice_volumes"] as Map? ?? const {}).entries)
           key: clamp(value, 1),
       },
+      locale: json["locale"] as String?,
     );
   }
 
@@ -77,6 +84,7 @@ class PlayerSettings {
         "sound_volume": soundVolume,
         "voice_volume": voiceVolume,
         if (voiceVolumes.isNotEmpty) "voice_volumes": voiceVolumes,
+        if (locale != null) "locale": locale,
       };
 
   @override
@@ -88,6 +96,7 @@ class PlayerSettings {
       other.musicVolume == musicVolume &&
       other.soundVolume == soundVolume &&
       other.voiceVolume == voiceVolume &&
+      other.locale == locale &&
       _sameVolumes(other.voiceVolumes, voiceVolumes);
 
   static bool _sameVolumes(Map<String, double> a, Map<String, double> b) =>
@@ -101,6 +110,7 @@ class PlayerSettings {
         musicVolume,
         soundVolume,
         voiceVolume,
+        locale,
         Object.hashAllUnordered(voiceVolumes.entries.map((entry) => Object.hash(entry.key, entry.value))),
       );
 }

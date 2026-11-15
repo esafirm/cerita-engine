@@ -8,8 +8,9 @@ import 'home_screen.dart';
 
 class DemoApp extends StatelessWidget {
   final StorySetup setup;
+  final StoryLanguage language;
 
-  const DemoApp({super.key, required this.setup});
+  const DemoApp({super.key, required this.setup, required this.language});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,10 @@ class DemoApp extends StatelessWidget {
       title: "Cerita Engine Demo",
       debugShowCheckedModeBanner: false,
       theme: CeritaTheme.dark(),
-      builder: (context, child) => StorySkinScope(skin: const AnimeVnSkin(), child: _PhoneFrame(child: child!)),
+      builder: (context, child) => StoryLanguageScope(
+        language: language,
+        child: StorySkinScope(skin: const AnimeVnSkin(), child: _PhoneFrame(child: child!)),
+      ),
       home: HomeScreen(setup: setup),
     );
   }

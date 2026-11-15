@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Reset progress?"),
-        content: const Text("Deletes every save slot, gallery unlock, ending and checkpoint."),
+        content: const Text("Deletes every save slot, gallery unlock, ending, checkpoint and remembered fact."),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text("Reset")),
@@ -59,6 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final config = setup.config;
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
     return FutureBuilder(
       future: _autosave,
       builder: (context, snapshot) {
@@ -77,15 +79,15 @@ class _HomeScreenState extends State<HomeScreen> {
           primary: [
             if (save != null)
               TitleMenuEntry(
-                label: "Continue · ${save.chapter ?? ""}",
+                label: "${strings.continueGame} · ${language.maybe(save.chapter) ?? ""}",
                 icon: Icons.play_arrow_rounded,
                 onTap: () => _play(save: save),
               ),
-            TitleMenuEntry(label: "New game", icon: Icons.auto_stories, onTap: () => _play()),
+            TitleMenuEntry(label: strings.newGame, icon: Icons.auto_stories, onTap: () => _play()),
           ],
           secondary: [
             TitleMenuEntry(
-              label: "Load",
+              label: strings.load,
               icon: Icons.folder_open,
               onTap: () => _push(
                 SaveSlotsScreen(
@@ -95,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             TitleMenuEntry(
-              label: "Chapters",
+              label: strings.chapters,
               icon: Icons.timeline,
               onTap: () => _push(
                 ChaptersScreen(
@@ -109,25 +111,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             TitleMenuEntry(
-              label: "Gallery",
+              label: strings.gallery,
               icon: Icons.photo_library_outlined,
               onTap: () => _push(GalleryScreen(setup: setup)),
             ),
             TitleMenuEntry(
-              label: "Endings",
+              label: strings.endings,
               icon: Icons.emoji_events_outlined,
               onTap: () => _push(EndingsScreen(setup: setup)),
             ),
             TitleMenuEntry(
-              label: "Music",
+              label: strings.music,
               icon: Icons.library_music_outlined,
               onTap: () => _push(MusicRoomScreen(setup: setup)),
             ),
             TitleMenuEntry(
-              label: "Settings",
+              label: strings.settings,
               icon: Icons.tune,
               onTap: () => _push(SettingsScreen(settings: setup.settings, loader: setup.loader)),
             ),
+            // A single-language story like Wrong Number has nothing to switch to.
+            if (language.available.length > 1)
+              TitleMenuEntry(label: strings.language, icon: Icons.translate, onTap: () => LanguagePicker.show(context)),
             TitleMenuEntry(label: "Features", icon: Icons.checklist, onTap: () => _push(const CapabilitiesScreen())),
             TitleMenuEntry(label: "Reset", icon: Icons.restart_alt, onTap: _resetProgress),
           ],

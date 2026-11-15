@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/story_language.dart';
 import 'tagged_text.dart';
 
 /// Text field + confirm button for INPUT items. Empty input falls back to `default_value`.
@@ -46,7 +47,7 @@ class _InputPromptState extends State<InputPrompt> {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(
-                  hintText: widget.item.defaultValue ?? "Type here",
+                  hintText: widget.item.defaultValue ?? StoryLanguage.of(context).strings.typeHere,
                   filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),

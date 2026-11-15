@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/story_language.dart';
 import '../story_controller.dart';
 import 'tagged_text.dart';
 
@@ -29,10 +30,11 @@ class BacklogSheet extends StatelessWidget {
       return entry.isPlayer || item is TextItemType || item is NarrationItemType || item is MediaItemType;
     }).toList();
     final theme = Theme.of(context);
+    final strings = StoryLanguage.of(context).strings;
 
     return Column(
       children: [
-        Text("Backlog", style: theme.textTheme.titleLarge),
+        Text(strings.backlog, style: theme.textTheme.titleLarge),
         Expanded(
           child: ListView.separated(
             reverse: true,
@@ -41,13 +43,13 @@ class BacklogSheet extends StatelessWidget {
             separatorBuilder: (_, _) => const Divider(height: 20),
             itemBuilder: (context, index) {
               final (historyIndex, entry) = lines[lines.length - 1 - index];
-              final item = entry.itemType;
+              final item = controller.itemOf(entry);
               final speaker = entry.isPlayer
                   ? controller.profileById(ProfileInfo.playerId)?.name
                   : item == null
                       ? null
                       : controller.profileOf(item)?.name;
-              final text = entry.playerText ??
+              final text = controller.playerTextOf(entry) ??
                   switch (item) {
                     MediaItemType(:final mediaType, :final caption) => "[${mediaType.key}] ${caption ?? ""}",
                     _ => item?.getText() ?? "",
@@ -71,13 +73,13 @@ class BacklogSheet extends StatelessWidget {
                   Expanded(child: line),
                   if (voiced)
                     IconButton(
-                      tooltip: "Play voice",
+                      tooltip: strings.playVoice,
                       icon: const Icon(Icons.volume_up_outlined),
                       onPressed: () => controller.replayVoice(item),
                     ),
                   if (rewind)
                     IconButton(
-                      tooltip: "Go back to this line",
+                      tooltip: strings.rollbackToLine,
                       icon: const Icon(Icons.fast_rewind_outlined),
                       onPressed: () {
                         Navigator.of(context).pop();

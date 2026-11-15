@@ -130,7 +130,7 @@ void main() {
       expect(again.text, "Pick");
       expect(engine.dataMap.containsKey("trust"), isFalse);
       expect(await _nextText(engine, result: ItemResult.choice(null, again.choices[1])), "Trust -1");
-      expect(engine.history.where((e) => e.isPlayer).map((e) => e.playerText), ["Rude"]);
+      expect(engine.history.where((e) => e.isPlayer).map((e) => e.playerText.toString()), ["Rude"]);
     });
 
     test('restores the stage and scene of an earlier conversation and tells the listener', () async {

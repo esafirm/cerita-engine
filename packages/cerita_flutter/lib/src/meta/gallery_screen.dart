@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/media_widgets.dart';
+import '../l10n/story_language.dart';
 import '../story_setup.dart';
 import 'meta_loader.dart';
 
@@ -11,26 +12,27 @@ class GalleryScreen extends StatelessWidget {
 
   const GalleryScreen({super.key, required this.setup});
 
-  static const _tabs = [
-    ("Photos & CGs", Icons.photo_outlined, {MediaType.image, MediaType.cg}),
-    ("Voice notes", Icons.mic_none, {MediaType.audio}),
-    ("Videos", Icons.videocam_outlined, {MediaType.video}),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
+    final tabs = [
+      (strings.photosAndCgs, Icons.photo_outlined, {MediaType.image, MediaType.cg}),
+      (strings.voiceNotes, Icons.mic_none, {MediaType.audio}),
+      (strings.videos, Icons.videocam_outlined, {MediaType.video}),
+    ];
     return DefaultTabController(
-      length: _tabs.length,
+      length: tabs.length,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Gallery"),
-          bottom: TabBar(tabs: [for (final (label, icon, _) in _tabs) Tab(text: label, icon: Icon(icon))]),
+          title: Text(strings.gallery),
+          bottom: TabBar(tabs: [for (final (label, icon, _) in tabs) Tab(text: label, icon: Icon(icon))]),
         ),
         body: MetaLoader(
           setup: setup,
           builder: (context, catalog, meta) => TabBarView(
             children: [
-              for (final (_, _, types) in _tabs)
+              for (final (_, _, types) in tabs)
                 _GalleryGrid(
                   setup: setup,
                   entries: catalog.media.where((entry) => types.contains(entry.item.mediaType)).toList(),
@@ -53,10 +55,14 @@ class _GalleryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final language = StoryLanguage.of(context);
     final count = entries.where((entry) => unlocked.contains(entry.item.unlockId)).length;
     return Column(
       children: [
-        Padding(padding: const EdgeInsets.all(12), child: Text("$count / ${entries.length} unlocked")),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Text(language.strings.galleryProgress(count, entries.length)),
+        ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,
@@ -66,8 +72,8 @@ class _GalleryGrid extends StatelessWidget {
             children: [
               for (final entry in entries)
                 unlocked.contains(entry.item.unlockId)
-                    ? _UnlockedTile(setup: setup, item: entry.item)
-                    : _LockedTile(hint: entry.hint),
+                    ? _UnlockedTile(setup: setup, item: entry.item.localized(language.localizer))
+                    : _LockedTile(hint: language.strings.unlockedIn(_chapterOf(entry.source, language.localizer))),
             ],
           ),
         ),
@@ -75,6 +81,10 @@ class _GalleryGrid extends StatelessWidget {
     );
   }
 }
+
+/// Where a locked item is found, e.g. "Day 1".
+String _chapterOf(Conversation source, Localizer localizer) =>
+    localizer.maybe(source.chapterText) ?? localizer.maybe(source.titleText) ?? source.key;
 
 class _LockedTile extends StatelessWidget {
   final String hint;
@@ -118,7 +128,9 @@ class _UnlockedTile extends StatelessWidget {
           ColoredBox(color: scheme.primaryContainer, child: Icon(Icons.graphic_eq, size: 48, color: scheme.primary)),
           () => showDialog<void>(
                 context: context,
-                builder: (_) => AlertDialog(content: VoiceNotePlayer(asset: path, transcript: item.transcript)),
+                builder: (_) => AlertDialog(
+                  content: VoiceNotePlayer(asset: path, transcript: item.transcript, assets: setup.assets),
+                ),
               ),
         ),
       MediaType.video => (
@@ -136,7 +148,7 @@ class _UnlockedTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               preview,
-              if (item.caption != null || item.transcript != null)
+              if (item.title ?? item.caption ?? item.transcript case final label?)
                 Positioned(
                   left: 0,
                   right: 0,
@@ -145,7 +157,7 @@ class _UnlockedTile extends StatelessWidget {
                     color: Colors.black54,
                     padding: const EdgeInsets.all(6),
                     child: Text(
-                      item.caption ?? item.transcript!,
+                      label,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.white, fontSize: 12),

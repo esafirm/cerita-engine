@@ -256,7 +256,12 @@ class _MediaOverlay extends StatelessWidget {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: VoiceNotePlayer(asset: path, transcript: item.transcript, audio: controller.audio),
+                  child: VoiceNotePlayer(
+                    asset: path,
+                    transcript: item.transcript,
+                    audio: controller.audio,
+                    assets: setup.assets,
+                  ),
                 ),
               ),
             ),

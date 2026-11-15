@@ -8,6 +8,7 @@ import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
 import '../common/tagged_text.dart';
+import '../l10n/story_language.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
@@ -46,6 +47,7 @@ class _CallViewState extends State<CallView> {
     final scene = controller.scene;
     final item = controller.current;
     final memberId = controller.channel?.members.firstOrNull;
+    final strings = StoryLanguage.of(context).strings;
     final caller = memberId == null ? controller.currentProfile : controller.profileById(memberId);
 
     // The call timer starts once the first line is spoken.
@@ -55,16 +57,14 @@ class _CallViewState extends State<CallView> {
       NarrationItemType(:final text) => text,
       _ when _stopwatch.isRunning =>
         "${elapsed.inMinutes.toString().padLeft(2, "0")}:${(elapsed.inSeconds % 60).toString().padLeft(2, "0")}",
-      _ => "Calling…",
+      _ => strings.calling,
     };
     // Keep the last spoken line on screen while the player picks a reply.
-    final caption = controller.history
-        .lastWhere(
-          (entry) => entry.conversationKey == controller.conversation?.key && entry.itemType is TextItemType,
-          orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.call),
-        )
-        .itemType
-        ?.getText();
+    final spoken = controller.history.lastWhere(
+      (entry) => entry.conversationKey == controller.conversation?.key && entry.itemType is TextItemType,
+      orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.call),
+    );
+    final caption = controller.itemOf(spoken)?.getText();
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -98,7 +98,7 @@ class _CallViewState extends State<CallView> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  caller?.name ?? "Unknown",
+                  caller?.name ?? strings.unknownCaller,
                   style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 6),

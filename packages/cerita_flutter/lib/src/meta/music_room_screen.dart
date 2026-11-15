@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../audio_helper.dart';
+import '../l10n/story_language.dart';
 import '../story_setup.dart';
 
 /// Every track of the story. Tracks the player has heard can be played, the rest are locked.
@@ -64,8 +65,9 @@ class _MusicRoomScreenState extends State<MusicRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final strings = StoryLanguage.of(context).strings;
     return Scaffold(
-      appBar: AppBar(title: const Text("Music room")),
+      appBar: AppBar(title: Text(strings.musicRoom)),
       body: FutureBuilder(
         future: _tracks,
         builder: (context, snapshot) {
@@ -73,13 +75,13 @@ class _MusicRoomScreenState extends State<MusicRoomScreen> {
           final data = snapshot.data;
           if (data == null) return const Center(child: CircularProgressIndicator());
           final (tracks, heard) = data;
-          if (tracks.isEmpty) return const Center(child: Text("This story has no music."));
+          if (tracks.isEmpty) return Center(child: Text(strings.noMusic));
           return ListView(
             padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Text("${tracks.where(heard.contains).length} / ${tracks.length} tracks heard"),
+                child: Text(strings.tracksHeard(tracks.where(heard.contains).length, tracks.length)),
               ),
               for (final (index, file) in tracks.indexed)
                 ListTile(
@@ -93,8 +95,8 @@ class _MusicRoomScreenState extends State<MusicRoomScreen> {
                       _ => Icons.play_arrow,
                     }),
                   ),
-                  title: Text(heard.contains(file) ? MusicRoomScreen.titleOf(file) : "Track ${index + 1}"),
-                  subtitle: Text(heard.contains(file) ? file : "Not heard yet"),
+                  title: Text(heard.contains(file) ? MusicRoomScreen.titleOf(file) : strings.track(index + 1)),
+                  subtitle: Text(heard.contains(file) ? file : strings.notHeardYet),
                   onTap: heard.contains(file) ? () => _toggle(file) : null,
                 ),
             ],

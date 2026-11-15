@@ -1,4 +1,5 @@
 import '../data/scene.dart';
+import '../l10n/localized_text.dart';
 import 'rollback.dart';
 import 'stage_state.dart';
 import 'transcript.dart';
@@ -30,9 +31,9 @@ class SaveSlot {
   /// Rollback frames and `random()` rolls, so rollback reaches back past the load. Null in older saves.
   final RollbackLog? rollback;
 
-  /// Display info for save/load menus.
-  final String? chapter;
-  final String? title;
+  /// Display info for save/load menus, in every language.
+  final LocalizedText? chapter;
+  final LocalizedText? title;
 
   const SaveSlot({
     required this.slotId,
@@ -85,8 +86,8 @@ class SaveSlot {
       rollback: json["rollback"] == null
           ? null
           : RollbackLog.fromJson(Map<String, dynamic>.from(json["rollback"] as Map)),
-      chapter: json["chapter"] as String?,
-      title: json["title"] as String?,
+      chapter: LocalizedText.fromJson(json["chapter"]),
+      title: LocalizedText.fromJson(json["title"]),
     );
   }
 
@@ -102,8 +103,8 @@ class SaveSlot {
         if (stage != null) "stage": stage!.toJson(),
         if (scene != null) "scene": scene!.toJson(),
         if (rollback != null) "rollback": rollback!.toJson(),
-        if (chapter != null) "chapter": chapter,
-        if (title != null) "title": title,
+        if (chapter != null) "chapter": chapter!.toJson(),
+        if (title != null) "title": title!.toJson(),
       };
 }
 

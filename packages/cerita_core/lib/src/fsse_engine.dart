@@ -18,6 +18,7 @@ import 'data/items/profile_info.dart';
 import 'data/profile.dart';
 import 'data/effect.dart';
 import 'data/scene.dart';
+import 'l10n/localized_text.dart';
 import 'loader.dart';
 import 'state/meta_state.dart';
 import 'state/rollback.dart';
@@ -51,7 +52,8 @@ abstract mixin class EngineListener {
 
   void onConversationStarted(Conversation conversation) {}
 
-  void onMediaUnlocked(String unlockId) {}
+  /// [item] is in the active language, so it can be named by its `title`.
+  void onMediaUnlocked(MediaItemType item) {}
 
   void onEndingUnlocked(EndingItemType ending) {}
 
@@ -95,6 +97,14 @@ class RealFsseEngine extends FsseEngine {
 
   late ProfileData profileData;
   List<Channel> channels = const [];
+
+  /// The story's languages, from `index.json`.
+  StoryLocales storyLocales = const StoryLocales();
+  String? _locale;
+  ProfileData? _localizedProfiles;
+
+  /// Name of the player profile until `NAME` is set.
+  String playerFallbackName = "You";
   GlobalMetaState meta = GlobalMetaState();
 
   Conversation? currentConversation;
@@ -147,6 +157,18 @@ class RealFsseEngine extends FsseEngine {
   /// True while replaying a single chapter, see [start].
   bool get replaying => _replay;
 
+  /// The player's language. Null shows the story's source language. Can change at any time: the next item,
+  /// profiles and channels follow it, and [history] keeps every language.
+  String? get locale => _locale;
+
+  set locale(String? locale) {
+    if (locale == _locale) return;
+    _locale = locale;
+    _localizedProfiles = null;
+  }
+
+  Localizer get localizer => Localizer(locale: _locale, sourceLocale: storyLocales.source);
+
   /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
   /// With [replay], only the [checkpoint]'s chapter is played: entering a conversation of another
   /// chapter throws [EndOfStoryException].
@@ -154,6 +176,8 @@ class RealFsseEngine extends FsseEngine {
     final package = await loader.initialLoad();
     profileData = package.profiles;
     channels = package.channels;
+    storyLocales = package.conversation.locales;
+    _localizedProfiles = null;
     meta = await storage?.loadMeta() ?? meta;
 
     dataMap.clear();
@@ -281,7 +305,8 @@ class RealFsseEngine extends FsseEngine {
 
     if (!_sameScene(previousScene, _scene) && _scene != null) listener?.onNewScene(_scene!);
     if (previousConversation?.key != currentConversation!.key) listener?.onConversationStarted(currentConversation!);
-    return frame.item;
+    // The frame may come from a save, or the player may have switched language since.
+    return frame.item.localized(localizer);
   }
 
   void _restoreFrame(RollbackFrame frame) {
@@ -384,12 +409,12 @@ class RealFsseEngine extends FsseEngine {
 
   Profile? getProfileById(String id) {
     if (id == ProfileInfo.playerId) {
-      return Profile(id: ProfileInfo.playerId, name: dataMap["NAME"]?.toString() ?? "You");
+      return Profile(id: ProfileInfo.playerId, name: dataMap["NAME"]?.toString() ?? playerFallbackName);
     }
-    return profileData.byId(id);
+    return (_localizedProfiles ??= profileData.localized(localizer)).byId(id);
   }
 
-  Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull;
+  Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull?.localized(localizer);
 
   bool evaluate(String? condition) => _evaluator.evaluate(condition, state);
 
@@ -413,8 +438,8 @@ class RealFsseEngine extends FsseEngine {
       chosen: _chosen.toSet(),
       stage: _copyStage(stage),
       scene: _scene,
-      chapter: conversation.chapter,
-      title: conversation.title,
+      chapter: conversation.chapterText,
+      title: conversation.titleText,
       rollback: _rollbackLog(),
     );
   }
@@ -512,7 +537,7 @@ class RealFsseEngine extends FsseEngine {
   /// Interpolates [item] and, for a CHOICE, hides picked `once` choices and locked memory-gated ones, and flags
   /// locked / chosen ones. Must be called while [dialogIndex] points at [item].
   ItemType _prepare(ItemType item) {
-    final cloned = item.cloneWithData(state);
+    final cloned = item.cloneWithData(state, localizer: localizer);
     if (cloned is! ChoiceItemType) return cloned;
     final itemKey = "${currentConversation!.key}#$dialogIndex";
     final choices = <Choice>[];
@@ -570,7 +595,7 @@ class RealFsseEngine extends FsseEngine {
   Future<void> _registerUnlocks(ItemType item) async {
     if (item is MediaItemType && item.unlockId != null && meta.unlockedMediaIds.add(item.unlockId!)) {
       await storage?.saveMeta(meta);
-      listener?.onMediaUnlocked(item.unlockId!);
+      listener?.onMediaUnlocked(item);
     }
     if (item is EndingItemType) {
       meta.unlockedEndingIds.add(item.endingId);
@@ -600,12 +625,16 @@ class RealFsseEngine extends FsseEngine {
     _applyEffects(itemResult.effects);
 
     final scene = _scene;
-    if (itemResult.text != null && scene != null) {
+    final playerText = itemResult.localizedText ?? switch (itemResult.text) {
+      final text? => LocalizedText(text),
+      null => null,
+    };
+    if (playerText != null && scene != null) {
       _history.add(TranscriptEntry(
         conversationKey: currentConversation!.key,
         mode: scene.mode,
         channelId: scene.channelId,
-        playerText: itemResult.text,
+        playerText: playerText,
       ));
     }
 
@@ -664,8 +693,8 @@ class RealFsseEngine extends FsseEngine {
     if (conversation.checkpoint && index == 0) {
       final checkpoint = Checkpoint(
         conversationKey: conversation.key,
-        chapter: conversation.chapter,
-        title: conversation.title,
+        chapter: conversation.chapterText,
+        title: conversation.titleText,
         day: _scene!.day,
         dataMap: Map.of(dataMap),
         unlockedAt: DateTime.now(),

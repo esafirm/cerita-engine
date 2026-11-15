@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/tagged_text.dart';
+import '../l10n/story_language.dart';
 
 /// Visual hooks of the story views. Subclass it to restyle the story (see the `cerita_ui` package)
 /// and provide it with [StorySkinScope]. The defaults are the plain Material look.
@@ -121,12 +122,15 @@ class StorySkin {
   /// runs unlocked. [choiceButton] places it. Override to restyle it, or return null to hide it.
   Widget? memoryMarker(BuildContext context, Choice choice, {required bool dark}) {
     final color = dark ? Colors.amberAccent : Theme.of(context).colorScheme.tertiary;
-    return Icon(Icons.auto_awesome, size: 16, color: color.withAlpha(200));
+    final label = StoryLanguage.of(context).strings.memoryMarker;
+    return Icon(Icons.auto_awesome, size: 16, color: color.withAlpha(200), semanticLabel: label);
   }
 
   /// The VN overlay with the chapter label and the quick controls: backlog, auto, skip and menu,
   /// then back, quick save, quick load and hide. A null callback means the control is unavailable.
+  /// Skins translate their own text: `StoryLanguage.of(context)` has the locale and the engine strings.
   Widget vnHud(BuildContext context, VnHud hud) {
+    final strings = StoryLanguage.of(context).strings;
     Widget toggle(String label, bool active, VoidCallback onTap) => Padding(
           padding: const EdgeInsets.only(left: 4),
           child: FilterChip(
@@ -165,19 +169,19 @@ class StorySkin {
                           ),
                   ),
                 ),
-                button("Backlog", Icons.history, hud.onBacklog),
-                toggle("Auto", hud.autoMode, hud.onAuto),
-                toggle("Skip", hud.skipMode, hud.onSkip),
-                button("Menu", Icons.menu, hud.onMenu),
+                button(strings.backlog, Icons.history, hud.onBacklog),
+                toggle(strings.auto, hud.autoMode, hud.onAuto),
+                toggle(strings.skip, hud.skipMode, hud.onSkip),
+                button(strings.menu, Icons.menu, hud.onMenu),
               ],
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                button("Back", Icons.undo, hud.onBack),
-                button("Quick save", Icons.bookmark_add_outlined, hud.onQuickSave),
-                button("Quick load", Icons.bookmark_outline, hud.onQuickLoad),
-                button("Hide", Icons.visibility_off_outlined, hud.onHide),
+                button(strings.back, Icons.undo, hud.onBack),
+                button(strings.quickSave, Icons.bookmark_add_outlined, hud.onQuickSave),
+                button(strings.quickLoad, Icons.bookmark_outline, hud.onQuickLoad),
+                button(strings.hide, Icons.visibility_off_outlined, hud.onHide),
               ],
             ),
           ],

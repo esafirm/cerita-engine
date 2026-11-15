@@ -17,15 +17,20 @@ extension VariableReplacer on String {
   }
 }
 
-/// Interpolates the user-facing string fields of a raw item JSON.
+/// Interpolates the user-facing string fields of a raw item JSON, in every language of a localized field.
 /// Logic fields (`condition`, `variable`, `target`, `uri`, `effects`) are left untouched.
 /// Values in `text`, which can have text tags, are inserted with their tags escaped.
 Map<String, dynamic> interpolateItemJson(Map<String, dynamic> json, Map<String, dynamic> dataMap) {
   const textKeys = {"text", "caption", "transcript", "title", "summary", "notification_text", "default_value"};
 
-  dynamic replace(String key, dynamic value) => textKeys.contains(key) && value is String
-      ? value.replaceWithVars(dataMap, escapeTags: key == "text")
-      : value;
+  String fill(String key, String text) => text.replaceWithVars(dataMap, escapeTags: key == "text");
+
+  dynamic replace(String key, dynamic value) => switch (value) {
+        String text when textKeys.contains(key) => fill(key, text),
+        Map locales when textKeys.contains(key) =>
+          locales.map((locale, text) => MapEntry(locale, text is String ? fill(key, text) : text)),
+        _ => value,
+      };
 
   final result = json.map((key, value) => MapEntry(key, replace(key, value)));
   final choices = json["choices"];

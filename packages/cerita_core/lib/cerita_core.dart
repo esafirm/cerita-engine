@@ -21,6 +21,7 @@ export 'src/data/items/wait.dart';
 export 'src/data/profile.dart';
 export 'src/data/scene.dart';
 export 'src/fsse_engine.dart';
+export 'src/l10n/localized_text.dart';
 export 'src/state/meta_state.dart';
 export 'src/state/player_settings.dart';
 export 'src/state/rollback.dart';

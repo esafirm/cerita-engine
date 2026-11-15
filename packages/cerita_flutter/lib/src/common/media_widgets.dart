@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../audio_helper.dart';
+import '../l10n/localized_assets.dart';
+import '../l10n/story_language.dart';
 
 /// Full-screen pinch-to-zoom image viewer.
 class ImageViewerPage extends StatelessWidget {
@@ -42,13 +44,15 @@ class ImageViewerPage extends StatelessWidget {
 }
 
 /// Voice note player: play/pause, progress bar, duration and a transcript toggle.
+/// With [assets], it plays the clip of the active language when the story has one.
 class VoiceNotePlayer extends StatefulWidget {
   final String asset;
   final String? transcript;
   final AudioHelper? audio;
+  final LocalizedAssets? assets;
   final Color? color;
 
-  const VoiceNotePlayer({super.key, required this.asset, this.transcript, this.audio, this.color});
+  const VoiceNotePlayer({super.key, required this.asset, this.transcript, this.audio, this.assets, this.color});
 
   @override
   State<VoiceNotePlayer> createState() => _VoiceNotePlayerState();
@@ -61,20 +65,37 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
   Duration _duration = Duration.zero;
   bool _playing = false;
   bool _showTranscript = false;
+  String? _source;
 
   @override
   void initState() {
     super.initState();
     _player.setVolume(widget.audio?.voiceVolume ?? 1);
-    _player.setSource(AssetSource(widget.asset)).then((_) async {
-      final duration = await _player.getDuration();
-      if (mounted && duration != null) setState(() => _duration = duration);
-    }).catchError((_) {});
     _subscriptions.addAll([
       _player.onPositionChanged.listen((position) => setState(() => _position = position)),
       _player.onDurationChanged.listen((duration) => setState(() => _duration = duration)),
       _player.onPlayerComplete.listen((_) => _setPlaying(false, reset: true)),
     ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Picks the clip again after a language switch, unless it is playing.
+    if (!_playing) _load(StoryLanguage.of(context).localizer.activeLocale);
+  }
+
+  Future<void> _load(String locale) async {
+    final source = await widget.assets?.resolve(widget.asset, locale) ?? widget.asset;
+    if (!mounted || source == _source) return;
+    _source = source;
+    try {
+      await _player.setSource(AssetSource(source));
+      final duration = await _player.getDuration();
+      if (mounted && duration != null) setState(() => _duration = duration);
+    } catch (_) {
+      // A missing clip leaves the player empty rather than breaking the bubble.
+    }
   }
 
   void _setPlaying(bool playing, {bool reset = false}) {
@@ -112,6 +133,7 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = StoryLanguage.of(context).strings;
     final color = widget.color ?? Theme.of(context).colorScheme.primary;
     final progress = _duration.inMilliseconds == 0 ? 0.0 : _position.inMilliseconds / _duration.inMilliseconds;
     return Column(
@@ -137,7 +159,7 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
           TextButton.icon(
             onPressed: () => setState(() => _showTranscript = !_showTranscript),
             icon: const Icon(Icons.subtitles_outlined, size: 16),
-            label: Text(_showTranscript ? "Hide transcript" : "Show transcript"),
+            label: Text(_showTranscript ? strings.hideTranscript : strings.showTranscript),
           ),
         if (_showTranscript && widget.transcript != null)
           Padding(
@@ -207,14 +229,17 @@ class VideoPreview extends StatelessWidget {
               ),
             ),
             const Center(child: Icon(Icons.play_circle_outline, color: Colors.white, size: 56)),
-            const Positioned(
+            Positioned(
               left: 8,
               bottom: 8,
               child: Row(
                 children: [
-                  Icon(Icons.videocam, color: Colors.white70, size: 16),
-                  SizedBox(width: 4),
-                  Text("Video", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  const Icon(Icons.videocam, color: Colors.white70, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    StoryLanguage.of(context).strings.video,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ],
               ),
             ),

@@ -1,3 +1,5 @@
+import 'package:cerita_core/src/l10n/localized_text.dart';
+
 import 'base.dart';
 
 enum EndingCategory {
@@ -23,11 +25,14 @@ class EndingItemType extends ItemType {
   final EndingCategory category;
   final String? summary;
 
-  EndingItemType.fromJson(super.json)
+  EndingItemType.fromJson(super.json, {Localizer localizer = const Localizer()})
       : endingId = json["ending_id"] as String,
-        title = json["title"] as String,
+        title = localizer.required(json, "title"),
         category = EndingCategory.fromKey(json["category"] as String?),
-        summary = json["summary"] as String?;
+        summary = localizer.json(json["summary"]);
+
+  @override
+  EndingItemType localized(Localizer localizer) => EndingItemType.fromJson(json, localizer: localizer);
 
   @override
   String getType() => type;

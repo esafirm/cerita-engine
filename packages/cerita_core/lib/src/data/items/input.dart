@@ -1,4 +1,5 @@
 import 'package:cerita_core/src/data/items/profile_info.dart';
+import 'package:cerita_core/src/l10n/localized_text.dart';
 
 import 'base.dart';
 
@@ -11,10 +12,13 @@ class InputItemType extends ItemType {
   final String? defaultValue;
   final ProfileInfo? profile;
 
-  InputItemType.fromJson(super.json)
-      : text = json["text"] as String,
+  InputItemType.fromJson(super.json, {Localizer localizer = const Localizer()})
+      : text = localizer.required(json, "text"),
         variable = json["variable"] as String,
-        defaultValue = json["default_value"]?.toString(),
+        defaultValue = switch (json["default_value"]) {
+          Map value => localizer.json(value),
+          final value => value?.toString(),
+        },
         profile = ProfileInfo.parse(json["profile"]);
 
   @override

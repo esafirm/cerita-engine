@@ -55,8 +55,9 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
   @override
   void didUpdateWidget(ChapterCardOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final chapter = widget.conversation.chapter;
-    if (chapter != null && chapter != oldWidget.conversation.chapter) _show();
+    // Compared in every language, so a language switch doesn't replay the card.
+    final chapter = widget.conversation.chapterText;
+    if (chapter != null && chapter != oldWidget.conversation.chapterText) _show();
   }
 
   void _show({bool entering = false}) {

@@ -1,3 +1,5 @@
+import '../l10n/localized_text.dart';
+
 /// Global meta-state shared across playthroughs: gallery, endings, checkpoints and read lines.
 class GlobalMetaState {
   final Set<String> unlockedMediaIds;
@@ -71,8 +73,8 @@ class GlobalMetaState {
 /// Variable snapshot taken when entering a conversation marked `"checkpoint": true`.
 class Checkpoint {
   final String conversationKey;
-  final String? chapter;
-  final String? title;
+  final LocalizedText? chapter;
+  final LocalizedText? title;
   final int? day;
   final Map<String, dynamic> dataMap;
   final DateTime unlockedAt;
@@ -89,8 +91,8 @@ class Checkpoint {
   factory Checkpoint.fromJson(Map<String, dynamic> json) {
     return Checkpoint(
       conversationKey: json["conversation_key"] as String,
-      chapter: json["chapter"] as String?,
-      title: json["title"] as String?,
+      chapter: LocalizedText.fromJson(json["chapter"]),
+      title: LocalizedText.fromJson(json["title"]),
       day: json["day"] as int?,
       dataMap: Map<String, dynamic>.from(json["data_map"] as Map),
       unlockedAt: DateTime.parse(json["unlocked_at"] as String),
@@ -99,8 +101,8 @@ class Checkpoint {
 
   Map<String, dynamic> toJson() => {
         "conversation_key": conversationKey,
-        if (chapter != null) "chapter": chapter,
-        if (title != null) "title": title,
+        if (chapter != null) "chapter": chapter!.toJson(),
+        if (title != null) "title": title!.toJson(),
         if (day != null) "day": day,
         "data_map": dataMap,
         "unlocked_at": unlockedAt.toIso8601String(),

@@ -1,3 +1,5 @@
+import 'package:cerita_core/src/l10n/localized_text.dart';
+
 import 'base.dart';
 
 enum NarrationStyle {
@@ -16,8 +18,8 @@ class NarrationItemType extends ItemType {
   final NarrationStyle style;
   final String? sfx;
 
-  NarrationItemType.fromJson(super.json)
-      : text = json["text"] as String,
+  NarrationItemType.fromJson(super.json, {Localizer localizer = const Localizer()})
+      : text = localizer.required(json, "text"),
         style = NarrationStyle.fromName(json["style"] as String?),
         sfx = json["sfx"] as String?;
 

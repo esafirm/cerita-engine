@@ -178,7 +178,7 @@ void main() {
           updatedAt: DateTime(2026),
           scene: scene,
           stage: stage,
-          chapter: "Prologue",
+          chapter: const LocalizedText("Prologue"),
         );
     await storage.saveSlot(slot(
       SaveSlot.quickSlotId,

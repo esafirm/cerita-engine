@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/story_language.dart';
 import '../player_prefs.dart';
 import '../vn/dialogue_box.dart';
 
@@ -18,17 +19,14 @@ class SettingsScreen extends StatefulWidget {
     return [for (final id in catalog.voicedProfiles) ?package.profiles.byId(id)];
   }
 
-  /// Typewriter speeds, slowest first. 0 is instant.
+  /// Typewriter speeds, slowest first. 0 is instant. Named by [CeritaStrings.textSpeeds].
   static const textSpeeds = [80, 60, 40, 25, 15, 0];
-  static const textSpeedLabels = ["Slowest", "Slow", "Normal", "Fast", "Faster", "Instant"];
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  static const _preview = "The phone buzzes again. This time, you read the message.";
-
   PlayerPrefs get prefs => widget.settings;
 
   late final Future<List<Profile>> _voiced = switch (widget.loader) {
@@ -56,6 +54,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
+    final speedLabels = strings.textSpeeds;
     Widget header(String text) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
           child: Text(text, style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary)),
@@ -76,9 +77,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(strings.settings),
         actions: [
-          TextButton(onPressed: () => prefs.update(const PlayerSettings()), child: const Text("Reset")),
+          // The language is a setting too, but resetting the rest shouldn't switch it.
+          TextButton(
+            onPressed: () => prefs.update(PlayerSettings(locale: prefs.value.locale)),
+            child: Text(strings.reset),
+          ),
         ],
       ),
       body: ValueListenableBuilder(
@@ -88,31 +93,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
             children: [
-              header("Text"),
+              if (language.available.length > 1)
+                ListTile(
+                  leading: const Icon(Icons.translate),
+                  title: Text(strings.language),
+                  subtitle: Text(language.languageName(language.locale ?? language.locales.source)),
+                  onTap: () => LanguagePicker.show(context),
+                ),
+              header(strings.text),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 20, 12, 8),
                 // Keyed by speed, so the preview types out again when it changes.
                 child: DialogueBox(
-                  _preview,
+                  strings.textPreview,
                   key: ValueKey(settings.textMsPerChar),
-                  speaker: "Preview",
+                  speaker: strings.preview,
                   msPerChar: settings.textMsPerChar,
                 ),
               ),
               ListTile(
-                title: const Text("Text speed"),
+                title: Text(strings.textSpeed),
                 subtitle: Slider(
                   value: speed.toDouble(),
                   max: SettingsScreen.textSpeeds.length - 1.0,
                   divisions: SettingsScreen.textSpeeds.length - 1,
-                  label: SettingsScreen.textSpeedLabels[speed],
+                  label: speedLabels[speed],
                   onChanged: (value) =>
                       _update((s) => s.copyWith(textMsPerChar: SettingsScreen.textSpeeds[value.round()])),
                 ),
-                trailing: SizedBox(width: 56, child: Text(SettingsScreen.textSpeedLabels[speed], textAlign: TextAlign.end)),
+                trailing: SizedBox(width: 56, child: Text(speedLabels[speed], textAlign: TextAlign.end)),
               ),
               ListTile(
-                title: const Text("Auto-forward delay"),
+                title: Text(strings.autoForwardDelay),
                 subtitle: Slider(
                   value: settings.autoDelayMs.clamp(400, 3000).toDouble(),
                   min: 400,
@@ -127,17 +139,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               SwitchListTile(
-                title: const Text("Skip unread text"),
-                subtitle: const Text("Skip also fast-forwards lines you haven't read yet."),
+                title: Text(strings.skipUnread),
+                subtitle: Text(strings.skipUnreadHint),
                 value: settings.skipUnread,
                 onChanged: (value) => _update((s) => s.copyWith(skipUnread: value)),
               ),
-              header("Sound"),
-              volume("Music", Icons.music_note_outlined, settings.musicVolume,
+              header(strings.sound),
+              volume(strings.music, Icons.music_note_outlined, settings.musicVolume,
                   (value) => settings.copyWith(musicVolume: value)),
-              volume("Sound effects", Icons.notifications_none, settings.soundVolume,
+              volume(strings.soundEffects, Icons.notifications_none, settings.soundVolume,
                   (value) => settings.copyWith(soundVolume: value)),
-              volume("Voice", Icons.record_voice_over_outlined, settings.voiceVolume,
+              volume(strings.voice, Icons.record_voice_over_outlined, settings.voiceVolume,
                   (value) => settings.copyWith(voiceVolume: value)),
               FutureBuilder(
                 future: _voiced,
@@ -147,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      header("Character voices"),
+                      header(strings.characterVoices),
                       for (final profile in characters)
                         volume(profile.name, Icons.person_outline, settings.voiceVolumes[profile.id] ?? 1,
                             (value) => settings.copyWith(voiceVolumes: {...settings.voiceVolumes, profile.id: value})),

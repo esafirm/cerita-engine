@@ -7,6 +7,7 @@ import 'call/call_view.dart';
 import 'chat/chat_view.dart';
 import 'common/backlog_sheet.dart';
 import 'common/ending_view.dart';
+import 'l10n/story_language.dart';
 import 'meta/developer_sheet.dart';
 import 'meta/endings_screen.dart';
 import 'meta/gallery_screen.dart';
@@ -39,9 +40,11 @@ class _StoryScreenState extends State<StoryScreen> {
     config: widget.setup.config,
     settings: widget.setup.settings,
     audio: widget.setup.audio(),
+    assets: widget.setup.assets,
   );
   StreamSubscription<String>? _toasts;
   Object? _error;
+  bool _started = false;
 
   @override
   void initState() {
@@ -56,6 +59,15 @@ class _StoryScreenState extends State<StoryScreen> {
           duration: const Duration(seconds: 2),
         ));
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Runs again whenever the player switches language.
+    _controller.setLanguage(StoryLanguage.of(context));
+    if (_started) return;
+    _started = true;
     _controller
         .start(save: widget.save, checkpoint: widget.checkpoint, replay: widget.replay)
         .catchError((Object error) {
@@ -81,6 +93,8 @@ class _StoryScreenState extends State<StoryScreen> {
   void _openGallery() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GalleryScreen(setup: widget.setup)));
 
   void _openMenu() {
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -99,14 +113,14 @@ class _StoryScreenState extends State<StoryScreen> {
                 if (!_controller.replay)
                   ListTile(
                     leading: const Icon(Icons.save_outlined),
-                    title: const Text("Save game"),
+                    title: Text(strings.saveGame),
                     onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
                         ))),
                   ),
                 ListTile(
                   leading: const Icon(Icons.folder_open),
-                  title: const Text("Load game"),
+                  title: Text(strings.loadGame),
                   onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
                         builder: (route) => SaveSlotsScreen(
                           setup: widget.setup,
@@ -119,42 +133,42 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text("Backlog"),
+                  title: Text(strings.backlog),
                   onTap: () => close(() => BacklogSheet.show(context, _controller)),
                 ),
                 ListTile(
                   leading: const Icon(Icons.tune),
-                  title: const Text("Settings"),
+                  title: Text(strings.settings),
                   onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader),
                       ))),
                 ),
                 ListTile(
                   leading: const Icon(Icons.data_object),
-                  title: const Text("Story variables"),
+                  title: Text(strings.storyVariables),
                   onTap: () => close(_showVariables),
                 ),
                 if (widget.setup.developer)
                   ListTile(
                     leading: const Icon(Icons.build_outlined),
-                    title: const Text("Developer"),
+                    title: Text(strings.developer),
                     onTap: () => close(() => DeveloperSheet.show(context, _controller, widget.setup)),
                   ),
                 ListTile(
                   leading: const Icon(Icons.photo_library_outlined),
-                  title: const Text("Gallery"),
+                  title: Text(strings.gallery),
                   onTap: () => close(_openGallery),
                 ),
                 ListTile(
                   leading: const Icon(Icons.emoji_events_outlined),
-                  title: const Text("Endings"),
+                  title: Text(strings.endings),
                   onTap: () => close(() => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
                       )),
                 ),
                 ListTile(
                   leading: const Icon(Icons.home_outlined),
-                  title: const Text("Back to title"),
+                  title: Text(strings.backToTitle),
                   onTap: () => close(() => Navigator.of(context).pop()),
                 ),
               ],
@@ -168,12 +182,13 @@ class _StoryScreenState extends State<StoryScreen> {
   /// Debug view of the typed state store, handy to see effects at work.
   void _showVariables() {
     final data = _controller.dataMap;
+    final strings = StoryLanguage.of(context).strings;
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Story variables"),
+        title: Text(strings.storyVariables),
         content: data.isEmpty
-            ? const Text("No variables yet.")
+            ? Text(strings.noVariables)
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -192,7 +207,8 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
-      return Scaffold(appBar: AppBar(), body: Center(child: Text("Can't load the story:\n$_error")));
+      final message = StoryLanguage.of(context).strings.loadError(_error!);
+      return Scaffold(appBar: AppBar(), body: Center(child: Text(message)));
     }
 
     return ListenableBuilder(
@@ -250,7 +266,11 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
               if (controller.phase == StoryPhase.finished)
                 controller.replay
-                    ? EndingView(title: "End of replay", backLabel: "Back", onTitle: () => Navigator.of(context).pop())
+                    ? EndingView(
+                        title: StoryLanguage.of(context).strings.endOfReplay,
+                        backLabel: StoryLanguage.of(context).strings.back,
+                        onTitle: () => Navigator.of(context).pop(),
+                      )
                     : EndingView(onTitle: () => Navigator.of(context).pop()),
             ],
           ),

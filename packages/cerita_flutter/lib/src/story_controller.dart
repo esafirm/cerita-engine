@@ -5,6 +5,9 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/foundation.dart';
 
 import 'audio_helper.dart';
+import 'l10n/cerita_strings.dart';
+import 'l10n/localized_assets.dart';
+import 'l10n/story_language.dart';
 import 'player_prefs.dart';
 
 enum StoryPhase {
@@ -44,6 +47,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   final LoaderConfig config;
   final AudioHelper audio;
   final PlayerPrefs settings;
+  final LocalizedAssets assets;
 
   StoryController({
     required EngineLoader loader,
@@ -51,8 +55,10 @@ class StoryController extends ChangeNotifier with EngineListener {
     required this.config,
     AudioHelper? audio,
     PlayerPrefs? settings,
+    LocalizedAssets? assets,
   })  : audio = audio ?? AudioHelper(),
         settings = settings ?? PlayerPrefs(storage),
+        assets = assets ?? LocalizedAssets(),
         engine = RealFsseEngine(loader, storage: storage) {
     engine.listener = this;
   }
@@ -91,6 +97,9 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// False while the VN line on screen is still typing out. Auto mode waits for it, see [lineTyped].
   bool _lineTyped = true;
 
+  /// Engine strings for toasts, in the language set by [setLanguage].
+  CeritaStrings strings = CeritaStrings.en;
+
   /// One-off messages (unlocks, saves) for the UI to show as toasts.
   final StreamController<String> _toasts = StreamController.broadcast();
 
@@ -111,6 +120,14 @@ class StoryController extends ChangeNotifier with EngineListener {
   StageState get stage => engine.stage;
 
   Map<String, dynamic> get dataMap => engine.dataMap;
+
+  Localizer get localizer => engine.localizer;
+
+  /// A delivered item in the active language.
+  ItemType? itemOf(TranscriptEntry entry) => entry.itemIn(localizer);
+
+  /// The player's reply of [entry] in the active language.
+  String? playerTextOf(TranscriptEntry entry) => localizer.maybe(entry.playerText);
 
   /// Transcript of a messenger thread across every conversation that used it.
   List<TranscriptEntry> channelHistory(String? channelId) =>
@@ -139,6 +156,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// chapter is played and nothing is saved.
   Future<void> start({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     audio.addObserver();
+    assets.preload();
     await settings.load();
     _applySettings();
     settings.addListener(_applySettings);
@@ -159,11 +177,11 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> quickLoad() async {
     final save = await engine.storage?.loadSlot(SaveSlot.quickSlotId);
     if (save == null) {
-      _toasts.add("No quick save yet");
+      _toasts.add(strings.noQuickSave);
       return;
     }
     await load(save);
-    _toasts.add("Quick loaded");
+    _toasts.add(strings.quickLoaded);
   }
 
   /// Developer panel: continues the story at [target], keeping the variables.
@@ -202,7 +220,7 @@ class StoryController extends ChangeNotifier with EngineListener {
       rolledBack = true;
       _show(item);
     }
-    _toasts.add("Story reloaded");
+    _toasts.add(strings.storyReloaded);
   }
 
   /// Goes back to the previous line, or to the transcript line at [historyIndex]. A choice there can be
@@ -251,7 +269,7 @@ class StoryController extends ChangeNotifier with EngineListener {
       (entry) => !entry.isPlayer && entry.conversationKey == conversation?.key,
       orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.vn),
     );
-    final item = last.itemType;
+    final item = itemOf(last);
     if (item == null || item is WaitItemType) {
       await advance();
     } else {
@@ -288,7 +306,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> replayVoice(TextItemType item) async {
     final voice = item.voice;
     if (voice == null) return;
-    await audio.playVoice(config.music(voice), character: _characterVolume(item));
+    final path = assets.resolveNow(config.music(voice), localizer.activeLocale);
+    await audio.playVoice(path, character: _characterVolume(item));
   }
 
   double _characterVolume(ItemType item) => settings.value.voiceVolumes[item.getProfileInfo()?.id] ?? 1;
@@ -341,9 +360,9 @@ class StoryController extends ChangeNotifier with EngineListener {
       case SaveSlot.autoSlotId:
         break;
       case SaveSlot.quickSlotId:
-        _toasts.add("Quick saved");
+        _toasts.add(strings.quickSaved);
       default:
-        _toasts.add("Saved to slot $slotId");
+        _toasts.add(strings.savedToSlot(slotId));
     }
   }
 
@@ -381,7 +400,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   }
 
   Future<void> _present(ItemType item) async {
-    final profile = engine.getProfile(item);
+    final locale = engine.locale;
+    var profile = engine.getProfile(item);
     final typingDelay = switch (item) {
       TextItemType(:final typingDelayMs) || MediaItemType(:final typingDelayMs) when typingDelayMs != null =>
         typingDelayMs,
@@ -402,6 +422,11 @@ class StoryController extends ChangeNotifier with EngineListener {
       typingProfile = null;
       _typingEntry = null;
     }
+    // The player may have switched language while the message was being typed.
+    if (engine.locale != locale) {
+      item = item.localized(localizer);
+      profile = engine.getProfile(item);
+    }
 
     final sfx = switch (item) {
       TextItemType(:final sfx) || NarrationItemType(:final sfx) || MediaItemType(:final sfx) => sfx,
@@ -410,7 +435,8 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (sfx != null) audio.playSfx(config.music(sfx));
     await audio.stopVoice();
     if (item is TextItemType && item.voice != null && !skipMode) {
-      audio.playVoice(config.music(item.voice!), character: _characterVolume(item));
+      final voice = assets.resolveNow(config.music(item.voice!), localizer.activeLocale);
+      audio.playVoice(voice, character: _characterVolume(item));
     }
 
     direction = item is StageItemType ? item : null;
@@ -427,6 +453,21 @@ class StoryController extends ChangeNotifier with EngineListener {
       autoMode = false;
       skipMode = false;
     }
+    _notify();
+  }
+
+  /// Switches story text, toasts and voice clips to [language]. The current line, speaker, chapter and
+  /// banner are re-read in it; history follows through [itemOf].
+  void setLanguage(StoryLanguage language) {
+    strings = language.strings;
+    engine.playerFallbackName = strings.you;
+    if (engine.locale == language.locale) return;
+    engine.locale = language.locale;
+    final item = current?.localized(localizer);
+    current = item;
+    if (item != null) currentProfile = engine.getProfile(item);
+    conversation = conversation?.localized(localizer);
+    if (item is WaitItemType && notification != null) notification = item.notificationText;
     _notify();
   }
 
@@ -505,15 +546,16 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   @override
   void onConversationStarted(Conversation conversation) {
-    this.conversation = conversation;
+    this.conversation = conversation.localized(localizer);
   }
 
   @override
-  void onMediaUnlocked(String unlockId) => _toasts.add("Gallery unlocked: $unlockId");
+  void onMediaUnlocked(MediaItemType item) =>
+      _toasts.add(strings.galleryUnlocked(item.title ?? item.caption ?? strings.newGalleryItem));
 
   @override
   void onCheckpointUnlocked(Checkpoint checkpoint) {
-    _toasts.add("Checkpoint: ${checkpoint.chapter ?? checkpoint.conversationKey}");
+    _toasts.add(strings.checkpoint(localizer.maybe(checkpoint.chapter) ?? checkpoint.conversationKey));
   }
 
   void _notify() {

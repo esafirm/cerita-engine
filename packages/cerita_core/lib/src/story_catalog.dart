@@ -63,6 +63,4 @@ class CatalogEntry<T> {
   final Conversation source;
 
   const CatalogEntry(this.item, this.source);
-
-  String get hint => "Unlocked in ${source.chapter ?? source.title ?? source.key}";
 }

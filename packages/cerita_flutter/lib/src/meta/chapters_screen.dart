@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/story_language.dart';
 import '../story_setup.dart';
 import 'meta_loader.dart';
 
@@ -18,8 +19,9 @@ class ChaptersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final language = StoryLanguage.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text("Chapters")),
+      appBar: AppBar(title: Text(language.strings.chapters)),
       body: MetaLoader(
         setup: setup,
         builder: (context, catalog, meta) {
@@ -28,7 +30,7 @@ class ChaptersScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             itemCount: chapters.length,
             itemBuilder: (context, index) {
-              final conversation = chapters[index];
+              final conversation = chapters[index].localized(language.localizer);
               final checkpoint = meta.unlockedCheckpoints[conversation.key];
               final unlocked = checkpoint != null;
               return IntrinsicHeight(
@@ -60,10 +62,10 @@ class ChaptersScreen extends StatelessWidget {
                         child: ListTile(
                           enabled: unlocked,
                           title: Text(conversation.chapter ?? conversation.key),
-                          subtitle: Text(unlocked ? (conversation.title ?? "") : "Not reached yet"),
+                          subtitle: Text(unlocked ? (conversation.title ?? "") : language.strings.notReachedYet),
                           trailing: switch (onReplay) {
                             final onReplay? when unlocked => IconButton(
-                                tooltip: "Replay this chapter",
+                                tooltip: language.strings.replayChapter,
                                 icon: const Icon(Icons.replay),
                                 onPressed: () => onReplay(checkpoint),
                               ),

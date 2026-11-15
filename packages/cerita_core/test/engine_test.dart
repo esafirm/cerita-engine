@@ -150,7 +150,7 @@ void main() {
       final branched = await engine.next(prevResult: ItemResult.choice(third.variable, third.choices.first));
       expect(branched.getText(), "Branched to A");
       expect(engine.getDataMap(), {"NAME": "Nora", "CHOICE": "A"});
-      expect(engine.history.where((e) => e.isPlayer).map((e) => e.playerText), ["Nora", "Go next"]);
+      expect(engine.history.where((e) => e.isPlayer).map((e) => e.playerText.toString()), ["Nora", "Go next"]);
     });
 
     test('skips items whose condition fails and applies item effects', () async {
@@ -252,7 +252,7 @@ void main() {
 
       final catalog = await StoryCatalog.load(loader);
       expect(catalog.media.single.item.unlockId, "cg_01");
-      expect(catalog.endings.single.hint, "Unlocked in index");
+      expect(catalog.endings.single.source.key, "index");
       expect(catalog.checkpoints.single.key, "index");
     });
 

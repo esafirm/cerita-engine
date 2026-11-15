@@ -5,6 +5,7 @@ import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
 import '../common/tagged_text.dart';
+import '../l10n/story_language.dart';
 import '../skin/chapter_card_overlay.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
@@ -47,11 +48,12 @@ class ChatView extends StatelessWidget {
     final config = setup.config;
     final avatar = channel?.avatar ?? contact?.avatar;
     final typing = controller.phase == StoryPhase.typing ? controller.typingProfile : null;
+    final strings = StoryLanguage.of(context).strings;
 
     final subtitle = typing != null
-        ? "typing…"
+        ? strings.typing
         : [
-            if (scene.day != null) "Day ${scene.day}",
+            if (scene.day != null) strings.day(scene.day!),
             scene.time,
             channel?.status ?? contact?.bio,
           ].whereType<String>().join(" · ");
@@ -67,7 +69,7 @@ class ChatView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(channel?.name ?? contact?.name ?? "Chat", style: const TextStyle(fontSize: 17)),
+                  Text(channel?.name ?? contact?.name ?? strings.chat, style: const TextStyle(fontSize: 17)),
                   Text(subtitle, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                 ],
               ),
@@ -76,12 +78,12 @@ class ChatView extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            tooltip: "Profile",
+            tooltip: strings.profile,
             icon: const Icon(Icons.person_outline),
             onPressed: contact == null ? null : () => _showProfile(context, contact),
           ),
-          IconButton(tooltip: "Gallery", icon: const Icon(Icons.photo_library_outlined), onPressed: onGallery),
-          IconButton(tooltip: "Menu", icon: const Icon(Icons.more_vert), onPressed: onMenu),
+          IconButton(tooltip: strings.gallery, icon: const Icon(Icons.photo_library_outlined), onPressed: onGallery),
+          IconButton(tooltip: strings.menu, icon: const Icon(Icons.more_vert), onPressed: onMenu),
         ],
       ),
       body: Column(
@@ -177,7 +179,7 @@ class _InteractionTray extends StatelessWidget {
                   color: scheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Text("Message", style: TextStyle(color: scheme.outline)),
+                child: Text(StoryLanguage.of(context).strings.messageHint, style: TextStyle(color: scheme.outline)),
               ),
             ),
             const SizedBox(width: 8),

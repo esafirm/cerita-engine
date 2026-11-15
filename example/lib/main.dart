@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'demo_app.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // The developer panel (in-game menu → Developer) is for writing the story, not for players.
-  runApp(DemoApp(setup: StorySetup.assets(developer: kDebugMode)));
+  final setup = StorySetup.assets(developer: kDebugMode);
+  final language = StoryLanguage();
+  await language.load(setup);
+  runApp(DemoApp(setup: setup, language: language));
 }
