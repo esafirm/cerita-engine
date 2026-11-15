@@ -77,6 +77,23 @@ flowchart TD
     index -.->|CALL| shared
 ```
 
+### 2.1 Route Map (`RouteMap`)
+
+The chapter-level view of the same graph, for the Chapters flowchart (presentation modes §4, CE-07).
+`RouteMap(graph)` keeps only checkpoints and endings:
+
+- **Nodes**: every conversation with `"checkpoint": true`, and every `ending_id`. A conversation that isn't a
+  checkpoint (a call scene, a shared subroutine, an ending scene) is folded into the checkpoint that leads to it.
+- **Edges**: a checkpoint leads to the checkpoints and endings it can reach through targets of any kind without
+  passing another checkpoint. Conditions aren't evaluated, so every possible branch is drawn.
+- **Roots**: `index` when it's a checkpoint, else the first checkpoints and endings reachable from it.
+  Checkpoints no route reaches are left out (the linter warns about them).
+- **Layers**: each node sits one row below the lowest node leading to it. Edges that go back to an earlier node
+  (a route that loops) are kept for reachability but not drawn. Within a row, nodes follow the order of the nodes
+  above them, then story order.
+- `endingsAfter(node)` is every ending reachable from a node, for "1 of 3 endings found". `branches` tells whether
+  any node leads to two or more nodes.
+
 ---
 
 ## 3. Command Line

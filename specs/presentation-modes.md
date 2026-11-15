@@ -97,8 +97,17 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - Locked items display a silhouette/placeholder with a hint (e.g., *"Unlocked in Day 3"*); unlocked items (matched against `unlocked_media_ids`) can be viewed or replayed at any time.
 2. **Endings Collection**:
    - Displays all story endings (`unlocked_ending_ids` vs. total endings), showing the ending badge (`TRUE`, `GOOD`, `BAD`, `SECRET`), title, and summary for completed routes.
-3. **Chapter / Day Timeline**:
-   - Visual node graph or Day list (`Day 1` ... `Day 7`) allowing players to jump to any unlocked checkpoint to try different choices without replaying from the beginning.
+3. **Chapters** (CE-07):
+   - Two views of the checkpoints, switched from the app bar: a **flowchart** and a **list**. The flowchart is the
+     default when the story branches (a node leads to two or more nodes), otherwise the list.
+   - **Flowchart**: the route map (authoring tools §2.1) drawn top to bottom, one row per layer, with lines from each
+     node to the nodes it leads to. Reached checkpoints show their chapter (or day) and title, and how many of the
+     endings after them were found ("1 of 3 endings found"). Unreached checkpoints show "???" and can't be tapped.
+     Reached endings show their badge and title, unreached ones only a lock. Wide rows scroll sideways.
+   - Tapping a reached checkpoint offers **Play from here** (continue from the checkpoint with its saved variables)
+     and **Replay this chapter**, the same as the list.
+   - **List**: every checkpoint in day order with a timeline, as before. Unlocked ones continue from there, and a
+     button replays just that chapter.
    - **Replay** plays only that chapter (engine §8) and returns when it ends, without touching the saves.
 4. **Save / Load Slots**:
    - Autosave, quick save and manual slots with chapter, title and time.
