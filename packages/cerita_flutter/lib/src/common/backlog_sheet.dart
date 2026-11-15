@@ -38,7 +38,8 @@ class BacklogSheet extends StatelessWidget {
         Expanded(
           child: ListView.separated(
             reverse: true,
-            padding: const EdgeInsets.all(16),
+            // The sheet reaches the bottom edge, so the newest line clears the gesture bar or home indicator.
+            padding: const EdgeInsets.all(16) + EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom),
             itemCount: lines.length,
             separatorBuilder: (_, _) => const Divider(height: 20),
             itemBuilder: (context, index) {

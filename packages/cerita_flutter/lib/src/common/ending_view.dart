@@ -111,6 +111,9 @@ class EndingBadge extends StatelessWidget {
 
   const EndingBadge({super.key, required this.category});
 
+  static const padding = EdgeInsets.symmetric(horizontal: 12, vertical: 4);
+  static const textStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12);
+
   static Color colorOf(EndingCategory category) => switch (category) {
         EndingCategory.trueEnding => const Color(0xFFE0A100),
         EndingCategory.good => const Color(0xFF2E9E5B),
@@ -122,12 +125,9 @@ class EndingBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: padding,
       decoration: BoxDecoration(color: colorOf(category), borderRadius: BorderRadius.circular(20)),
-      child: Text(
-        StoryLanguage.of(context).strings.endingBadge(category),
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12),
-      ),
+      child: Text(StoryLanguage.of(context).strings.endingBadge(category), style: textStyle),
     );
   }
 }

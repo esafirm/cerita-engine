@@ -290,6 +290,10 @@ class _EvidencePickerState extends State<EvidencePicker> with SingleTickerProvid
 
 /// Shows a [StorySkin.clueNotification] at the top of [child] for each clue the story finds, one at a time.
 /// Tapping one opens the clue on the Case Board.
+///
+/// None shows during an evidence question: it would cover the picker's prompt and countdown, and open the
+/// board the question hides. Notifications still queued when the question comes are dropped. Their clues stay
+/// new, so the picker lists them and the board's badge counts them afterwards.
 class ClueNotifications extends StatefulWidget {
   final StoryController controller;
   final Widget child;
@@ -305,39 +309,52 @@ class ClueNotifications extends StatefulWidget {
 class _ClueNotificationsState extends State<ClueNotifications> {
   final List<Clue> _queue = [];
   late final StreamSubscription<Clue> _subscription;
+  Timer? _timer;
+
+  StoryController get _controller => widget.controller;
+
+  bool get _evidenceAsked => _controller.phase == StoryPhase.choice && _controller.current is EvidenceItemType;
 
   @override
   void initState() {
     super.initState();
-    _subscription = widget.controller.cluesFound.listen((clue) {
+    _subscription = _controller.cluesFound.listen((clue) {
+      if (_evidenceAsked) return;
       setState(() => _queue.add(clue));
       if (_queue.length == 1) _schedule();
     });
+    _controller.addListener(_onStoryChanged);
+  }
+
+  void _onStoryChanged() {
+    if (!_evidenceAsked || _queue.isEmpty) return;
+    _timer?.cancel();
+    setState(_queue.clear);
   }
 
   void _schedule() {
-    final clue = _queue.firstOrNull;
-    if (clue == null) return;
-    Future.delayed(ClueNotifications.duration, () {
-      if (!mounted || _queue.firstOrNull != clue) return;
-      _dismiss();
-    });
+    _timer?.cancel();
+    if (_queue.isEmpty) return;
+    _timer = Timer(ClueNotifications.duration, _dismiss);
   }
 
   void _dismiss() {
+    if (!mounted || _queue.isEmpty) return;
     setState(() => _queue.removeAt(0));
     _schedule();
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
+    _controller.removeListener(_onStoryChanged);
     _subscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final clue = _queue.firstOrNull;
+    final clue = _evidenceAsked ? null : _queue.firstOrNull;
     final controller = widget.controller;
     return Stack(
       fit: StackFit.expand,

@@ -51,14 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _resetProgress() async {
+    final strings = _demoStringsOf(StoryLanguage.of(context));
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Reset progress?"),
-        content: const Text("Deletes every save slot, gallery unlock, ending, checkpoint and remembered fact."),
+        title: Text(strings.resetTitle),
+        content: Text(strings.resetBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text("Reset")),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(strings.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(strings.reset)),
         ],
       ),
     );
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final config = setup.config;
     final language = StoryLanguage.of(context);
     final strings = language.strings;
+    final demoStrings = _demoStringsOf(language);
     return FutureBuilder(
       future: _autosave,
       builder: (context, snapshot) {
@@ -150,11 +152,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.groups_outlined,
                 onTap: () => _push(CreditsScreen(setup: setup)),
               ),
-            TitleMenuEntry(label: "Features", icon: Icons.checklist, onTap: () => _push(const CapabilitiesScreen())),
-            TitleMenuEntry(label: "Reset", icon: Icons.restart_alt, onTap: _resetProgress),
+            TitleMenuEntry(
+              label: demoStrings.features,
+              icon: Icons.checklist,
+              onTap: () => _push(const CapabilitiesScreen()),
+            ),
+            TitleMenuEntry(label: demoStrings.reset, icon: Icons.restart_alt, onTap: _resetProgress),
           ],
         );
       },
     );
   }
 }
+
+/// The demo's own title screen strings, by locale. Engine strings come from [CeritaStrings]. The Features screen
+/// itself stays in English: it lists engine capabilities for developers.
+typedef _DemoStrings = ({String features, String reset, String resetTitle, String resetBody, String cancel});
+
+const _demoStrings = <String, _DemoStrings>{
+  "en": (
+    features: "Features",
+    reset: "Reset",
+    resetTitle: "Reset progress?",
+    resetBody: "Deletes every save slot, gallery unlock, ending, checkpoint and remembered fact.",
+    cancel: "Cancel",
+  ),
+  "id": (
+    features: "Fitur",
+    reset: "Atur ulang",
+    resetTitle: "Atur ulang progres?",
+    resetBody: "Menghapus semua slot simpanan, gambar galeri yang terbuka, ending, checkpoint dan fakta yang diingat.",
+    cancel: "Batal",
+  ),
+};
+
+/// [_demoStrings] in [language]'s active locale, else English.
+_DemoStrings _demoStringsOf(StoryLanguage language) =>
+    _demoStrings[language.locale ?? language.locales.source] ?? _demoStrings["en"]!;

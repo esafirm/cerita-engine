@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
@@ -64,6 +66,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final language = StoryLanguage.of(context);
     final strings = language.strings;
     final speedLabels = strings.textSpeeds;
+    String seconds(int ms) => "${(ms / 1000).toStringAsFixed(1)} s";
+    // The text sliders share one value column, so they line up and keep their length when the value changes.
+    final textValues = [...speedLabels, ...strings.chatPacings, seconds(3000)];
     Widget header(String text) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
           child: Text(text, style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary)),
@@ -79,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             label: "${(value * 100).round()}%",
             onChanged: (value) => prefs.update(change(value)),
           ),
-          trailing: SizedBox(width: 40, child: Text("${(value * 100).round()}%", textAlign: TextAlign.end)),
+          trailing: _SliderValue("${(value * 100).round()}%", options: const ["100%"]),
         );
 
     return Scaffold(
@@ -129,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (value) =>
                       _update((s) => s.copyWith(textMsPerChar: SettingsScreen.textSpeeds[value.round()])),
                 ),
-                trailing: SizedBox(width: 56, child: Text(speedLabels[speed], textAlign: TextAlign.end)),
+                trailing: _SliderValue(speedLabels[speed], options: textValues),
               ),
               ListTile(
                 title: Text(strings.autoForwardDelay),
@@ -138,13 +143,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   min: 400,
                   max: 3000,
                   divisions: 13,
-                  label: "${(settings.autoDelayMs / 1000).toStringAsFixed(1)} s",
+                  label: seconds(settings.autoDelayMs),
                   onChanged: (value) => _update((s) => s.copyWith(autoDelayMs: value.round())),
                 ),
-                trailing: SizedBox(
-                  width: 56,
-                  child: Text("${(settings.autoDelayMs / 1000).toStringAsFixed(1)} s", textAlign: TextAlign.end),
-                ),
+                trailing: _SliderValue(seconds(settings.autoDelayMs), options: textValues),
               ),
               SwitchListTile(
                 title: Text(strings.skipUnread),
@@ -162,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (value) =>
                       _update((s) => s.copyWith(chatPacing: SettingsScreen.chatPacings[value.round()])),
                 ),
-                trailing: SizedBox(width: 56, child: Text(strings.chatPacings[pacing], textAlign: TextAlign.end)),
+                trailing: _SliderValue(strings.chatPacings[pacing], options: textValues),
               ),
               header(strings.sound),
               volume(strings.music, Icons.music_note_outlined, settings.musicVolume,
@@ -190,6 +192,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// A slider's value on one line, as wide as the widest of [options] in the tile's trailing style, up to
+/// [maxWidth]. A longer value is scaled down to fit rather than wrapped, e.g. at a large text scale.
+class _SliderValue extends StatelessWidget {
+  static const maxWidth = 120.0;
+
+  final String value;
+  final List<String> options;
+
+  const _SliderValue(this.value, {required this.options});
+
+  @override
+  Widget build(BuildContext context) {
+    final style = DefaultTextStyle.of(context).style;
+    var width = 0.0;
+    for (final option in {value, ...options}) {
+      final painter = TextPainter(
+        text: TextSpan(text: option, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      width = max(width, painter.width);
+      painter.dispose();
+    }
+    return SizedBox(
+      width: min(width.ceilToDouble(), maxWidth),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: AlignmentDirectional.centerEnd,
+        child: Text(value, maxLines: 1, softWrap: false),
       ),
     );
   }

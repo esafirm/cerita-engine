@@ -128,7 +128,7 @@ The player, especially completionists going after every ending.
 
 | Risk | Mitigation |
 | :--- | :--- |
-| Complex stories make an unreadable chart on a phone | Chapter-level only, vertical scroll, and authors keep checkpoints to major beats |
+| Complex stories make an unreadable chart on a phone | Chapter-level only, vertical scroll only (rows of many endings wrap onto more lines), and authors keep checkpoints to major beats |
 | Routing that depends on state makes the drawn structure misleading | Draw every possible branch, and only reveal what was reached |
 
 ## 15. Phasing

@@ -1,4 +1,5 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,21 +45,99 @@ Map<String, Map<String, dynamic>> _story({String mode = "VN"}) => {
       },
     };
 
+/// A HUD much taller than the default one, as a skin may draw it.
+class _TallHudSkin extends StorySkin {
+  const _TallHudSkin();
+
+  @override
+  Widget vnHud(BuildContext context, VnHud hud) => SafeArea(
+        child: SizedBox(
+          height: 160,
+          child: Align(
+            alignment: Alignment.topRight,
+            child: TextButton(onPressed: hud.onBacklog, child: const Text("LOG")),
+          ),
+        ),
+      );
+}
+
+/// Fails if anything is drawn over [finder]: points across its whole area must reach it.
+void expectUncovered(WidgetTester tester, Finder finder) {
+  final target = tester.renderObject(finder);
+  final rect = tester.getRect(finder).deflate(1);
+  for (final x in [0.0, 0.25, 0.5, 0.75, 1.0]) {
+    for (final y in [0.0, 0.5, 1.0]) {
+      final point = Offset(rect.left + rect.width * x, rect.top + rect.height * y);
+      final result = HitTestResult();
+      tester.binding.hitTestInView(result, point, tester.view.viewId);
+      expect(result.path.any((entry) => entry.target == target), isTrue,
+          reason: "something covers $finder at $point");
+    }
+  }
+}
+
+Finder _inPicker(Finder finder) => find.descendant(of: find.byType(EvidencePicker), matching: finder);
+
+/// The picker's header: the prompt, the "pick a clue" line and the countdown bar when there is one.
+void expectPickerHeaderUncovered(WidgetTester tester, {bool countdown = false}) {
+  expectUncovered(tester, _inPicker(find.byType(TaggedText)));
+  expectUncovered(tester, _inPicker(find.text(_strings.chooseEvidence)));
+  if (countdown) expectUncovered(tester, _inPicker(find.byType(LinearProgressIndicator)));
+}
+
 void main() {
   setUp(mockAudioChannels);
   languageTests();
 
   Future<StoryController> pumpStory(WidgetTester tester, Map<String, Map<String, dynamic>> files,
-      {Map<String, dynamic>? clues = _clues}) async {
+      {Map<String, dynamic>? clues = _clues, StorySkin skin = const StorySkin()}) async {
     final setup = StorySetup(
       config: const LoaderConfig(),
       loader: FakeEngineLoader(files, clues: clues),
       storage: InMemoryStoryStorage(),
       audio: SilentAudio.new,
     );
-    await tester.pumpWidget(MaterialApp(home: StoryScreen(setup: setup)));
+    await tester.pumpWidget(MaterialApp(home: StorySkinScope(skin: skin, child: StoryScreen(setup: setup))));
     await tester.pumpAndSettle();
     return tester.widget<ClueNotifications>(find.byType(ClueNotifications)).controller;
+  }
+
+  for (final (name, skin) in [("default", const StorySkin()), ("tall", const _TallHudSkin())]) {
+    testWidgets('in VN, the picker sits below the $name HUD and a clue found just before shows no notification',
+        (tester) async {
+      tester.view.physicalSize = const Size(411, 820);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final story = _story();
+      story["index"]!["scene"] = {"mode": "VN", "day": 1, "time": "21:00"};
+      (story["index"]!["conversations"] as List)[1]
+        ..["timeout_ms"] = 30000
+        ..["timeout"] = {"target": "#right"};
+      final controller = await pumpStory(tester, story, skin: skin);
+      expect(find.text(_strings.clueFound("Pier photo")), findsOneWidget);
+
+      // Straight on to the question, while the notification would still be up. The countdown keeps frames
+      // coming, so no pumpAndSettle until it stops.
+      await tester.tap(find.byType(VnStage));
+      for (var i = 0; i < 30 && find.byType(EvidencePicker).evaluate().isEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      expect(find.byType(EvidencePicker), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text(_strings.clueFound("Pier photo")), findsNothing, reason: "it would cover the picker");
+      expect(find.byTooltip("Backlog").evaluate().length + find.text("LOG").evaluate().length, 1,
+          reason: "the HUD stays, with the backlog at hand");
+      expectPickerHeaderUncovered(tester, countdown: true);
+
+      await tester.tap(find.text("Pier photo").last);
+      await tester.pump();
+      expectPickerHeaderUncovered(tester, countdown: true);
+      await tester.tap(find.text(_strings.present));
+      await tester.pumpAndSettle();
+      expect(controller.current?.getText(), "Right.");
+      expect(find.text(_strings.clueFound("Pier photo")), findsNothing, reason: "dropped, not put off");
+      expect(controller.newClues, hasLength(1), reason: "the board's badge counts it");
+    });
   }
 
   /// Lets the clue notification time out, so no timer is left pending.
@@ -153,6 +232,7 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(find.byType(EvidencePicker), findsOneWidget);
+    expectPickerHeaderUncovered(tester);
 
     await tester.tap(find.text("Pier photo").last);
     await tester.pumpAndSettle();

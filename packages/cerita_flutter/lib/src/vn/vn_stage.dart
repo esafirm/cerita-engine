@@ -104,6 +104,38 @@ class _VnStageState extends State<VnStage> {
     final nvl = stage.textbox == TextboxStyle.nvl;
     final msPerChar = controller.settings.value.textMsPerChar;
     final autoResume = controller.autoMode ? Duration(milliseconds: controller.settings.value.autoDelayMs) : null;
+    final picking = controller.phase == StoryPhase.choice && item is EvidenceItemType && asked;
+
+    // Top-anchored, so the bottom inset is not its concern. Above the picker it would leave a gap.
+    final hud = MediaQuery.removePadding(
+      context: context,
+      removeBottom: true,
+      child: StorySkin.of(context).vnHud(
+        context,
+        VnHud(
+          label: scene.day != null || scene.time != null
+              ? [
+                  if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
+                  if (scene.time != null) scene.time!,
+                ].join(" · ")
+              : null,
+          autoMode: controller.autoMode,
+          skipMode: controller.skipMode,
+          onBacklog: () => BacklogSheet.show(context, controller),
+          onAuto: controller.toggleAuto,
+          onSkip: controller.toggleSkip,
+          onMenu: widget.onMenu,
+          onBack: controller.canRollback ? controller.rollback : null,
+          onQuickSave: controller.replay ? null : controller.quickSave,
+          onQuickLoad: controller.replay ? null : controller.quickLoad,
+          onHide: () => _setHidden(true),
+          onCaseBoard: controller.hasClues && item is! EvidenceItemType
+              ? () => CaseBoardScreen.open(context, controller)
+              : null,
+          newClues: controller.newClues.length,
+        ),
+      ),
+    );
 
     return Listener(
       onPointerSignal: _onPointerSignal,
@@ -155,15 +187,29 @@ class _VnStageState extends State<VnStage> {
                         onTyped: () => _lineTyped(item, text),
                       ),
                     ),
-                  if (controller.phase == StoryPhase.choice && item is EvidenceItemType && asked)
+                  // The picker fills the screen, so it goes below the HUD rather than under it: the prompt and
+                  // countdown stay readable, and the backlog stays at hand to look up what was said.
+                  if (picking)
                     ColoredBox(
                       color: Colors.black54,
-                      child: SafeArea(
-                        minimum: const EdgeInsets.all(16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          hud,
+                          Expanded(
+                            child: MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              child: SafeArea(
+                                minimum: const EdgeInsets.all(16),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   else if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
@@ -186,36 +232,7 @@ class _VnStageState extends State<VnStage> {
                         ),
                       ),
                     ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: StorySkin.of(context).vnHud(
-                      context,
-                      VnHud(
-                        label: scene.day != null || scene.time != null
-                            ? [
-                                if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
-                                if (scene.time != null) scene.time!,
-                              ].join(" · ")
-                            : null,
-                        autoMode: controller.autoMode,
-                        skipMode: controller.skipMode,
-                        onBacklog: () => BacklogSheet.show(context, controller),
-                        onAuto: controller.toggleAuto,
-                        onSkip: controller.toggleSkip,
-                        onMenu: widget.onMenu,
-                        onBack: controller.canRollback ? controller.rollback : null,
-                        onQuickSave: controller.replay ? null : controller.quickSave,
-                        onQuickLoad: controller.replay ? null : controller.quickLoad,
-                        onHide: () => _setHidden(true),
-                        onCaseBoard: controller.hasClues && item is! EvidenceItemType
-                            ? () => CaseBoardScreen.open(context, controller)
-                            : null,
-                        newClues: controller.newClues.length,
-                      ),
-                    ),
-                  ),
+                  if (!picking) Positioned(top: 0, left: 0, right: 0, child: hud),
                 ],
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support.dart';
@@ -220,6 +221,62 @@ void main() {
     await tester.tap(find.text("Reset"));
     await tester.pumpAndSettle();
     expect(prefs.value, const PlayerSettings());
+  });
+
+  testWidgets('settings show every slider value on one line in both languages', (tester) async {
+    tester.view
+      ..physicalSize = const Size(411, 900)
+      ..devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final prefs = PlayerPrefs(InMemoryStoryStorage());
+    final language = StoryLanguage(locale: "en", locales: const StoryLocales(locales: ["en", "id"]));
+    await tester.pumpWidget(MaterialApp(
+      builder: (context, child) => StoryLanguageScope(language: language, child: child!),
+      home: SettingsScreen(settings: prefs),
+    ));
+    await tester.pumpAndSettle();
+
+    Future<void> expectOneLine(String row, String value) async {
+      await tester.pumpAndSettle();
+      final tile = find.widgetWithText(ListTile, row);
+      final paragraph = tester.renderObject<RenderParagraph>(find.descendant(of: tile, matching: find.text(value)));
+      final boxes = paragraph.getBoxesForSelection(TextSelection(baseOffset: 0, extentOffset: value.length));
+      expect({for (final box in boxes) box.top}, hasLength(1), reason: "$row: $value is on one line");
+      final slider = tester.getSize(find.descendant(of: tile, matching: find.byType(Slider)));
+      expect(slider.width, greaterThan(200), reason: "$row: the slider keeps most of the row");
+    }
+
+    for (final locale in ["en", "id"]) {
+      await language.select(locale);
+      final strings = language.strings;
+      for (final (index, msPerChar) in SettingsScreen.textSpeeds.indexed) {
+        await prefs.update(prefs.value.copyWith(textMsPerChar: msPerChar));
+        await expectOneLine(strings.textSpeed, strings.textSpeeds[index]);
+      }
+      for (final (index, pacing) in SettingsScreen.chatPacings.indexed) {
+        await prefs.update(prefs.value.copyWith(chatPacing: pacing));
+        await expectOneLine(strings.chatPacing, strings.chatPacings[index]);
+      }
+      await prefs.update(prefs.value.copyWith(autoDelayMs: 3000));
+      await expectOneLine(strings.autoForwardDelay, "3.0 s");
+      await expectOneLine(strings.music, "100%");
+    }
+  });
+
+  testWidgets('the newest backlog line clears the bottom system inset', (tester) async {
+    tester.view
+      ..physicalSize = const Size(411, 900)
+      ..devicePixelRatio = 1
+      ..viewPadding = const FakeViewPadding(bottom: 48)
+      ..padding = const FakeViewPadding(bottom: 48);
+    addTearDown(tester.view.reset);
+    await pumpStory(tester);
+    await advance(tester);
+
+    await tester.tap(find.byTooltip("Backlog"));
+    await tester.pumpAndSettle();
+    final newest = find.descendant(of: find.byType(BacklogSheet), matching: find.text("Two"));
+    expect(tester.getRect(newest).bottom, lessThanOrEqualTo(900 - 48));
   });
 
   testWidgets('save slots list the quick save, with stage thumbnails for VN saves', (tester) async {

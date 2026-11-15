@@ -218,6 +218,8 @@ class StorySkin {
   /// The VN overlay with the chapter label and the quick controls: backlog, auto, skip and menu,
   /// then back, quick save, quick load, hide and, in stories with clues, the Case Board. A null callback means
   /// the control is unavailable.
+  /// It is placed at the top of the stage with the full width and its own height, and gets no bottom inset. While
+  /// the evidence picker is open, the picker takes the space below it.
   /// Skins translate their own text: `StoryLanguage.of(context)` has the locale and the engine strings.
   Widget vnHud(BuildContext context, VnHud hud) {
     final strings = StoryLanguage.of(context).strings;

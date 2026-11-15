@@ -404,6 +404,27 @@ for a branching story, the list otherwise.
   visited a few times per run.
 - **Revisit if** playtesters switch to the list every time.
 
+## Wide flowchart rows wrap instead of scrolling sideways
+
+*2026-11-15. Presentation modes §4. Backlog CE-07.*
+
+The Chapters flowchart fits the screen's width and only scrolls down. Nodes are at least 136 dp wide, so a
+360 dp phone gets two columns. A row with more nodes than columns wraps onto more lines, checkpoints first and
+endings after, and lines into and out of a wrapped row run down the gaps between its columns. Every node is as
+tall as the tallest reached node's text, measured in the player's language and text size, so titles get two lines
+and the endings count is never cut.
+
+- **Why:** Last Seen's last row holds 7 endings and the whole story has 10. Fitting them in one row made nodes
+  84 dp wide on a phone, which cut "0 dari 4 ending ditemukan" and titles, and pushed the fourth ending of Wrong
+  Number off a 360 dp screen while the trunk stayed centered. Sideways scrolling would put most of a 10-ending
+  row out of sight, and zooming to fit makes the text unreadable. Wrapping keeps one scroll direction, and
+  endings are leaves, so the extra lines don't hide any route.
+- **Cost:** in a wrapped row the lines share the gaps between columns, so it reads like a bus rather than one
+  line per ending. Which checkpoint leads to an ending on a lower line is less obvious than in a single row. A
+  title longer than two lines is cut with an ellipsis.
+- **Revisit if** playtesters can't tell which checkpoint leads to an ending in a wrapped row. Then group a
+  wrapped row's endings under their parent, or show the parent's name on a reached ending.
+
 ## Chat pacing scales the typing, not the pause after a message
 
 *2026-11-15. Engine §5.3. Backlog CE-04, D2.*
@@ -461,6 +482,73 @@ The toolkit shows `clues.yaml` in place of `clues.json` in core lint messages.
   outcomes apart from clue ids: a clue named `retry` is still a valid id. Authors never see `clues.json`.
 - **Cost:** `[retry]` looks like the option modifiers (`[default]`, `[once]`), which don't apply here and are
   reported as an invalid answer.
+
+## The evidence picker sits below the VN HUD, and no clue notification shows over it
+
+*2026-11-15. Presentation modes §6.2, §6.3. Backlog CE-05, CE-06.*
+
+In VN the picker fills the space under the HUD instead of the whole safe area, so the HUD stays visible and
+usable above it. No "Clue found" notification shows while an evidence question is up, in any mode.
+Notifications still queued when the question comes are dropped, not shown after it.
+
+- **Why:** on an Android emulator the HUD was drawn over the picker and hid its prompt, the "pick a clue" line
+  and the countdown for as long as the picker was open. A clue awarded right before the question also put its
+  notification over the picker header for 3 seconds while the countdown ran. Hiding the HUD would also fix the
+  overlap, but the backlog is the one place to read again what a witness said before presenting a clue, so
+  the HUD stays and the picker moves. The notification has no free spot during the question, and tapping it
+  opens the board, which the question hides on purpose. The clue isn't lost: the picker lists it, and it stays
+  new, so the board's badge counts it once the question is answered. Showing it after the question would
+  announce a clue the player has just looked at.
+- **Cost:** the picker is shorter in VN by the HUD's height, about 90 dp in the anime skin. A skin with a very
+  tall HUD leaves the picker little room. A clue found just before a question never gets its notification.
+- **Revisit if** stories award clues in the line before a question and players miss them. Then the picker
+  could mark clues found during this question.
+
+## Settings slider values are as wide as their longest option
+
+*2026-11-15. Backlog CE-04.*
+
+The value next to each settings slider sits in a column measured from the longest option in the tile's text
+style, capped at 120 dp. Text speed, auto-forward delay and chat typing share one column, built from all their
+options in the active language, and the volumes share another. A value that still doesn't fit, e.g. at a large
+text scale, is scaled down instead of wrapped. The labels themselves stay as they are.
+
+- **Why:** the fixed 56 dp column wrapped "Story pace" in English and "Paling lambat", "Lebih cepat" and "Tempo
+  cerita" in Indonesian. Shortening the labels would make them vaguer, and every new language would need to fit
+  56 dp. Measuring all options, not the current one, keeps the slider the same length while it is dragged, and a
+  shared column keeps the sliders lined up.
+- **Cost:** the text sliders are roughly 30 dp shorter than before in Indonesian, and about 10 dp in English.
+- **Revisit if** a language has a value label longer than 120 dp at the normal text scale. It would show
+  scaled down.
+
+## Continue after an ending reopens the ending summary
+
+*2026-11-15. Engine §5.2. Backlog CE-08.*
+
+The autosave is written after every item, including the `ENDING` item, and loading a save that stops at an
+ending shows the summary again. So once a playthrough has ended, the title screen still offers Continue, named
+after the ending's chapter, until a new game overwrites the autosave. This was kept as it is.
+
+- **Why:** this is how saves have worked since the first engine commit (`17bed14`), which restores an `ENDING`
+  item into the ending phase on purpose. Rolling credits (CE-08) don't change it: an ending with and without
+  `roll_after` leaves the same autosave, and a widget test checks that.
+- **Cost:** after finishing, Continue leads to the summary of a finished story rather than somewhere new.
+- **Revisit if** players find Continue to an ending confusing. Options: skip the autosave at an `ENDING` item,
+  or have the title screen offer Continue only when the autosave isn't at an ending.
+
+## The demo's own title strings stay in the demo
+
+*2026-11-15. Example app.*
+
+The title screen's Features and Reset entries and the reset dialog are translated by a small map in
+`example/lib/home_screen.dart`, keyed by the active story locale, with English as the fallback. The Features
+screen itself and the subtitle stay in English.
+
+- **Why:** `CeritaStrings` is for strings every app built on the engine needs. A demo-only entry there would
+  make every app and every added language carry it. The Features screen lists engine capabilities for
+  developers, not story text.
+- **Revisit if** the demo gets more app strings or more languages. Then a demo strings class like
+  `CeritaStrings` would be cleaner than a map.
 
 ## Deferred
 

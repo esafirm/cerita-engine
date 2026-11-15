@@ -103,7 +103,13 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - **Flowchart**: the route map (authoring tools §2.1) drawn top to bottom, one row per layer, with lines from each
      node to the nodes it leads to. Reached checkpoints show their chapter (or day) and title, and how many of the
      endings after them were found ("1 of 3 endings found"). Unreached checkpoints show "???" and can't be tapped.
-     Reached endings show their badge and title, unreached ones only a lock. Wide rows scroll sideways.
+     Reached endings show their badge and title, unreached ones only a lock.
+   - **Flowchart layout**: the chart fits the screen's width and only scrolls down. Nodes are at least 136 dp wide
+     (two fit across a 320 dp phone, at most 200 dp), so as many columns as fit. A row with more nodes than columns
+     wraps onto more lines: checkpoints first, then endings, every line on the first line's columns. Lines into and
+     out of a wrapped row run down the gaps between its columns, never under a node. A title wraps to two lines and
+     the endings count is never cut. Every node is as tall as the tallest reached node's text in the player's
+     language and text size.
    - Tapping a reached checkpoint offers **Play from here** (continue from the checkpoint with its saved variables)
      and **Replay this chapter**, the same as the list.
    - **List**: every checkpoint in day order with a timeline, as before. Unlocked ones continue from there, and a
@@ -198,11 +204,16 @@ no board entry, button, badge or notification anywhere.
   Pier photo", with the clue's image if it has one. It disappears after about 3 seconds. Several clues found at
   once queue up.
 - Tapping it opens the board at that clue's detail.
+- No notification shows during an evidence question (§6.3), in any mode: it would cover the picker and open
+  the board the question hides. Notifications still queued when the question comes are dropped. Their clues
+  stay new, so the picker lists them and the board's badge counts them once the question is answered.
 
 ### 6.3 Picker mode (evidence questions)
 - When the story reaches an evidence question, its prompt is shown as for a `CHOICE` (dialogue box, NVL page
   or chat tray). Once the prompt has been read, the board opens in picker mode: in VN over the dimmed stage, in
   chat in place of the reply tray.
+- In VN the picker fills the space below the HUD, so nothing covers its prompt or countdown, and the HUD's
+  backlog stays at hand to read again what was said.
 - The picker lists every clue found in this playthrough (PRD CE-06 D1), grouped like the board, with the
   prompt on top. Tapping a clue opens its detail with **Present** and **Back**. Presenting needs this second
   tap, so a stray tap can't answer.
