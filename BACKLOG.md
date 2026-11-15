@@ -10,7 +10,6 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 
 ## Later features
 
-- **Translations.** Per-language story text (separate files or a key table), the player's language in settings, and a UI string table for the built-in screens.
 - **Achievements.** Declared in the story, unlocked by effects or endings, kept in the meta-state, with a screen next to the gallery.
 - **Accessibility.** Screen reader labels for the stage, dialogue and controls, a larger text option, a dyslexia-friendly font option, and reduced motion for stage shake and flash (moving letters already stop when the platform asks).
 - **Gallery unlock conditions.** Unlock gallery items from conditions, not only from viewing a `MEDIA` item.
