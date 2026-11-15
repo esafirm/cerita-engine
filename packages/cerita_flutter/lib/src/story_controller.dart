@@ -458,12 +458,14 @@ class StoryController extends ChangeNotifier with EngineListener {
       _ => null,
     };
 
-    if (scene.mode != SceneMode.vn && typingDelay != null && typingDelay > 0 && !skipMode) {
+    // The player's chat pacing speeds it up, down to instant.
+    final typingMs = typingDelay == null ? 0 : settings.value.chatTypingFor(typingDelay);
+    if (scene.mode != SceneMode.vn && typingMs > 0 && !skipMode) {
       phase = StoryPhase.typing;
       typingProfile = profile;
       _typingEntry = history.lastOrNull;
       _notify();
-      await Future.delayed(Duration(milliseconds: typingDelay));
+      await Future.delayed(Duration(milliseconds: typingMs));
       if (_disposed) return;
       typingProfile = null;
       _typingEntry = null;

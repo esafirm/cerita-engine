@@ -128,6 +128,10 @@ abstract class CeritaStrings {
   String get autoForwardDelay;
   String get skipUnread;
   String get skipUnreadHint;
+  String get chatPacing;
+
+  /// Names of `SettingsScreen.chatPacings`, the author's pace first.
+  List<String> get chatPacings;
   String get sound;
   String get music;
   String get soundEffects;
@@ -366,6 +370,10 @@ class EnglishCeritaStrings extends CeritaStrings {
   @override
   String get skipUnreadHint => "Skip also fast-forwards lines you haven't read yet.";
   @override
+  String get chatPacing => "Chat typing";
+  @override
+  List<String> get chatPacings => const ["Story pace", "Fast", "Faster", "Instant"];
+  @override
   String get sound => "Sound";
   @override
   String get music => "Music";
@@ -590,6 +598,10 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get skipUnread => "Lewati teks yang belum dibaca";
   @override
   String get skipUnreadHint => "Lewati juga mempercepat baris yang belum pernah kamu baca.";
+  @override
+  String get chatPacing => "Kecepatan mengetik chat";
+  @override
+  List<String> get chatPacings => const ["Tempo cerita", "Cepat", "Lebih cepat", "Instan"];
   @override
   String get sound => "Suara";
   @override

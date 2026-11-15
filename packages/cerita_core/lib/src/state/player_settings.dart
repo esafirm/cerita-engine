@@ -9,6 +9,10 @@ class PlayerSettings {
   /// Skip mode also fast-forwards lines never seen before.
   final bool skipUnread;
 
+  /// How long chat and call messages type, as a share of the story's own typing time. 1 is the author's pace,
+  /// 0 is instant. Never above 1, so players can only speed chats up (CE-04 D2).
+  final double chatPacing;
+
   final double musicVolume;
   final double soundVolume;
   final double voiceVolume;
@@ -23,12 +27,13 @@ class PlayerSettings {
     this.textMsPerChar = 40,
     this.autoDelayMs = 1200,
     this.skipUnread = false,
+    double chatPacing = 1,
     this.musicVolume = 1,
     this.soundVolume = 1,
     this.voiceVolume = 1,
     this.voiceVolumes = const {},
     this.locale,
-  });
+  }) : chatPacing = chatPacing < 0 ? 0 : (chatPacing > 1 ? 1 : chatPacing);
 
   /// Voice volume of the character [profileId].
   double voiceVolumeOf(String? profileId) => voiceVolume * (voiceVolumes[profileId] ?? 1);
@@ -36,10 +41,14 @@ class PlayerSettings {
   /// Reading time of [characters] in auto mode.
   int autoDelayFor(int characters) => autoDelayMs + characters * autoDelayMs * 45 ~/ 1200;
 
+  /// The typing time of a chat message the story types for [ms].
+  int chatTypingFor(int ms) => (ms * chatPacing).round();
+
   PlayerSettings copyWith({
     int? textMsPerChar,
     int? autoDelayMs,
     bool? skipUnread,
+    double? chatPacing,
     double? musicVolume,
     double? soundVolume,
     double? voiceVolume,
@@ -50,6 +59,7 @@ class PlayerSettings {
         textMsPerChar: textMsPerChar ?? this.textMsPerChar,
         autoDelayMs: autoDelayMs ?? this.autoDelayMs,
         skipUnread: skipUnread ?? this.skipUnread,
+        chatPacing: chatPacing ?? this.chatPacing,
         musicVolume: musicVolume ?? this.musicVolume,
         soundVolume: soundVolume ?? this.soundVolume,
         voiceVolume: voiceVolume ?? this.voiceVolume,
@@ -65,6 +75,7 @@ class PlayerSettings {
       textMsPerChar: (json["text_ms_per_char"] as num?)?.toInt() ?? defaults.textMsPerChar,
       autoDelayMs: (json["auto_delay_ms"] as num?)?.toInt() ?? defaults.autoDelayMs,
       skipUnread: json["skip_unread"] as bool? ?? defaults.skipUnread,
+      chatPacing: (json["chat_pacing"] as num?)?.toDouble() ?? defaults.chatPacing,
       musicVolume: volume("music_volume", defaults.musicVolume),
       soundVolume: volume("sound_volume", defaults.soundVolume),
       voiceVolume: volume("voice_volume", defaults.voiceVolume),
@@ -80,6 +91,7 @@ class PlayerSettings {
         "text_ms_per_char": textMsPerChar,
         "auto_delay_ms": autoDelayMs,
         "skip_unread": skipUnread,
+        "chat_pacing": chatPacing,
         "music_volume": musicVolume,
         "sound_volume": soundVolume,
         "voice_volume": voiceVolume,
@@ -93,6 +105,7 @@ class PlayerSettings {
       other.textMsPerChar == textMsPerChar &&
       other.autoDelayMs == autoDelayMs &&
       other.skipUnread == skipUnread &&
+      other.chatPacing == chatPacing &&
       other.musicVolume == musicVolume &&
       other.soundVolume == soundVolume &&
       other.voiceVolume == voiceVolume &&
@@ -107,6 +120,7 @@ class PlayerSettings {
         textMsPerChar,
         autoDelayMs,
         skipUnread,
+        chatPacing,
         musicVolume,
         soundVolume,
         voiceVolume,

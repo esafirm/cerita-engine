@@ -402,6 +402,19 @@ for a branching story, the list otherwise.
   visited a few times per run.
 - **Revisit if** playtesters switch to the list every time.
 
+## Chat pacing scales the typing, not the pause after a message
+
+*2026-11-15. Engine §5.3. Backlog CE-04, D2.*
+
+`chat_pacing` multiplies how long the "is typing..." indicator shows: an explicit `typing_delay_ms`, or the
+default typing time of a message without one. The pause after a delivered message, before the next one starts,
+stays as it is. The Settings screen offers four steps: the story's pace, half, a quarter and instant.
+
+- **Why:** the PRD defines chat pacing as the typing indicator's time. The pause after a message is the
+  player's time to read it, and a chat moves on by itself, so cutting it would push lines past unread.
+- **Revisit if** instant chats still feel slow in playtests. Then let a tap skip the pause, rather than
+  scaling it.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

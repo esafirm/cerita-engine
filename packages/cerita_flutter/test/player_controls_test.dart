@@ -154,6 +154,39 @@ void main() {
     expect(controller.skipMode, isFalse);
   });
 
+  testWidgets('chat pacing speeds up typing, down to instant', (tester) async {
+    Map<String, dynamic> message(String text) =>
+        {"type": "TEXT", "text": text, "profile": "nora:0", "typing_delay_ms": 2000};
+    final storage = InMemoryStoryStorage();
+    await storage.saveSettings(const PlayerSettings(chatPacing: 0.5));
+    final setup = StorySetup(
+      config: const LoaderConfig(),
+      loader: FakeEngineLoader({
+        "index": {
+          "conversation_id": "cvn",
+          "scene": {"mode": "CHAT", "channel_id": "dm"},
+          "conversations": [message("Hey"), message("Still there?")],
+        },
+      }),
+      storage: storage,
+      audio: SilentAudio.new,
+    );
+    await tester.pumpWidget(MaterialApp(home: StoryScreen(setup: setup)));
+    await tester.pump();
+    final controller = tester.widget<ChatView>(find.byType(ChatView)).controller;
+    expect(controller.phase, StoryPhase.typing);
+    await tester.pump(const Duration(milliseconds: 990));
+    expect(controller.phase, StoryPhase.typing);
+    await tester.pump(const Duration(milliseconds: 20));
+    expect(controller.current?.getText(), "Hey", reason: "half the story's 2 s");
+
+    await setup.settings.update(setup.settings.value.copyWith(chatPacing: 0));
+    await tester.pump(const Duration(milliseconds: 900)); // The pause after a message isn't scaled.
+    await tester.pump();
+    expect(controller.current?.getText(), "Still there?", reason: "instant: no typing at all");
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('settings apply to a running story', (tester) async {
     final storage = InMemoryStoryStorage();
     final (controller, setup) = await pumpStory(tester, storage: storage);
@@ -179,6 +212,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(prefs.value.skipUnread, isTrue);
     expect((await storage.loadSettings()).skipUnread, isTrue);
+
+    await prefs.update(prefs.value.copyWith(chatPacing: 0));
+    await tester.pumpAndSettle();
+    expect(find.text("Instant"), findsOneWidget, reason: "the chat typing row shows the pace");
 
     await tester.tap(find.text("Reset"));
     await tester.pumpAndSettle();

@@ -349,6 +349,12 @@ void main() {
       expect(PlayerSettings.fromJson({}), const PlayerSettings());
       expect(settings.autoDelayFor(10), 2400 + 10 * 90);
 
+      // Chat pacing speeds chats up, never slows them down (CE-04 D2). Settings saved before it keep the story pace.
+      expect(PlayerSettings.fromJson({}).chatTypingFor(1500), 1500);
+      expect(PlayerSettings.fromJson(const PlayerSettings(chatPacing: 0.25).toJson()).chatTypingFor(1500), 375);
+      expect(PlayerSettings.fromJson({"chat_pacing": 3}).chatPacing, 1);
+      expect(const PlayerSettings(chatPacing: -1).chatTypingFor(1500), 0);
+
       final storage = InMemoryStoryStorage();
       expect(await storage.loadSettings(), const PlayerSettings());
       await storage.saveSettings(settings);

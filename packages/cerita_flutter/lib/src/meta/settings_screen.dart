@@ -22,6 +22,10 @@ class SettingsScreen extends StatefulWidget {
   /// Typewriter speeds, slowest first. 0 is instant. Named by [CeritaStrings.textSpeeds].
   static const textSpeeds = [80, 60, 40, 25, 15, 0];
 
+  /// Chat typing paces, as a share of the story's own typing time: the author's pace first, then faster down to
+  /// instant. Never slower than the author (CE-04 D2). Named by [CeritaStrings.chatPacings].
+  static const chatPacings = [1.0, 0.5, 0.25, 0.0];
+
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
@@ -43,10 +47,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _update(PlayerSettings Function(PlayerSettings settings) change) => prefs.update(change(prefs.value));
 
   /// Index in [SettingsScreen.textSpeeds] of the speed nearest to [msPerChar].
-  int _speedIndex(int msPerChar) {
+  int _speedIndex(int msPerChar) => _nearest(SettingsScreen.textSpeeds, msPerChar);
+
+  /// Index of the step in [steps] nearest to [value].
+  static int _nearest(List<num> steps, num value) {
     var best = 0;
-    for (final (index, speed) in SettingsScreen.textSpeeds.indexed) {
-      if ((speed - msPerChar).abs() < (SettingsScreen.textSpeeds[best] - msPerChar).abs()) best = index;
+    for (final (index, step) in steps.indexed) {
+      if ((step - value).abs() < (steps[best] - value).abs()) best = index;
     }
     return best;
   }
@@ -90,6 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         valueListenable: prefs,
         builder: (context, settings, _) {
           final speed = _speedIndex(settings.textMsPerChar);
+          final pacing = _nearest(SettingsScreen.chatPacings, settings.chatPacing);
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
             children: [
@@ -143,6 +151,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: Text(strings.skipUnreadHint),
                 value: settings.skipUnread,
                 onChanged: (value) => _update((s) => s.copyWith(skipUnread: value)),
+              ),
+              ListTile(
+                title: Text(strings.chatPacing),
+                subtitle: Slider(
+                  value: pacing.toDouble(),
+                  max: SettingsScreen.chatPacings.length - 1.0,
+                  divisions: SettingsScreen.chatPacings.length - 1,
+                  label: strings.chatPacings[pacing],
+                  onChanged: (value) =>
+                      _update((s) => s.copyWith(chatPacing: SettingsScreen.chatPacings[value.round()])),
+                ),
+                trailing: SizedBox(width: 56, child: Text(strings.chatPacings[pacing], textAlign: TextAlign.end)),
               ),
               header(strings.sound),
               volume(strings.music, Icons.music_note_outlined, settings.musicVolume,

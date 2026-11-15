@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | In progress. Mostly shipped by the settings screen on main. Language shipped with CE-01. Chat pacing (D2) is designed in [engine §5.3](../engine-and-state.md#53-player-settings) |
+| **Status** | Done. The settings screen shipped on main, language with CE-01, and chat pacing (D2, [engine §5.3](../engine-and-state.md#53-player-settings)) last |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
