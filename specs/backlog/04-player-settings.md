@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress. Mostly shipped by the settings screen on main. Chat pacing (D2) and the language option (CE-01) remain |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
