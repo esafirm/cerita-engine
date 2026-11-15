@@ -119,6 +119,7 @@ erDiagram
         List_CallFrame call_stack
         Set_String chosen
         StageState stage
+        RollbackLog rollback
         DateTime updated_at
     }
 ```
@@ -139,6 +140,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Call Stack (`call_stack`)**: Return points of pending `CALL`s.
 - **Chosen (`chosen`)**: `once` choices already picked in this playthrough.
 - **Stage (`stage`)**: See §6.
+- **Rollback (`rollback`)**: The rollback frames and recorded `random()` rolls, see §7.
 
 Slot ids: `0` is the autosave, written after every delivered item. `-1` is the quick save slot. `1` and up are manual slots.
 
@@ -183,8 +185,8 @@ The engine remembers the last 100 delivered items with the full playthrough stat
 - Rollback targets are lines (`TEXT`, `NARRATION`, `MEDIA`, `CHOICE`, `INPUT`) delivered in a `VN` scene. `STAGE` and `WAIT` items are passed over. Chat and call threads move on by themselves, so they are not rollback targets.
 - `rollback()` goes back one line. `rollbackTo(historyIndex)` goes back to the line at that transcript index (the backlog uses it).
 - The global meta-state is not rolled back: seen lines, unlocks and `persistent.*` variables stay.
-- `random()` is evaluated again when the story moves forward after a rollback.
-- The rollback log is not saved. After loading a save, the loaded line is the first rollback target.
+- `random()` results are recorded. Moving forward after a rollback replays them in order, so going back and forth can't change a result. A `random()` call with another range than the recorded one (the story took another path) drops the recorded rest and rolls again.
+- Saves keep the rollback log: the frames of the rollback targets, the frame the save was made in, and the rolls they can still replay. After loading a save, rollback reaches as far back as it did when the save was made. Saves made before this keep only the loaded line as the first rollback target.
 
 ---
 

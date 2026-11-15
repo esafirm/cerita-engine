@@ -87,7 +87,7 @@ class CapabilitiesScreen extends StatelessWidget {
     (
       "Player controls",
       [
-        ("Rollback", "BACK (or scroll up) returns to the previous line. Back at the prologue menu, pick another answer."),
+        ("Rollback", "BACK (or scroll up) returns to the previous line. Back at the prologue menu, pick another answer. Saves keep the rollback history, and random() rolls come out the same when you go forward again."),
         ("Backlog jump", "LOG: the rewind button next to a VN line goes straight back to it."),
         ("Quick save / load", "Q.SAVE and Q.LOAD on the VN stage."),
         ("Hide", "HIDE clears the dialogue box and controls to look at the stage or a CG. Tap to bring them back."),

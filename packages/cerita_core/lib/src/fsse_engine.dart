@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'data/channel.dart';
@@ -19,6 +20,7 @@ import 'data/effect.dart';
 import 'data/scene.dart';
 import 'loader.dart';
 import 'state/meta_state.dart';
+import 'state/rollback.dart';
 import 'state/save_slot.dart';
 import 'state/stage_state.dart';
 import 'state/story_state.dart';
@@ -85,6 +87,12 @@ class RealFsseEngine extends FsseEngine {
       : storage = null,
         evaluator = const ConditionEvaluator();
 
+  /// `random()` results, replayed after a rollback.
+  late final RollLog _rolls = RollLog(evaluator.random);
+
+  /// [evaluator] drawing its random numbers from [_rolls].
+  late final ConditionEvaluator _evaluator = ConditionEvaluator(_rolls);
+
   late ProfileData profileData;
   List<Channel> channels = const [];
   GlobalMetaState meta = GlobalMetaState();
@@ -109,7 +117,10 @@ class RealFsseEngine extends FsseEngine {
   final Set<String> _chosen = {};
 
   /// State after each recently delivered item, oldest first. The last one is the current state.
-  final List<_Frame> _frames = [];
+  final List<RollbackFrame> _frames = [];
+
+  /// The latest loaded copy of every conversation a frame or the pointer is in, by key.
+  final Map<String, Conversation> _conversations = {};
 
   bool _replay = false;
 
@@ -149,6 +160,8 @@ class RealFsseEngine extends FsseEngine {
     _callStack.clear();
     _chosen.clear();
     _frames.clear();
+    _conversations.clear();
+    _rolls.restore();
     _replay = false;
     _replayChapter = null;
     stage = StageState();
@@ -169,10 +182,15 @@ class RealFsseEngine extends FsseEngine {
       if (!conversation.hasScene && _scene != null) listener?.onNewScene(_scene!);
       if (save.stage != null) stage = _copyStage(save.stage!);
       _hearMusic();
-      // The loaded line is the first rollback target.
-      final last = _history.lastWhere((entry) => !entry.isPlayer && entry.conversationKey == conversation.key,
-          orElse: () => TranscriptEntry(conversationKey: conversation.key, mode: SceneMode.vn));
-      if (last.itemType case final item?) _pushFrame(item);
+      final log = save.rollback;
+      if (log != null && log.frames.isNotEmpty) {
+        await _restoreFrames(log);
+      } else {
+        // An older save: the loaded line is the first rollback target.
+        final last = _history.lastWhere((entry) => !entry.isPlayer && entry.conversationKey == conversation.key,
+            orElse: () => TranscriptEntry(conversationKey: conversation.key, mode: SceneMode.vn));
+        if (last.itemType case final item?) _pushFrame(item);
+      }
     } else if (checkpoint != null) {
       dataMap.addAll(checkpoint.dataMap);
       final conversation = await loader.loadConversation(checkpoint.conversationKey);
@@ -218,6 +236,7 @@ class RealFsseEngine extends FsseEngine {
     if (current == null) return null;
     final conversation = await loader.loadConversation(current.key);
     currentConversation = conversation;
+    _conversations[conversation.key] = conversation;
     final index = dialogIndex - 1;
     if (index < 0 || index >= conversation.conversations.length) return null;
 
@@ -257,7 +276,15 @@ class RealFsseEngine extends FsseEngine {
 
     final previousScene = _scene;
     final previousConversation = currentConversation;
-    currentConversation = frame.conversation;
+    _restoreFrame(frame);
+
+    if (!_sameScene(previousScene, _scene) && _scene != null) listener?.onNewScene(_scene!);
+    if (previousConversation?.key != currentConversation!.key) listener?.onConversationStarted(currentConversation!);
+    return frame.item;
+  }
+
+  void _restoreFrame(RollbackFrame frame) {
+    currentConversation = _conversations[frame.conversationKey];
     dialogIndex = frame.dialogIndex;
     _scene = frame.scene;
     dataMap
@@ -274,11 +301,11 @@ class RealFsseEngine extends FsseEngine {
     _awaitingResult = frame.awaitingResult;
     _lastItemKey = frame.lastItemKey;
     lastItemPreviouslySeen = frame.previouslySeen;
-
-    if (!identical(previousScene, _scene) && _scene != null) listener?.onNewScene(_scene!);
-    if (!identical(previousConversation, currentConversation)) listener?.onConversationStarted(frame.conversation);
-    return frame.item;
+    _rolls.position = frame.roll;
   }
+
+  static bool _sameScene(Scene? a, Scene? b) =>
+      identical(a, b) || (a != null && b != null && jsonEncode(a.toJson()) == jsonEncode(b.toJson()));
 
   /// Index in [_frames] of the newest line before the current one (or at [historyIndex]).
   int? _rollbackTarget(int? historyIndex) {
@@ -290,9 +317,11 @@ class RealFsseEngine extends FsseEngine {
   }
 
   void _pushFrame(ItemType item) {
-    _frames.add(_Frame(
+    final conversation = currentConversation!;
+    _conversations[conversation.key] = conversation;
+    _frames.add(RollbackFrame(
       item: item,
-      conversation: currentConversation!,
+      conversationKey: conversation.key,
       dialogIndex: dialogIndex,
       scene: _scene,
       dataMap: Map.of(dataMap),
@@ -303,8 +332,35 @@ class RealFsseEngine extends FsseEngine {
       awaitingResult: _awaitingResult,
       lastItemKey: _lastItemKey,
       previouslySeen: lastItemPreviouslySeen,
+      roll: _rolls.position,
     ));
-    if (_frames.length > _maxRollback) _frames.removeAt(0);
+    if (_frames.length > _maxRollback) {
+      _frames.removeAt(0);
+      _rolls.dropBefore(_frames.first.roll);
+    }
+  }
+
+  /// The rollback frames for a save: the rollback targets, then the state the save is made in. A pending
+  /// CHOICE / INPUT is asked again on restore, so its frame is left out. Null when there are none.
+  RollbackLog? _rollbackLog() {
+    final frames = _frames.toList();
+    if (_awaitingResult && frames.isNotEmpty) frames.removeLast();
+    if (frames.isEmpty) return null;
+    final kept = [
+      for (final (index, frame) in frames.indexed)
+        if (frame.isTarget || index == frames.length - 1) frame,
+    ];
+    final base = kept.first.roll;
+    return RollbackLog(frames: kept, rolls: _rolls.rollsFrom(base), rollBase: base);
+  }
+
+  /// Puts back the rollback frames of a save. Its last frame is the state the save was made in.
+  Future<void> _restoreFrames(RollbackLog log) async {
+    for (final key in {for (final frame in log.frames) frame.conversationKey}) {
+      _conversations[key] ??= await loader.loadConversation(key);
+    }
+    _frames.addAll(log.frames);
+    _rolls.restore(rolls: log.rolls, base: log.rollBase, position: log.frames.last.roll);
   }
 
   @override
@@ -334,7 +390,7 @@ class RealFsseEngine extends FsseEngine {
 
   Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull;
 
-  bool evaluate(String? condition) => evaluator.evaluate(condition, state);
+  bool evaluate(String? condition) => _evaluator.evaluate(condition, state);
 
   /// Current playthrough state. A pending CHOICE / INPUT is rewound so it is asked again on restore.
   SaveSlot snapshot({int slotId = SaveSlot.autoSlotId}) {
@@ -358,6 +414,7 @@ class RealFsseEngine extends FsseEngine {
       scene: _scene,
       chapter: conversation.chapter,
       title: conversation.title,
+      rollback: _rollbackLog(),
     );
   }
 
@@ -382,7 +439,7 @@ class RealFsseEngine extends FsseEngine {
 
   void _applyEffects(List<Effect> effects) {
     for (final effect in effects) {
-      effect.apply(state, evaluator);
+      effect.apply(state, _evaluator);
     }
   }
 
@@ -590,6 +647,7 @@ class RealFsseEngine extends FsseEngine {
     }
     final previous = _scene;
     currentConversation = conversation;
+    _conversations[conversation.key] = conversation;
     dialogIndex = index;
     if (conversation.hasScene || previous == null) {
       _scene = conversation.scene;
@@ -614,45 +672,4 @@ class RealFsseEngine extends FsseEngine {
       listener?.onCheckpointUnlocked(checkpoint);
     }
   }
-}
-
-/// Playthrough state right after [item] was delivered. See [RealFsseEngine.rollback].
-class _Frame {
-  final ItemType item;
-  final Conversation conversation;
-  final int dialogIndex;
-  final Scene? scene;
-  final Map<String, dynamic> dataMap;
-  final int historyLength;
-  final List<CallFrame> callStack;
-  final Set<String> chosen;
-  final StageState stage;
-  final bool awaitingResult;
-  final String? lastItemKey;
-  final bool previouslySeen;
-
-  const _Frame({
-    required this.item,
-    required this.conversation,
-    required this.dialogIndex,
-    required this.scene,
-    required this.dataMap,
-    required this.historyLength,
-    required this.callStack,
-    required this.chosen,
-    required this.stage,
-    required this.awaitingResult,
-    required this.lastItemKey,
-    required this.previouslySeen,
-  });
-
-  /// A line of a VN scene. Stage directions and waits are passed over, and chat / call threads
-  /// move on by themselves.
-  bool get isTarget =>
-      scene?.mode == SceneMode.vn &&
-      (item is TextItemType ||
-          item is NarrationItemType ||
-          item is MediaItemType ||
-          item is ChoiceItemType ||
-          item is InputItemType);
 }

@@ -4,8 +4,6 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 
 ## Polish
 
-- **Save the rollback history.** Rollback frames live in memory only, so after loading a save the loaded line is the furthest the player can go back (engine §7).
-- **Stable `random()` after a rollback.** `random()` rolls again when the story moves forward after a rollback, so going back and forth can change a result. Record the rolls in the rollback frames and replay them.
 - **Text tags in choice options.** Choice buttons show tags as written. Render them with `TaggedText`, and strip them where plain text is needed (transcript, `playerText`).
 - **Escape tags in player input.** A typed name like `{b}` is interpolated into lines and then styled. Escape `{` in values that come from `INPUT`.
 - **Pause auto mode while the UI is hidden.** Auto keeps advancing behind HIDE.

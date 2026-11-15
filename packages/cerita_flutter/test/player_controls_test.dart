@@ -109,7 +109,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.current?.getText(), "Two");
     expect(controller.phase, StoryPhase.showing);
-    expect(controller.canRollback, isFalse);
+    // The quick save kept the rollback log.
+    await tester.tap(find.byTooltip("Back"));
+    await tester.pumpAndSettle();
+    expect(controller.current?.getText(), "One");
   });
 
   testWidgets('HIDE hides the dialogue and controls until the next tap', (tester) async {

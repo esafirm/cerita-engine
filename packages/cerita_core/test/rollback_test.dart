@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cerita_core/cerita_core.dart';
 import 'package:test/test.dart';
 
@@ -23,6 +25,22 @@ class _FakeEngineLoader extends EngineLoader {
 
   @override
   Future<List<String>> listConversationKeys() async => files.keys.toList();
+}
+
+/// Counts up, so every roll differs from the one before.
+class _CountingRandom implements Random {
+  int _next;
+
+  _CountingRandom([this._next = 0]);
+
+  @override
+  int nextInt(int max) => _next++ % max;
+
+  @override
+  double nextDouble() => 0;
+
+  @override
+  bool nextBool() => false;
 }
 
 class _Listener with EngineListener {
@@ -184,21 +202,70 @@ void main() {
       expect(engine.state["persistent.runs"], 2);
     });
 
-    test('after loading a save, the loaded line is the first target', () async {
+    test('reaches back past a loaded save, into an earlier conversation and to a pending choice', () async {
       final storage = InMemoryStoryStorage();
       final files = {
-        "index": _conversation([_text("one"), _text("two"), _text("three")]),
+        "index": _conversation([_text("one"), {"type": "JUMP", "target": "street"}]),
+        "street": _conversation([
+          _text("two"),
+          {
+            "type": "CHOICE",
+            "text": "Pick",
+            "choices": [
+              {"text": "Kind"},
+              {"text": "Secret", "condition": "trust > 5"},
+            ],
+          },
+          _text("three"),
+        ], background: "street.png"),
       };
       final first = _engine(files, storage: storage);
       await first.next();
       await first.next();
+      await first.next(); // The choice, still waiting for an answer.
       await first.saveTo(1);
 
       final engine = _engine(files, storage: storage);
       await engine.start(save: await storage.loadSlot(1));
-      expect(engine.canRollback(), isFalse);
-      expect(await _nextText(engine), "three");
-      expect(engine.rollback()?.getText(), "two");
+      final choice = await engine.next() as ChoiceItemType;
+      expect(await _nextText(engine, result: ItemResult.choice(null, choice.choices[0])), "three");
+      await engine.saveTo(1);
+
+      final loaded = _engine(files, storage: storage);
+      await loaded.start(save: await storage.loadSlot(1));
+      final again = loaded.rollback() as ChoiceItemType;
+      expect(again.choices.map((c) => (c.text, c.locked)), [("Kind", false), ("Secret", true)]);
+      expect(loaded.rollback()?.getText(), "two");
+      expect(loaded.rollback()?.getText(), "one");
+      expect(loaded.currentConversation!.key, "index");
+      expect(loaded.stage.background, "room.png");
+      expect(loaded.canRollback(), isFalse);
+      expect(await _nextText(loaded), "two");
+    });
+
+    test('random() gives the same result after rolling back, also after a load', () async {
+      final storage = InMemoryStoryStorage();
+      final files = {
+        "index": _conversation([
+          _text("before"),
+          _text("Dice {{dice}}", effects: [
+            {"variable": "dice", "op": "set", "expr": "random(1, 100)"},
+          ]),
+        ]),
+      };
+      final engine = RealFsseEngine(_FakeEngineLoader(files),
+          storage: storage, evaluator: ConditionEvaluator(_CountingRandom()));
+      await engine.next();
+      expect(await _nextText(engine), "Dice 1");
+      engine.rollback();
+      expect(await _nextText(engine), "Dice 1");
+      await engine.saveTo(1);
+
+      final loaded = RealFsseEngine(_FakeEngineLoader(files),
+          storage: storage, evaluator: ConditionEvaluator(_CountingRandom(50)));
+      await loaded.start(save: await storage.loadSlot(1));
+      expect(loaded.rollback()?.getText(), "before");
+      expect(await _nextText(loaded), "Dice 1");
     });
   });
 

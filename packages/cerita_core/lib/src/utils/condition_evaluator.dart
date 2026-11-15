@@ -14,6 +14,9 @@ class ConditionEvaluator {
 
   const ConditionEvaluator([this._random]);
 
+  /// Source of `random()`.
+  Random get random => _random ?? _defaultRandom;
+
   /// Evaluates [expression] as a condition. Empty or null expressions are true.
   bool evaluate(String? expression, Map<String, dynamic> dataMap) {
     if (expression == null || expression.trim().isEmpty) return true;
@@ -59,7 +62,7 @@ class ConditionEvaluator {
   }
 
   dynamic _run(String expression, Map<String, dynamic> dataMap) {
-    final parser = _Parser(_tokenize(expression), dataMap, expression, _random ?? _defaultRandom);
+    final parser = _Parser(_tokenize(expression), dataMap, expression, random);
     final result = parser.parseOr();
     parser.expectEnd();
     return result;

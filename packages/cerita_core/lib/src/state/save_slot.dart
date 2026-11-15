@@ -1,4 +1,5 @@
 import '../data/scene.dart';
+import 'rollback.dart';
 import 'stage_state.dart';
 import 'transcript.dart';
 
@@ -26,6 +27,9 @@ class SaveSlot {
   /// The active scene, which a conversation without `scene` inherits. Null in older saves.
   final Scene? scene;
 
+  /// Rollback frames and `random()` rolls, so rollback reaches back past the load. Null in older saves.
+  final RollbackLog? rollback;
+
   /// Display info for save/load menus.
   final String? chapter;
   final String? title;
@@ -41,6 +45,7 @@ class SaveSlot {
     this.chosen = const {},
     this.stage,
     this.scene,
+    this.rollback,
     this.chapter,
     this.title,
   });
@@ -56,6 +61,7 @@ class SaveSlot {
         chosen: chosen,
         stage: stage,
         scene: scene,
+        rollback: rollback,
         chapter: chapter,
         title: title,
       );
@@ -76,6 +82,9 @@ class SaveSlot {
       chosen: (json["chosen"] as List<dynamic>? ?? const []).map((e) => e.toString()).toSet(),
       stage: json["stage"] == null ? null : StageState.fromJson(Map<String, dynamic>.from(json["stage"] as Map)),
       scene: json["scene"] == null ? null : Scene.fromJson(Map<String, dynamic>.from(json["scene"] as Map)),
+      rollback: json["rollback"] == null
+          ? null
+          : RollbackLog.fromJson(Map<String, dynamic>.from(json["rollback"] as Map)),
       chapter: json["chapter"] as String?,
       title: json["title"] as String?,
     );
@@ -92,6 +101,7 @@ class SaveSlot {
         if (chosen.isNotEmpty) "chosen": chosen.toList(),
         if (stage != null) "stage": stage!.toJson(),
         if (scene != null) "scene": scene!.toJson(),
+        if (rollback != null) "rollback": rollback!.toJson(),
         if (chapter != null) "chapter": chapter,
         if (title != null) "title": title,
       };
