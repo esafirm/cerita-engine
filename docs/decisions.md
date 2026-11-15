@@ -201,6 +201,7 @@ its own any more.
 - **Cost:** cerita_tools now depends on cerita_core at runtime. A JSON check can only point at an item's
   header line, not at the exact body line, since the engine reports item indexes.
 - **Revisit if** core issues need finer positions (an option index, a field name). `LintIssue` would need them.
+  Done: `LintIssue.path` names the option, route, effect or stage action, and the toolkit reports at its line.
 
 ## `lint` compiles partially so both layers report in one run
 
@@ -232,6 +233,7 @@ objects.
 `voice=` and a voice note's file stay one file name. The player tries `name.<locale>.mp3`, then `name.mp3`, so
 the script has no per-locale voice syntax. `tts-manifest` names each entry's output `name.<locale>.mp3`, and an
 asset check passes with either the shared file or every locale's own file.
+The core linter applies the same rule, so `cerita lint` on the compiled folder agrees with `cerita_tools lint`.
 
 - **Why:** CE-01's design. An earlier draft of the toolkit compiled per-locale clips to a locale object, which
   CE-01 didn't adopt.
@@ -415,6 +417,24 @@ stays as it is. The Settings screen offers four steps: the story's pace, half, a
 - **Revisit if** instant chats still feel slow in playtests. Then let a tap skip the pause, rather than
   scaling it.
 
+## A story that can run out of items is a warning
+
+*2026-11-15. Authoring tools §1.2.*
+
+`StoryLinter` warns at the last item of a conversation the story enters at the top level when nothing after its
+last entry point ends the story or leads on: no unconditional `ENDING`, `JUMP`, `RETURN`, `BRANCH` fallback, or
+`CHOICE` whose options all have targets and one of them is always there, or evidence question whose responses,
+`fallback` and `timeout` all have targets. Conversations only reached through `CALL` aren't checked, since running
+out there returns to the caller.
+
+- **Why:** the engine doesn't crash there. It ends the story with a plain "The End" and no ending is recorded,
+  which is usually a mistake but can be a deliberate demo stop. Warnings already fail `cerita lint --strict` and
+  `cerita_tools lint --release`, so a release can't ship with one.
+- **Cost:** conditions aren't evaluated, so a route that always meets a conditional `JUMP` is reported anyway.
+  Add an unconditional fallback, which also guards against the condition changing later.
+- **Revisit if** authors get false warnings from `RETURN` in conversations that are both called and jumped to.
+  `RETURN` counts as leading on, so a top-level `RETURN` with nothing to return to isn't reported.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
@@ -423,11 +443,6 @@ stays as it is. The Settings screen offers four steps: the story's pace, half, a
   a device. Until then, track changes fade out and then in.
 - **Rollback in chat and call scenes.** These threads move on by themselves, so rolling back into one needs
   their pacing to pause and resume. It also needs a design for what the thread shows while paused.
-- **Remembered facts in the developer panel.** It lists run and `persistent.*` variables only. Showing
-  `meta.flag.*` there needs a read-only row, since memory can only be written with `meta_set`.
-- **"Story stops" check.** A route that runs out of items without an ending, jump or caller makes the engine
-  throw `EndOfStoryException`. The first toolkit draft checked this on scripts, but it's a JSON check, so it
-  belongs in `StoryLinter`, where `cerita_tools lint` picks it up. Until then neither linter reports it.
 
 ## Device checks
 

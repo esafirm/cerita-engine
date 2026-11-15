@@ -83,7 +83,8 @@ Future<Diagnostics> lintCompiled(StoryProject project, Map<String, String> compi
       assetExists: files == null ? null : (path) => _assetExists(project, files, path),
     );
     for (final issue in await linter.lint()) {
-      if (!seen.add("${issue.severity}|${issue.conversationKey}|${issue.itemIndex}|${issue.message}")) continue;
+      final id = [issue.severity, issue.conversationKey, issue.itemIndex, issue.part, issue.message].join("|");
+      if (!seen.add(id)) continue;
       final span = _locate(project, issue);
       issue.isError ? diagnostics.error(span, issue.message) : diagnostics.warning(span, issue.message);
     }
@@ -91,14 +92,11 @@ Future<Diagnostics> lintCompiled(StoryProject project, Map<String, String> compi
   return diagnostics;
 }
 
-/// Whether [path] (relative to the asset folder, or under `asset_prefix`) exists. Voice clips and voice notes
-/// also count when every locale has its own file (CE-01, data schema §5.4).
+/// Whether [path] (relative to the asset folder, or under `asset_prefix`) exists. The core linter also tries the
+/// per-locale files of voice clips and voice notes (CE-01, data schema §7.4).
 bool _assetExists(StoryProject project, Set<String> files, String path) {
   final prefix = project.config.assetPrefix;
-  final relative = path.startsWith(prefix) ? path.substring(prefix.length) : path;
-  if (files.contains(relative)) return true;
-  if (!relative.startsWith("music/") && !relative.startsWith("media/")) return false;
-  return project.config.locales.every((locale) => files.contains(localeVariant(relative, locale)));
+  return files.contains(path.startsWith(prefix) ? path.substring(prefix.length) : path);
 }
 
 /// The script line of a core issue: the item it's about, the scene for scene-level issues, or the profile for
@@ -109,7 +107,10 @@ SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
   final conversation = project.conversationsByKey[key];
   if (conversation == null) return null;
   final index = issue.itemIndex;
-  if (index != null && index < conversation.items.length) return conversation.items[index].span;
+  if (index != null && index < conversation.items.length) {
+    final item = conversation.items[index];
+    return _locatePart(item, issue.path) ?? item.span;
+  }
   final aboutScene = issue.message.contains(" file '") || issue.message.contains("CHAT") || issue.message.contains("thread");
   return aboutScene ? conversation.scene?.span ?? conversation.span : conversation.span;
 }
@@ -123,4 +124,24 @@ SourceSpan _locateProfile(Cast cast, String message) {
     if (file != null && profile.avatar?.split("/").last == file) return profile.avatarSpan ?? profile.span;
   }
   return const SourceSpan(Cast.fileName, 1);
+}
+
+/// The line of the part of [item] an issue names (`LintIssue.path`): an option, a branch route or its fallback, an
+/// effect or a stage action. The compiler writes them in script order, so JSON indexes match. Null for the item.
+SourceSpan? _locatePart(ItemNode item, List<Object> path) {
+  SourceSpan? effect(List<EffectNode> effects, List<Object> rest) => switch (rest) {
+        ["effects", final int at, ...] when at < effects.length => effects[at].span,
+        _ => null,
+      };
+  return switch ((item, path)) {
+    (ChoiceItem(:final options), ["choices", final int at, "target", ...]) when at < options.length =>
+      options[at].target?.span ?? options[at].span,
+    (ChoiceItem(:final options), ["choices", final int at, ...final rest]) when at < options.length =>
+      effect(options[at].effects, rest) ?? options[at].span,
+    (BranchItem(:final routes), ["branches", final int at, ...]) when at < routes.length => routes[at].span,
+    (BranchItem(:final fallback?), ["fallback_target", ...]) => fallback.span,
+    (StageItem(:final actions), ["actions", final int at, ...]) when at < actions.length => actions[at].span,
+    (_, ["effects", ...]) => effect(item.effects, path),
+    _ => null,
+  };
 }

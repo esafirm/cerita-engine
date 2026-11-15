@@ -117,6 +117,10 @@ class _Variables extends StatelessWidget {
           for (final MapEntry(:key, :value) in controller.engine.meta.persistent.entries) "persistent.$key": value,
         };
         final names = variables.keys.toList()..sort();
+        // Remembered facts are read-only: only the meta_set effect remembers one, and only Reset progress forgets it.
+        final facts = [
+          for (final fact in controller.engine.meta.rememberedFacts) "${StoryState.flagPrefix}$fact",
+        ]..sort();
         return ListView(
           children: [
             for (final name in names)
@@ -125,6 +129,16 @@ class _Variables extends StatelessWidget {
                 title: Text(name, style: const TextStyle(fontFamily: "monospace")),
                 trailing: Text(variables[name] is String ? '"${variables[name]}"' : "${variables[name]}"),
                 onTap: () => _edit(context, name: name, value: variables[name]),
+              ),
+            for (final fact in facts)
+              ListTile(
+                dense: true,
+                title: Text(fact, style: const TextStyle(fontFamily: "monospace")),
+                subtitle: const Text("Remembered across playthroughs, read-only"),
+                trailing: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [Icon(Icons.lock_outline, size: 16), SizedBox(width: 4), Text("true")],
+                ),
               ),
             ListTile(
               leading: const Icon(Icons.add),
@@ -249,7 +263,11 @@ class _CheckState extends State<_Check> {
                   ),
                   title: Text(issue.message),
                   subtitle: Text(
-                    [issue.file, if (issue.itemIndex != null) "#${issue.itemIndex}"].join(" "),
+                    [
+                      issue.file,
+                      if (issue.itemIndex != null) "#${issue.itemIndex}",
+                      if (issue.path.isNotEmpty) issue.part,
+                    ].join(" "),
                     style: const TextStyle(fontFamily: "monospace"),
                   ),
                 ),

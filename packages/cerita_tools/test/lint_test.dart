@@ -74,10 +74,10 @@ void main() {
       "a.cerita:8: warning: No ENDING has ending_id 'end_x' (read as 'meta.ending.end_x')",
       "a.cerita:12: error: Bad expression: Unexpected end of 'trust >='",
       "a.cerita:12: warning: Variable 'trust' is read but never set",
-      "a.cerita:16: error: Target 'cafe' doesn't exist",
-      "a.cerita:16: error: Target 'home#nowhere' has no item with id 'nowhere'",
-      "a.cerita:16: warning: Variable 'trsut' is read but never set",
       "a.cerita:17: warning: Missing 'en' text",
+      "a.cerita:19: error: Target 'cafe' doesn't exist",
+      "a.cerita:20: warning: Variable 'trsut' is read but never set",
+      "a.cerita:21: error: Target 'home#nowhere' has no item with id 'nowhere'",
       "a.cerita:26: error: CHAT scene without a channel_id",
       "a.cerita:27: warning: Variable 'unused' is set but never read",
       "a.cerita:28: warning: Unknown text tag '{shaek}'",
@@ -89,6 +89,28 @@ void main() {
       "profiles.yaml:6: error: Missing sprite file 'sprites/nora_sad.png'",
       "profiles.yaml:6: warning: Expression 'nora:sad' is never used",
       "profiles.yaml:7: warning: Character 'bob' is never used",
+    ]);
+  });
+
+  test('engine problems inside an item point at the effect, stage action or route line', () async {
+    const script = '''
+@conversation index
+@scene VN bg=room.png
+set
+  +trust 1
+  set roll = rnd(1, 6)
+stage
+  show nora
+  music gone.mp3
+branch
+  if trust > roll -> nowhere
+  -> index
+''';
+    const cast = "nora:\n  name: Nora\n  expressions:\n    open: nora_open.png\n";
+    expect(await _lint(story({"a.cerita": script}, profiles: cast, assets: _assets)), [
+      "a.cerita:5: error: Bad expression: Unknown function 'rnd' in 'rnd(1, 6)'",
+      "a.cerita:8: error: Missing music file 'music/gone.mp3'",
+      "a.cerita:10: error: Target 'nowhere' doesn't exist",
     ]);
   });
 

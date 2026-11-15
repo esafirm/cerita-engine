@@ -33,12 +33,12 @@ void main() {
   setUp(mockAudioChannels);
 
   Future<(StoryController, Map<String, Map<String, dynamic>>)> pumpStory(WidgetTester tester,
-      {bool developer = true}) async {
+      {bool developer = true, StoryStorage? storage}) async {
     final files = _files();
     final setup = StorySetup(
       config: const LoaderConfig(),
       loader: FakeEngineLoader(files),
-      storage: InMemoryStoryStorage(),
+      storage: storage ?? InMemoryStoryStorage(),
       audio: SilentAudio.new,
       developer: developer,
     );
@@ -85,6 +85,18 @@ void main() {
     expect(find.text("true"), findsOneWidget);
   });
 
+  testWidgets('remembered facts are listed read-only', (tester) async {
+    final storage = InMemoryStoryStorage();
+    await storage.saveMeta(GlobalMetaState(rememberedFacts: {"knows_boat"}));
+    await pumpStory(tester, storage: storage);
+    await openDeveloper(tester);
+
+    expect(find.text("meta.flag.knows_boat"), findsOneWidget);
+    await tester.tap(find.text("meta.flag.knows_boat"));
+    await tester.pumpAndSettle();
+    expect(find.text("Set"), findsNothing, reason: "only meta_set can remember a fact");
+  });
+
   testWidgets('jumps to a label in another conversation, keeping the variables', (tester) async {
     final (controller, _) = await pumpStory(tester);
     await controller.setVariable("NAME", "Rin");
@@ -108,7 +120,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text("Unknown character 'ghost'"), findsOneWidget);
     expect(find.text("Variable 'NAME' is read but never set"), findsOneWidget);
-    expect(find.text("cvn_day2.json #1"), findsNWidgets(2));
+    expect(find.textContaining("The story can stop here"), findsOneWidget, reason: "Day 2 runs out of items");
+    expect(find.text("cvn_day2.json #1"), findsNWidgets(3));
   });
 
   testWidgets('a hot reload reads the edited story and stays on the line', (tester) async {

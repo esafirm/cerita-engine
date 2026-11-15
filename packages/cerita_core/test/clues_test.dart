@@ -353,7 +353,11 @@ void main() {
 
   group('Linter', () {
     Future<List<String>> lint(Map<String, Map<String, dynamic>> files, {Map<String, dynamic>? clues = _clues}) async =>
-        [for (final issue in await StoryLinter(_FakeEngineLoader(files, clues: clues)).lint()) "$issue"];
+        [
+          for (final issue in await StoryLinter(_FakeEngineLoader(files, clues: clues)).lint())
+            // Most fixtures just run out of items.
+            if (!issue.message.startsWith("The story can stop here")) "$issue",
+        ];
 
     test('a story whose clues are all awarded before the question is clean of clue issues', () async {
       final issues = await lint(_story());
@@ -387,8 +391,8 @@ void main() {
         "error   index.json #0  Clue 'boat' isn't declared in clues.json (used as 'clue_boat')",
         "error   index.json #1  An evidence question takes no default_choice. Use a timeout outcome",
         "error   index.json #1  retries can't be negative",
-        "error   index.json #1  Two responses for clue 'pier'",
-        "error   index.json #1  Clue 'pier' isn't declared in clues.json",
+        "error   index.json #1 responses[1]  Two responses for clue 'pier'",
+        "error   index.json #1 responses[0]  Clue 'pier' isn't declared in clues.json",
         "error   index.json #1  No clue with a response can be found before this evidence question",
         "error   index.json #2  Evidence question without responses",
       ]));

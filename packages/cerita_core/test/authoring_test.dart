@@ -41,8 +41,12 @@ Map<String, dynamic> _conversation(List<Map<String, dynamic>> items, {Map<String
 Map<String, dynamic> _text(String text, {String profile = "nora:0", String? condition}) =>
     {"type": "TEXT", "text": text, "profile": profile, "condition": ?condition};
 
-Future<List<String>> _lint(Map<String, Object> files, {bool Function(String)? assetExists}) async =>
-    [for (final issue in await StoryLinter(_FakeEngineLoader(files), assetExists: assetExists).lint()) "$issue"];
+/// The issues as text. Most fixtures just run out of items, so "story stops" warnings are left out unless [stops].
+Future<List<String>> _lint(Map<String, Object> files, {bool Function(String)? assetExists, bool stops = false}) async =>
+    [
+      for (final issue in await StoryLinter(_FakeEngineLoader(files), assetExists: assetExists).lint())
+        if (stops || !issue.message.startsWith("The story can stop here")) "$issue",
+    ];
 
 void main() {
   group('StoryLinter', () {
@@ -75,7 +79,7 @@ void main() {
       expect(issues, containsAll([
         "error   index.json #0  Target 'nowhere' doesn't exist",
         "error   index.json #1  Target '#missing' has no item with id 'missing'",
-        "error   index.json #2  Target 'other#hub' has no item with id 'hub'",
+        "error   index.json #2 branches[0]  Target 'other#hub' has no item with id 'hub'",
       ]));
     });
 
@@ -96,10 +100,10 @@ void main() {
         "error   index.json #0  Unknown character 'miko'",
         "error   index.json #1  Nora has no sprite 4 (2 sprites)",
         "error   index.json #2  Bad expression: Unexpected end of 'trust >= '",
-        "error   index.json #3  Bad expression: Unknown function 'rnd' in 'rnd(1, 2)'",
+        "error   index.json #3 effects[0]  Bad expression: Unknown function 'rnd' in 'rnd(1, 2)'",
         "error   index.json #4  Duplicate id 'x'",
         "error   index.json #5  default_choice 2 isn't one of the 1 options",
-        "error   index.json #6  Unknown character 'ghost'",
+        "error   index.json #6 actions[0]  Unknown character 'ghost'",
       ]);
     });
 
@@ -114,9 +118,9 @@ void main() {
       });
       expect(issues, unorderedEquals([
         "warning index.json #0  Variable 'curiousity' is read but never set",
-        "warning index.json #2  Variable 'unused' is set but never read",
+        "warning index.json #2 effects[0]  Variable 'unused' is set but never read",
         "warning index.json #3  Variable 'PICK' is set but never read",
-        "warning index.json #3  Variable 'flag' is read but never set",
+        "warning index.json #3 choices[0]  Variable 'flag' is read but never set",
       ]));
     });
 
@@ -141,6 +145,70 @@ void main() {
       ]);
     });
 
+    test('routes that can run out of items without an ending', () async {
+      Map<String, dynamic> choice(List<Map<String, dynamic>> options, {String? id}) =>
+          {"type": "CHOICE", "id": ?id, "text": "?", "choices": options};
+      Map<String, dynamic> evidence({Map<String, dynamic>? fallback}) => {
+            "type": "CHOICE",
+            "source": "clues",
+            "text": "Which clue?",
+            "responses": [{"clue": "boat", "target": "end"}],
+            "fallback": ?fallback,
+          };
+      final ending = {"type": "ENDING", "ending_id": "e", "title": "E", "category": "GOOD"};
+      final issues = await _lint({
+        "index": _conversation([
+          {"type": "CALL", "target": "shared"},
+          choice([
+            {"text": "a", "target": "hub"},
+            {"text": "b", "target": "open"},
+            {"text": "c", "target": "late"},
+            {"text": "d", "target": "ask"},
+            {"text": "e", "target": "ask_open"},
+          ]),
+        ]),
+        "hub": _conversation([
+          choice(id: "ask", [{"text": "again", "once": true, "target": "#ask"}, {"text": "leave", "target": "end"}]),
+        ]),
+        "open": _conversation([{"type": "JUMP", "target": "end", "condition": "lucky"}, _text("and then?")]),
+        "late": _conversation([
+          {"type": "JUMP", "target": "end"},
+          {"type": "TEXT", "id": "back", "text": "back again", "profile": "nora:0"},
+          {"type": "JUMP", "target": "late#back", "condition": "lucky"},
+        ]),
+        "ask": _conversation([evidence(fallback: {"target": "end"})]),
+        "ask_open": _conversation([evidence()]),
+        "shared": {"conversation_id": "shared", "conversations": [_text("buzz")]},
+        "end": _conversation([ending]),
+      }, stops: true);
+      const stop = "The story can stop here: no ENDING, JUMP, RETURN or BRANCH fallback after this item";
+      expect(issues.where((issue) => issue.contains("stop here")), [
+        "warning cvn_ask_open.json #0  $stop",
+        "warning cvn_late.json #2  $stop",
+        "warning cvn_open.json #1  $stop",
+      ], reason: "a called subroutine returns, a hub choice with a way out leads on, so does a fallback");
+    });
+
+    test('a voice clip passes with one file per story locale', () async {
+      final issues = await _lint(
+        {
+          "index": {
+            ..._conversation([
+              {"type": "TEXT", "text": "a", "profile": "nora:0", "voice": "vo.mp3"},
+              {"type": "MEDIA", "media_type": "AUDIO", "uri": "note.mp3"},
+              {"type": "ENDING", "ending_id": "e", "title": "E", "category": "GOOD"},
+            ]),
+            "source_locale": "id",
+            "locales": ["id", "en"],
+          },
+        },
+        assetExists: (path) =>
+            !path.contains("/music/") && !path.contains("/media/") ||
+            {"vo.id.mp3", "vo.en.mp3", "note.id.mp3"}.contains(path.split("/").last),
+      );
+      expect(issues, ["error   index.json #1  Missing media file 'assets/story/media/note.mp3'"]);
+    });
+
     test('files that fail to load and missing assets', () async {
       final issues = await _lint(
         {
@@ -157,7 +225,7 @@ void main() {
       expect(issues, [
         "error   cvn_broken.json  Can't load: FormatException: Broken file broken",
         "error   index.json #0  Missing voice file 'assets/story/music/vo.mp3'",
-        "error   index.json #1  Missing music file 'assets/story/music/theme.mp3'",
+        "error   index.json #1 actions[0]  Missing music file 'assets/story/music/theme.mp3'",
         "error   index.json #2  Missing media file 'assets/story/bg/cg.png'",
         "error   profiles.json  Missing sprite file 'assets/story/sprites/nora_1.png'",
       ]);
@@ -295,7 +363,8 @@ flowchart TD
       expect(code, 1);
       expect(out.toString(), contains("error   index.json  Missing background file '${story.path}/bg/room.png'"));
       expect(out.toString(), contains("warning cvn_day1.json #0  Variable 'mood' is read but never set"));
-      expect(out.toString(), endsWith("2 error(s), 1 warning(s).\n"));
+      expect(out.toString(), contains("warning cvn_day1.json #0  The story can stop here"));
+      expect(out.toString(), endsWith("2 error(s), 2 warning(s).\n"));
     });
 
     test('lint passes warnings unless strict', () async {

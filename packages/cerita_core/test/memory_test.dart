@@ -349,13 +349,13 @@ void main() {
       expect(issues, containsAll([
         "error   index.json #2  Unknown memory variable 'meta.route.harbor'. "
             "Use meta.ending.<ending_id> or meta.flag.<name>",
-        "error   index.json #3  'meta.flag.knows_host' is read-only. Remember facts with the meta_set op",
+        "error   index.json #3 effects[0]  'meta.flag.knows_host' is read-only. Remember facts with the meta_set op",
         "warning index.json #1  No ENDING has ending_id 'end_lost' (read as 'meta.ending.end_lost')",
       ]));
     });
 
     test('warns about facts read but never remembered', () async {
-      final issues = await lint([_text("a", condition: "meta.flag.knows_host")]);
+      final issues = await lint([_text("a", condition: "meta.flag.knows_host"), _ending("end")]);
       expect(issues, ["warning index.json #0  Fact 'meta.flag.knows_host' is read but never remembered with meta_set"]);
     });
   });

@@ -17,7 +17,18 @@ class StoryLink {
   /// Choice text or branch condition.
   final String? label;
 
-  const StoryLink({required this.from, required this.itemIndex, required this.target, required this.kind, this.label});
+  /// Where in the item the target is, as JSON keys and indexes: `["choices", 1, "target"]`, `["branches", 0]`,
+  /// `["fallback_target"]` or `["responses", 0, "target"]`. Empty for a `JUMP` or `CALL`.
+  final List<Object> path;
+
+  const StoryLink({
+    required this.from,
+    required this.itemIndex,
+    required this.target,
+    required this.kind,
+    this.label,
+    this.path = const [],
+  });
 
   /// The conversation [target] points at: [from] for a `#label` in the same conversation.
   String get targetKey {
@@ -35,25 +46,28 @@ class StoryLink {
   /// Every target in [conversation], in item order.
   static Iterable<StoryLink> of(Conversation conversation) sync* {
     for (final (index, item) in conversation.conversations.indexed) {
-      StoryLink link(String target, LinkKind kind, [String? label]) =>
-          StoryLink(from: conversation.key, itemIndex: index, target: target, kind: kind, label: label);
+      StoryLink link(String target, LinkKind kind, [String? label, List<Object> path = const []]) =>
+          StoryLink(from: conversation.key, itemIndex: index, target: target, kind: kind, label: label, path: path);
       switch (item) {
         case EvidenceItemType(:final responses, :final retry, :final fallback, :final timeout):
-          for (final response in responses) {
-            if (response.target != null) yield link(response.target!, LinkKind.choice, "Present ${response.clue}");
+          for (final (at, response) in responses.indexed) {
+            if (response.target case final target?) {
+              yield link(target, LinkKind.choice, "Present ${response.clue}", ["responses", at, "target"]);
+            }
           }
-          if (retry?.target case final target?) yield link(target, LinkKind.choice, "retry");
-          if (fallback?.target case final target?) yield link(target, LinkKind.fallback);
-          if (timeout?.target case final target?) yield link(target, LinkKind.choice, "time out");
+          if (retry?.target case final target?) yield link(target, LinkKind.choice, "retry", ["retry", "target"]);
+          if (fallback?.target case final target?) yield link(target, LinkKind.fallback, null, ["fallback", "target"]);
+          if (timeout?.target case final target?) yield link(target, LinkKind.choice, "time out", ["timeout", "target"]);
         case ChoiceItemType(:final choices):
-          for (final choice in choices) {
-            if (choice.target != null) yield link(choice.target!, LinkKind.choice, choice.text);
+          for (final (option, choice) in choices.indexed) {
+            final target = choice.target;
+            if (target != null) yield link(target, LinkKind.choice, choice.text, ["choices", option, "target"]);
           }
         case BranchItemType(:final branches, :final fallbackTarget):
-          for (final branch in branches) {
-            yield link(branch.target, LinkKind.branch, branch.condition);
+          for (final (route, branch) in branches.indexed) {
+            yield link(branch.target, LinkKind.branch, branch.condition, ["branches", route]);
           }
-          if (fallbackTarget != null) yield link(fallbackTarget, LinkKind.fallback);
+          if (fallbackTarget != null) yield link(fallbackTarget, LinkKind.fallback, null, ["fallback_target"]);
         case JumpItemType(:final target):
           yield link(target, LinkKind.jump);
         case CallItemType(:final target):

@@ -16,7 +16,7 @@ it's about (when it names one: `choices[2]`, `branches[0]`, `fallback_target`, `
 like `choices[2].effects[0]`) and a message:
 
 ```text
-error   cvn_day2.json #14 choices[1]  Target 'ending_tru' doesn't exist
+error   cvn_day2.json #14 choices[1].target  Target 'ending_tru' doesn't exist
 warning index.json #9      Variable 'curiousity' is read but never set
 ```
 

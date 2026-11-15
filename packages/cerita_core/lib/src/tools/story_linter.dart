@@ -17,6 +17,7 @@ import '../data/channel.dart';
 import '../data/clue.dart';
 import '../data/profile.dart';
 import '../data/scene.dart';
+import '../l10n/localized_text.dart';
 import '../loader.dart';
 import '../state/story_state.dart';
 import '../utils/condition_evaluator.dart';
@@ -37,9 +38,19 @@ class LintIssue {
   /// The file when it isn't a conversation or `profiles.json`, e.g. `clues.json`.
   final String? fileName;
 
-  const LintIssue(this.severity, this.conversationKey, this.itemIndex, this.message, {this.fileName});
+  /// The part of the item the issue is about, as JSON keys and list indexes: `["choices", 2]` for the third
+  /// option, `["choices", 2, "effects", 0]` for its first effect. Empty when it's about the whole item.
+  final List<Object> path;
+
+  const LintIssue(this.severity, this.conversationKey, this.itemIndex, this.message,
+      {this.fileName, this.path = const []});
 
   bool get isError => severity == LintSeverity.error;
+
+  /// [path] as text, e.g. `choices[2].effects[0]`.
+  String get part => [
+        for (final (index, step) in path.indexed) step is int ? "[$step]" : "${index > 0 ? "." : ""}$step",
+      ].join();
 
   /// The file the issue is in.
   String get file => fileName ?? switch (conversationKey) {
@@ -49,8 +60,10 @@ class LintIssue {
       };
 
   @override
-  String toString() =>
-      "${severity.name.padRight(7)} ${[file, if (itemIndex != null) "#$itemIndex"].join(" ")}  $message";
+  String toString() {
+    final where = [file, if (itemIndex != null) "#$itemIndex", if (path.isNotEmpty) part];
+    return "${severity.name.padRight(7)} ${where.join(" ")}  $message";
+  }
 }
 
 /// Finds mistakes in a story before a player does: broken targets, unknown characters and sprites,
@@ -73,8 +86,10 @@ class StoryLinter {
 
   Future<List<LintIssue>> lint() async {
     final issues = <LintIssue>[];
-    void error(String? key, int? index, String message) => issues.add(LintIssue(LintSeverity.error, key, index, message));
-    void warn(String? key, int? index, String message) => issues.add(LintIssue(LintSeverity.warning, key, index, message));
+    void error(String? key, int? index, String message, [List<Object> path = const []]) =>
+        issues.add(LintIssue(LintSeverity.error, key, index, message, path: path));
+    void warn(String? key, int? index, String message, [List<Object> path = const []]) =>
+        issues.add(LintIssue(LintSeverity.warning, key, index, message, path: path));
 
     var profiles = const ProfileData([]);
     var channels = const <Channel>[];
@@ -102,10 +117,21 @@ class StoryLinter {
     }
     final byKey = {for (final conversation in conversations) conversation.key: conversation};
 
-    void asset(String? key, int? index, String? name, String Function(String) path, String what) {
+    void asset(String? key, int? index, String? name, String Function(String) path, String what,
+        [List<Object> at = const []]) {
       final exists = assetExists;
       if (exists == null || name == null) return;
-      if (!exists(path(name))) error(key, index, "Missing $what file '${path(name)}'");
+      if (!exists(path(name))) error(key, index, "Missing $what file '${path(name)}'", at);
+    }
+
+    // A voice clip or voice note passes with its shared file or with one for every story locale, the files the
+    // player tries (data schema §7.4).
+    final locales = byKey[Conversation.indexKey]?.locales.supported ?? const [StoryLocales.defaultSource];
+    void voice(String key, int index, String? name, String Function(String) path, String what) {
+      final exists = assetExists;
+      if (exists == null || name == null) return;
+      if (locales.every((locale) => exists(path(localizedAssetName(name, locale))))) return;
+      asset(key, index, name, path, what);
     }
 
     // Characters and their sprites.
@@ -131,57 +157,59 @@ class StoryLinter {
       }
     }
 
-    void character(String key, int index, ProfileInfo? info) {
+    void character(String key, int index, ProfileInfo? info, [List<Object> at = const []]) {
       if (info == null || info.isPlayer || !profilesLoaded) return;
       final profile = profiles.byId(info.id);
       if (profile == null) {
-        error(key, index, "Unknown character '${info.id}'");
+        error(key, index, "Unknown character '${info.id}'", at);
       } else if (profile.sprites.isNotEmpty && info.spriteIndex >= profile.sprites.length) {
-        error(key, index, "${profile.name} has no sprite ${info.spriteIndex} (${profile.sprites.length} sprites)");
+        error(key, index, "${profile.name} has no sprite ${info.spriteIndex} (${profile.sprites.length} sprites)", at);
       }
     }
 
-    final reads = <String, (String, int)>{};
-    final sets = <String, (String, int)>{};
+    // Where each variable is first read and set: conversation, item and the part of the item.
+    final reads = <String, (String, int, List<Object>)>{};
+    final sets = <String, (String, int, List<Object>)>{};
     final endingIds = <String>{};
 
     // Where each clue is awarded, and each evidence question with the clues it has a response for.
     final awards = <String, List<(String, int)>>{};
     final questions = <(String, int, Set<String>)>[];
 
-    void expression(String key, int index, String? source) {
+    void expression(String key, int index, String? source, [List<Object> at = const []]) {
       if (source == null || source.trim().isEmpty) return;
       final problem = ConditionEvaluator.syntaxError(source);
-      if (problem != null) error(key, index, "Bad expression: $problem");
+      if (problem != null) error(key, index, "Bad expression: $problem", at);
       for (final variable in ConditionEvaluator.variablesOf(source)) {
-        reads.putIfAbsent(variable, () => (key, index));
+        reads.putIfAbsent(variable, () => (key, index, at));
       }
     }
 
-    void effects(String key, int index, List<Effect> effects) {
-      for (final effect in effects) {
+    void effects(String key, int index, List<Effect> effects, [List<Object> at = const []]) {
+      for (final (effectIndex, effect) in effects.indexed) {
+        final path = [...at, "effects", effectIndex];
         final remembers = effect.op == EffectOp.metaSet;
         if (!remembers && StoryState.isMeta(effect.variable)) {
-          error(key, index, "'${effect.variable}' is read-only. Remember facts with the meta_set op");
+          error(key, index, "'${effect.variable}' is read-only. Remember facts with the meta_set op", path);
         }
         // A remembered fact is read back as meta.flag.<name>.
         final variable = remembers ? "${StoryState.flagPrefix}${effect.variable}" : effect.variable;
-        sets.putIfAbsent(variable, () => (key, index));
+        sets.putIfAbsent(variable, () => (key, index, path));
         if (Clue.idOf(variable) case final clue?) awards.putIfAbsent(clue, () => []).add((key, index));
-        expression(key, index, effect.expr);
+        expression(key, index, effect.expr, path);
       }
     }
 
-    void text(String key, int index, Map<String, dynamic> json) {
+    void text(String key, int index, Map<String, dynamic> json, [List<Object> at = const []]) {
       for (final MapEntry(key: field, :value) in json.entries) {
         if (!_textKeys.contains(field) || value is! String) continue;
         for (final match in variablePattern.allMatches(value)) {
-          reads.putIfAbsent(match.group(1)!, () => (key, index));
+          reads.putIfAbsent(match.group(1)!, () => (key, index, at));
         }
         // `{{` is an escaped `{`, written on purpose.
         final shown = TextMarkup.plain(value.replaceAll(variablePattern, "").replaceAll("{{", ""));
         final unknown = RegExp(r"\{/?[a-z]+(=[^{}]*)?\}").firstMatch(shown);
-        if (unknown != null) warn(key, index, "Unknown text tag '${unknown.group(0)}'");
+        if (unknown != null) warn(key, index, "Unknown text tag '${unknown.group(0)}'", at);
       }
     }
 
@@ -190,12 +218,12 @@ class StoryLinter {
       // Already reported as a file that fails to load.
       if (broken.contains(link.targetKey)) return;
       if (conversation == null) {
-        error(link.from, link.itemIndex, "Target '${link.target}' doesn't exist");
+        error(link.from, link.itemIndex, "Target '${link.target}' doesn't exist", link.path);
         return;
       }
       final label = link.targetLabel;
       if (label != null && !conversation.conversations.any((item) => item.id == label)) {
-        error(link.from, link.itemIndex, "Target '${link.target}' has no item with id '$label'");
+        error(link.from, link.itemIndex, "Target '${link.target}' has no item with id '$label'", link.path);
       }
     }
 
@@ -226,16 +254,20 @@ class StoryLinter {
         character(key, index, item.getProfileInfo());
 
         switch (item) {
-          case TextItemType(:final sfx, :final voice):
+          case TextItemType(:final sfx):
             asset(key, index, sfx, config.music, "sound");
-            asset(key, index, voice, config.music, "voice");
+            voice(key, index, item.voice, config.music, "voice");
           case NarrationItemType(:final sfx):
             asset(key, index, sfx, config.music, "sound");
-          case MediaItemType(:final sfx):
+          case MediaItemType(:final sfx, :final mediaType):
             asset(key, index, sfx, config.music, "sound");
-            asset(key, index, item.uri, (_) => config.mediaPath(item), "media");
+            if (mediaType == MediaType.audio) {
+              voice(key, index, item.uri, config.media, "media");
+            } else {
+              asset(key, index, item.uri, (_) => config.mediaPath(item), "media");
+            }
           case EvidenceItemType(:final responses, :final variable, :final retries):
-            if (variable != null) sets.putIfAbsent(variable, () => (key, index));
+            if (variable != null) sets.putIfAbsent(variable, () => (key, index, const []));
             if (responses.isEmpty) error(key, index, "Evidence question without responses");
             if (item.json.containsKey("choices")) error(key, index, "An evidence question takes no choices");
             if (item.json.containsKey("default_choice")) {
@@ -243,46 +275,50 @@ class StoryLinter {
             }
             if (retries < 0) error(key, index, "retries can't be negative");
             final answered = <String>{};
-            for (final response in responses) {
-              if (!answered.add(response.clue)) error(key, index, "Two responses for clue '${response.clue}'");
+            for (final (responseIndex, response) in responses.indexed) {
+              final at = ["responses", responseIndex];
+              if (!answered.add(response.clue)) error(key, index, "Two responses for clue '${response.clue}'", at);
               if (!clueIds.contains(response.clue)) {
-                error(key, index, "Clue '${response.clue}' isn't declared in clues.json");
+                error(key, index, "Clue '${response.clue}' isn't declared in clues.json", at);
               }
-              effects(key, index, response.effects);
+              effects(key, index, response.effects, at);
             }
-            for (final outcome in [item.retry, item.fallback, item.timeout].nonNulls) {
-              effects(key, index, outcome.effects);
+            final outcomes = [("retry", item.retry), ("fallback", item.fallback), ("timeout", item.timeout)];
+            for (final (name, outcome) in outcomes) {
+              if (outcome != null) effects(key, index, outcome.effects, [name]);
             }
             questions.add((key, index, answered));
           case ChoiceItemType(:final choices, :final variable, :final defaultChoice):
-            if (variable != null) sets.putIfAbsent(variable, () => (key, index));
+            if (variable != null) sets.putIfAbsent(variable, () => (key, index, const []));
             if (choices.isEmpty) error(key, index, "CHOICE without options");
             if (defaultChoice != null && (defaultChoice < 0 || defaultChoice >= choices.length)) {
               error(key, index, "default_choice $defaultChoice isn't one of the ${choices.length} options");
             }
             for (final (choiceIndex, choice) in choices.indexed) {
-              expression(key, index, choice.condition);
-              effects(key, index, choice.effects);
+              final at = ["choices", choiceIndex];
+              expression(key, index, choice.condition, at);
+              effects(key, index, choice.effects, at);
               final raw = (item.json["choices"] as List)[choiceIndex] as Map;
-              text(key, index, Map<String, dynamic>.from(raw));
+              text(key, index, Map<String, dynamic>.from(raw), at);
             }
           case InputItemType(:final variable):
-            sets.putIfAbsent(variable, () => (key, index));
+            sets.putIfAbsent(variable, () => (key, index, const []));
           case BranchItemType(:final branches):
-            for (final branch in branches) {
-              expression(key, index, branch.condition);
+            for (final (branchIndex, branch) in branches.indexed) {
+              expression(key, index, branch.condition, ["branches", branchIndex]);
             }
           case StageItemType(:final actions):
-            for (final action in actions) {
+            for (final (actionIndex, action) in actions.indexed) {
+              final at = ["actions", actionIndex];
               switch (action) {
                 case ShowAction(:final profile):
-                  character(key, index, profile);
+                  character(key, index, profile, at);
                 case BackgroundAction(:final image):
-                  asset(key, index, image, config.bg, "background");
+                  asset(key, index, image, config.bg, "background", at);
                 case MusicAction(:final file) || AmbienceAction(:final file):
-                  asset(key, index, file, config.music, "music");
+                  asset(key, index, file, config.music, "music", at);
                 case SoundAction(:final file):
-                  asset(key, index, file, config.music, "sound");
+                  asset(key, index, file, config.music, "sound", at);
                 default:
                   break;
               }
@@ -294,18 +330,22 @@ class StoryLinter {
       _deadItems(conversation, (index) => warn(key, index, "Never reached: it follows a JUMP or RETURN"));
     }
 
-    final reachable = StoryGraph(conversations).reachable;
+    final graph = StoryGraph(conversations);
+    final reachable = graph.reachable;
     for (final conversation in conversations) {
       if (!reachable.contains(conversation.key)) warn(conversation.key, null, "No target leads to this conversation");
     }
+    _stops(graph, (key, index) {
+      warn(key, index, "The story can stop here: no ENDING, JUMP, RETURN or BRANCH fallback after this item");
+    });
 
     // In a story with clues, `clue_<x>` variables stand for clues. Declared ones are read by the board.
     bool isClue(String variable) => clues.isNotEmpty && Clue.idOf(variable) != null;
     final undeclared = <String>{};
-    for (final MapEntry(key: variable, value: (key, index)) in [...reads.entries, ...sets.entries]) {
+    for (final MapEntry(key: variable, value: (key, index, at)) in [...reads.entries, ...sets.entries]) {
       final clue = Clue.idOf(variable);
       if (isClue(variable) && !clueIds.contains(clue) && undeclared.add(variable)) {
-        error(key, index, "Clue '$clue' isn't declared in clues.json (used as '$variable')");
+        error(key, index, "Clue '$clue' isn't declared in clues.json (used as '$variable')", at);
       }
     }
     for (final clue in clues.clues) {
@@ -317,13 +357,15 @@ class StoryLinter {
       error(key, index, "No clue with a response can be found before this evidence question");
     });
 
-    for (final MapEntry(key: variable, value: (key, index)) in reads.entries) {
+    for (final MapEntry(key: variable, value: (key, index, at)) in reads.entries) {
       if (isClue(variable)) continue;
       if (variable.startsWith(StoryState.endingPrefix)) {
         final ending = variable.substring(StoryState.endingPrefix.length);
-        if (!endingIds.contains(ending)) warn(key, index, "No ENDING has ending_id '$ending' (read as '$variable')");
+        if (!endingIds.contains(ending)) {
+          warn(key, index, "No ENDING has ending_id '$ending' (read as '$variable')", at);
+        }
       } else if (StoryState.isMeta(variable) && !variable.startsWith(StoryState.flagPrefix)) {
-        error(key, index, "Unknown memory variable '$variable'. Use meta.ending.<ending_id> or meta.flag.<name>");
+        error(key, index, "Unknown memory variable '$variable'. Use meta.ending.<ending_id> or meta.flag.<name>", at);
       } else if (!sets.containsKey(variable)) {
         warn(
           key,
@@ -331,12 +373,13 @@ class StoryLinter {
           variable.startsWith(StoryState.flagPrefix)
               ? "Fact '$variable' is read but never remembered with meta_set"
               : "Variable '$variable' is read but never set",
+          at,
         );
       }
     }
-    for (final MapEntry(key: variable, value: (key, index)) in sets.entries) {
+    for (final MapEntry(key: variable, value: (key, index, at)) in sets.entries) {
       if (!reads.containsKey(variable) && !_engineReads.contains(variable) && !isClue(variable)) {
-        warn(key, index, "Variable '$variable' is set but never read");
+        warn(key, index, "Variable '$variable' is set but never read", at);
       }
     }
 
@@ -414,6 +457,57 @@ class StoryLinter {
       if (!found) report(key, index);
     }
   }
+
+  /// Reports the last item of each conversation where the story can run out of items and end without an
+  /// ending: one the story enters at the top level (from `index`, or through a target that isn't a `CALL`),
+  /// with nothing after its last entry point that ends the story or leads on. Conditions aren't evaluated.
+  static void _stops(StoryGraph graph, void Function(String key, int? index) report) {
+    final byKey = {for (final conversation in graph.conversations) conversation.key: conversation};
+    final labels = <String, Set<String>>{};
+    for (final conversation in graph.conversations) {
+      for (final link in StoryLink.of(conversation)) {
+        if (link.targetLabel case final label?) labels.putIfAbsent(link.targetKey, () => {}).add(label);
+      }
+    }
+    // Running out of items inside a CALL returns to the caller, so only top-level conversations can stop.
+    final top = <String>{};
+    final queue = [Conversation.indexKey];
+    while (queue.isNotEmpty) {
+      final key = queue.removeLast();
+      final conversation = byKey[key];
+      if (conversation == null || !top.add(key)) continue;
+      for (final link in StoryLink.of(conversation)) {
+        if (link.kind != LinkKind.call) queue.add(link.targetKey);
+      }
+    }
+    for (final key in top) {
+      final items = byKey[key]!.conversations;
+      var entry = 0;
+      for (final (index, item) in items.indexed) {
+        if (labels[key]?.contains(item.id) ?? false) entry = index;
+      }
+      final leadsOn = [
+        for (final (index, item) in items.indexed)
+          if (index >= entry && item.condition == null && _leadsOn(item)) item,
+      ];
+      if (leadsOn.isEmpty) report(key, items.isEmpty ? null : items.length - 1);
+    }
+  }
+
+  /// Whether the story never runs past [item]: it ends the story, jumps away or returns. A choice does when every
+  /// option goes somewhere and one of them is always there.
+  static bool _leadsOn(ItemType item) => switch (item) {
+        EndingItemType() => true,
+        // A response or outcome without a target continues after the question. `retry` asks it again.
+        EvidenceItemType(:final responses, :final fallback, :final timeout) =>
+          responses.every((response) => response.target != null) &&
+              fallback?.target != null &&
+              (timeout == null || timeout.target != null),
+        ChoiceItemType(:final choices) => choices.isNotEmpty &&
+            choices.every((choice) => choice.target != null) &&
+            choices.any((choice) => choice.condition == null && !choice.once),
+        _ => _endsFlow(item),
+      };
 
   /// Reports the first item of each run that can't be reached: right after an unconditional JUMP,
   /// RETURN or BRANCH with a fallback, without an `id` a target could use.
