@@ -142,8 +142,18 @@ class StorySkin {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (hud.label != null) Chip(visualDensity: VisualDensity.compact, label: Text(hud.label!)),
-                const Spacer(),
+                // A long chapter name is cut short rather than pushing the buttons off screen.
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: hud.label == null
+                        ? null
+                        : Chip(
+                            visualDensity: VisualDensity.compact,
+                            label: Text(hud.label!, maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ),
+                  ),
+                ),
                 button("Backlog", Icons.history, hud.onBacklog),
                 toggle("Auto", hud.autoMode, hud.onAuto),
                 toggle("Skip", hud.skipMode, hud.onSkip),

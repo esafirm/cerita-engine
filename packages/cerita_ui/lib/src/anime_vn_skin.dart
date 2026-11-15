@@ -156,8 +156,14 @@ class AnimeVnSkin extends StorySkin {
           children: [
             Row(
               children: [
-                if (hud.label != null) _HudLabel(hud.label!),
-                const Spacer(),
+                // A long chapter name is cut short rather than pushing the buttons off screen.
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: hud.label == null ? null : _HudLabel(hud.label!),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 _Glass(
                   radius: 999,
                   child: Row(
@@ -382,13 +388,17 @@ class _HudLabel extends StatelessWidget {
               decoration: BoxDecoration(gradient: CeritaColors.accent, borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(width: 8),
-            Text(
-              label.toUpperCase(),
-              style: const TextStyle(
-                color: CeritaColors.moon,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.6,
+            Flexible(
+              child: Text(
+                label.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: CeritaColors.moon,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.6,
+                ),
               ),
             ),
           ],

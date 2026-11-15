@@ -39,6 +39,29 @@ void main() {
     expect(selected, ['{b}Kind{/b}']);
   });
 
+  testWidgets('a long chapter label is cut short and leaves the HUD buttons in place', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final hud = VnHud(
+      label: 'The Night Everything Went Quiet On The Other End Of The Line · 23:40',
+      autoMode: false,
+      skipMode: false,
+      onBacklog: () {},
+      onAuto: () {},
+      onSkip: () {},
+      onMenu: () {},
+      onHide: () {},
+    );
+    for (final skin in const [StorySkin(), AnimeVnSkin()]) {
+      await tester.pumpWidget(MaterialApp(
+        theme: CeritaTheme.dark(),
+        home: Scaffold(body: Builder(builder: (context) => skin.vnHud(context, hud))),
+      ));
+      expect(tester.takeException(), isNull, reason: "${skin.runtimeType} overflows");
+    }
+  });
+
   testWidgets('title screen lays out its menu', (tester) async {
     var started = false;
     await tester.pumpWidget(
