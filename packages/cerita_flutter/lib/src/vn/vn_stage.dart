@@ -45,7 +45,7 @@ class _VnStageState extends State<VnStage> {
 
   void _onTap() {
     if (_hidden) {
-      setState(() => _hidden = false);
+      _setHidden(false);
       return;
     }
     if (_dialogueKey.currentState?.complete() ?? false) return;
@@ -58,6 +58,18 @@ class _VnStageState extends State<VnStage> {
     if (!identical(_typedItem, item)) setState(() => _typedItem = item);
     controller.lineTyped();
     if (TextMarkup.parse(text).noWait && !controller.rolledBack && !controller.skipMode) controller.advance();
+  }
+
+  void _setHidden(bool hidden) {
+    setState(() => _hidden = hidden);
+    controller.setUiHidden(hidden);
+  }
+
+  @override
+  void dispose() {
+    // A scene change can take the stage away while the UI is hidden.
+    if (_hidden) controller.setUiHidden(false);
+    super.dispose();
   }
 
   void _onPointerSignal(PointerSignalEvent event) {
@@ -178,7 +190,7 @@ class _VnStageState extends State<VnStage> {
                         onBack: controller.canRollback ? controller.rollback : null,
                         onQuickSave: controller.replay ? null : controller.quickSave,
                         onQuickLoad: controller.replay ? null : controller.quickLoad,
-                        onHide: () => setState(() => _hidden = true),
+                        onHide: () => _setHidden(true),
                       ),
                     ),
                   ),

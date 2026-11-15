@@ -66,7 +66,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **Back**: Rolls back to the previous line (engine §7). A mouse wheel scroll up does the same. Rolled-back lines and stage changes show instantly.
   - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
   - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
-  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back.
+  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Auto and skip wait while the UI is hidden and carry on when it comes back.
 
 ---
 

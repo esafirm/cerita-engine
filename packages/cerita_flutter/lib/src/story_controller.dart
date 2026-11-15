@@ -99,6 +99,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   bool _busy = false;
   bool _disposed = false;
   bool _pacingHeld = false;
+  bool _uiHidden = false;
   Timer? _autoTimer;
 
   /// Bumped when a load or rollback replaces the state, so pending waits of the old state stop.
@@ -463,6 +464,13 @@ class StoryController extends ChangeNotifier with EngineListener {
     _scheduleAutoAdvance();
   }
 
+  /// The VN UI is hidden to look at the stage. Auto and skip wait until it comes back.
+  void setUiHidden(bool hidden) {
+    if (_uiHidden == hidden) return;
+    _uiHidden = hidden;
+    _scheduleAutoAdvance();
+  }
+
   void _scheduleAutoAdvance() {
     _autoTimer?.cancel();
     if (phase != StoryPhase.showing) return;
@@ -473,6 +481,7 @@ class StoryController extends ChangeNotifier with EngineListener {
       return;
     }
     if (!autoMode && !skipMode) return;
+    if (_uiHidden) return;
     if (autoMode && !_lineTyped) return;
     if (skipMode && !engine.lastItemPreviouslySeen && !settings.value.skipUnread) {
       // Skip only fast-forwards text read in an earlier playthrough, unless the player skips unread text too.

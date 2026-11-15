@@ -115,20 +115,25 @@ void main() {
     expect(controller.current?.getText(), "One");
   });
 
-  testWidgets('HIDE hides the dialogue and controls until the next tap', (tester) async {
-    await pumpStory(tester);
+  testWidgets('HIDE hides the dialogue and controls until the next tap, and holds auto mode', (tester) async {
+    final (controller, _) = await pumpStory(tester);
     expect(find.text("One"), findsOneWidget);
+    controller.toggleAuto();
 
     await tester.tap(find.byTooltip("Hide"));
     await tester.pump();
     expect(find.text("One"), findsNothing);
     expect(find.byTooltip("Back"), findsNothing);
+    await tester.pump(const Duration(seconds: 5));
+    expect(controller.current?.getText(), "One", reason: "auto mode waits while the UI is hidden");
 
     await tester.tap(find.byType(VnStage));
     await tester.pump();
     expect(find.text("One"), findsOneWidget);
-    final stage = tester.widget<VnStage>(find.byType(VnStage));
-    expect(stage.controller.current?.getText(), "One", reason: "the tap that shows the UI doesn't advance");
+    expect(controller.current?.getText(), "One", reason: "the tap that shows the UI doesn't advance");
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(controller.current?.getText(), "Two");
   });
 
   testWidgets('settings apply to a running story', (tester) async {
