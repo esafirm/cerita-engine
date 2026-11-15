@@ -11,7 +11,7 @@ Every capability is generic. Last Seen is the first story that uses it, not the 
 | ID | PRD | Priority | Needed by | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | CE-01 | [Bilingual stories](01-bilingual-stories.md) | Must | M0 | Done |
-| CE-02 | [Story authoring toolkit](02-story-authoring-toolkit.md) | Must | M0 | Backlog |
+| CE-02 | [Story authoring toolkit](02-story-authoring-toolkit.md) | Must | M0 | In progress |
 | CE-03 | [Cross-playthrough memory](03-cross-playthrough-memory.md) | Must | M0 | Done |
 | CE-04 | [Player settings](04-player-settings.md) | Should | M1 | In progress |
 | CE-05 | [Case Board](05-case-board.md) | Must | M2 | Backlog |
