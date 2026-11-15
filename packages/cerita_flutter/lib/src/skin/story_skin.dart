@@ -126,8 +126,92 @@ class StorySkin {
     return Icon(Icons.auto_awesome, size: 16, color: color.withAlpha(200), semanticLabel: label);
   }
 
+  /// Backdrop of the Case Board and the evidence picker, behind the clue list. Override for a cork board, a
+  /// notebook or a case file.
+  Widget caseBoardBackground(BuildContext context, Widget child) =>
+      ColoredBox(color: Theme.of(context).colorScheme.surface, child: child);
+
+  /// A chapter heading on the Case Board. [ClueGroupHeader.total] is set when the story shows counts.
+  Widget clueGroupHeader(BuildContext context, ClueGroupHeader header) {
+    final theme = Theme.of(context);
+    final strings = StoryLanguage.of(context).strings;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 16, 4, 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              header.chapter ?? "",
+              style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary),
+            ),
+          ),
+          if (header.total case final total?)
+            Text(strings.cluesFound(header.found, total), style: theme.textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
+
+  /// One clue on the Case Board or in the evidence picker.
+  Widget clueCard(BuildContext context, ClueCard card) {
+    final scheme = Theme.of(context).colorScheme;
+    final strings = StoryLanguage.of(context).strings;
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: card.isNew ? scheme.primary : Colors.transparent, width: 2),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        onTap: card.onTap,
+        leading: SizedBox.square(
+          dimension: 48,
+          child: card.image == null
+              ? Icon(Icons.search, color: scheme.primary)
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.asset(card.image!, fit: BoxFit.cover),
+                ),
+        ),
+        title: Text(card.title),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (card.isNew)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Chip(label: Text(strings.newClue), visualDensity: VisualDensity.compact),
+              ),
+            if (card.isKey) Icon(Icons.star, color: scheme.tertiary, semanticLabel: strings.keyClue),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The "Clue found" notification at the top of the story. Tapping it calls [ClueNotice.onTap].
+  Widget clueNotification(BuildContext context, ClueNotice notice) {
+    return Material(
+      elevation: 6,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        onTap: notice.onTap,
+        leading: notice.image == null
+            ? const Icon(Icons.search)
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(notice.image!, width: 40, height: 40, fit: BoxFit.cover),
+              ),
+        title: Text(StoryLanguage.of(context).strings.clueFound(notice.title)),
+      ),
+    );
+  }
+
   /// The VN overlay with the chapter label and the quick controls: backlog, auto, skip and menu,
-  /// then back, quick save, quick load and hide. A null callback means the control is unavailable.
+  /// then back, quick save, quick load, hide and, in stories with clues, the Case Board. A null callback means
+  /// the control is unavailable.
   /// Skins translate their own text: `StoryLanguage.of(context)` has the locale and the engine strings.
   Widget vnHud(BuildContext context, VnHud hud) {
     final strings = StoryLanguage.of(context).strings;
@@ -182,6 +266,12 @@ class StorySkin {
                 button(strings.quickSave, Icons.bookmark_add_outlined, hud.onQuickSave),
                 button(strings.quickLoad, Icons.bookmark_outline, hud.onQuickLoad),
                 button(strings.hide, Icons.visibility_off_outlined, hud.onHide),
+                if (hud.onCaseBoard case final onCaseBoard?)
+                  Badge(
+                    isLabelVisible: hud.newClues > 0,
+                    label: Text("${hud.newClues}"),
+                    child: button(strings.caseBoard, Icons.push_pin_outlined, onCaseBoard),
+                  ),
               ],
             ),
           ],
@@ -233,6 +323,12 @@ class VnHud {
   /// Hides the dialogue box and the controls until the next tap.
   final VoidCallback onHide;
 
+  /// Opens the Case Board. Null in stories without clues and while the evidence picker is open.
+  final VoidCallback? onCaseBoard;
+
+  /// Found clues not viewed on the board yet, for a badge.
+  final int newClues;
+
   const VnHud({
     required this.label,
     required this.autoMode,
@@ -245,5 +341,56 @@ class VnHud {
     this.onBack,
     this.onQuickSave,
     this.onQuickLoad,
+    this.onCaseBoard,
+    this.newClues = 0,
   });
+}
+
+/// A chapter heading on the Case Board, see [StorySkin.clueGroupHeader].
+class ClueGroupHeader {
+  /// Null for the clues without a chapter.
+  final String? chapter;
+  final int found;
+
+  /// How many clues the chapter has, when the story shows counts (`show_counts`).
+  final int? total;
+
+  const ClueGroupHeader({required this.chapter, required this.found, this.total});
+}
+
+/// One clue on the Case Board or in the evidence picker, see [StorySkin.clueCard].
+class ClueCard {
+  final Clue clue;
+  final String title;
+
+  /// Asset path of the clue image.
+  final String? image;
+  final bool isKey;
+
+  /// Found but not viewed on the board yet.
+  final bool isNew;
+  final VoidCallback onTap;
+
+  const ClueCard({
+    required this.clue,
+    required this.title,
+    required this.image,
+    required this.isKey,
+    required this.isNew,
+    required this.onTap,
+  });
+}
+
+/// A "Clue found" notification, see [StorySkin.clueNotification].
+class ClueNotice {
+  final Clue clue;
+  final String title;
+
+  /// Asset path of the clue image.
+  final String? image;
+
+  /// Opens the clue on the Case Board.
+  final VoidCallback onTap;
+
+  const ClueNotice({required this.clue, required this.title, required this.image, required this.onTap});
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'call/call_view.dart';
 import 'chat/chat_view.dart';
+import 'clues/case_board.dart';
 import 'common/backlog_sheet.dart';
 import 'common/ending_view.dart';
 import 'l10n/story_language.dart';
@@ -131,6 +132,12 @@ class _StoryScreenState extends State<StoryScreen> {
                         ),
                       ))),
                 ),
+                if (_controller.hasClues && _controller.current is! EvidenceItemType)
+                  ListTile(
+                    leading: const Icon(Icons.push_pin_outlined),
+                    title: Text(strings.caseBoardEntry(_controller.newClues.length)),
+                    onTap: () => close(() => CaseBoardScreen.open(context, _controller)),
+                  ),
                 ListTile(
                   leading: const Icon(Icons.history),
                   title: Text(strings.backlog),
@@ -233,46 +240,49 @@ class _StoryScreenState extends State<StoryScreen> {
           // The keyboard must not squeeze the stage. Chat resizes its own Scaffold, and the VN input
           // prompt moves itself above the keyboard.
           resizeToAvoidBottomInset: false,
-          body: Stack(
-            fit: StackFit.expand,
-            children: [
-              SceneSwitcher(
-                mode: mode,
-                scene: (
-                  channelId: controller.scene.channelId,
-                  // A new VN conversation is a new scene. Chat and call threads continue across conversations.
-                  conversationKey: mode == SceneMode.vn ? controller.conversation?.key : null,
-                ),
-                // The card belongs to its scene, so it leaves with the outgoing one.
-                child: switch (controller.conversation) {
-                  final conversation? => ChapterCardOverlay(conversation: conversation, child: view),
-                  null => view,
-                },
-              ),
-              if (controller.notification != null)
-                Positioned(
-                  top: 0,
-                  left: 12,
-                  right: 12,
-                  child: SafeArea(child: _NotificationBanner(text: controller.notification!)),
-                ),
-              if (controller.phase == StoryPhase.ending && ending is EndingItemType)
-                EndingView(
-                  ending: ending,
-                  onEndings: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
+          body: ClueNotifications(
+            controller: controller,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                SceneSwitcher(
+                  mode: mode,
+                  scene: (
+                    channelId: controller.scene.channelId,
+                    // A new VN conversation is a new scene. Chat and call threads continue across conversations.
+                    conversationKey: mode == SceneMode.vn ? controller.conversation?.key : null,
                   ),
-                  onTitle: () => Navigator.of(context).pop(),
+                  // The card belongs to its scene, so it leaves with the outgoing one.
+                  child: switch (controller.conversation) {
+                    final conversation? => ChapterCardOverlay(conversation: conversation, child: view),
+                    null => view,
+                  },
                 ),
-              if (controller.phase == StoryPhase.finished)
-                controller.replay
-                    ? EndingView(
-                        title: StoryLanguage.of(context).strings.endOfReplay,
-                        backLabel: StoryLanguage.of(context).strings.back,
-                        onTitle: () => Navigator.of(context).pop(),
-                      )
-                    : EndingView(onTitle: () => Navigator.of(context).pop()),
-            ],
+                if (controller.notification != null)
+                  Positioned(
+                    top: 0,
+                    left: 12,
+                    right: 12,
+                    child: SafeArea(child: _NotificationBanner(text: controller.notification!)),
+                  ),
+                if (controller.phase == StoryPhase.ending && ending is EndingItemType)
+                  EndingView(
+                    ending: ending,
+                    onEndings: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
+                    ),
+                    onTitle: () => Navigator.of(context).pop(),
+                  ),
+                if (controller.phase == StoryPhase.finished)
+                  controller.replay
+                      ? EndingView(
+                          title: StoryLanguage.of(context).strings.endOfReplay,
+                          backLabel: StoryLanguage.of(context).strings.back,
+                          onTitle: () => Navigator.of(context).pop(),
+                        )
+                      : EndingView(onTitle: () => Navigator.of(context).pop()),
+              ],
+            ),
           ),
         );
       },

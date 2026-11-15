@@ -193,6 +193,12 @@ class AnimeVnSkin extends StorySkin {
                   _HudButton(strings.quickSaveShort.toUpperCase(), onTap: hud.onQuickSave),
                   _HudButton(strings.quickLoadShort.toUpperCase(), onTap: hud.onQuickLoad),
                   _HudButton(strings.hide.toUpperCase(), onTap: hud.onHide),
+                  if (hud.onCaseBoard case final onCaseBoard?)
+                    _HudButton(
+                      [strings.caseBoardShort.toUpperCase(), if (hud.newClues > 0) "${hud.newClues}"].join(" "),
+                      active: hud.newClues > 0,
+                      onTap: onCaseBoard,
+                    ),
                 ],
               ),
             ),

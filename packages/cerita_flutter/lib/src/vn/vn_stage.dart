@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../clues/case_board.dart';
 import '../common/backlog_sheet.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
@@ -154,9 +155,26 @@ class _VnStageState extends State<VnStage> {
                         onTyped: () => _lineTyped(item, text),
                       ),
                     ),
-                  if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
+                  if (controller.phase == StoryPhase.choice && item is EvidenceItemType && asked)
+                    ColoredBox(
+                      color: Colors.black54,
+                      child: SafeArea(
+                        minimum: const EdgeInsets.all(16),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                        ),
+                      ),
+                    )
+                  else if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
                     _Dimmed(
-                      child: ChoiceList(key: ValueKey(item), item: item, dark: true, onSelected: controller.choose),
+                      child: ChoiceList(
+                        key: ValueKey(item),
+                        item: item,
+                        dark: true,
+                        paused: controller.storyHeld,
+                        onSelected: controller.choose,
+                      ),
                     ),
                   if (controller.phase == StoryPhase.input && item is InputItemType && asked)
                     _Dimmed(
@@ -191,6 +209,10 @@ class _VnStageState extends State<VnStage> {
                         onQuickSave: controller.replay ? null : controller.quickSave,
                         onQuickLoad: controller.replay ? null : controller.quickLoad,
                         onHide: () => _setHidden(true),
+                        onCaseBoard: controller.hasClues && item is! EvidenceItemType
+                            ? () => CaseBoardScreen.open(context, controller)
+                            : null,
+                        newClues: controller.newClues.length,
                       ),
                     ),
                   ),

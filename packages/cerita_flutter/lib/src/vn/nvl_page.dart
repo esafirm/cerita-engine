@@ -47,7 +47,7 @@ class NvlPage extends StatelessWidget {
       if (entry.isPlayer) {
         return Padding(
           padding: const EdgeInsets.only(left: 12),
-          child: Text("› ${entry.playerText}", style: textStyle.copyWith(color: accent)),
+          child: Text("› ${controller.playerTextOf(entry) ?? ""}", style: textStyle.copyWith(color: accent)),
         );
       }
       final item = entry.itemType!;

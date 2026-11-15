@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../clues/case_board.dart';
 import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
@@ -83,6 +84,16 @@ class ChatView extends StatelessWidget {
             onPressed: contact == null ? null : () => _showProfile(context, contact),
           ),
           IconButton(tooltip: strings.gallery, icon: const Icon(Icons.photo_library_outlined), onPressed: onGallery),
+          if (controller.hasClues && controller.current is! EvidenceItemType)
+            IconButton(
+              tooltip: strings.caseBoard,
+              icon: Badge(
+                isLabelVisible: controller.newClues.isNotEmpty,
+                label: Text("${controller.newClues.length}"),
+                child: const Icon(Icons.push_pin_outlined),
+              ),
+              onPressed: () => CaseBoardScreen.open(context, controller),
+            ),
           IconButton(tooltip: strings.menu, icon: const Icon(Icons.more_vert), onPressed: onMenu),
         ],
       ),
@@ -153,6 +164,14 @@ class _InteractionTray extends StatelessWidget {
     final item = controller.current;
     final scheme = Theme.of(context).colorScheme;
     final child = switch (controller.phase) {
+      // The picker takes the tray's place, tall enough to browse the board.
+      StoryPhase.choice when item is EvidenceItemType => SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.55,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+          ),
+        ),
       StoryPhase.choice when item is ChoiceItemType => Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -161,7 +180,7 @@ class _InteractionTray extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: TaggedText(item.text, style: Theme.of(context).textTheme.labelLarge),
             ),
-            ChoiceList(key: ValueKey(item), item: item, onSelected: controller.choose),
+            ChoiceList(key: ValueKey(item), item: item, paused: controller.storyHeld, onSelected: controller.choose),
           ],
         ),
       StoryPhase.input when item is InputItemType => InputPrompt(

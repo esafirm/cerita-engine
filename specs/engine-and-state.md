@@ -324,7 +324,7 @@ UI can name it by its `title` (or `caption`) instead of its `unlock_id`.
 
 | Type | Role |
 | :--- | :--- |
-| `Clue` | One `clues.json` entry. Keeps its raw JSON, so `title`, `description` and `chapter` stay in every language. `variable` is `clue_<id>` |
+| `Clue` | One `clues.json` entry. `title`, `description` and `chapter` are `LocalizedText` (§9.1) in every language, resolved with the engine's `Localizer` where they are shown. `variable` is `clue_<id>` |
 | `ClueCatalog` | The declared clues and `show_counts`. `groups` groups them by chapter in board order (data-schema §8.2). Empty when the story has no `clues.json` |
 | `EvidenceItemType` | A `CHOICE` with `"source": "clues"`. A `ChoiceItemType` subclass with no `choices`, plus `responses`, `retries`, `retry`, `fallback` and `timeout` |
 | `EvidenceOutcome` / `EvidenceResponse` | An outcome's `effects` and `target`. A response adds its `clue` |
@@ -364,9 +364,10 @@ UI can name it by its `title` (or `caption`) instead of its `unlock_id`.
 ### 10.3 Transcript, saves and rollback
 
 - A presented clue is a player entry: `TranscriptEntry.clueId` is its `id` (`"clue"` in JSON) and
-  `playerText` its title. The UI renders it from the clue: "Presented: Pier photo" in the VN backlog and NVL
-  page, an outgoing clue message in chat (presentation-modes §1.1). Old UIs that only read `playerText` still
-  show the title.
+  `playerText` its title as a `LocalizedText` in every language. The UI renders it from the clue in the active
+  language, so it follows a language switch like the rest of the history (PRD CE-01 D3): "Presented: Pier
+  photo" in the VN backlog and NVL page (`StoryController.playerTextOf`), an outgoing clue message in chat
+  (presentation-modes §6.4). UIs that only read `playerText` still show the title.
 - `SaveSlot` adds `viewed_clues` (null in older saves) and `evidence_tries`. `RollbackFrame` adds
   `evidence_tries`. Clue variables need nothing new.
 - Saves can't be made while the picker is open, as with any pending `CHOICE`: a save made then rewinds to the

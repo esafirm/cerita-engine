@@ -172,8 +172,8 @@ no board entry, button, badge or notification anywhere.
   title, its image as a thumbnail, a marker when it is a `key` clue, and a "New" highlight until viewed. With
   `show_counts`, each chapter heading says "3 of 5 found". Chapters with no clue found yet aren't shown.
   Before the first clue, the board says so.
-- **Detail**: tapping a clue opens its title, image and full description. Tapping the image opens it full
-  screen with pinch to zoom.
+- **Detail**: tapping a clue opens a sheet with its title, image and full description. Tapping the image opens
+  it full screen with pinch to zoom.
 - **Viewed**: closing the board marks every clue it showed as viewed (engine §10.2), which clears the
   highlights and the count.
 - **Pausing**: while the board is open the story holds: chat pacing, auto and skip wait, and a timed choice's
@@ -201,7 +201,8 @@ no board entry, button, badge or notification anywhere.
 - **VN**: the backlog and the NVL page show the player's line as "Presented: Pier photo".
 - **Chat**: the clue is sent as an outgoing message: its image (tap to view full screen) with the title under
   it, or the title alone with a clue icon when it has no image. It stays in chat history.
-- **Call**: the player's line shows "Presented: Pier photo".
+- **Call**: the picker opens in place of the call buttons. The call view shows no player lines, so the presented
+  clue appears in the backlog only.
 
 ### 6.5 Skin hooks
 The board and the notification are drawn through `StorySkin`, so a game can make them a cork board, a notebook
@@ -214,4 +215,6 @@ or a case file:
 | `clueCard(context, ClueCard)` | One clue on the board or in the picker: title, image, key marker, "New" highlight and tap handler |
 | `clueNotification(context, ClueNotice)` | The "Clue found" notification |
 
-Hooks get the clue's text already resolved, the image's asset path and the callbacks.
+Hooks get the clue's text already resolved in the active language, the image's asset path and the callbacks.
+Every label (board title, "New", "Clue found", "Present", "Presented", the counts) comes from `CeritaStrings`
+(§5.2), in English and Indonesian.

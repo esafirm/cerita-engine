@@ -5,7 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 class FakeEngineLoader extends EngineLoader {
   final Map<String, Map<String, dynamic>> files;
 
-  FakeEngineLoader(this.files);
+  /// The story's `clues.json`, if it has one.
+  final Map<String, dynamic>? clues;
+
+  FakeEngineLoader(this.files, {this.clues});
 
   @override
   Future<EnginePackage> initialLoad() async => EnginePackage(
@@ -16,6 +19,7 @@ class FakeEngineLoader extends EngineLoader {
           ],
         }),
         conversation: await loadConversation(Conversation.indexKey),
+        clues: clues == null ? ClueCatalog.empty : ClueCatalog.fromJson(clues!),
       );
 
   @override

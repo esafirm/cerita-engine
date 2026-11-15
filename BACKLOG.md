@@ -8,6 +8,8 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 - **Rollback in chat and call scenes.** Rollback stops at chat and call threads, which move on by themselves. It would need their pacing to pause and resume.
 - **Device check.** Rollback, text tags and HIDE were checked on an Android emulator (see the decisions log). Fades and volumes still need a listen on a device, and the mouse wheel rollback and story hot reload a run on a desktop and a device.
 
+- **Case Board in the demo.** Wrong Number has no clues, so the Case Board and evidence questions are only covered by tests. A short deduction in the demo would show them on a device. The clue notification also covers the VN HUD for its 3 seconds.
+
 ## Later features
 
 - **Achievements.** Declared in the story, unlocked by effects or endings, kept in the meta-state, with a screen next to the gallery.

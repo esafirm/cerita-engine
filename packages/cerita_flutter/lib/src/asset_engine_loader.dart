@@ -26,10 +26,16 @@ class AssetEngineLoader extends EngineLoader {
       // channels.json is optional
     }
 
+    // clues.json is optional, but a broken one should fail loudly.
+    final assets = (await AssetManifest.loadFromAssetBundle(bundle)).listAssets();
+    final cluesPath = "${config.storyDir}/clues.json";
+    final clues = assets.contains(cluesPath) ? ClueCatalog.fromJson(await _loadJson(cluesPath)) : ClueCatalog.empty;
+
     return EnginePackage(
       conversation: conversation,
       profiles: ProfileData.fromJson(profiles),
       channels: channels,
+      clues: clues,
     );
   }
 

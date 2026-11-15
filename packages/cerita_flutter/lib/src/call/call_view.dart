@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../clues/case_board.dart';
 import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
@@ -121,6 +122,13 @@ class _CallViewState extends State<CallView> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: switch (controller.phase) {
+                    StoryPhase.choice when item is EvidenceItemType => SizedBox(
+                        height: MediaQuery.sizeOf(context).height * 0.55,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                        ),
+                      ),
                     StoryPhase.choice when item is ChoiceItemType =>
                       ChoiceList(key: ValueKey(item), item: item, dark: true, onSelected: controller.choose),
                     StoryPhase.input when item is InputItemType => Card(

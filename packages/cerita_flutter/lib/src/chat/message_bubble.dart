@@ -46,8 +46,14 @@ class MessageBubble extends StatelessWidget {
     final bubbleColor = outgoing ? scheme.primary : scheme.surfaceContainerHighest;
     final textColor = outgoing ? scheme.onPrimary : scheme.onSurface;
 
+    final clue = entry.clueId == null ? null : controller.clues.byId(entry.clueId!);
     final content = switch (item) {
       MediaItemType() => _MediaContent(item: item, setup: setup, controller: controller, textColor: textColor),
+      _ when clue != null => _ClueContent(
+          title: controller.clueText(clue.title),
+          image: controller.clueImage(clue),
+          textColor: textColor,
+        ),
       // Player answers are shown as typed.
       _ when entry.isPlayer =>
         Text(controller.playerTextOf(entry) ?? "", style: TextStyle(color: textColor, fontSize: 15)),
@@ -56,7 +62,9 @@ class MessageBubble extends StatelessWidget {
 
     final bubble = Container(
       constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.72),
-      padding: item is MediaItemType ? const EdgeInsets.all(4) : const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      padding: item is MediaItemType || clue?.image != null
+          ? const EdgeInsets.all(4)
+          : const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
         color: bubbleColor,
         borderRadius: BorderRadius.only(
@@ -142,6 +150,45 @@ class _SystemPill extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A clue the player presented to an evidence question: its image and title, or the title with a clue icon.
+class _ClueContent extends StatelessWidget {
+  final String title;
+  final String? image;
+  final Color textColor;
+
+  const _ClueContent({required this.title, required this.image, required this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.push_pin_outlined, size: 16, color: textColor),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(title, style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w600)),
+        ),
+      ],
+    );
+    final image = this.image;
+    if (image == null) return label;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => ImageViewerPage.open(context, image, caption: title),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.asset(image, width: 220, fit: BoxFit.cover),
+          ),
+        ),
+        Padding(padding: const EdgeInsets.fromLTRB(8, 6, 8, 4), child: label),
+      ],
     );
   }
 }

@@ -105,10 +105,16 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Stream<String> get toasts => _toasts.stream;
 
+  final StreamController<Clue> _cluesFound = StreamController.broadcast();
+
+  /// Clues as the story finds them, for the clue notification.
+  Stream<Clue> get cluesFound => _cluesFound.stream;
+
   bool _busy = false;
   bool _disposed = false;
   bool _pacingHeld = false;
   bool _uiHidden = false;
+  bool _storyHeld = false;
   Timer? _autoTimer;
 
   /// Bumped when a load or rollback replaces the state, so pending waits of the old state stop.
@@ -126,8 +132,35 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// A delivered item in the active language.
   ItemType? itemOf(TranscriptEntry entry) => entry.itemIn(localizer);
 
-  /// The player's reply of [entry] in the active language.
-  String? playerTextOf(TranscriptEntry entry) => localizer.maybe(entry.playerText);
+  /// The player's reply of [entry] in the active language. A presented clue reads "Presented: <title>".
+  String? playerTextOf(TranscriptEntry entry) {
+    final clue = entry.clueId == null ? null : clues.byId(entry.clueId!);
+    if (clue != null) return strings.presented(localizer.resolve(clue.title));
+    return localizer.maybe(entry.playerText);
+  }
+
+  /// The story's clues. Empty when it has no `clues.json`, and then no Case Board is shown anywhere.
+  ClueCatalog get clues => engine.clues;
+
+  bool get hasClues => engine.clues.isNotEmpty;
+
+  List<Clue> get foundClues => engine.foundClues;
+
+  /// Found clues the player hasn't seen on the Case Board yet.
+  List<Clue> get newClues => engine.newClues;
+
+  bool isClueNew(Clue clue) => !engine.viewedClues.contains(clue.id);
+
+  void markCluesViewed(Iterable<Clue> clues) {
+    engine.markCluesViewed([for (final clue in clues) clue.id]);
+    _notify();
+  }
+
+  /// Clue text in the active language.
+  String clueText(LocalizedText text) => localizer.resolve(text);
+
+  /// Asset path of [clue]'s image, in `media/`.
+  String? clueImage(Clue clue) => clue.image == null ? null : config.media(clue.image!);
 
   /// Transcript of a messenger thread across every conversation that used it.
   List<TranscriptEntry> channelHistory(String? channelId) =>
@@ -332,6 +365,19 @@ class StoryController extends ChangeNotifier with EngineListener {
     await _next(ItemResult.choice(item.variable, choice));
   }
 
+  /// Presents [clue] to the pending evidence question.
+  Future<void> present(Clue clue) async {
+    final item = current;
+    if (phase != StoryPhase.choice || item is! EvidenceItemType) return;
+    await _next(ItemResult.present(item, clue));
+  }
+
+  /// The pending evidence question's countdown ran out.
+  Future<void> evidenceTimedOut() async {
+    if (phase != StoryPhase.choice || current is! EvidenceItemType) return;
+    await _next(const ItemResult.evidenceTimeout());
+  }
+
   Future<void> submitInput(String value) async {
     final item = current;
     if (phase != StoryPhase.input || item is! InputItemType) return;
@@ -505,6 +551,17 @@ class StoryController extends ChangeNotifier with EngineListener {
     _scheduleAutoAdvance();
   }
 
+  /// Holds the story while a screen covers it, like the Case Board: chat pacing, auto, skip and a timed choice's
+  /// countdown wait until it is released.
+  void holdStory(bool held) {
+    if (_storyHeld == held) return;
+    _storyHeld = held;
+    _scheduleAutoAdvance();
+    _notify();
+  }
+
+  bool get storyHeld => _storyHeld;
+
   /// The VN UI is hidden to look at the stage. Auto and skip wait until it comes back.
   void setUiHidden(bool hidden) {
     if (_uiHidden == hidden) return;
@@ -515,6 +572,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   void _scheduleAutoAdvance() {
     _autoTimer?.cancel();
     if (phase != StoryPhase.showing) return;
+    if (_storyHeld) return;
     if (scene.mode == SceneMode.chat && !skipMode) {
       if (_pacingHeld) return;
       final pause = current is MediaItemType ? _chatMediaPauseMs : _chatPauseMs;
@@ -554,6 +612,11 @@ class StoryController extends ChangeNotifier with EngineListener {
       _toasts.add(strings.galleryUnlocked(item.title ?? item.caption ?? strings.newGalleryItem));
 
   @override
+  void onClueFound(Clue clue) {
+    if (!_cluesFound.isClosed) _cluesFound.add(clue);
+  }
+
+  @override
   void onCheckpointUnlocked(Checkpoint checkpoint) {
     _toasts.add(strings.checkpoint(localizer.maybe(checkpoint.chapter) ?? checkpoint.conversationKey));
   }
@@ -568,6 +631,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     _autoTimer?.cancel();
     settings.removeListener(_applySettings);
     _toasts.close();
+    _cluesFound.close();
     audio.removeObserver();
     super.dispose();
   }

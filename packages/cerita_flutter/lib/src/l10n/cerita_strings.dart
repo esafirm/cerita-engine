@@ -132,6 +132,25 @@ abstract class CeritaStrings {
   String get videos;
   String galleryProgress(int unlocked, int total);
   String unlockedIn(String chapter);
+
+  // Case Board and evidence questions.
+  String get caseBoard;
+
+  /// The board's HUD label. Keep it short, like the other HUD labels.
+  String get caseBoardShort;
+
+  /// The in-game menu entry, with the count of clues not viewed yet.
+  String caseBoardEntry(int newClues);
+  String get noCluesYet;
+  String get newClue;
+  String get keyClue;
+  String cluesFound(int found, int total);
+  String clueFound(String title);
+  String get chooseEvidence;
+  String get present;
+
+  /// The player's line after presenting a clue, in the backlog and the NVL page.
+  String presented(String title);
 }
 
 class EnglishCeritaStrings extends CeritaStrings {
@@ -235,6 +254,28 @@ class EnglishCeritaStrings extends CeritaStrings {
   String galleryProgress(int unlocked, int total) => "$unlocked / $total unlocked";
   @override
   String unlockedIn(String chapter) => "Unlocked in $chapter";
+  @override
+  String get caseBoard => "Case Board";
+  @override
+  String get caseBoardShort => "Board";
+  @override
+  String caseBoardEntry(int newClues) => newClues == 0 ? caseBoard : "$caseBoard ($newClues new)";
+  @override
+  String get noCluesYet => "No clues yet. Keep an eye out.";
+  @override
+  String get newClue => "New";
+  @override
+  String get keyClue => "Key clue";
+  @override
+  String cluesFound(int found, int total) => "$found of $total found";
+  @override
+  String clueFound(String title) => "Clue found: $title";
+  @override
+  String get chooseEvidence => "Choose a clue to present";
+  @override
+  String get present => "Present";
+  @override
+  String presented(String title) => "Presented: $title";
   @override
   String get quickSave => "Quick save";
   @override
@@ -416,6 +457,28 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String galleryProgress(int unlocked, int total) => "$unlocked / $total terbuka";
   @override
   String unlockedIn(String chapter) => "Terbuka di $chapter";
+  @override
+  String get caseBoard => "Papan Kasus";
+  @override
+  String get caseBoardShort => "Papan";
+  @override
+  String caseBoardEntry(int newClues) => newClues == 0 ? caseBoard : "$caseBoard ($newClues baru)";
+  @override
+  String get noCluesYet => "Belum ada petunjuk. Tetap waspada.";
+  @override
+  String get newClue => "Baru";
+  @override
+  String get keyClue => "Petunjuk kunci";
+  @override
+  String cluesFound(int found, int total) => "$found dari $total ditemukan";
+  @override
+  String clueFound(String title) => "Petunjuk ditemukan: $title";
+  @override
+  String get chooseEvidence => "Pilih petunjuk untuk ditunjukkan";
+  @override
+  String get present => "Tunjukkan";
+  @override
+  String presented(String title) => "Ditunjukkan: $title";
   @override
   String get quickSave => "Simpan cepat";
   @override

@@ -10,7 +10,10 @@ class ChoiceList extends StatefulWidget {
   final ValueChanged<Choice> onSelected;
   final bool dark;
 
-  const ChoiceList({super.key, required this.item, required this.onSelected, this.dark = false});
+  /// Stops the countdown while the story is held, e.g. under the Case Board.
+  final bool paused;
+
+  const ChoiceList({super.key, required this.item, required this.onSelected, this.dark = false, this.paused = false});
 
   @override
   State<ChoiceList> createState() => _ChoiceListState();
@@ -30,7 +33,16 @@ class _ChoiceListState extends State<ChoiceList> with SingleTickerProviderStateM
           if (status == AnimationStatus.completed && fallback != null) widget.onSelected(fallback);
         })
         ..forward();
+      if (widget.paused) _countdown!.stop();
     }
+  }
+
+  @override
+  void didUpdateWidget(ChoiceList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final countdown = _countdown;
+    if (countdown == null || widget.paused == oldWidget.paused || countdown.isCompleted) return;
+    widget.paused ? countdown.stop() : countdown.forward();
   }
 
   @override
