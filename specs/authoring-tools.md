@@ -35,7 +35,7 @@ Probably a mistake, but the story still runs.
 
 | Check | Example |
 | :--- | :--- |
-| Unknown text tag | `{shaek}` is shown as written. |
+| Unknown text tag | `{shaek}` is shown as written. An escaped `{{b}` is not reported. |
 | Variable read but never set | A condition, `expr` or `{{VAR}}` uses a variable that no effect, `CHOICE` or `INPUT` sets. Usually a typo. |
 | Variable set but never read | Nothing reads it, so it has no effect. |
 | Unreachable conversation | No `target` from `index.json` leads to it, directly or through other conversations. |

@@ -123,7 +123,7 @@ void main() {
     test('unknown tags, unreachable conversations, dead items and chat threads', () async {
       final issues = await _lint({
         "index": _conversation([
-          _text("{shaek}Boo{/shaek} {w=500}"),
+          _text("{shaek}Boo{/shaek} {w=500} {{b} is escaped"),
           {"type": "JUMP", "target": "chat"},
           _text("dead"),
           _text("also dead"),

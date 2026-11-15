@@ -9,7 +9,8 @@ class TextMarkup {
 
   const TextMarkup(this.tokens, {this.noWait = false});
 
-  static final _tag = RegExp(r"\{(/?)([a-z]+)(?:=([^{}]*))?\}");
+  /// A tag, or `{{` for a literal `{`.
+  static final _tag = RegExp(r"\{\{|\{(/?)([a-z]+)(?:=([^{}]*))?\}");
 
   /// Lines without a `{` can't have tags, which is most of them.
   static TextMarkup parse(String text) {
@@ -38,6 +39,10 @@ class TextMarkup {
     for (final match in _tag.allMatches(text)) {
       buffer.write(text.substring(index, match.start));
       index = match.end;
+      if (match.group(2) == null) {
+        buffer.write("{");
+        continue;
+      }
       final closing = match.group(1)!.isNotEmpty;
       final name = match.group(2)!;
       final value = match.group(3);
@@ -83,6 +88,9 @@ class TextMarkup {
 
   /// [text] without its tags, as the player reads it.
   static String plain(String text) => parse(text).text;
+
+  /// [text] shown as written, with its `{` escaped, so tags in it are not applied.
+  static String escape(String text) => text.replaceAll("{", "{{");
 
   static const _styleTags = {"b", "i", "u", "s", "color", "size", "shake", "wave", "speed"};
 

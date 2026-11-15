@@ -141,7 +141,8 @@ class StoryLinter {
         for (final match in variablePattern.allMatches(value)) {
           reads.putIfAbsent(match.group(1)!, () => (key, index));
         }
-        final shown = TextMarkup.plain(value.replaceAll(variablePattern, ""));
+        // `{{` is an escaped `{`, written on purpose.
+        final shown = TextMarkup.plain(value.replaceAll(variablePattern, "").replaceAll("{{", ""));
         final unknown = RegExp(r"\{/?[a-z]+(=[^{}]*)?\}").firstMatch(shown);
         if (unknown != null) warn(key, index, "Unknown text tag '${unknown.group(0)}'");
       }

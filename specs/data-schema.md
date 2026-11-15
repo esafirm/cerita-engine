@@ -336,7 +336,7 @@ A jump into the middle of a conversation does not unlock its checkpoint.
 
 ## 6. Text Tags
 
-`TEXT` and `NARRATION` text, the prompt of `CHOICE` and `INPUT`, and the text of choice options can style parts of a line and control how it types out. Tags are applied after `{{variable}}` interpolation.
+`TEXT` and `NARRATION` text, the prompt of `CHOICE` and `INPUT`, and the text of choice options can style parts of a line and control how it types out. Tags are applied after `{{variable}}` interpolation. Variable values are inserted as written: tags in them are not applied, so a name typed into an `INPUT` like `{b}` shows as `{b}`.
 
 ```json
 {
@@ -362,7 +362,7 @@ A jump into the middle of a conversation does not unlock its checkpoint.
 | `{nw}` | Moves on as soon as the line is typed out, without a tap. For interrupted lines. |
 
 - Closing tags are optional at the end of the line. Tags can nest.
-- A `{` that does not start a known tag is shown as written, so `{draft}` is just text.
+- A `{` that does not start a known tag is shown as written, so `{draft}` is just text. Write `{{` for a `{` that would otherwise start a tag: `{{b}` shows `{b}`.
 - `{w}`, `{w=…}`, `{speed}` and `{nw}` only affect the VN dialogue box and NVL page. Skip mode and rolled-back lines show the whole line at once and ignore them.
 - Chat bubbles, the call view, the backlog and choice options show the styles without the pauses. The player's reply in the transcript, and the value a choice without `value` stores, are the option text without its tags.
 - Reading time in auto mode counts only the visible characters.

@@ -72,6 +72,39 @@ void main() {
         const MarkupText("big", MarkupStyle(size: 1.5, underline: true)),
       ]);
     });
+
+    test('tags in a typed name are shown as written, and choice tags stay out of the reply', () async {
+      final engine = RealFsseEngine(_FakeEngineLoader({
+        "index": {
+          "conversation_id": "cvn",
+          "scene": {"mode": "VN"},
+          "conversations": [
+            {"type": "INPUT", "text": "Name?", "variable": "NAME"},
+            _text("Hi {b}{{NAME}}{/b}"),
+            {
+              "type": "CHOICE",
+              "text": "Pick",
+              "variable": "PICK",
+              "choices": [
+                {"text": "{i}Wave{/i} at {{NAME}}"},
+              ],
+            },
+          ],
+        },
+      }));
+      await engine.next();
+      final hi = await engine.next(prevResult: const ItemResult.input("NAME", "{w}Bo{color=#FF0000}"));
+      expect(TextMarkup.parse(hi.getText()!).tokens, [
+        const MarkupText("Hi ", MarkupStyle()),
+        const MarkupText("{w}Bo{color=#FF0000}", MarkupStyle(bold: true)),
+      ]);
+      expect(engine.dataMap["NAME"], "{w}Bo{color=#FF0000}");
+
+      final choice = await engine.next() as ChoiceItemType;
+      final result = ItemResult.choice(choice.variable, choice.choices.single);
+      expect(result.text, "Wave at {w}Bo{color=#FF0000}");
+      expect(result.value, "Wave at {w}Bo{color=#FF0000}");
+    });
   });
 
   group('NVL page', () {

@@ -43,7 +43,7 @@ class CapabilitiesScreen extends StatelessWidget {
     (
       "Text & audio",
       [
-        ("Text tags", "Prologue & Day 2: {i}, {b}, {color}, {shake}, {wave}, timed pauses {w=…} and tap-to-continue {w}."),
+        ("Text tags", "Prologue & Day 2: {i}, {b}, {color}, {shake}, {wave}, timed pauses {w=…} and tap-to-continue {w}. Choices too: \"Nah. {i}Probably{/i} spam.\" Tags typed into your name show as written."),
         ("Interrupted lines", "Day 2: Nora gets cut off mid-sentence with {nw}."),
         ("NVL mode", "The prologue opens as a full-screen page, then switches to the dialogue box. The secret ending is a diary page."),
         ("Music fades & ambience", "Track changes fade. Prologue, pick \"Nah\": a looping ambience track plays under the stage."),
