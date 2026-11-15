@@ -521,20 +521,22 @@ text scale, is scaled down instead of wrapped. The labels themselves stay as the
 - **Revisit if** a language has a value label longer than 120 dp at the normal text scale. It would show
   scaled down.
 
-## Continue after an ending reopens the ending summary
+## A finished playthrough leaves no autosave
 
 *2026-11-15. Engine §5.2. Backlog CE-08.*
 
-The autosave is written after every item, including the `ENDING` item, and loading a save that stops at an
-ending shows the summary again. So once a playthrough has ended, the title screen still offers Continue, named
-after the ending's chapter, until a new game overwrites the autosave. This was kept as it is.
+The autosave was written after every item, including the `ENDING` item, and loading a save that stops at an
+ending shows the summary again. So after finishing, the title screen still offered Continue, named after the
+ending's chapter, and it only led back to the summary. Now the controller deletes the autosave when the
+playthrough reaches an `ENDING` (or the story runs out of items), so a finished story offers no Continue until
+a new game starts.
 
-- **Why:** this is how saves have worked since the first engine commit (`17bed14`), which restores an `ENDING`
-  item into the ending phase on purpose. Rolling credits (CE-08) don't change it: an ending with and without
-  `roll_after` leaves the same autosave, and a widget test checks that.
-- **Cost:** after finishing, Continue leads to the summary of a finished story rather than somewhere new.
-- **Revisit if** players find Continue to an ending confusing. Options: skip the autosave at an `ENDING` item,
-  or have the title screen offer Continue only when the autosave isn't at an ending.
+- **Why:** Continue should lead somewhere new. Skipping the write at the ending instead would leave the
+  autosave on the line before it, which replays the ending and is worse.
+- **Kept:** a manual or quick save made on the ending summary still reopens it, as it always has. Rolling
+  credits don't change anything here: both ending paths leave no autosave, and a widget test checks that.
+- **Cost:** after finishing, a player who wants to see the summary again uses the Endings screen.
+- **Revisit if** players want to pick up right after an ending, e.g. for a post-ending epilogue.
 
 ## The demo's own title strings stay in the demo
 

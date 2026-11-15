@@ -154,9 +154,9 @@ void main() {
     expect(find.text("Title screen"), findsOneWidget);
   });
 
-  testWidgets('rolling credits leave the same autosave as an ending without them', (tester) async {
-    /// Plays to the ending, leaves it and continues from the autosave, as the title screen's Continue does.
-    Future<SaveSlot> finishAndContinue(StorySetup setup) async {
+  testWidgets('reaching an ending clears the autosave, with or without rolling credits', (tester) async {
+    /// Plays to the ending and back to the title, then returns the autosave the title screen would continue.
+    Future<SaveSlot?> finish(StorySetup setup) async {
       await tester.pumpWidget(MaterialApp(
         home: Builder(
           builder: (context) => TextButton(
@@ -167,30 +167,24 @@ void main() {
       ));
       await tester.tap(find.text("Title screen"));
       await tester.pumpAndSettle();
+      final before = await tester.runAsync<SaveSlot?>(() => setup.storage.loadSlot(SaveSlot.autoSlotId));
+      expect(before, isNotNull, reason: "lines before the ending are autosaved");
       await tester.tap(find.byType(VnStage));
       await tester.pumpAndSettle();
+      expect(find.text("Back to title"), findsOneWidget);
       await tester.tap(find.text("Back to title"));
       await tester.pump();
       if (find.byType(RollingCredits).evaluate().isNotEmpty) await tester.tap(find.byType(RollingCredits));
       await tester.pumpAndSettle();
       expect(find.text("Title screen"), findsOneWidget);
-      final save = (await tester.runAsync<SaveSlot?>(() => setup.storage.loadSlot(SaveSlot.autoSlotId)))!;
-
-      await tester.pumpWidget(MaterialApp(home: StoryScreen(setup: setup, save: save)));
-      await tester.pumpAndSettle();
-      // The autosave is made at the ENDING item, so Continue shows its summary again. See docs/decisions.md.
-      expect(find.text("The last word"), findsOneWidget);
-      expect(find.text("Back to title"), findsOneWidget);
+      final save = await tester.runAsync<SaveSlot?>(() => setup.storage.loadSlot(SaveSlot.autoSlotId));
       await tester.pumpWidget(const SizedBox());
       return save;
     }
 
-    final rolled = await finishAndContinue(setup(credits: _credits));
-    final plain = await finishAndContinue(setup());
-    expect(
-      (rolled.conversationKey, rolled.dialogIndex, rolled.history.length),
-      (plain.conversationKey, plain.dialogIndex, plain.history.length),
-    );
+    // A finished playthrough leaves nothing to continue. See docs/decisions.md.
+    expect(await finish(setup(credits: _credits)), isNull);
+    expect(await finish(setup()), isNull);
   });
 
   test('a bundled story without credits.json has no credits', () async {

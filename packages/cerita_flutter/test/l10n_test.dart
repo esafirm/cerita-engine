@@ -164,6 +164,10 @@ void main() {
     expect(find.text("Reply?"), findsOneWidget);
     expect((await tester.runAsync(storage.loadSettings))!.locale, "en");
 
+    // Saves keep every language.
+    final save = (await tester.runAsync(() => storage.loadSlot(SaveSlot.autoSlotId)))!;
+    expect(save.chapter, LocalizedText.locales({"id": "Hari 1", "en": "Day 1"}));
+
     await tester.tap(find.text("Yes"));
     var toast = false;
     for (var i = 0; i < 20; i++) {
@@ -182,9 +186,8 @@ void main() {
     expect(find.text("ENDING BAIK"), findsOneWidget);
     expect(find.text("Kembali ke menu utama"), findsOneWidget);
 
-    // Saves keep every language.
-    final save = (await tester.runAsync(() => storage.loadSlot(SaveSlot.autoSlotId)))!;
-    expect(save.chapter, LocalizedText.locales({"id": "Hari 1", "en": "Day 1"}));
+    // The ending clears the autosave, so a finished story offers no Continue.
+    expect(await tester.runAsync(() => storage.loadSlot(SaveSlot.autoSlotId)), isNull);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 3));

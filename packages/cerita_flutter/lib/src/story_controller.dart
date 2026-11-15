@@ -428,7 +428,14 @@ class StoryController extends ChangeNotifier with EngineListener {
     }
     if (_disposed) return;
 
-    if (phase != StoryPhase.typing && !replay) await engine.saveTo(SaveSlot.autoSlotId);
+    if (!replay) {
+      // A finished playthrough leaves no autosave, so the title screen doesn't offer Continue into it.
+      if (phase == StoryPhase.ending || phase == StoryPhase.finished) {
+        await engine.storage?.deleteSlot(SaveSlot.autoSlotId);
+      } else if (phase != StoryPhase.typing) {
+        await engine.saveTo(SaveSlot.autoSlotId);
+      }
+    }
     if (phase == StoryPhase.waiting) {
       final duration = switch (current) {
         WaitItemType(:final durationMs) => skipMode ? 200 : durationMs,

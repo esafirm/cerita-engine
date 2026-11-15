@@ -206,7 +206,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 
 **Reset progress** calls `StoryStorage.clear()`, which wipes the whole meta-state (gallery, endings, checkpoints, chosen choices, persistent variables, remembered facts) and every save slot.
 
-Slot ids: `0` is the autosave, written after every delivered item. `-1` is the quick save slot. `1` and up are manual slots.
+Slot ids: `0` is the autosave, written after every delivered item and deleted when the playthrough reaches an `ENDING` (or runs out of items), so a finished story offers no Continue. `-1` is the quick save slot. `1` and up are manual slots.
 
 ### 5.3 Player Settings
 Preferences live outside both scopes, so resetting progress keeps them. `StoryStorage.loadSettings` / `saveSettings` store them; storages that don't override them keep the defaults in memory.
