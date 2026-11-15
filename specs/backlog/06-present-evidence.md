@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | In progress |
+| **Status** | Done |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |
