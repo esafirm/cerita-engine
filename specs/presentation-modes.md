@@ -109,6 +109,11 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - Text speed (with a preview line), auto-forward delay, skip unread text, and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.
    - A voice volume for each character with voiced lines.
    - Language, when the story offers more than one (§5).
+7. **Credits** (CE-08):
+   - Shown from the title screen when the story has a `credits.json` (data schema §9). Without one, apps leave the entry out (`loader.loadCredits()` returns null).
+   - The sections with each person and role, then the third-party assets with title, author, source, license and note, in the active language. A button at the end opens the open-source licenses page (`showLicensePage`).
+   - **Rolling credits**: when the player leaves the summary of an ending listed in `roll_after` (Back to title or All endings), the credits scroll up over black, then the game goes where the player asked. A tap skips them.
+   - Skins restyle both through `StorySkin.credits`.
 
 ---
 

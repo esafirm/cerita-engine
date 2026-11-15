@@ -12,6 +12,7 @@ assets/story/
 ├── profiles.json           # Cast & character profile registry
 ├── channels.json           # (Optional) Chat thread metadata for Messenger mode
 ├── clues.json              # (Optional) Clues for the Case Board, see section 8
+├── credits.json            # (Optional) People, roles and third-party assets for the Credits screen, see section 9
 ├── cvn_<id>.json           # Branched conversation scripts (e.g., cvn_qxfOhA.json)
 ├── bg/                     # Scene background images & event CGs
 ├── sprites/                # Character expression sprites
@@ -603,3 +604,51 @@ clue not found yet.
 Clues are grouped by `chapter`. Groups keep the order in which their first clue appears in `clues.json`, and
 the board lists them newest first. Inside a group clues keep their file order. Clues without a `chapter`
 form one group without a heading, listed last. Write `clues.json` in story order.
+
+---
+
+## 9. Credits (`credits.json`)
+
+*Backlog CE-08.* An optional file next to `index.json` that lists who made the story and every third-party asset it
+uses. Without it, the story has no Credits screen.
+
+```json
+{
+  "sections": [
+    {
+      "title": { "id": "Cerita", "en": "Story" },
+      "people": [
+        { "name": "Esa Firman", "role": { "id": "Penulis", "en": "Writer" } },
+        { "name": "Dina" }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "title": { "id": "Pelabuhan malam", "en": "Harbor at night" },
+      "author": "Jane Doe",
+      "source": "opengameart.org/content/harbor-at-night",
+      "license": "CC0 1.0",
+      "note": { "id": "Musik bab 3", "en": "Chapter 3 music" }
+    }
+  ],
+  "roll_after": ["end_01_true"]
+}
+```
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `sections` | `List` | No | Groups of people, in the order shown: story, art, music, voice, engine, ... |
+| `sections[].title` | text | Yes | Section heading. |
+| `sections[].people[].name` | text | Yes | A person, team or tool. |
+| `sections[].people[].role` | text | No | What they did. |
+| `assets` | `List` | No | Third-party assets, shown after the sections. |
+| `assets[].title` | text | Yes | The asset's name. |
+| `assets[].author` | `String` | Yes | Who made it. |
+| `assets[].source` | `String` | Yes | Where it came from, usually a URL. Shown as text, never opened from the game. |
+| `assets[].license` | `String` | Yes | The license name, e.g. `CC0 1.0` or `CC BY 4.0`. |
+| `assets[].note` | text | No | What the story uses it for. |
+| `roll_after` | `List<String>` | No | `ending_id`s after which the credits roll (presentation modes §4). |
+
+"text" fields are localized text ([section 7](#7-localized-text)). Open-source software licenses aren't listed
+here: the Credits screen links to the licenses Flutter collects from the app's packages.

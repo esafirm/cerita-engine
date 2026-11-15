@@ -1,3 +1,4 @@
+| Bad credits | `credits.json` fails to load (a section without `title`, a person without `name`, an asset without `title`, `author`, `source` or `license`), or `roll_after` names an `ending_id` no `ENDING` has. |
 # Authoring Tools Specification
 
 Tools for writers working on a story: a linter that finds mistakes before a player does, a graph of how the story flows, and a developer panel inside the running story.
@@ -35,6 +36,7 @@ The story breaks or behaves wrongly when it gets there.
 | Undeclared clue | A `clue_<x>` variable read or set, or an evidence response for clue `x`, when `x` isn't in `clues.json`. The `clue_` variables are only checked in stories that have a `clues.json`. |
 | Bad evidence question | No `responses`, two responses for one clue, `choices` or `default_choice` on it, or negative `retries`. |
 | Evidence question without an answer | No clue with a response is awarded before the question can be reached (see below). |
+| Bad credits | `credits.json` doesn't load (a section without `title`, a person without `name`, an asset without `title`, `author`, `source` or `license`), or its `roll_after` names an `ending_id` no `ENDING` has. |
 
 ### 1.2 Warnings
 Probably a mistake, but the story still runs.

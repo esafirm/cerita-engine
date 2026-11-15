@@ -17,7 +17,7 @@ Every capability is generic. Last Seen is the first story that uses it, not the 
 | CE-05 | [Case Board](05-case-board.md) | Must | M2 | Done |
 | CE-06 | [Present evidence](06-present-evidence.md) | Must | M2 | Done |
 | CE-07 | [Route flowchart](07-route-flowchart.md) | Should | M3 | Backlog |
-| CE-08 | [Credits screen](08-credits-screen.md) | Should | M5 | Backlog |
+| CE-08 | [Credits screen](08-credits-screen.md) | Should | M5 | In progress |
 
 Milestones refer to [Last Seen section 9](../last-seen.md#9-milestones).
 

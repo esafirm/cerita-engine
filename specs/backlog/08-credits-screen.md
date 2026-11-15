@@ -2,7 +2,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress ([design](../data-schema.md#9-credits-creditsjson), [screens](../presentation-modes.md#4-meta-game-screens)) |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | User stories only (small, low-risk) |
