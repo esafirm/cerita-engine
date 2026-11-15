@@ -1,12 +1,12 @@
 # Backlog
 
-Work that is known but not scheduled. Specs come first: update `specs/` before the code, like the rest of the engine.
+Work that is known but not scheduled. Specs come first: update `specs/` before the code, like the rest of the engine. Why an item was deferred, and the calls made while finishing others, are in [`docs/decisions.md`](docs/decisions.md).
 
 ## Polish
 
 - **Crossfade music.** Track changes fade out, then in, because a second music player would take Android audio focus from the first. A crossfade needs a player setup that shares focus.
 - **Rollback in chat and call scenes.** Rollback stops at chat and call threads, which move on by themselves. It would need their pacing to pause and resume.
-- **Device check.** Animations, fades, volumes, the mouse wheel rollback and story hot reload have only been tested in widget tests and renders. Run them on a device and a desktop.
+- **Device check.** Rollback, text tags and HIDE were checked on an Android emulator (see the decisions log). Fades and volumes still need a listen on a device, and the mouse wheel rollback and story hot reload a run on a desktop and a device.
 
 ## Later features
 

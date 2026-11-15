@@ -87,4 +87,6 @@ make install DEVICE=emulator-5554   # profile build, install (keeping saves) and
 
 `example/test/story_test.dart` plays the bundled story headlessly to all four endings.
 
+Known work that isn't scheduled yet is in [`BACKLOG.md`](BACKLOG.md). Judgment calls, with their reasons and when to revisit them, are in [`docs/decisions.md`](docs/decisions.md): add an entry when you make one.
+
 Keep tests focused on behaviour a player or writer would notice: story flow, saves, rollback, what the screens show. Don't add low-value tests, like ones for trivial helpers, getters or formatting, or ones that repeat what another test already covers.
