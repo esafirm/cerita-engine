@@ -83,6 +83,9 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Separate audio channel for one-shot UI/message sounds (`item.sfx`) and voice-overs/voice notes (`item.voice` or `MEDIA` audio) so BGM continues uninterrupted (or ducks slightly in volume).
   - Sound effects can overlap: a few players take turns.
   - A voice line stops when the story moves on. Its speaker's voice volume applies.
+- **Voice per language**: voice-overs and voice notes resolve `name.<locale>.mp3` before `name.mp3` against the
+  asset manifest (`LocalizedAssets`, loaded once per bundle). The active locale picks the clip. A voice note
+  that is not playing reloads its clip after a language switch.
 
 ---
 
@@ -104,3 +107,52 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 6. **Settings**:
    - Text speed (with a preview line), auto-forward delay, skip unread text, and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.
    - A voice volume for each character with voiced lines.
+   - Language, when the story offers more than one (§5).
+
+---
+
+## 5. Language
+
+Implements [CE-01 Bilingual stories](backlog/01-bilingual-stories.md) in `cerita_flutter`.
+
+### 5.1 `StoryLanguage`
+
+A `ChangeNotifier` holding the active locale, the story's `StoryLocales` and the engine string tables. Apps
+provide it above the navigator with `StoryLanguageScope`, the same way as `StorySkinScope`:
+
+```dart
+final language = StoryLanguage();
+await language.load(setup); // reads index.json and the saved pick
+runApp(MaterialApp(
+  builder: (context, child) => StoryLanguageScope(language: language, child: child!),
+  home: ...,
+));
+```
+
+- `load(setup)` picks, in order: the saved language, the device language (PRD 10.6, D4), the story's
+  `source_locale`. Saved and device languages only count if the story lists them in `locales`.
+- `select(locale)` switches and saves it as `PlayerSettings.locale` through `StorySetup.settings`.
+- `StoryLanguage.of(context)` returns the scope's language. Without a scope it is a fallback with English
+  engine screens and the story in its source language, which is how the engine looked before CE-01.
+
+`StoryScreen` passes the language to its `StoryController`, which sets `engine.locale` and re-reads the
+current line, speaker, chapter and WAIT banner in the new language. Everything else re-renders from the
+transcript (`controller.itemOf(entry)`), so a switch mid-chapter changes the current line, the backlog, chat
+history and menus at once, without touching progress.
+
+### 5.2 Engine screens (`CeritaStrings`)
+
+Every string the engine draws itself (in-game menu, HUD, toasts, dialogs, chat and call chrome, Save, Load,
+Chapters, Gallery and Endings screens, ending summary) comes from `StoryLanguage.of(context).strings`, a
+`CeritaStrings`. Built in: `CeritaStrings.en` and `CeritaStrings.id`.
+
+- **More languages**: subclass `CeritaStrings` and pass `StoryLanguage(strings: {"ja": JaStrings()})`.
+- **Lookup**: the active locale, else English. Without a picked locale, English.
+- **Skins** read `StoryLanguage.of(context)` for the locale and translate their own text. The default skin
+  and `AnimeVnSkin` use `CeritaStrings` for their HUD labels.
+- **Apps** can use the same strings for their title screen (`newGame`, `continueGame`, `load`, ...).
+
+### 5.3 Language switch
+
+`LanguagePicker.show(context)` lists the story's `locales` by their `CeritaStrings.languageName`. The Settings
+screen shows a Language row when the story has more than one locale, and so does the demo title screen.

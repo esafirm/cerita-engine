@@ -103,6 +103,28 @@ Each conversation file represents a scene, chat session, or story chapter.
 
 A conversation **without** a `scene` object continues the current scene and stage. Use it for shared `CALL` subroutines that should not reset the background or characters.
 
+### Story languages (`index.json` only)
+
+`index.json` also declares the languages the story is written in. Both fields are optional and ignored in
+`cvn_<id>.json` files. See [section 7](#7-localized-text).
+
+```json
+{
+  "conversation_id": "cvn_prologue",
+  "source_locale": "id",
+  "locales": ["id", "en"],
+  "conversations": []
+}
+```
+
+| Field | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `source_locale` | `String` | `"id"` | The language the story is written in first. Fallback for text missing in the active language. |
+| `locales` | `List<String>` | `[source_locale]` | Every language the story offers. The language switch lists these. |
+
+Locale codes are lowercase ISO 639-1 language codes (`"id"`, `"en"`). A single-language story in another
+language than Indonesian declares only `source_locale`, e.g. Wrong Number declares `"en"`.
+
 ---
 
 ## 4. Conversation Item Types (`conversations`)
@@ -150,6 +172,7 @@ Delivers rich media inside a chat bubble or displays a full-screen CG in VN mode
   "type": "MEDIA",
   "media_type": "IMAGE",
   "uri": "photo_luna_cafe.png",
+  "title": { "id": "Kafe Luna", "en": "Luna's café" },
   "caption": "Look what I found in her old drawer...",
   "profile": "123bbb:1",
   "unlock_id": "cg_luna_cafe_01",
@@ -158,6 +181,9 @@ Delivers rich media inside a chat bubble or displays a full-screen CG in VN mode
 ```
 - `media_type`: `"IMAGE"` \| `"AUDIO"` (voice note) \| `"VIDEO"` \| `"CG"`.
 - `unlock_id` (`String?`): Key saved to the global Gallery registry once viewed.
+- `title` (`String?`): Display name of the collectible, shown in the Gallery and in the unlock toast. Falls
+  back to `caption`, then to a generic label. Never shows `unlock_id`.
+- `transcript` (`String?`): Text of a voice note, behind a "Show transcript" toggle.
 
 ### 4.4 `CHOICE` — Branching Player Decision
 Presents interactive options to the player. Choices can mutate state variables, require conditions to appear/unlock, enforce a countdown timer, and jump to a target conversation.
@@ -381,3 +407,66 @@ A jump into the middle of a conversation does not unlock its checkpoint.
 - `{w}`, `{w=…}`, `{speed}` and `{nw}` only affect the VN dialogue box and NVL page. Skip mode and rolled-back lines show the whole line at once and ignore them.
 - Chat bubbles, the call view, the backlog and choice options show the styles without the pauses. The player's reply in the transcript, and the value a choice without `value` stores, are the option text without its tags.
 - Reading time in auto mode counts only the visible characters.
+
+---
+
+## 7. Localized Text
+
+A story can hold every language side by side. Any player-visible text field is either a plain string or an
+object of locale code to string:
+
+```json
+{
+  "type": "TEXT",
+  "profile": "raka:0",
+  "text": { "id": "Lo di mana sekarang?", "en": "Where are you right now?" },
+  "voice": "vo_raka_04.mp3"
+}
+```
+
+A plain string is the same text in every language, so single-language stories need no changes.
+
+### 7.1 Localizable fields
+
+| Where | Fields |
+| :--- | :--- |
+| Conversation file | `chapter`, `title` |
+| `TEXT`, `NARRATION` | `text` |
+| `MEDIA` | `title`, `caption`, `transcript` |
+| `CHOICE` | `text` (the prompt) and each option's `text` |
+| `INPUT` | `text` (the prompt), `default_value` |
+| `WAIT` | `notification_text` |
+| `ENDING` | `title`, `summary` |
+| `profiles.json` | `name`, `bio` |
+| `channels.json` | `name`, `status` |
+
+Logic fields never take a locale object: `id`, `condition`, `effects`, `variable`, `target`, `value`,
+`profile`, `uri`, `voice`, `sfx`, `music`, `background`, `unlock_id`, `ending_id`, `handle`, `scene.time`.
+
+### 7.2 Fallback
+
+The text shown is the first one present, in this order:
+
+1. The active locale (the player's pick).
+2. The story's `source_locale` (section 3, defaults to `"id"`).
+3. The first key of the object.
+
+A missing translation never blanks a line or stops the story (PRD CE-01, D2). The story authoring toolkit
+(CE-02) reports the gaps before release.
+
+### 7.3 Interpolation and player input
+
+`{{VAR}}` placeholders are filled in each language's text separately, so each translation places the value
+where its grammar needs it. Values typed by the player (`INPUT`) are stored and shown as typed in every
+language.
+
+A localized `CHOICE` option without a `value` stores its **source-language** text (without tags, §6) in `variable`, so state and
+conditions don't depend on the language the player picked. Plain-string options keep storing their text as
+before. Give options an explicit `value` when conditions test them.
+
+### 7.4 Voice per language
+
+`voice` on `TEXT` and `uri` on `MEDIA` items of type `AUDIO` name one file. For `name.mp3` the player first
+tries `name.<locale>.mp3` (e.g. `vo_raka_04.en.mp3`) in the active locale, then `name.mp3`. A story can ship a
+clip per language, or one clip shared by every language. Other media (images, CGs, video, music, SFX) are not
+localized.

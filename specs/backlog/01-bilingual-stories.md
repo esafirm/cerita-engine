@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | Backlog |
+| **Status** | In progress. Design: [data schema 7](../data-schema.md#7-localized-text), [engine 9](../engine-and-state.md#9-localization), [presentation 5](../presentation-modes.md#5-language) |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |

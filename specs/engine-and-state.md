@@ -199,6 +199,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 - **Chosen (`chosen`)**: `once` choices already picked in this playthrough.
 - **Stage (`stage`)**: See §6.
 - **Rollback (`rollback`)**: The rollback frames and recorded `random()` rolls, see §7.
+- **Language independence**: saves and checkpoints never depend on the active language, see §9.4.
 
 **Reset progress** calls `StoryStorage.clear()`, which wipes the whole meta-state (gallery, endings, checkpoints, chosen choices, persistent variables, remembered facts) and every save slot.
 
@@ -214,6 +215,7 @@ Preferences live outside both scopes, so resetting progress keeps them. `StorySt
 | `skip_unread` | `false` | Skip mode also fast-forwards lines never seen before. |
 | `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. Ambience follows `sound_volume`. |
 | `voice_volumes` | `{}` | Per-character voice volume by profile id, `0.0` to `1.0`, on top of `voice_volume`. Missing characters play at `1.0`. |
+| `locale` | none | The player's language (§9.4). Unset until the player or the device picks one. |
 
 ---
 
@@ -253,3 +255,57 @@ The engine remembers the last 100 delivered items with the full playthrough stat
 ## 8. Scene Replay
 
 `start(checkpoint: ..., replay: true)` plays one chapter from an unlocked checkpoint with its saved variables. The replay ends with `EndOfStoryException` when the story enters a conversation with a different `chapter` (conversations without a `chapter`, like shared subroutines, don't end it). The UI does not autosave or offer saving during a replay.
+
+---
+
+## 9. Localization
+
+Implements [CE-01 Bilingual stories](backlog/01-bilingual-stories.md). The JSON format is in
+[data schema section 7](data-schema.md#7-localized-text).
+
+### 9.1 Types (`cerita_core`)
+
+| Type | Role |
+| :--- | :--- |
+| `LocalizedText` | Value of a localizable field: a plain string or a locale map. `resolve(locale, source:)` applies the fallback order. `toJson()` returns the original form. Equality is by value |
+| `StoryLocales` | The story's `source_locale` (default `"id"`) and `locales`, parsed from `index.json` into `Conversation.locales` |
+| `Localizer` | The active locale plus the source locale. Resolves `LocalizedText` and raw JSON fields. A `null` locale shows the source language |
+| `localizedAssetName(name, locale)` | `vo.mp3` to `vo.en.mp3`. Shared by the player and by tooling that checks clips exist |
+
+### 9.2 Where text is resolved
+
+The engine has an active locale: `RealFsseEngine.locale` (`null` until the app sets one), and
+`RealFsseEngine.localizer` combines it with the story's `source_locale`. The UI changes `locale` at any time.
+
+- **Items** keep their raw JSON, locale maps included. Their typed fields (`TextItemType.text`,
+  `Choice.text`, `EndingItemType.title`, ...) are plain strings resolved with the `Localizer` passed to
+  `ItemType.fromJson(json, localizer:)`. Without one they resolve to the source language.
+  `item.localized(localizer)` re-reads the same JSON in another language. A `ChoiceItemType` keeps its locked
+  options.
+- **Interpolation** (`cloneWithData`) fills `{{VAR}}` in every language of a field and keeps the map. The engine
+  then resolves the result with its `localizer`, so `next()` returns items in the active language.
+- **Conversations, profiles and channels** keep the raw values next to the resolved ones
+  (`Conversation.chapterText`, `Profile.localized(...)`). `getProfile`, `getProfileById` and `getChannel`
+  return them in the active language. Item conditions and engine logic never read resolved text.
+- **Choice values**: a localized option without `value` stores its source-language text (data schema 7.3).
+
+### 9.3 Transcript
+
+`TranscriptEntry.item` is the interpolated JSON with every language still in it, and
+`TranscriptEntry.playerText` is a `LocalizedText`: a chosen option keeps all its languages, typed input is a
+plain string. `entry.itemIn(localizer)` renders an entry in any language, so the backlog and chat history
+follow a language switch (PRD D3). `entry.itemType` keeps resolving to the source language, for type checks.
+
+### 9.4 Saves and the language setting
+
+- `SaveSlot.chapter`/`title` and `Checkpoint.chapter`/`title` are `LocalizedText`, written as the original
+  string or map. A game saved in one language loads in any other.
+- Old saves load unchanged: their plain strings parse as plain `LocalizedText`, and plain `player_text` and
+  item JSON read as before.
+- The active language is a player setting, not playthrough state: `PlayerSettings.locale` (§5.3), outside
+  every save slot, kept by reset progress.
+
+### 9.5 Listener
+
+`EngineListener.onMediaUnlocked(MediaItemType item)` receives the unlocked item in the active language, so the
+UI can name it by its `title` (or `caption`) instead of its `unlock_id`.
