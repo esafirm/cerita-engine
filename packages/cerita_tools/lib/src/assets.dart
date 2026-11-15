@@ -3,7 +3,12 @@ import 'model.dart';
 import 'project.dart';
 
 /// Asset kinds in report order (spec §3.3).
-const assetKinds = ["background", "cg", "sprite", "avatar", "image", "video", "voice_note", "music", "sfx", "voice"];
+const assetKinds = [
+  "background", "cg", "sprite", "avatar", "image", "video", "voice_note", "music", "ambience", "sfx", "voice",
+];
+
+/// Kinds a story can ship per locale as `name.<locale>.ext` (CE-01, data schema §5.4).
+const localizedAssetKinds = {"voice", "voice_note"};
 
 /// A file the story uses. [path] is relative to the asset folder (`bg/x.png`).
 class AssetRef {
@@ -24,16 +29,9 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
     return avatar.contains("/") ? avatar : "sprites/$avatar";
   }
 
-  void add(String kind, String folder, String? file, SourceSpan span) {
-    if (file == null || file.isEmpty) return;
+  void add(String kind, String folder, Object? file, SourceSpan span) {
+    if (file is! String || file.isEmpty) return;
     refs.add(AssetRef(kind, "$folder/$file", span));
-  }
-
-  void addAll(String kind, String folder, LocalizedAsset? asset) {
-    if (asset == null) return;
-    for (final file in asset.files(config.locales, config.sourceLocale)) {
-      add(kind, folder, file, asset.span);
-    }
   }
 
   for (final profile in project.cast.profiles.values) {
@@ -53,12 +51,13 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
     if (scene != null) {
       add("background", "bg", scene.background, scene.span);
       add("music", "music", scene.music, scene.span);
+      add("ambience", "music", scene.ambience, scene.span);
     }
     for (final item in conversation.items) {
       switch (item) {
         case LineItem():
           add("sfx", "music", item.sfx, item.span);
-          addAll("voice", "music", item.voice);
+          add("voice", "music", item.voice, item.span);
         case NarrationItem():
           add("sfx", "music", item.sfx, item.span);
         case MediaItem():
@@ -68,8 +67,20 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
             "VIDEO" => ("video", "media"),
             _ => ("image", "media"),
           };
-          addAll(kind, folder, item.uri);
+          add(kind, folder, item.uri, item.span);
           add("sfx", "music", item.sfx, item.span);
+        case StageItem():
+          for (final action in item.actions) {
+            final file = action.fields["file"];
+            switch (action.action) {
+              case "background":
+                add("background", "bg", action.fields["image"], action.span);
+              case "music" || "ambience":
+                add(action.action, "music", file, action.span);
+              case "sound":
+                add("sfx", "music", file, action.span);
+            }
+          }
         default:
           break;
       }
@@ -78,13 +89,27 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
   return refs;
 }
 
-/// References whose file isn't in the asset folder, first reference per path. `null` when asset checks can't run.
+/// Files that are missing, first reference per path. `null` when asset checks can't run.
+///
+/// A voice clip or voice note is there when its shared file is, or when every locale has its own
+/// `name.<locale>.ext`. Otherwise each missing per-locale file is listed, since that's what the voice pipeline
+/// produces (spec §3.4).
 List<AssetRef>? missingAssets(StoryProject project) {
   final files = project.assetFiles;
   if (files == null) return null;
+  final locales = project.config.locales;
   final seen = <String>{};
-  return [
-    for (final ref in collectAssetRefs(project))
-      if (!files.contains(ref.path) && seen.add(ref.path)) ref,
-  ];
+  final missing = <AssetRef>[];
+  for (final ref in collectAssetRefs(project)) {
+    if (files.contains(ref.path)) continue;
+    if (!localizedAssetKinds.contains(ref.kind)) {
+      if (seen.add(ref.path)) missing.add(ref);
+      continue;
+    }
+    for (final locale in locales) {
+      final variant = localeVariant(ref.path, locale);
+      if (!files.contains(variant) && seen.add(variant)) missing.add(AssetRef(ref.kind, variant, ref.span));
+    }
+  }
+  return missing;
 }

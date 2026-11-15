@@ -1,8 +1,18 @@
 @conversation index id=cvn_qxfOhN chapter=Prologue title="A Quiet Evening" checkpoint
-@scene VN day=0 time=21:00 bg=bg_sitting_room.png music=sunny.mp3
+@scene VN day=0 time=21:00 bg=bg_sitting_room.png music=sunny.mp3 textbox=nvl
+
++persistent.runs
 
 narration
-  en: A quiet evening at Nora's place. Your phone has been buzzing all day, all from your old number.
+  en: A quiet evening at Nora's place.
+narration
+  en: Your phone has been buzzing all day.{w=500} All of it to your {i}old{/i} number.
+narration
+  en: You switched numbers a week ago.{w} Whoever is texting doesn't know that.
+
+stage
+  textbox adv
+  show nora:smile center transition=slide_up duration=700
 
 nora:smile [center] voice=vo_nora_01.mp3
   en: Hey! You're finally here.
@@ -12,24 +22,43 @@ input NAME default=Alex by=nora
 
 nora:smile
   en: Nice to e-meet you {{NAME}} 🙏 ...kidding. Sit down.
-  set met_nora true
+nora:frown [if persistent.runs > 1]
+  en: ...Weird. I feel like we've done this before. Run number {{persistent.runs}}?
 
 nora:open
   en: So you got a new number, but someone keeps texting the old one?
 
-choice CURIOSITY by=nora
+choice CURIOSITY by=nora label=ask
   en: "Are you going to check it?"
 ? Yeah, let me look.
   value eager
   +curiosity 5
   -> day1
-? Nah. Probably spam.
+? Nah. {i}Probably{/i} spam.
   value wary
+? Who had this number before you? [once]
+  value asked
+  -> #old_number
+
+stage [if CURIOSITY == 'wary']
+  background bg_sitting_room_night.png transition=fade_black duration=1.4s
+  music none fade=2s
+  ambience night_ambience.mp3 fade=3s
+  move nora left duration=800
 
 nora:frown voice=vo_nora_02.mp3 [if CURIOSITY == 'wary']
-  en: Your phone is buzzing again. You should really look.
+  en: Your phone is buzzing again.{w=400} You should {i}really{/i} look.
 
+call shared#phone_buzz
 wait 1.5s
   en: New message from an unknown number
 
--> day1
+branch
+  -> day1
+
+nora:frown label=old_number
+  en: No idea.{w} The shop said it was {i}"recently freed up"{/i}. {shake}Creepy{/shake}, right?
+call shared#phone_buzz
+nora
+  en: ...See? It's doing it again.
+-> #ask

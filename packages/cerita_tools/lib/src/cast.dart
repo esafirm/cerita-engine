@@ -13,7 +13,7 @@ class CastProfile {
   final String id;
   final SourceSpan span;
   final Localized? name;
-  final Localized? handle;
+  final String? handle;
   final Localized? bio;
   final String? avatar;
   final SourceSpan? avatarSpan;
@@ -124,7 +124,7 @@ class Cast {
         id: id,
         span: span,
         name: name,
-        handle: config.localizedFromYaml(file, node.nodes["handle"], diagnostics, "handle"),
+        handle: node.nodes["handle"]?.value?.toString(),
         bio: config.localizedFromYaml(file, node.nodes["bio"], diagnostics, "bio"),
         avatar: avatarNode?.value?.toString(),
         avatarSpan: avatarNode == null ? null : yamlSpan(file, avatarNode),

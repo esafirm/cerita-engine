@@ -5,7 +5,11 @@ scripts plus a few YAML files. `cerita_tools` compiles them into the JSON the en
 ([data schema](data-schema.md)), checks them, estimates playtime and exports what the voice and art pipelines
 need.
 
-`packages/cerita_tools` is a pure Dart package with no dependency on the engine packages:
+It's the authoring layer on top of the engine's own tools ([authoring tools](authoring-tools.md)): those work on
+story JSON, this works on scripts. `cerita_tools lint` runs cerita_core's `StoryLinter` on the compiled story, so
+both share one set of story checks (§3.1).
+
+`packages/cerita_tools` is a pure Dart package that depends on `cerita_core`:
 
 ```bash
 dart run cerita_tools compile <story> [out] [--check]
@@ -48,7 +52,7 @@ stats:
   media_seconds: 4          # Time spent on a photo, video, voice note or CG. Default: 4
 ```
 
-Paths are relative to `cerita.yaml`.
+Paths are relative to `cerita.yaml`. `source_locale` and `locales` are also written to `index.json` (§2.7).
 
 ### 1.2 `profiles.yaml`
 
@@ -58,9 +62,9 @@ Each key is the name the scripts use. Expressions are listed in sprite order, so
 ```yaml
 nora:
   id: 123aaa                # Engine profile id. Default: the key
-  name: Nora
-  handle: "@nora_w"
-  bio: Busy chasing deadlines ☕   # A plain string, or { id: ..., en: ... }
+  name: Nora                # A plain string, or { id: ..., en: ... }. So is bio
+  handle: "@nora_w"         # Always a plain string
+  bio: Busy chasing deadlines ☕
   avatar: assets/story/sprites/nora_avatar.png
   expressions:
     open: nora_open.png       # Index 0, used when a script names no expression
@@ -76,7 +80,7 @@ The engine schema doesn't change: expression names exist only in the toolkit.
 
 ```yaml
 thread_miki:
-  name: Unknown Number
+  name: Unknown Number      # A plain string, or { id: ..., en: ... }. So is status
   avatar: assets/story/sprites/miki_avatar.png
   status: last seen a long time ago
   members: [miki]           # Profile keys, compiled to engine ids
@@ -91,12 +95,14 @@ thread_miki:
 @conversation d3_pier chapter="Hari 3" chapter.en="Day 3" checkpoint
 @scene VN bg=pier_dusk.webp music=tide.ogg day=3 time=17:40
 
-hendra:wary [right] voice=vo_d3_hendra_01.{locale}.mp3
+stage
+  show hendra:wary right transition=slide_left
+hendra:wary [right] voice=vo_d3_hendra_01.mp3
   id: Kapal itu nggak pernah balik malam itu.
   en: That boat never came back that night.
   delivery: low, staring at the water
 
-choice by=raka:worried timeout=10s
+choice by=raka:worried timeout=10s label=ask
   id: Apa yang kamu lakukan?
   en: What do you do?
 ? Tanya soal kapal | Ask about the boat
@@ -106,6 +112,8 @@ choice by=raka:worried timeout=10s
   set asked_photo true
   remember saw_pier_photo
   -> d3_photo
+? Tanya lagi | Ask again [once]
+  -> #ask
 ```
 
 ### 2.1 Lines
@@ -116,34 +124,42 @@ choice by=raka:worried timeout=10s
   quoted: `title="A Quiet Evening"`, with `\"` for a quote inside.
 - A `key.<locale>=value` attribute gives that locale's version: `chapter="Hari 3" chapter.en="Day 3"`.
 - Every statement header can end with `[if <condition>]` (§2.5), which becomes the item's `condition`.
-- `label=<id>` gives an item its optional step `id`.
+- `label=<id>` gives an item its step `id`, which targets can jump to (§2.4).
 - Durations take `ms` or `s`, and a bare number is milliseconds: `typing=1.9s`, `wait 1500`.
 - File names are written with their extension, as they are stored.
 
 ### 2.2 Statements
 
+Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-conversations)) has a statement:
+
 | Statement | Compiles to | Attributes and modifiers |
 | :--- | :--- | :--- |
 | `@conversation <key>` | A conversation file: `index.json` for `index`, else `cvn_<key>.json` | `id=` (`conversation_id`, default `cvn_<key>`), `chapter=`, `title=`, `checkpoint` |
-| `@scene <VN\|CHAT\|CALL>` | Its `scene` | `bg=`, `music=`, `channel=`, `day=`, `time=` |
-| `<speaker>[:<expression>]` | `TEXT` | `[left]` `[center]` `[right]`, `typing=`, `sfx=`, `voice=` |
+| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `textbox=adv\|nvl`, `channel=`, `day=`, `time=` |
+| `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `typing=`, `sfx=`, `voice=` |
 | `narration` / `system` / `timestamp` | `NARRATION` (no style / `system` / `timestamp`) | `sfx=` |
 | `media <IMAGE\|AUDIO\|VIDEO\|CG> <file>` | `MEDIA` | `by=`, `unlock=`, `typing=`, `sfx=` |
 | `choice [<VARIABLE>]` | `CHOICE`, followed by `?` options | `by=`, `timeout=` |
-| `? <text>` | One choice option | `[if <condition>]`, `[default]` |
+| `? <text>` | One choice option | `[if <condition>]`, `[default]`, `[once]`, `[memory_marker]` |
 | `input <VARIABLE>` | `INPUT` | `default=`, `by=` |
 | `wait <duration>` | `WAIT` | |
-| `branch` | `BRANCH`, with routes in its body | |
-| `-> <key>` | `BRANCH` with only a `fallback_target` (an unconditional jump) | |
+| `branch` | `BRANCH`, with routes in its body (§2.4) | |
+| `-> <target>` | `JUMP` | |
+| `call <target>` | `CALL` | |
+| `return` | `RETURN` | |
+| `set` | `SET`, with effects in its body (§2.4) | |
+| `stage` | `STAGE`, with actions in its body (§2.6) | `wait=` (`wait_ms`) |
 | `ending <ending_id> <CATEGORY>` | `ENDING` | |
 
 - `<speaker>` is a `profiles.yaml` key or `player`. Without an expression, the first expression is used.
 - `by=` takes a speaker the same way and becomes the item's `profile`.
 - `@conversation` starts a conversation and every statement up to the next `@conversation` belongs to it.
   `@scene` comes right after it.
-- `voice=` and a `media` file can use `{locale}` to name one clip per locale:
-  `voice=vo_01.{locale}.mp3` compiles to `{"id": "vo_01.id.mp3", "en": "vo_01.en.mp3"}`. `voice.en=` names one
-  locale's clip on top of a shared one.
+- An effect line at column 0 (§2.4) is a `SET` of its own. Effect lines that follow each other share one `SET`.
+- `[default]` marks the option picked when `timeout=` runs out. `[once]` hides an option for the rest of the
+  playthrough once picked. `[memory_marker]` marks an option unlocked by past runs.
+- `voice=` and a voice note's file name one clip, as written. The player looks for `name.<locale>.mp3` first and
+  falls back to `name.mp3` (CE-01, data schema §5.4), so a story can ship either.
 - `clue` and `evidence` are reserved for the Case Board (CE-05) and Present evidence (CE-06). Using them is an
   error until those features define their syntax.
 
@@ -159,14 +175,15 @@ nora:smile
 
 - `<locale>: <text>` sets the statement's main text field. `<field> <locale>: <text>` sets another one, e.g.
   `summary en: ...` on an ending.
-- `\n` in text is a line break.
+- Text is written as the engine shows it, [text tags](data-schema.md#6-text-tags) included. `\n` is a line
+  break.
 - Options can put every locale on the `?` line, separated by `|` in `locales` order: `? Tanya | Ask`. With a
   single locale, `|` is plain text. An option written as a bare `?` takes its text from body lines instead.
 
 | Statement | Main field | Other fields |
 | :--- | :--- | :--- |
 | speaker line, `narration`, `system`, `timestamp`, `choice`, `?`, `input` | `text` | `tts` (speaker lines) |
-| `media` | `caption` (`transcript` for `AUDIO`) | `caption`, `transcript`, `tts` (`AUDIO`) |
+| `media` | `caption` (`transcript` for `AUDIO`) | `title`, `caption`, `transcript`, `tts` (`AUDIO`) |
 | `wait` | `notification` (`notification_text`) | |
 | `ending` | `title` | `summary` |
 
@@ -175,19 +192,23 @@ the voice manifest (§3.4). They never reach the story JSON.
 
 ### 2.4 Effects, Targets and Routes
 
-Body lines of any statement except `branch` and `->`. They run when the item is shown, or when the option is
-picked:
+Effect lines go in the body of any statement except `branch`, which the engine follows without running effects.
+They run when the item is reached, or when the option is picked:
 
 | Line | Effect JSON |
 | :--- | :--- |
 | `+<var> [n]` | `{"variable": var, "op": "add", "value": n}` (n defaults to 1) |
 | `-<var> [n]` | `{"variable": var, "op": "subtract", "value": n}` |
 | `set <var> <value>` | `{"variable": var, "op": "set", "value": value}`: a number, `true`, `false`, a `"string"` or a bare word |
+| `set <var> = <expression>` | `{"variable": var, "op": "set", "expr": expression}`. `+<var> = ...` and `-<var> = ...` work the same way |
 | `toggle <var>` | `{"variable": var, "op": "toggle"}` |
 | `remember <name>` | `{"variable": name, "op": "meta_set"}`: remembered across playthroughs (CE-03) |
 
-Option bodies also take `value <value>` (the value stored in the choice's variable) and `-> <key>` (its target).
+Variable names can be `persistent.<name>` (kept across playthroughs, engine-and-state §2).
 
+Option bodies also take `value <value>` (the value stored in the choice's variable) and `-> <target>`.
+
+A target is `day2`, `#label` (an item in the same conversation) or `day2#label` ([data schema §5](data-schema.md#5-targets--labels)).
 A `branch` body lists routes in order, then an optional fallback:
 
 ```text
@@ -197,23 +218,51 @@ branch
   -> ending_bad
 ```
 
-Effects can't be put on items that never run them: the engine jumps on a `branch` or `->` without executing it.
-
 ### 2.5 Conditions
 
-The engine's condition language ([engine §3](engine-and-state.md#3-condition-evaluator)), passed through as
-written. Two read-only names come from Cross-playthrough memory (CE-03):
+The engine's expression language ([engine §3](engine-and-state.md#3-condition-evaluator)), passed through as
+written, including `meta.ending.<ending_id>` and `meta.flag.<name>` from Cross-playthrough memory (CE-03).
+The toolkit doesn't parse conditions itself: cerita_core's linter checks them on the compiled story (§3.1).
 
-- `meta.ending.<ending_id>`: the player has reached that ending in any playthrough.
-- `meta.flag.<name>`: a `remember <name>` ran in any playthrough.
+### 2.6 Stage Directions
 
-### 2.6 Locales (CE-01)
+A `stage` body has one action per line: the action, its values, then `key=value`s. Every action takes
+`transition=` and `duration=`, and compiles to one entry of `actions` ([data schema §4.12](data-schema.md#412-stage--stage-direction-vn)).
 
-A localized field compiles to a plain string when the story has a single locale, and to an object of locale
-code to text when it has more: `{"id": "...", "en": "..."}`, keys in `locales` order. Missing locales are left
-out, and the engine falls back to the source locale.
+```text
+stage wait=0
+  background bg_rooftop.png transition=fade_black duration=1.2s
+  show nora:smile left transition=slide_left
+  move miki far_right duration=600
+  music none fade=2s
+```
 
-### 2.7 Output
+| Line | Action |
+| :--- | :--- |
+| `show <speaker>[:<expression>] [<position>]` | `show` |
+| `hide <speaker>` / `clear` | `hide` / `clear` |
+| `move <speaker> <position>` | `move` |
+| `background <image>\|none` | `background` (`none` is black) |
+| `music <file>\|none` / `ambience <file>\|none` | `music` / `ambience`, with `fade=` (`fade_ms`) |
+| `sound <file>` | `sound` |
+| `weather rain\|snow\|sakura\|none` | `weather` |
+| `shake intensity=<px>` / `flash color=#RRGGBB` | `shake` / `flash` |
+| `zoom [<scale>] [focus=<position>]` | `zoom` |
+| `textbox adv\|nvl` / `page` | `textbox` / `page` |
+
+Positions are `far_left`, `left`, `center`, `right` and `far_right`. A `stage` body can also hold effect lines.
+
+### 2.7 Locales (CE-01)
+
+A localized field ([data schema §5.1](data-schema.md#51-localizable-fields) on the CE-01 branch) compiles to a
+plain string when the story has a single locale, and to an object of locale code to text when it has more:
+`{"id": "...", "en": "..."}`, keys in `locales` order. Missing locales are left out, and the engine falls back to
+the source locale.
+
+`index.json` gets the story's languages (data schema §3): `source_locale` unless it's the default `id` in a
+single-language story, and `locales` when there's more than one.
+
+### 2.8 Output
 
 `compile` writes `index.json`, one `cvn_<key>.json` per other conversation, `profiles.json` and, when
 `channels.yaml` exists, `channels.json`. Keys are written in a fixed order with two-space indents and a final
@@ -232,7 +281,7 @@ when a script names a speaker or expression that doesn't exist. Every other prob
 
 ### 3.1 `lint`
 
-Reports every problem with its file and line, then a summary, and exits with `1` if there are errors:
+Reports every problem with its script file and line, then a summary, and exits with `1` if there are errors:
 
 ```text
 story/day3.cerita:14: error: Target 'd3_boot' doesn't exist
@@ -240,30 +289,31 @@ story/day3.cerita:9: warning: Missing 'en' text
 2 problems (1 error, 1 warning)
 ```
 
-Every check is an error, except missing translations, which are warnings while drafting and errors with
-`--release` (PRD D2). All problems are reported, not just the first.
+It checks in two layers and reports both together:
 
-| Check | Example |
-| :--- | :--- |
-| Syntax | An unknown statement, a bad attribute, a body line outside a statement, an option outside a `choice` |
-| Missing target | `-> d3_boot`, an option or route to a conversation that doesn't exist |
-| Unknown speaker or expression | `hendra:smirk` when `smirk` isn't in `profiles.yaml` |
-| Missing asset | A background, sprite, avatar, music, sound, voice clip or media file that isn't in the `assets` folder |
-| Missing translation | A localized field without one of the `locales` |
-| Unreachable conversation | No route from `index` leads to it |
-| Unreachable ending | An `ending` no route reaches, including one after an unconditional jump |
-| Story stops | A route reaches the end of a conversation without an ending or jump, so the engine would stop |
-| Variable read but never set | A condition or `{{VAR}}` uses a variable that no effect, `choice` or `input` sets |
-| Unknown memory | `meta.flag.x` that no `remember x` sets, or `meta.ending.x` for an ending that doesn't exist |
-| Bad condition | A condition that doesn't parse, or a dotted name other than `meta.ending.*` and `meta.flag.*` |
-| Structure | No `index` conversation, a duplicate conversation key or label, a `choice` without options or prompt, two `[default]` options, a `CHAT` or `CALL` scene without a channel, an unknown channel |
+1. **Script checks**, on what only exists in the scripts and YAML files:
 
+   | Check | Example |
+   | :--- | :--- |
+   | Syntax | An unknown statement, stage action or attribute, a body line outside a statement, an option outside a `choice`, a missing prompt or option text |
+   | Unknown speaker or expression | `hendra:smirk` when `smirk` isn't in `profiles.yaml` |
+   | Unused cast | A character or expression in `profiles.yaml` that no script uses (warning) |
+   | Missing translation | A localized field without one of the `locales` (warning) |
+   | Structure | No `index` conversation, two conversations with one key |
+
+2. **Story checks**: the story is compiled, and cerita_core's `StoryLinter` runs on the JSON, once per locale
+   ([authoring tools §1](authoring-tools.md#1-story-linter-storylinter)). Its errors and warnings keep their
+   severity, and each one is reported at the line of the script item it's about (the scene line for scene
+   issues, `profiles.yaml` for sprites and avatars). A script with errors is compiled without its broken
+   statements, so both layers are reported in one run.
+
+- `--release` fails on warnings too (PRD D2), so a release has no missing translations, unused cast or
+  engine warnings.
 - Asset checks need the `assets` folder (`cerita.yaml` or `--assets`). Without it they are skipped with a
-  note, and `--release` reports that as an error.
-- Reachability follows every target regardless of conditions, so it finds content no route can ever reach,
-  not content the current numbers happen to lock out. Logic errors are the job of automated playthroughs.
-- Clue checks (declared but never found, used but not declared) come with CE-05. The linter has a slot for
-  them, keyed by the same file and line positions.
+  note, and `--release` reports that as an error. A voice clip or voice note passes when its shared file
+  exists, or when every locale has its own `name.<locale>.ext`.
+- Clue checks (declared but never found, used but not declared) come with CE-05: as story checks if clues get
+  JSON fields, as script checks if they only exist in the script.
 
 ### 3.2 `stats`
 
@@ -294,6 +344,8 @@ Each item's time is its reading time plus the story's own pacing:
 | Choice | Prompt and every option read, plus `choice_seconds` |
 | Input | Prompt read, plus `input_seconds` |
 | Wait | `duration_ms` |
+| Stage | `wait_ms`, or its longest action |
+| Call | Every item of the called section, from its target to a `RETURN` or the end of that conversation |
 | Ending | Title and summary read |
 
 - Words are counted in `--locale` (default: the source locale), falling back to the source text where a
@@ -311,14 +363,17 @@ and audio pipelines. It always exits with `0`: it's a report, and `lint` is the 
 
 | Kind | Folder | Referenced by |
 | :--- | :--- | :--- |
-| `background` | `bg/` | `@scene bg=` |
+| `background` | `bg/` | `@scene bg=`, `stage background` |
 | `cg` | `bg/` | `media CG` |
 | `sprite` | `sprites/` | `profiles.yaml` expressions |
 | `avatar` | `sprites/` or under `asset_prefix` | `profiles.yaml`, `channels.yaml` avatars |
 | `image`, `video`, `voice_note` | `media/` | `media IMAGE`, `media VIDEO`, `media AUDIO` |
-| `music` | `music/` | `@scene music=` |
-| `sfx` | `music/` | `sfx=` |
+| `music`, `ambience` | `music/` | `@scene music=` and `ambience=`, `stage music` and `ambience` |
+| `sfx` | `music/` | `sfx=`, `stage sound` |
 | `voice` | `music/` | `voice=` |
+
+A voice clip or voice note with neither a shared file nor per-locale files is listed as one
+`name.<locale>.ext` per missing locale, the files the voice pipeline produces.
 
 ### 3.4 `tts-manifest`
 
@@ -330,7 +385,7 @@ speaker lines with `voice=` and `media AUDIO` voice notes.
 {
   "lines": [
     {
-      "id": "vo_d3_hendra_01.en",
+      "id": "vo_d3_hendra_01",
       "file": "vo_d3_hendra_01.en.mp3",
       "kind": "line",
       "speaker": "hendra",
@@ -346,11 +401,13 @@ speaker lines with `voice=` and `media AUDIO` voice notes.
 }
 ```
 
-- One entry per voiced line and locale. `id` is the clip file name without its extension.
-- A line with one shared clip in a multi-locale story gets a single entry in the source locale, since one clip
-  can't match two texts.
+- One entry per voiced line and locale. `id` is the clip name without its extension, and `file` is the
+  per-locale file the player looks for first, `name.<locale>.ext` (§2.2).
+- `text` has its text tags removed, since they style the line on screen and aren't spoken.
 - `kind` is `line` or `voice_note`. A voice note's text is its transcript, and its speaker is its `by=`.
 - `tts_text` and `delivery` are left out when the script doesn't set them.
+- Warnings go to stderr: a voice note without a speaker, a locale without text, and one clip used for lines with
+  different text.
 
 ---
 
@@ -358,8 +415,5 @@ speaker lines with `voice=` and `media AUDIO` voice notes.
 
 - **New statements** (clues for CE-05, evidence choices for CE-06): a statement keyword maps to a parser that
   builds an item, and the item compiles itself to JSON. `clue` and `evidence` are reserved keywords today.
-- **New checks**: the linter walks the parsed story and the flow graph that `stats` also uses. Declared and used
-  names (variables, memory flags, endings) are collected per namespace with their positions, so clues slot in as
-  one more namespace.
-- **New condition names**: dotted names are resolved by namespace (`meta.ending`, `meta.flag`). A new feature
-  adds its namespace to the linter.
+- **New checks**: a check that can run on story JSON goes into cerita_core's `StoryLinter`, and `cerita_tools
+  lint` picks it up. Only checks on names that exist in the script alone go into the script linter.

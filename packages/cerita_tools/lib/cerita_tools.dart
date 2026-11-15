@@ -7,7 +7,7 @@ export 'src/cli.dart';
 export 'src/compiler.dart';
 export 'src/config.dart';
 export 'src/diagnostics.dart';
-export 'src/expression.dart';
+export 'src/core_lint.dart';
 export 'src/flow.dart';
 export 'src/linter.dart';
 export 'src/model.dart';

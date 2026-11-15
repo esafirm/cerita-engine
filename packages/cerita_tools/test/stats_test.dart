@@ -79,6 +79,15 @@ void main() {
     expect(storyStats(story({"a.cerita": _script}, config: _config), wpm: 120).conversations.last.total.seconds, 1);
   });
 
+  test('a CALL takes as long as the section it calls, and a STAGE as long as its longest action', () {
+    final called = storyStats(story({
+      "a.cerita": "@conversation index\ncall shared#bit\nstage\n  shake\n  flash duration=2s\nending end GOOD\n  en: E\n"
+          "@conversation shared\nnarration\n  en: skipped\nnarration label=bit\n  en: one two three\nreturn\nnarration\n  en: after return\n",
+    }, config: _config));
+    // 3 words in the called section, 2 s of stage, 1 word of ending title.
+    expect(called.endings.single.longest.measure.seconds, 6);
+  });
+
   test('counts words across scripts and placeholders', () {
     expect(countWords("Hai, {{NAME}}! 🙏 ...kidding — ok"), 4);
   });

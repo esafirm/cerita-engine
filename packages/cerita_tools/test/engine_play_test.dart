@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cerita_core/cerita_core.dart';
 import 'package:cerita_tools/cerita_tools.dart';
@@ -8,38 +8,17 @@ import 'package:test/test.dart';
 
 import 'support.dart';
 
-/// Serves story files from memory, the way the Flutter asset loader serves them from the bundle.
-class _MapLoader extends EngineLoader {
-  final Map<String, String> files;
-
-  _MapLoader(this.files);
-
-  Map<String, dynamic> _json(String name) => jsonDecode(files[name]!) as Map<String, dynamic>;
-
-  @override
-  Future<EnginePackage> initialLoad() async => EnginePackage(
-        conversation: await loadConversation(Conversation.indexKey),
-        profiles: ProfileData.fromJson(_json("profiles.json")),
-        channels: files.containsKey("channels.json") ? Channel.listFromJson(_json("channels.json")) : const [],
-      );
-
-  @override
-  Future<Conversation> loadConversation(String conversationId) async {
-    final name = conversationId == Conversation.indexKey ? "index.json" : "cvn_$conversationId.json";
-    return Conversation.fromJson(_json(name), key: conversationId);
-  }
-}
-
 /// Plays a story headlessly, like example/test/story_test.dart, and records every item the engine returns.
+/// `random()` is seeded, so two runs of the same story roll the same numbers.
 Future<(String, List<Map<String, dynamic>>)> _play(
   EngineLoader loader, {
   required String Function(ChoiceItemType item) pick,
   Map<String, String> inputs = const {},
 }) async {
-  final engine = RealFsseEngine(loader);
+  final engine = RealFsseEngine(loader, storage: InMemoryStoryStorage(), evaluator: ConditionEvaluator(Random(7)));
   final transcript = <Map<String, dynamic>>[];
   ItemResult? result;
-  for (var step = 0; step < 200; step++) {
+  for (var step = 0; step < 300; step++) {
     final item = await engine.next(prevResult: result);
     transcript.add(item.toJson());
     result = null;
@@ -67,10 +46,11 @@ void main() {
       p.basename(file.path): file.readAsStringSync(),
   };
 
-  final routes = <String, (String, String Function(ChoiceItemType), Map<String, String>)>{
+  // The same routes as example/test/story_test.dart. Each entry builds a fresh picker, since the hub route counts.
+  final routes = <String, (String, String Function(ChoiceItemType) Function(), Map<String, String>)>{
     "secret": (
       "end_04_secret",
-      (item) => switch (item.text) {
+      () => (item) => switch (item.text) {
             "\"Are you going to check it?\"" => "Yeah",
             "How do you reply?" => "Who is Luna",
             "What now?" => "📞",
@@ -81,7 +61,7 @@ void main() {
     ),
     "true": (
       "end_01_true",
-      (item) => switch (item.text) {
+      () => (item) => switch (item.text) {
             "How do you reply?" => "Who is Luna",
             "What now?" => "📞",
             "Say something" => "I'll tell her",
@@ -92,7 +72,7 @@ void main() {
     ),
     "good": (
       "end_02_good",
-      (item) => switch (item.text) {
+      () => (item) => switch (item.text) {
             "\"Are you going to check it?\"" => "Nah",
             "How do you reply?" => "Who is Luna",
             "What now?" => "I'll find Luna",
@@ -103,12 +83,25 @@ void main() {
     ),
     "bad": (
       "end_03_bad",
-      (item) => switch (item.text) {
+      () => (item) => switch (item.text) {
             "How do you reply?" => "Wrong number",
             "What now?" => "I'll find Luna",
             "What do you tell Luna?" => "Nothing",
             _ => "",
           },
+      const {},
+    ),
+    "bad, through the prologue hub": (
+      "end_03_bad",
+      () {
+        var asked = 0;
+        return (item) => switch (item.text) {
+              "\"Are you going to check it?\"" => ++asked == 1 ? "Who had" : "Nah",
+              "How do you reply?" => "Wrong number",
+              "What do you tell Luna?" => "Nothing",
+              _ => "I'll find Luna",
+            };
+      },
       const {},
     ),
   };
@@ -117,10 +110,11 @@ void main() {
     expect(compiled.ok, isTrue, reason: compiled.diagnostics.items.join("\n"));
   });
 
-  for (final MapEntry(key: name, value: (ending, pick, inputs)) in routes.entries) {
+  for (final MapEntry(key: name, value: (ending, picker, inputs)) in routes.entries) {
     test('compiled Wrong Number reaches the $name ending, like the hand-written story', () async {
-      final (scriptEnding, scriptRun) = await _play(_MapLoader(compiled.files), pick: pick, inputs: inputs);
-      final (jsonEnding, jsonRun) = await _play(_MapLoader(handWritten), pick: pick, inputs: inputs);
+      final (scriptEnding, scriptRun) =
+          await _play(CompiledStoryLoader.fromCompiled(compiled.files), pick: picker(), inputs: inputs);
+      final (jsonEnding, jsonRun) = await _play(CompiledStoryLoader.fromCompiled(handWritten), pick: picker(), inputs: inputs);
       expect(scriptEnding, ending);
       expect(jsonEnding, ending);
       expect(scriptRun, jsonRun);

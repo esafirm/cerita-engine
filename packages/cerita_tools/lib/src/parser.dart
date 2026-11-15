@@ -4,15 +4,26 @@ import 'model.dart';
 
 final _speakerPattern = RegExp(r"^([a-z_][a-z0-9_]*)(?::([A-Za-z0-9_-]+))?$");
 final _keyPattern = RegExp(r"^[A-Za-z0-9_]+$");
-final variablePattern = RegExp(r"^[A-Za-z_][A-Za-z0-9_]*$");
+final _targetPattern = RegExp(r"^[A-Za-z0-9_]*(#[A-Za-z0-9_-]+)?$");
+
+/// Variable names, including `persistent.*` and `meta.*` (engine-and-state §2).
+final variablePattern = RegExp(r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$");
 final _attrKeyPattern = RegExp(r"^([a-z_]+)(?:\.([a-z]{2,3}(?:-[A-Za-z0-9]+)?))?$");
 final _textLinePattern = RegExp(r"^(?:([a-z]+) )?([a-z]{2,3}(?:-[A-Za-z0-9]+)?):(?:[ \t](.*))?$");
 final _durationPattern = RegExp(r"^(\d+(?:\.\d+)?)(ms|s)?$");
 final _numberPattern = RegExp(r"^-?\d+(\.\d+)?$");
+final _effectLinePattern = RegExp(r"^([+-][A-Za-z_]|set\s|toggle\s|remember\s)");
+final _setBlockPattern = RegExp(r"^set(\s*$|\s+\[|\s+label=)");
 
 const _modes = {"VN", "CHAT", "CALL"};
 const _mediaTypes = {"IMAGE", "AUDIO", "VIDEO", "CG"};
-const _positions = {"left", "center", "right"};
+const _positions = ["far_left", "left", "center", "right", "far_right"];
+const _textboxStyles = {"adv", "nvl"};
+const _weathers = {"rain", "snow", "sakura"};
+const _transitions = {
+  "fade", "dissolve", "fade_black", "slide_left", "slide_right", "slide_up", "zoom", "wipe_left", "wipe_right", //
+  "none",
+};
 
 /// Script field names that differ from their JSON field.
 const _jsonFields = {"notification": "notification_text"};
@@ -30,7 +41,12 @@ class ScriptParser {
   /// What indented lines belong to: an item, an option, [_discard] after a broken header, or `null` (none).
   Object? _body;
   ChoiceItem? _choice;
-  final Set<BranchItem> _jumps = {};
+
+  /// The `SET` that column-0 effect lines are added to, while they follow each other.
+  SetItem? _inlineSet;
+
+  /// Stages with at least one action line, valid or not.
+  final Set<StageItem> _stagesWithActions = {};
 
   static final _discard = Object();
 
@@ -38,6 +54,7 @@ class ScriptParser {
     _conversation = null;
     _body = null;
     _choice = null;
+    _inlineSet = null;
     final script = ScriptFile(path);
     final lines = source.replaceFirst("﻿", "").split("\n");
     for (var i = 0; i < lines.length; i++) {
@@ -68,6 +85,9 @@ class ScriptParser {
     }
     _choice = null;
     _body = _discard;
+    if (_effectLinePattern.hasMatch(line) && !_setBlockPattern.hasMatch(line)) return _inlineEffect(line, span);
+    _inlineSet = null;
+
     final tokens = _tokenize(line, span);
     if (tokens == null || tokens.isEmpty) return;
     final head = tokens.first;
@@ -86,7 +106,10 @@ class ScriptParser {
     if (conversation == null) return _error(span, "Statements must come after an @conversation line");
 
     final ItemNode? item = switch (word) {
-      "->" => _jump(st),
+      "->" || "call" => _jump(st, isCall: word == "call"),
+      "return" => ReturnItem(span),
+      "set" => SetItem(span),
+      "stage" => _stage(st),
       "narration" || "system" || "timestamp" => _narration(st, word),
       "media" => _media(st),
       "choice" => _choiceItem(st),
@@ -104,6 +127,22 @@ class ScriptParser {
     conversation.items.add(item);
     _body = item;
     if (item is ChoiceItem) _choice = item;
+  }
+
+  /// An effect line at column 0 becomes a `SET`. Effect lines that follow each other share one.
+  void _inlineEffect(String line, SourceSpan span) {
+    final conversation = _conversation;
+    if (conversation == null) return _error(span, "Statements must come after an @conversation line");
+    _body = null;
+    final effect = _effect(line, span);
+    if (effect == null) return;
+    var set = _inlineSet;
+    if (set == null || conversation.items.lastOrNull != set) {
+      set = SetItem(span);
+      conversation.items.add(set);
+      _inlineSet = set;
+    }
+    set.effects.add(effect);
   }
 
   ItemNode? _reserved(SourceSpan span, String word) {
@@ -150,6 +189,8 @@ class ScriptParser {
     final scene = SceneNode(st.span, mode)
       ..background = st.take("bg")
       ..music = st.take("music")
+      ..ambience = st.take("ambience")
+      ..textbox = st.choose("textbox", _textboxStyles)
       ..channel = st.take("channel")
       ..time = st.take("time");
     final day = st.take("day");
@@ -162,14 +203,23 @@ class ScriptParser {
     _body = null;
   }
 
-  ItemNode? _jump(_Statement st) {
-    final target = st.next();
-    if (target == null) {
-      _error(st.span, "-> needs a conversation key");
+  TargetRef? _target(String? raw, SourceSpan span, String what) {
+    if (raw == null || raw.isEmpty || !_targetPattern.hasMatch(raw)) {
+      _error(span, raw == null || raw.isEmpty ? "$what needs a target" : "Invalid target '$raw'. Use day2, #label or day2#label");
       return null;
     }
-    final item = BranchItem(st.span)..fallback = TargetRef(target, st.span);
-    _jumps.add(item);
+    return TargetRef(raw, span);
+  }
+
+  ItemNode? _jump(_Statement st, {required bool isCall}) {
+    final target = _target(st.next(), st.span, isCall ? "call" : "->");
+    return target == null ? null : JumpItem(st.span, target, isCall: isCall);
+  }
+
+  ItemNode _stage(_Statement st) {
+    final item = StageItem(st.span);
+    final wait = st.duration("wait");
+    if (wait != null) item.waitMs = wait;
     return item;
   }
 
@@ -187,7 +237,7 @@ class ScriptParser {
       _error(st.span, "media needs a file name");
       return null;
     }
-    return MediaItem(st.span, mediaType, LocalizedAsset(st.span, file))
+    return MediaItem(st.span, mediaType, file)
       ..by = st.profile("by")
       ..unlock = st.take("unlock")
       ..typingMs = st.duration("typing")
@@ -258,7 +308,7 @@ class ScriptParser {
     item
       ..typingMs = st.duration("typing")
       ..sfx = st.take("sfx")
-      ..voice = st.asset("voice");
+      ..voice = st.take("voice");
     return item;
   }
 
@@ -278,6 +328,10 @@ class ScriptParser {
       if (inner == "default") {
         if (option.isDefault) _error(span, "Duplicate [default]");
         option.isDefault = true;
+      } else if (inner == "once") {
+        option.once = true;
+      } else if (inner == "memory_marker") {
+        option.memoryMarker = true;
       } else if (inner.startsWith("if ")) {
         if (option.condition != null) _error(span, "An option has only one [if]");
         option.condition = inner.substring(3).trim();
@@ -339,6 +393,7 @@ class ScriptParser {
     if (identical(body, _discard)) return;
     if (body == null) return _error(span, "Indented line outside a statement");
     if (body is BranchItem) return _routeLine(body, content, span);
+    if (body is StageItem && !_effectLinePattern.hasMatch(content)) return _stageAction(body, content, span);
     final holder = body as TextHolder;
 
     final text = _textLinePattern.firstMatch(content);
@@ -357,11 +412,9 @@ class ScriptParser {
       return;
     }
     if (content.startsWith("->")) {
-      final target = content.substring(2).trim();
       if (holder is! OptionNode) return _error(span, "A target only goes under a choice option or in a branch");
-      if (target.isEmpty || target.contains(" ")) return _error(span, "-> needs one conversation key");
       if (holder.target != null) return _error(span, "An option has only one target");
-      holder.target = TargetRef(target, span);
+      holder.target = _target(content.substring(2).trim(), span, "->");
       return;
     }
     if (content.startsWith("value ") || content == "value") {
@@ -379,11 +432,12 @@ class ScriptParser {
       holder.effects.add(effect);
       return;
     }
-    if (!_isEffectLine(content)) _error(span, "Unknown line '$content'");
+    if (!_effectLinePattern.hasMatch(content)) _error(span, "Unknown line '$content'");
   }
 
   void _textLine(TextHolder holder, RegExpMatch match, SourceSpan span) {
     final (main, allowed) = _fields(holder);
+    if (allowed.isEmpty) return _error(span, "No text goes under this statement");
     final field = match.group(1) ?? main;
     final locale = match.group(2)!;
     final value = unescapeText((match.group(3) ?? "").trim());
@@ -399,25 +453,23 @@ class ScriptParser {
 
   (String, Set<String>) _fields(TextHolder holder) => switch (holder) {
     LineItem() => ("text", const {"text", "tts"}),
-    MediaItem(isVoiceNote: true) => ("transcript", const {"caption", "transcript", "tts"}),
-    MediaItem() => ("caption", const {"caption", "transcript"}),
+    MediaItem(isVoiceNote: true) => ("transcript", const {"title", "caption", "transcript", "tts"}),
+    MediaItem() => ("caption", const {"title", "caption", "transcript"}),
     WaitItem() => ("notification", const {"notification"}),
     EndingItem() => ("title", const {"title", "summary"}),
-    BranchItem() => ("text", const <String>{}),
+    BranchItem() || JumpItem() || ReturnItem() || SetItem() || StageItem() => ("text", const <String>{}),
     _ => ("text", const {"text"}),
   };
 
   void _routeLine(BranchItem branch, String content, SourceSpan span) {
-    if (_jumps.contains(branch)) return _error(span, "A jump has no body. Use branch for routes");
-    if (_isEffectLine(content)) {
+    if (_effectLinePattern.hasMatch(content)) {
       return _error(span, "Effects on a branch never run: the engine jumps without executing it");
     }
     final arrow = content.lastIndexOf("->");
-    if (arrow < 0) return _error(span, "A branch route is 'if <condition> -> <key>' or '-> <key>'");
-    final target = content.substring(arrow + 2).trim();
+    if (arrow < 0) return _error(span, "A branch route is 'if <condition> -> <target>' or '-> <target>'");
     final head = content.substring(0, arrow).trim();
-    if (target.isEmpty || target.contains(" ")) return _error(span, "-> needs one conversation key");
-    final ref = TargetRef(target, span);
+    final ref = _target(content.substring(arrow + 2).trim(), span, "->");
+    if (ref == null) return;
     if (head.isEmpty) {
       if (branch.fallback != null) return _error(span, "A branch has only one fallback");
       branch.fallback = ref;
@@ -425,15 +477,137 @@ class ScriptParser {
       if (branch.fallback != null) _error(span, "Routes after the fallback never run");
       branch.routes.add(BranchRoute(head.substring(3).trim(), ref, span));
     } else {
-      _error(span, "A branch route is 'if <condition> -> <key>' or '-> <key>'");
+      _error(span, "A branch route is 'if <condition> -> <target>' or '-> <target>'");
     }
   }
 
-  bool _isEffectLine(String content) => RegExp(r"^([+-][A-Za-z_]|set\s|toggle\s|remember\s)").hasMatch(content);
+  /// One action under `stage` (data schema §4.12): the action name, positional values, then `key=value`s.
+  void _stageAction(StageItem stage, String content, SourceSpan span) {
+    _stagesWithActions.add(stage);
+    final tokens = _tokenize(content, span);
+    if (tokens == null || tokens.isEmpty || tokens.first is! _Word) {
+      return _error(span, "A stage action starts with its name, e.g. 'show nora:smile left'");
+    }
+    final name = (tokens.first as _Word).text;
+    final errorsBefore = diagnostics.items.length;
+    final st = _Statement(this, span, tokens.skip(1));
+    final action = StageAction(name, span);
+    final fields = action.fields;
+
+    String? required(String what) {
+      final value = st.next();
+      if (value == null) _error(span, "$name needs $what");
+      return value;
+    }
+
+    /// A file or name, or `none` for null.
+    void nullable(String field, String what) {
+      final value = required(what);
+      if (value != null) fields[field] = value == "none" ? null : value;
+    }
+
+    void profile({required bool idOnly}) {
+      final raw = required("a character");
+      if (raw == null) return;
+      final match = _speakerPattern.firstMatch(raw);
+      if (match == null) return _error(span, "Invalid character '$raw'");
+      if (idOnly && match.group(2) != null) _error(span, "$name takes a character without an expression");
+      fields["profile"] = ProfileRef(match.group(1)!, match.group(2), span);
+      action.idOnly = idOnly;
+    }
+
+    void position({required bool isRequired}) {
+      final value = st.next();
+      if (value == null) {
+        if (isRequired) _error(span, "$name needs a position: ${_positions.join(", ")}");
+      } else if (_positions.contains(value)) {
+        fields["position"] = value;
+      } else {
+        _error(span, "Unknown position '$value'. Use ${_positions.join(", ")}");
+      }
+    }
+
+    num? number(String key) {
+      final raw = st.take(key);
+      if (raw == null) return null;
+      final value = parseLiteral(raw);
+      if (value is num) return value;
+      _error(span, "$key must be a number");
+      return null;
+    }
+
+    switch (name) {
+      case "show":
+        profile(idOnly: false);
+        position(isRequired: false);
+      case "hide":
+        profile(idOnly: true);
+      case "clear" || "page":
+        break;
+      case "move":
+        profile(idOnly: true);
+        position(isRequired: true);
+      case "background":
+        nullable("image", "an image or none");
+      case "music" || "ambience":
+        nullable("file", "a file or none");
+      case "sound":
+        final file = required("a file");
+        if (file != null) fields["file"] = file;
+      case "weather":
+        final weather = required("rain, snow, sakura or none");
+        if (weather != null && weather != "none" && !_weathers.contains(weather)) {
+          _error(span, "Unknown weather '$weather'. Use rain, snow, sakura or none");
+        }
+        if (weather != null) fields["name"] = weather == "none" ? null : weather;
+      case "shake":
+        final intensity = number("intensity");
+        if (intensity != null) fields["intensity"] = intensity;
+      case "flash":
+        final color = st.take("color");
+        if (color != null) fields["color"] = color;
+      case "zoom":
+        final scale = st.next();
+        if (scale != null) {
+          final value = parseLiteral(scale);
+          value is num ? fields["scale"] = value : _error(span, "zoom takes a scale, e.g. zoom 1.2");
+        }
+        final focus = st.take("focus");
+        if (focus != null) {
+          _positions.contains(focus) ? fields["focus"] = focus : _error(span, "Unknown focus '$focus'");
+        }
+      case "textbox":
+        final style = required("adv or nvl");
+        if (style != null) {
+          _textboxStyles.contains(style) ? fields["style"] = style : _error(span, "textbox takes adv or nvl");
+        }
+      default:
+        return _error(span, "Unknown stage action '$name'");
+    }
+    final transition = st.choose("transition", _transitions);
+    if (transition != null) fields["transition"] = transition;
+    final duration = st.duration("duration");
+    if (duration != null) fields["duration_ms"] = duration;
+    if (name == "music" || name == "ambience") {
+      final fade = st.duration("fade");
+      if (fade != null) fields["fade_ms"] = fade;
+    }
+    st.finish(allowCondition: false);
+    // A broken action is left out, so a partial compile for the linter still loads.
+    if (diagnostics.items.length == errorsBefore) stage.actions.add(action);
+  }
 
   EffectNode? _effect(String content, SourceSpan span) {
-    final step = RegExp(r"^([+-])([A-Za-z_][A-Za-z0-9_]*)(?:\s+(\d+(?:\.\d+)?))?$").firstMatch(content);
+    final computed = RegExp(r"^(set\s+|[+-])(\S+?)\s*=\s*(.+)$").firstMatch(content);
+    if (computed != null) {
+      final head = computed.group(1)!.trim();
+      final op = switch (head) { "set" => "set", "+" => "add", _ => "subtract" };
+      if (!_checkVariable(computed.group(2)!, span)) return null;
+      return EffectNode(computed.group(2)!, op, span, expr: computed.group(3)!.trim());
+    }
+    final step = RegExp(r"^([+-])(\S+?)(?:\s+(\d+(?:\.\d+)?))?$").firstMatch(content);
     if (step != null) {
+      if (!_checkVariable(step.group(2)!, span)) return null;
       final amount = step.group(3) == null ? 1 : parseLiteral(step.group(3)!);
       return EffectNode(step.group(2)!, step.group(1) == "+" ? "add" : "subtract", span, value: amount, hasValue: true);
     }
@@ -447,7 +621,7 @@ class ScriptParser {
       if (!_checkVariable(single.group(2)!, span)) return null;
       return EffectNode(single.group(2)!, single.group(1) == "toggle" ? "toggle" : EffectNode.metaSet, span);
     }
-    if (_isEffectLine(content)) _error(span, "Invalid effect '$content'");
+    if (_effectLinePattern.hasMatch(content)) _error(span, "Invalid effect '$content'");
     return null;
   }
 
@@ -457,7 +631,7 @@ class ScriptParser {
     return false;
   }
 
-  /// Required text that the engine would crash without.
+  /// Required text and parts that the engine would fail to load without.
   void _validate(ConversationNode conversation) {
     String? missing(ItemNode item) => switch (item) {
       LineItem() || NarrationItem() => item.texts["text"] == null ? "a line needs text" : null,
@@ -469,6 +643,8 @@ class ScriptParser {
     for (final item in conversation.items) {
       final problem = missing(item);
       if (problem != null) _error(item.span, "Missing text: $problem, e.g. '  ${config.sourceLocale}: ...'");
+      if (item is StageItem && !_stagesWithActions.contains(item)) _error(item.span, "A stage needs at least one action");
+      if (item is SetItem && item.effects.isEmpty) _error(item.span, "A set needs at least one effect");
       if (item is ChoiceItem) {
         if (item.options.isEmpty) _error(item.span, "A choice needs at least one '?' option");
         for (final option in item.options) {
@@ -679,11 +855,14 @@ class _Statement {
     return result;
   }
 
-  LocalizedAsset? asset(String key) {
-    final plain = take(key);
-    final perLocale = _takeLocales(key);
-    if (plain == null && perLocale.isEmpty) return null;
-    return LocalizedAsset(span, plain)..perLocale.addAll(perLocale);
+  /// `key=value` where value must be one of [allowed].
+  String? choose(String key, Set<String> allowed) {
+    final value = take(key);
+    if (value != null && !allowed.contains(value)) {
+      parser._error(span, "Unknown $key '$value'. Use ${allowed.join(", ")}");
+      return null;
+    }
+    return value;
   }
 
   int? duration(String key) {

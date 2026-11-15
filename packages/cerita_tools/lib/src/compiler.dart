@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'cast.dart';
+import 'config.dart';
 import 'diagnostics.dart';
 import 'model.dart';
 import 'project.dart';
@@ -20,11 +21,14 @@ class CompileResult {
 /// Fails, with no files, on load and syntax errors and on speakers or expressions that don't exist, since those
 /// can't be written as engine JSON. The output depends only on the sources: keys are written in a fixed order,
 /// so compiling an unchanged story twice gives identical files.
-CompileResult compileStory(StoryProject project) {
+///
+/// With [partial], the files are returned even when there are errors, without the statements that failed to parse
+/// and without unknown speakers. The linter uses this to run the JSON checks on a story that doesn't compile yet.
+CompileResult compileStory(StoryProject project, {bool partial = false}) {
   final diagnostics = Diagnostics()..addAll(project.diagnostics);
-  final compiler = _Compiler(project, diagnostics);
+  final compiler = _Compiler(project, diagnostics, partial: partial);
   final files = compiler.run();
-  return CompileResult(diagnostics.hasErrors ? const {} : files, diagnostics);
+  return CompileResult(diagnostics.hasErrors && !partial ? const {} : files, diagnostics);
 }
 
 String encodeJson(Object json) => "${const JsonEncoder.withIndent("  ").convert(json)}\n";
@@ -32,8 +36,13 @@ String encodeJson(Object json) => "${const JsonEncoder.withIndent("  ").convert(
 class _Compiler {
   final StoryProject project;
   final Diagnostics diagnostics;
+  final bool partial;
 
-  _Compiler(this.project, this.diagnostics);
+  _Compiler(this.project, this.diagnostics, {required this.partial});
+
+  /// Text the engine needs to load the item. A partial compile writes "" where it's missing (the parser has
+  /// reported it), so the item still loads and keeps its place.
+  Object? _required(Localized? text) => _text(text) ?? (partial ? "" : null);
 
   Map<String, String> run() {
     final files = <String, String>{};
@@ -68,15 +77,6 @@ class _Compiler {
     };
   }
 
-  Object? _asset(LocalizedAsset? asset) {
-    if (asset == null) return null;
-    final config = project.config;
-    final resolved = asset.resolve(config.locales, _source);
-    if (!config.isMultiLocale) return resolved.values.firstOrNull ?? asset.shared;
-    if (!asset.isPerLocale) return asset.shared;
-    return resolved;
-  }
-
   String? _profile(ProfileRef? ref) => ref == null ? null : project.resolveProfile(ref, diagnostics);
 
   /// Adds [value] under [key] unless it's `null`.
@@ -92,6 +92,7 @@ class _Compiler {
           "variable": effect.variable,
           "op": effect.op,
           if (effect.hasValue) "value": effect.value,
+          "expr": ?effect.expr,
         },
     ];
   }
@@ -100,6 +101,7 @@ class _Compiler {
 
   Map<String, Object?> _conversation(ConversationNode conversation) {
     final json = <String, Object?>{"conversation_id": conversation.conversationId ?? "cvn_${conversation.key}"};
+    if (conversation.key == ConversationNode.indexKey) _locales(json);
     _put(json, "chapter", _text(conversation.chapter));
     _put(json, "title", _text(conversation.title));
     if (conversation.checkpoint) json["checkpoint"] = true;
@@ -111,6 +113,8 @@ class _Compiler {
       _put(sceneJson, "time", scene.time);
       _put(sceneJson, "background", scene.background);
       _put(sceneJson, "music", scene.music);
+      _put(sceneJson, "ambience", scene.ambience);
+      _put(sceneJson, "textbox", scene.textbox);
       json["scene"] = sceneJson;
     }
     json["conversations"] = [for (final item in conversation.items) _item(item)];
@@ -123,19 +127,19 @@ class _Compiler {
     _put(json, "condition", item.condition);
     switch (item) {
       case LineItem():
-        _put(json, "text", _text(item.texts["text"]));
+        _put(json, "text", _required(item.texts["text"]));
         _put(json, "profile", _profile(item.speaker));
         _put(json, "position", item.position);
         _put(json, "typing_delay_ms", item.typingMs);
         _put(json, "sfx", item.sfx);
-        _put(json, "voice", _asset(item.voice));
+        _put(json, "voice", item.voice);
       case NarrationItem():
         _put(json, "style", item.style);
-        _put(json, "text", _text(item.texts["text"]));
+        _put(json, "text", _required(item.texts["text"]));
         _put(json, "sfx", item.sfx);
       case MediaItem():
         json["media_type"] = item.mediaType;
-        json["uri"] = _asset(item.uri);
+        json["uri"] = item.uri;
         _put(json, "caption", _text(item.texts["caption"]));
         _put(json, "transcript", _text(item.texts["transcript"]));
         _put(json, "profile", _profile(item.by));
@@ -143,7 +147,7 @@ class _Compiler {
         _put(json, "typing_delay_ms", item.typingMs);
         _put(json, "sfx", item.sfx);
       case ChoiceItem():
-        _put(json, "text", _text(item.texts["text"]));
+        _put(json, "text", _required(item.texts["text"]));
         _put(json, "variable", item.variable);
         _put(json, "profile", _profile(item.by));
         _put(json, "timeout_ms", item.timeoutMs);
@@ -151,7 +155,7 @@ class _Compiler {
         if (defaultIndex >= 0) json["default_choice"] = defaultIndex;
         json["choices"] = [for (final option in item.options) _option(option)];
       case InputItem():
-        _put(json, "text", _text(item.texts["text"]));
+        _put(json, "text", _required(item.texts["text"]));
         json["variable"] = item.variable;
         _put(json, "default_value", _text(item.defaultValue));
         _put(json, "profile", _profile(item.by));
@@ -165,9 +169,16 @@ class _Compiler {
           ];
         }
         _put(json, "fallback_target", item.fallback?.key);
+      case JumpItem():
+        json["target"] = item.target.key;
+      case ReturnItem() || SetItem():
+        break;
+      case StageItem():
+        _put(json, "wait_ms", item.waitMs);
+        json["actions"] = [for (final action in item.actions) _stageAction(action)];
       case EndingItem():
         json["ending_id"] = item.endingId;
-        _put(json, "title", _text(item.texts["title"]));
+        _put(json, "title", _required(item.texts["title"]));
         json["category"] = item.category;
         _put(json, "summary", _text(item.texts["summary"]));
     }
@@ -175,10 +186,35 @@ class _Compiler {
     return json;
   }
 
+  /// `source_locale` and `locales` go in index.json (CE-01, data schema §3). Like the engine's defaults, `locales`
+  /// is left out for a single-language story, and `source_locale` too when it's `id`.
+  void _locales(Map<String, Object?> json) {
+    final config = project.config;
+    if (config.isMultiLocale || config.sourceLocale != StoryConfig.defaultSourceLocale) {
+      json["source_locale"] = config.sourceLocale;
+    }
+    if (config.isMultiLocale) json["locales"] = config.locales;
+  }
+
+  Map<String, Object?> _stageAction(StageAction action) {
+    final json = <String, Object?>{"action": action.action};
+    action.fields.forEach((key, value) {
+      json[key] = value is ProfileRef ? _stageProfile(value, idOnly: action.idOnly) : value;
+    });
+    return json;
+  }
+
+  String? _stageProfile(ProfileRef ref, {required bool idOnly}) {
+    final resolved = project.resolveProfile(ref, diagnostics);
+    return idOnly ? resolved?.split(":").first : resolved;
+  }
+
   Map<String, Object?> _option(OptionNode option) {
-    final json = <String, Object?>{"text": _text(option.texts["text"])};
+    final json = <String, Object?>{"text": _required(option.texts["text"])};
     if (option.hasValue) json["value"] = option.value;
     _put(json, "condition", option.condition);
+    if (option.once) json["once"] = true;
+    if (option.memoryMarker) json["memory_marker"] = true;
     _put(json, "effects", _effects(option.effects));
     _put(json, "target", option.target?.key);
     return json;
@@ -190,7 +226,7 @@ class _Compiler {
             {
               "id": profile.id,
               "name": _text(profile.name),
-              if (profile.handle != null) "handle": _text(profile.handle),
+              if (profile.handle != null) "handle": profile.handle,
               if (profile.bio != null) "bio": _text(profile.bio),
               if (profile.avatar != null) "avatar": profile.avatar,
               if (profile.sprites.isNotEmpty) "sprites": profile.sprites,

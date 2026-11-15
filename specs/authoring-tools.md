@@ -2,6 +2,8 @@
 
 Tools for writers working on a story: a linter that finds mistakes before a player does, a graph of how the story flows, and a developer panel inside the running story.
 
+These tools work on story JSON. Stories written as `.cerita` scripts go through the [story authoring toolkit](authoring-toolkit.md) (`cerita_tools`), which compiles them and runs this linter on the result, reporting each issue at its script line.
+
 ---
 
 ## 1. Story Linter (`StoryLinter`)
@@ -70,6 +72,7 @@ dart run cerita_core:cerita graph example/assets/story > story.mmd
 - The story folder holds `index.json`, `profiles.json`, `channels.json`, the `cvn_*.json` files and the `bg/`, `sprites/`, `music/` and `media/` folders (data schema §1), so missing files are checked too.
 - `lint` prints the issues and exits with `1` when there are errors, so CI can run it. `--strict` also fails on warnings.
 - `make lint-story` lints the demo story.
+- For a story written as scripts, use `dart run cerita_tools lint <story>` instead. It runs the same linter on the compiled story plus the script checks ([authoring toolkit §3.1](authoring-toolkit.md#31-lint)).
 
 ---
 

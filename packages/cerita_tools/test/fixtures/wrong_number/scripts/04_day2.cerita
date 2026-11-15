@@ -6,13 +6,26 @@ narration
 
 nora [left]
   en: So this is the place? It looks exactly like the picture.
-luna [right] voice=vo_luna_01.mp3
-  en: You must be the one Miki wrote about.
-miki:frown [center]
-  en: (She can't see me. Please... tell her.)
-nora:frown
-  en: {{NAME}}? Who are you staring at?
+nora:smile [if PLAN == 'knows_cafe']
+  en: Good thing you knew the way. I'd still be wandering down 5th street.
+narration [if heard_story == true]
+  en: Miki's voice from last night is still in your head. {i}We met at that café in 2019.{/i}
 
+set greeting = random(1, 2)
+luna [right] voice=vo_luna_01.mp3 [if greeting == 1]
+  en: You must be the one Miki wrote about.
+luna [right] voice=vo_luna_01.mp3 [if greeting == 2]
+  en: You're the one Miki kept writing about, aren't you?
+
+stage
+  flash color=#E6E0FF duration=600
+  show miki:frown far_right transition=dissolve duration=900
+miki:frown
+  en: {color=#B9A8FF}(She can't see me.{w=500} Please...{w} {wave}tell her.{/wave}){/color}
+nora:frown
+  en: {{NAME}}? Hello? Are you even list-{nw}
+nora:frown
+  en: ...{w=300}{b}Who{/b} are you staring at?
 choice TOLD by=luna
   en: What do you tell Luna?
 ? Miki is sorry. She wanted you to know.
@@ -42,6 +55,10 @@ luna:smile [if PASSCODE == '2019']
   set knows_passcode true
 luna:frown [if TOLD != 'silent' && !knows_passcode]
   en: No... that's not it. But thank you for coming.
+
+set bond = miki_trust + luna_affection
+narration [if bond >= 25]
+  en: For a moment the café is very quiet, as if someone just let out a long breath.
 
 branch
   if knows_passcode == true && luna_affection >= 15 -> ending_secret

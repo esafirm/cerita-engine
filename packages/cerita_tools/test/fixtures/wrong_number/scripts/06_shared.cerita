@@ -1,0 +1,9 @@
+# Scenes that CALL into this one keep their own stage, so it has no @scene.
+@conversation shared
+
+stage wait=400 label=phone_buzz
+  sound sfx_notification.mp3
+  shake intensity=6 duration=400
+narration
+  en: Your phone buzzes against the table.
+return

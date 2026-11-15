@@ -6,8 +6,8 @@ class Localized {
   final Map<String, String> values = {};
   final Map<String, SourceSpan> spans = {};
 
-  /// A plain YAML value (a name or handle in profiles.yaml): the same in every locale, so it stays a plain string
-  /// and isn't checked for translations.
+  /// A plain YAML value (a name in profiles.yaml): the same in every locale, so it stays a plain string and isn't
+  /// checked for translations.
   bool isPlain = false;
 
   Localized(this.span);
@@ -25,38 +25,12 @@ class Localized {
   String? textFor(String locale, String fallback) => values[locale] ?? values[fallback] ?? values.values.firstOrNull;
 }
 
-/// A file named once for every locale (`voice=x.mp3`), per locale (`voice.en=x.en.mp3`) or with a `{locale}`
-/// template (`voice=x.{locale}.mp3`).
-class LocalizedAsset {
-  static const placeholder = "{locale}";
-
-  final SourceSpan span;
-  String? shared;
-  final Map<String, String> perLocale = {};
-
-  LocalizedAsset(this.span, [this.shared]);
-
-  bool get isTemplate => shared?.contains(placeholder) ?? false;
-
-  bool get isPerLocale => isTemplate || perLocale.isNotEmpty;
-
-  /// The file for each of [locales] that has one. A shared, non-template file is listed under [source] only.
-  Map<String, String> resolve(List<String> locales, String source) {
-    final result = <String, String>{};
-    for (final locale in locales) {
-      final file = perLocale[locale] ??
-          (isTemplate ? shared!.replaceAll(placeholder, locale) : (locale == source ? shared : null));
-      if (file != null) result[locale] = file;
-    }
-    return result;
-  }
-
-  /// Every concrete file this refers to, for asset checks.
-  Iterable<String> files(List<String> locales, String source) {
-    final resolved = resolve(locales, source).values.toSet();
-    if (!isTemplate && shared != null) resolved.add(shared!);
-    return resolved;
-  }
+/// The CE-01 voice convention (data schema §5.4): for `name.mp3` the player first tries `name.<locale>.mp3`,
+/// then `name.mp3`.
+String localeVariant(String file, String locale) {
+  final dot = file.lastIndexOf(".");
+  final slash = file.lastIndexOf("/");
+  return dot > slash + 1 ? "${file.substring(0, dot)}.$locale${file.substring(dot)}" : "$file.$locale";
 }
 
 class ProfileRef {
@@ -74,11 +48,24 @@ class ProfileRef {
   String toString() => expression == null ? speaker : "$speaker:$expression";
 }
 
+/// A `target`: `conv`, `#label` in the current conversation, or `conv#label` (data schema §5).
 class TargetRef {
   final String key;
   final SourceSpan span;
 
   const TargetRef(this.key, this.span);
+
+  /// The conversation this points at: [from] for a `#label`.
+  String conversation(String from) {
+    final hash = key.indexOf("#");
+    final conversation = hash < 0 ? key : key.substring(0, hash);
+    return conversation.isEmpty ? from : conversation;
+  }
+
+  String? get label {
+    final hash = key.indexOf("#");
+    return hash < 0 ? null : key.substring(hash + 1);
+  }
 }
 
 class EffectNode {
@@ -88,11 +75,12 @@ class EffectNode {
   final String op;
   final Object? value;
   final bool hasValue;
+
+  /// Expression the engine evaluates when the effect runs, in place of [value].
+  final String? expr;
   final SourceSpan span;
 
-  const EffectNode(this.variable, this.op, this.span, {this.value, this.hasValue = false});
-
-  bool get isRemember => op == metaSet;
+  const EffectNode(this.variable, this.op, this.span, {this.value, this.hasValue = false, this.expr});
 }
 
 /// Something with localized text fields and effects: an item or a choice option.
@@ -127,7 +115,7 @@ class LineItem extends ItemNode {
   String? position;
   int? typingMs;
   String? sfx;
-  LocalizedAsset? voice;
+  String? voice;
   String? delivery;
 
   LineItem(super.span, this.speaker);
@@ -149,7 +137,7 @@ class NarrationItem extends ItemNode {
 
 class MediaItem extends ItemNode {
   final String mediaType;
-  final LocalizedAsset uri;
+  final String uri;
   ProfileRef? by;
   String? unlock;
   int? typingMs;
@@ -185,6 +173,8 @@ class OptionNode implements TextHolder {
   final List<EffectNode> effects = [];
   String? condition;
   bool isDefault = false;
+  bool once = false;
+  bool memoryMarker = false;
   Object? value;
   bool hasValue = false;
   TargetRef? target;
@@ -220,7 +210,7 @@ class BranchRoute {
   const BranchRoute(this.condition, this.target, this.span);
 }
 
-/// A `branch` router, or a `-> key` jump (a branch with only a fallback).
+/// A `branch` router.
 class BranchItem extends ItemNode {
   final List<BranchRoute> routes = [];
   TargetRef? fallback;
@@ -229,6 +219,66 @@ class BranchItem extends ItemNode {
 
   @override
   String get type => "BRANCH";
+}
+
+/// `-> target` (`JUMP`) or `call target` (`CALL`).
+class JumpItem extends ItemNode {
+  final TargetRef target;
+  final bool isCall;
+
+  JumpItem(super.span, this.target, {this.isCall = false});
+
+  @override
+  String get type => isCall ? "CALL" : "JUMP";
+}
+
+class ReturnItem extends ItemNode {
+  ReturnItem(super.span);
+
+  @override
+  String get type => "RETURN";
+}
+
+/// Effects with nothing shown: a `set` block, or effect lines at column 0.
+class SetItem extends ItemNode {
+  SetItem(super.span);
+
+  @override
+  String get type => "SET";
+}
+
+/// One stage action (data schema §4.12). [fields] are the JSON fields after `action`, in output order. A
+/// [ProfileRef] value is resolved when compiling: to `<id>:<sprite>`, or to `<id>` when [idOnly].
+class StageAction {
+  final String action;
+  final SourceSpan span;
+  final Map<String, Object?> fields = {};
+  bool idOnly = false;
+
+  StageAction(this.action, this.span);
+
+  /// How long the action runs, counted like the engine: an explicit `duration_ms`, else 0 with the `none`
+  /// transition, 400 for `shake` and `flash`, and 500 otherwise.
+  int get durationMs {
+    final explicit = fields["duration_ms"];
+    if (explicit is int) return explicit;
+    if (fields["transition"] == "none") return 0;
+    return action == "shake" || action == "flash" ? 400 : 500;
+  }
+}
+
+class StageItem extends ItemNode {
+  int? waitMs;
+  final List<StageAction> actions = [];
+
+  StageItem(super.span);
+
+  /// [waitMs], or the longest action.
+  int get effectiveWaitMs =>
+      waitMs ?? actions.fold(0, (longest, action) => action.durationMs > longest ? action.durationMs : longest);
+
+  @override
+  String get type => "STAGE";
 }
 
 class EndingItem extends ItemNode {
@@ -248,6 +298,8 @@ class SceneNode {
   final String mode;
   String? background;
   String? music;
+  String? ambience;
+  String? textbox;
   String? channel;
   int? day;
   String? time;
@@ -283,6 +335,6 @@ class ScriptFile {
 /// Words that start a statement, so they can't be speaker names. `clue` and `evidence` are reserved for CE-05
 /// and CE-06, whose syntax isn't designed yet.
 const statementKeywords = {
-  "narration", "system", "timestamp", "media", "choice", "input", "wait", "branch", "ending", //
-  "clue", "evidence",
+  "narration", "system", "timestamp", "media", "choice", "input", "wait", "branch", "ending", "call", "return",
+  "set", "toggle", "remember", "stage", "clue", "evidence",
 };

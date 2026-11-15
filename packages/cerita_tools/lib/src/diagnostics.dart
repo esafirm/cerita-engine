@@ -57,7 +57,7 @@ class Diagnostics {
 
   void addAll(Diagnostics other) => _items.addAll(other._items);
 
-  int count(Severity severity) => _items.where((d) => d.severity == severity).length;
+  int count(Severity severity) => sorted().where((d) => d.severity == severity).length;
 
   bool get hasErrors => _items.any((d) => d.severity == Severity.error);
 

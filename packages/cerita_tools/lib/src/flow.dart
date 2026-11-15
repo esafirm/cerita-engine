@@ -14,6 +14,8 @@ class FlowEdge {
 ///
 /// Every conversation has one node per item plus an exit node after its last item. Reaching an exit node means
 /// the engine runs out of items there. Conditions are never evaluated, so the graph holds every possible route.
+/// A `CALL` isn't followed: it continues at the next item, and `stats` counts the called section as the CALL's
+/// own time. A `RETURN` ends the path.
 class FlowGraph {
   final List<ConversationNode> conversations;
   final Map<String, int> _indexByKey = {};
@@ -58,47 +60,44 @@ class FlowGraph {
 
   bool isExit(int node) => itemAt(node) == null;
 
+  /// The node [target] points at from the conversation [from]: a conversation's first item, or a labelled item.
+  int? resolve(TargetRef target, String from) {
+    final index = _indexByKey[target.conversation(from)];
+    if (index == null) return null;
+    final label = target.label;
+    if (label == null) return _base[index];
+    final item = conversations[index].items.indexWhere((item) => item.label == label);
+    return item < 0 ? null : _base[index] + item;
+  }
+
   void _link(int node, ItemNode item, int next) {
     final out = edges[node];
+    final from = conversationOf(node).key;
     if (item.condition != null) out.add(FlowEdge(next, false));
-    void to(String? key) {
-      final target = key == null ? next : start(key);
-      if (target != null) out.add(FlowEdge(target, true));
+    void to(TargetRef? target) {
+      final resolved = target == null ? next : resolve(target, from);
+      if (resolved != null) out.add(FlowEdge(resolved, true));
     }
 
     switch (item) {
-      case EndingItem():
+      case EndingItem() || ReturnItem():
         break;
+      case JumpItem(isCall: false):
+        to(item.target);
       case BranchItem():
         for (final route in item.routes) {
-          to(route.target.key);
+          to(route.target);
         }
-        if (item.fallback != null) {
-          to(item.fallback!.key);
-        } else {
-          to(null);
-        }
+        to(item.fallback);
       case ChoiceItem():
-        if (item.options.isEmpty) to(null);
+        // The engine skips a choice whose options are all hidden.
+        if (item.options.every((option) => option.condition != null || option.once)) to(null);
         for (final option in item.options) {
-          to(option.target?.key);
+          to(option.target);
         }
       default:
         to(null);
     }
-  }
-
-  /// Every node reachable from [from].
-  Set<int> reachableFrom(int from) {
-    final seen = {from};
-    final queue = [from];
-    while (queue.isNotEmpty) {
-      final node = queue.removeLast();
-      for (final edge in edges[node]) {
-        if (seen.add(edge.to)) queue.add(edge.to);
-      }
-    }
-    return seen;
   }
 }
 

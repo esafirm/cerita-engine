@@ -33,10 +33,12 @@ ending end_02_good GOOD
 
 
 @conversation ending_secret chapter=Ending title="Our Year"
-@scene VN day=2 time=10:30 bg=cg_luna_cafe.png music=sunny.mp3
+@scene VN day=2 time=10:30 bg=cg_luna_cafe.png music=sunny.mp3 textbox=nvl
 
 narration
-  en: Luna opens the diary to the last page. Two handwritings. One of them is still wet.
+  en: Luna opens the diary to the last page.
+narration
+  en: Two handwritings.{w=600} One of them is {i}still wet{/i}.
 miki:smile [left]
   en: "See you at our table, Luna. Same time next year."
 luna:smile [right]
@@ -51,8 +53,14 @@ ending end_04_secret SECRET
 
 miki:smile [center]
   en: Tell her... thank you. I can go now.
+stage
+  weather sakura
+  zoom 1.15 focus=center duration=1.2s
 luna:smile [right]
   en: It's warm in here all of a sudden. Is that strange?
+stage
+  hide miki transition=slide_up duration=1.2s
+  zoom 1 duration=1.2s
 narration
   en: Your phone buzzes one last time. The unknown number is gone from your contacts.
 ending end_01_true TRUE

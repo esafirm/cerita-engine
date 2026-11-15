@@ -130,7 +130,7 @@ choice FIRST_REPLY by=miki timeout=10s
 
 ```sh
 dart run cerita_tools compile <story> <out>   # scripts to engine JSON (--check verifies committed files)
-dart run cerita_tools lint <story> --release  # every broken link, unknown name, missing asset and translation
+dart run cerita_tools lint <story> --release  # script checks plus the core story linter, reported at script lines
 dart run cerita_tools stats <story>           # words and minutes per chapter, route and ending
 dart run cerita_tools tts-manifest <story>    # voiced lines for the voice pipeline
 dart run cerita_tools assets <story>          # files the story uses that don't exist yet

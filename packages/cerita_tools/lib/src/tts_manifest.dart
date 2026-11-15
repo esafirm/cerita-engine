@@ -1,42 +1,51 @@
+import 'package:cerita_core/cerita_core.dart' show TextMarkup;
+
 import 'diagnostics.dart';
 import 'model.dart';
 import 'project.dart';
 
-/// Every voiced line, one entry per line and locale, for the voice pipeline (spec §3.4). Lines that can't be
-/// voiced (no text, no speaker) are reported to [diagnostics] as warnings and left out.
+/// Every voiced line, one entry per line and locale, for the voice pipeline (spec §3.4).
+///
+/// Each entry's `file` is the per-locale clip the player looks for first, `name.<locale>.ext` (CE-01, data schema
+/// §5.4). Lines that can't be voiced (no speaker, no text in a locale) are reported to [diagnostics] as warnings.
 Map<String, Object?> buildTtsManifest(StoryProject project, Diagnostics diagnostics) {
   final config = project.config;
   final lines = <Map<String, Object?>>[];
+  final firstUse = <String, (String, SourceSpan)>{};
 
   void add({
     required String kind,
     required ConversationNode conversation,
     required ItemNode item,
     required ProfileRef? speaker,
-    required LocalizedAsset clip,
+    required String clip,
     required Localized? text,
     required Localized? tts,
     required String? delivery,
   }) {
     if (speaker == null) diagnostics.warning(item.span, "Voice note without a speaker: add by=");
-    final files = clip.resolve(config.locales, config.sourceLocale);
-    for (final MapEntry(key: locale, value: file) in files.entries) {
+    final profile = speaker == null ? null : project.cast[speaker.speaker];
+    for (final locale in config.locales) {
       final value = text?.values[locale];
       if (value == null) {
-        diagnostics.warning(item.span, "No '$locale' text to voice for '$file'");
+        diagnostics.warning(item.span, "No '$locale' text to voice for '${localeVariant(clip, locale)}'");
         continue;
       }
-      final profile = speaker == null ? null : project.cast[speaker.speaker];
-      final name = profile?.name?.textFor(locale, config.sourceLocale);
+      final file = localeVariant(clip, locale);
+      final (firstText, firstSpan) = firstUse.putIfAbsent(file, () => (value, item.span));
+      if (firstText != value) {
+        diagnostics.warning(item.span, "'$file' is also voiced at $firstSpan with other text, so one of them won't match");
+      }
       lines.add({
-        "id": _stem(file),
+        "id": _stem(clip),
         "file": file,
         "kind": kind,
         "speaker": speaker?.speaker,
-        "speaker_name": ?name,
+        "speaker_name": ?profile?.name?.textFor(locale, config.sourceLocale),
         "locale": locale,
-        "text": value,
-        if (tts?.values[locale] != null) "tts_text": tts!.values[locale],
+        // Text tags such as {w=400} or {i} style the line on screen. They aren't spoken.
+        "text": TextMarkup.plain(value),
+        "tts_text": ?tts?.values[locale],
         "delivery": ?delivery,
         "conversation": conversation.key,
         "source": item.span.toString(),

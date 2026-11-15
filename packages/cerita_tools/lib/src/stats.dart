@@ -11,6 +11,8 @@ class Measure {
 
   double get minutes => seconds / 60;
 
+  Measure operator +(Measure other) => Measure(words + other.words, seconds + other.seconds);
+
   Map<String, Object?> toJson() => {"words": words, "minutes": _round(minutes)};
 }
 
@@ -155,6 +157,8 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
         extra = pacing.inputSeconds.toDouble();
       case WaitItem():
         extra = item.durationMs / 1000;
+      case StageItem():
+        extra = item.effectiveWaitMs / 1000;
       default:
         break;
     }
@@ -163,10 +167,28 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 
   final conversations = project.conversationsByKey.values.toList();
   final graph = FlowGraph(conversations);
-  final measures = List<Measure?>.generate(graph.length, (node) {
+  final itemMeasures = List<Measure?>.generate(graph.length, (node) {
     final item = graph.itemAt(node);
     return item == null ? null : measure(item);
   });
+
+  // A CALL takes as long as the section it calls: every item from its target to a RETURN or the end of that
+  // conversation. Nested calls are followed a few levels deep.
+  Measure called(int node, int depth) {
+    final item = graph.itemAt(node);
+    if (item is! JumpItem || !item.isCall || depth > 8) return const Measure(0, 0);
+    final target = graph.resolve(item.target, graph.conversationOf(node).key);
+    var total = const Measure(0, 0);
+    for (var next = target; next != null && graph.itemAt(next) != null && graph.itemAt(next) is! ReturnItem; next++) {
+      total = total + itemMeasures[next]! + called(next, depth + 1);
+    }
+    return total;
+  }
+
+  final measures = [
+    for (var node = 0; node < graph.length; node++)
+      if (itemMeasures[node] case final measure?) measure + called(node, 0) else null,
+  ];
   double cost(int node) => measures[node]?.seconds ?? 0;
 
   // Conversations in the order a reader meets them: breadth first from index, then the unreachable ones by key.
@@ -192,7 +214,7 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
       ConversationStats(
         conversation.key,
         conversation.chapter?.textFor(activeLocale, config.sourceLocale),
-        conversation.items.map(measure).fold(const Measure(0, 0), (a, b) => Measure(a.words + b.words, a.seconds + b.seconds)),
+        conversation.items.map(measure).fold(const Measure(0, 0), (a, b) => a + b),
       ),
   ];
   final chapterTotals = <String, Measure>{};
@@ -253,20 +275,22 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 }
 
 Iterable<String> _targets(ConversationNode conversation) sync* {
+  final from = conversation.key;
   for (final item in conversation.items) {
     switch (item) {
       case ChoiceItem():
         for (final option in item.options) {
-          if (option.target != null) yield option.target!.key;
+          if (option.target != null) yield option.target!.conversation(from);
         }
       case BranchItem():
         for (final route in item.routes) {
-          yield route.target.key;
+          yield route.target.conversation(from);
         }
-        if (item.fallback != null) yield item.fallback!.key;
+        if (item.fallback != null) yield item.fallback!.conversation(from);
+      case JumpItem():
+        yield item.target.conversation(from);
       default:
         break;
     }
   }
 }
-

@@ -21,6 +21,11 @@ void main() {
       final compiled = {for (final entry in result.files.entries) entry.key: jsonDecode(entry.value)};
       final expected = exampleStoryJson();
       expect(compiled.keys, unorderedEquals(expected.keys));
+      // CE-01 adds source_locale to index.json. Until example/ has it, it's the one key allowed to differ.
+      final index = expected["index.json"] as Map;
+      if (!index.containsKey("source_locale")) {
+        expect((compiled["index.json"] as Map).remove("source_locale"), "en");
+      }
       for (final file in expected.keys) {
         expect(compiled[file], expected[file], reason: file);
       }
@@ -47,6 +52,8 @@ choice
   -> index
 """,
     }, config: _bilingual));
+    expect(json["source_locale"], "id");
+    expect(json["locales"], ["id", "en"]);
     expect(json["chapter"], {"id": "Hari 1", "en": "Day 1"});
     final [line, choice] = json["conversations"] as List;
     expect((line as Map).keys.first, "type");
@@ -94,14 +101,110 @@ ending end_a GOOD
     ]);
   });
 
-  test('a {locale} voice template names one clip per locale', () {
+  test('voice stays one file name, which the player tries per locale first (CE-01)', () {
     final json = _compileOne(story({
-      "a.cerita": "@conversation index\nnora voice=vo_01.{locale}.mp3\n  id: Hai\n  en: Hi\n"
-          "nora voice=vo_02.mp3 voice.en=vo_02.en.mp3\n  id: Hai\n  en: Hi\n",
+      "a.cerita": "@conversation index\nnora voice=vo_01.mp3\n  id: Hai\n  en: Hi\nmedia AUDIO vn_01.mp3 by=nora\n  id: Halo\n",
     }, config: _bilingual));
-    final [first, second] = json["conversations"] as List;
-    expect(first["voice"], {"id": "vo_01.id.mp3", "en": "vo_01.en.mp3"});
-    expect(second["voice"], {"id": "vo_02.mp3", "en": "vo_02.en.mp3"});
+    final [line, note] = json["conversations"] as List;
+    expect(line["voice"], "vo_01.mp3");
+    expect(note["uri"], "vn_01.mp3");
+    expect(note["transcript"], {"id": "Halo"});
+  });
+
+  test('every engine item has a script form', () {
+    final json = _compileOne(story({
+      "a.cerita": """
+@conversation index
+@scene VN bg=room.png music=theme.mp3 ambience=rain.mp3 textbox=nvl
++persistent.runs
+set coin = random(0, 1)
+remember saw_intro
+set [if coin == 1] label=lucky
+  set mood "very happy"
+  -trust 2
+stage wait=0
+  show nora:smile far_left transition=slide_left duration=0.7s
+  move nora far_right
+  hide nora transition=none
+  clear
+  background none
+  music none fade=2s
+  ambience rain.mp3
+  sound door.mp3
+  weather sakura
+  shake intensity=8 duration=400
+  flash color=#E05050
+  zoom 1.2 focus=left
+  textbox adv
+  page
+  +staged
+choice label=hub
+  en: Ask?
+? Again [once]
+  -> #hub
+? Remember? [if meta.flag.saw_intro] [memory_marker]
+  -> shared#start
+? Leave
+call shared#start
+-> next [if coin == 0]
+return
+
+@conversation shared
+narration label=start
+  en: Shared
+return
+""",
+    }));
+    final items = json["conversations"] as List;
+    expect(json["scene"], {"mode": "VN", "background": "room.png", "music": "theme.mp3", "ambience": "rain.mp3", "textbox": "nvl"});
+    // Effect lines that follow each other at column 0 share one SET.
+    expect(items.take(2), [
+      {
+        "type": "SET",
+        "effects": [
+          {"variable": "persistent.runs", "op": "add", "value": 1},
+          {"variable": "coin", "op": "set", "expr": "random(0, 1)"},
+          {"variable": "saw_intro", "op": "meta_set"},
+        ],
+      },
+      {
+        "type": "SET",
+        "id": "lucky",
+        "condition": "coin == 1",
+        "effects": [{"variable": "mood", "op": "set", "value": "very happy"}, {"variable": "trust", "op": "subtract", "value": 2}],
+      },
+    ]);
+    expect(items[2], {
+      "type": "STAGE",
+      "wait_ms": 0,
+      "actions": [
+        {"action": "show", "profile": "nora:1", "position": "far_left", "transition": "slide_left", "duration_ms": 700},
+        {"action": "move", "profile": "nora", "position": "far_right"},
+        {"action": "hide", "profile": "nora", "transition": "none"},
+        {"action": "clear"},
+        {"action": "background", "image": null},
+        {"action": "music", "file": null, "fade_ms": 2000},
+        {"action": "ambience", "file": "rain.mp3"},
+        {"action": "sound", "file": "door.mp3"},
+        {"action": "weather", "name": "sakura"},
+        {"action": "shake", "intensity": 8, "duration_ms": 400},
+        {"action": "flash", "color": "#E05050"},
+        {"action": "zoom", "scale": 1.2, "focus": "left"},
+        {"action": "textbox", "style": "adv"},
+        {"action": "page"},
+      ],
+      "effects": [{"variable": "staged", "op": "add", "value": 1}],
+    });
+    expect(items[3]["choices"], [
+      {"text": "Again", "once": true, "target": "#hub"},
+      {"text": "Remember?", "condition": "meta.flag.saw_intro", "memory_marker": true, "target": "shared#start"},
+      {"text": "Leave"},
+    ]);
+    expect(items.skip(4), [
+      {"type": "CALL", "target": "shared#start"},
+      {"type": "JUMP", "condition": "coin == 0", "target": "next"},
+      {"type": "RETURN"},
+    ]);
   });
 
   test('a choice timeout and [default] compile to timeout_ms and default_choice', () {

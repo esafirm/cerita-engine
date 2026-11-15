@@ -185,72 +185,86 @@ check) is not.
 - **Why:** it is a writing tool behind `StorySetup.developer`, off in release builds, so players never see it.
 - **Revisit if** writers on a team want it in Indonesian.
 
-## `cerita_tools` doesn't depend on the engine at runtime
+## `cerita_tools` stays its own package, and lints through core's `StoryLinter`
 
-*2026-11-15. Authoring toolkit §4.*
+*2026-11-15. Authoring toolkit §3.1, authoring tools §1.*
 
-The toolkit has its own condition parser instead of calling `ConditionEvaluator` from cerita_core. It only needs
-to know whether a condition parses and which names it reads, and it accepts `meta.ending.*` and `meta.flag.*`
-before the engine does (CE-03). cerita_core is a dev dependency, used by the test that plays the compiled
-Wrong Number.
+The toolkit's commands stay under `cerita_tools` instead of moving into cerita_core's `cerita` command.
+`cerita_tools lint` compiles the story and runs `StoryLinter` on the JSON, once per locale, and maps each issue
+back to the script line of the item it's about. The toolkit only adds checks for what exists in the scripts
+alone: syntax, speaker and expression names, unused cast, missing translations. It has no condition parser of
+its own any more.
 
-- **Why:** CE-01 and CE-03 change cerita_core in parallel, and the toolkit must keep building and running while
-  they land. Authors also run it without Flutter.
-- **Cost:** the condition grammar exists twice.
-- **Revisit if** the grammars drift. The round-trip test catches drift only for what Wrong Number uses, so a
-  shared grammar package is the fix if conditions grow.
+- **Why:** cerita_core is the engine and runs on the web, while the toolkit reads YAML and script folders from
+  disk and only matters to authors. One linter means a check added for JSON stories also covers scripts, and the
+  two can't disagree about what a valid story is.
+- **Cost:** cerita_tools now depends on cerita_core at runtime. A JSON check can only point at an item's
+  header line, not at the exact body line, since the engine reports item indexes.
+- **Revisit if** core issues need finer positions (an option index, a field name). `LintIssue` would need them.
+
+## `lint` compiles partially so both layers report in one run
+
+*2026-11-15. Authoring toolkit §3.1.*
+
+When a script has errors, the linter still compiles it without the broken statements, writing `""` for missing
+required text, and runs the story checks on the result.
+
+- **Why:** PRD 10.3 asks for every error, not just the first. Without this, one typo hides every JSON problem
+  until it's fixed.
+- **Cost:** a broken statement that was dropped can cause a knock-on issue, such as a label nothing defines.
 
 ## Text in a multi-locale story always compiles to an object
 
-*2026-11-15. Authoring toolkit §2.6, CE-01.*
+*2026-11-15. Authoring toolkit §2.7, CE-01.*
 
 With one locale, script text compiles to a plain string, so Wrong Number's JSON is unchanged. With more, it's
 always `{locale: text}`, even when only the source locale is written. Plain YAML values in `profiles.yaml` and
-`channels.yaml` (names, handles) stay plain strings, since they're the same in every language.
+`channels.yaml` (names) stay plain strings, since they're the same in every language. CE-01 accepts single-key
+objects.
 
 - **Why:** one shape per story is simpler for the engine and for diffs than switching shape as translations
   arrive.
-- **Revisit if** CE-01 settles on omitting single-entry objects.
 
-## Per-locale voice clips use the localized shape too
+## Voice follows CE-01's file name convention
 
-*2026-11-15. Authoring toolkit §2.2, CE-01 D5.*
+*2026-11-15. Authoring toolkit §2.2, CE-01 D5, data schema §5.4 on the CE-01 branch.*
 
-`voice=vo_01.{locale}.mp3` and `voice.en=` compile `voice` (and a voice note's `uri`) to
-`{"id": "...", "en": "..."}`, the same shape as localized text. A shared clip stays a plain string.
+`voice=` and a voice note's file stay one file name. The player tries `name.<locale>.mp3`, then `name.mp3`, so
+the script has no per-locale voice syntax. `tts-manifest` names each entry's output `name.<locale>.mp3`, and an
+asset check passes with either the shared file or every locale's own file.
 
-- **Why:** CE-01 D5 needs a clip per language with a shared fallback, and the contract only defines the text
-  shape. Reusing it means the engine needs one resolver.
-- **Revisit when** CE-01 picks the JSON for per-language clips. This is the open contract question.
+- **Why:** CE-01's design. An earlier draft of the toolkit compiled per-locale clips to a locale object, which
+  CE-01 didn't adopt.
 
-## Every lint check is an error, even while drafting
+## `--release` fails on warnings
 
 *2026-11-15. Authoring toolkit §3.1, PRD D2.*
 
-Only missing translations are warnings while drafting. Unreachable conversations, variables read but never set
-and missing assets fail `lint` straight away.
+While drafting, issues keep the severity the linter gives them: core's warnings (unreachable conversations,
+variables read but never set) and the toolkit's (missing translations, unused cast) don't fail `lint`. With
+`--release`, every warning is an error, like `cerita lint --strict`.
 
-- **Why:** PRD D2 says every check blocks release, and most of these are typos that are cheapest to fix at once.
-- **Cost:** a half-written scene that nothing links to yet fails `lint`.
-- **Revisit if** that gets in the way of drafting. Then make reachability a warning without `--release`.
+- **Why:** PRD D2 says every check blocks release builds, and drafting needs room for half-linked scenes and
+  untranslated lines. This replaces the first draft, where every toolkit check was an error even while drafting.
 
-## Effects belong to an item
+## Effects stand alone as `SET`
 
 *2026-11-15. Authoring toolkit §2.4.*
 
-`+trust 5`, `set`, `toggle` and `remember` are body lines of a line, choice option or other item. There is no
-standalone effect statement.
+An effect line at column 0 compiles to a `SET`, and effect lines that follow each other share one. `set` with
+a body is the form that takes `[if]` and `label=`.
 
-- **Why:** the engine on this branch has no item that only runs effects, and inventing one would change the
-  schema. An effect on a `branch` or `->` is an error, since the engine jumps without executing it.
-- **Revisit when** the engine gets an effect-only item (`main` has `STAGE` and script flow items).
+- **Why:** most state changes sit between lines, and a `set` keyword on each one is noise. Merging keeps the JSON
+  close to what a person would write.
+- **Cost:** two consecutive effect lines can't become two `SET`s without something in between.
 
 ## Playtime runs are bounds, not predictions
 
 *2026-11-15. Authoring toolkit §3.2, PRD D3.*
 
 The shortest run to an ending skips every conditional item, the longest shows every one and counts each loop
-once. The critical path is the longest of the longest runs.
+once. The critical path is the longest of the longest runs. A `CALL` counts the whole called section, from its
+target to a `RETURN`.
 
 - **Why:** conditions aren't evaluated, so the toolkit can't know which conditional lines a real run shows.
   Bounds are honest and cheap. Pacing defaults (200 wpm, 4 s per choice, 8 s per input, 4 s per media item) are
@@ -264,6 +278,8 @@ once. The critical path is the longest of the longest runs.
 - File names are written with their extension (`bg=pier_dusk.webp`). Defaulting extensions would make the
   compiled JSON depend on a setting authors forget about.
 - `[default]` marks the timeout option instead of a number, so reordering options can't change it.
+- `-> target` is a `JUMP`. A `BRANCH` with only a fallback is written as `branch` with a `-> target` body, which
+  Wrong Number needs to compile to its hand-written JSON.
 - `compile` never deletes stale `cvn_*.json` files. It warns, and `compile --check` fails on them.
 - Asset checks are skipped with a note when no asset folder is set, and `--release` makes that an error.
 
@@ -277,6 +293,9 @@ once. The critical path is the longest of the longest runs.
   their pacing to pause and resume. It also needs a design for what the thread shows while paused.
 - **Remembered facts in the developer panel.** It lists run and `persistent.*` variables only. Showing
   `meta.flag.*` there needs a read-only row, since memory can only be written with `meta_set`.
+- **"Story stops" check.** A route that runs out of items without an ending, jump or caller makes the engine
+  throw `EndOfStoryException`. The first toolkit draft checked this on scripts, but it's a JSON check, so it
+  belongs in `StoryLinter`, where `cerita_tools lint` picks it up. Until then neither linter reports it.
 
 ## Device checks
 

@@ -23,7 +23,7 @@ void main() {
     final out = p.join(temp.path, "story");
     final (code, stdout, _) = await _run(["compile", wrongNumberDir, out]);
     expect(code, exitOk);
-    expect(stdout, contains("Compiled 10 files"));
+    expect(stdout, contains("Compiled 11 files"));
     expect(File(p.join(out, "cvn_day1.json")).readAsStringSync(), compileStory(loadWrongNumber()).files["cvn_day1.json"]);
 
     expect((await _run(["compile", "--check", wrongNumberDir, out])).$1, exitOk);
@@ -68,7 +68,7 @@ void main() {
   test('tts-manifest and assets write their reports', () async {
     final file = p.join(temp.path, "manifest.json");
     expect((await _run(["tts-manifest", wrongNumberDir, "--out", file])).$1, exitOk);
-    expect((jsonDecode(File(file).readAsStringSync())["lines"] as List), hasLength(6));
+    expect((jsonDecode(File(file).readAsStringSync())["lines"] as List), hasLength(7));
 
     final (code, stdout, _) = await _run(["assets", "--json", wrongNumberDir]);
     expect(code, exitOk);
@@ -86,7 +86,7 @@ String _writeStory(Directory dir, String script) {
   final story = p.join(dir.path, "src");
   Directory(story).createSync();
   File(p.join(story, "cerita.yaml")).writeAsStringSync("source_locale: en\n");
-  File(p.join(story, "profiles.yaml")).writeAsStringSync("nora:\n  name: Nora\n");
+  File(p.join(story, "profiles.yaml")).writeAsStringSync("{}");
   File(p.join(story, "a.cerita")).writeAsStringSync(script);
   return story;
 }

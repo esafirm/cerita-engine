@@ -162,15 +162,15 @@ class _LintCommand extends _StoryCommand {
 
   _LintCommand(super.cli) {
     argParser
-      ..addFlag("release", negatable: false, help: "Treat missing translations and skipped asset checks as errors.")
+      ..addFlag("release", negatable: false, help: "Fail on warnings too, including missing translations and skipped asset checks.")
       ..addOption("assets", help: "Asset folder with bg/, sprites/, media/ and music/. Overrides cerita.yaml.");
   }
 
   @override
-  int run() {
+  Future<int> run() async {
     final root = storyDir();
     final project = load(root, assets: args.option("assets"));
-    final diagnostics = lintStory(project, release: args.flag("release"));
+    final diagnostics = await lintStory(project, release: args.flag("release"));
     return report(root, diagnostics) ? exitProblems : exitOk;
   }
 }
