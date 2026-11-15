@@ -13,11 +13,11 @@ Every capability is generic. Last Seen is the first story that uses it, not the 
 | CE-01 | [Bilingual stories](01-bilingual-stories.md) | Must | M0 | Done |
 | CE-02 | [Story authoring toolkit](02-story-authoring-toolkit.md) | Must | M0 | In progress |
 | CE-03 | [Cross-playthrough memory](03-cross-playthrough-memory.md) | Must | M0 | Done |
-| CE-04 | [Player settings](04-player-settings.md) | Should | M1 | In progress |
+| CE-04 | [Player settings](04-player-settings.md) | Should | M1 | Done |
 | CE-05 | [Case Board](05-case-board.md) | Must | M2 | Done |
 | CE-06 | [Present evidence](06-present-evidence.md) | Must | M2 | Done |
-| CE-07 | [Route flowchart](07-route-flowchart.md) | Should | M3 | In progress |
-| CE-08 | [Credits screen](08-credits-screen.md) | Should | M5 | In progress |
+| CE-07 | [Route flowchart](07-route-flowchart.md) | Should | M3 | Done |
+| CE-08 | [Credits screen](08-credits-screen.md) | Should | M5 | Done |
 
 Milestones refer to [Last Seen section 9](../last-seen.md#9-milestones).
 

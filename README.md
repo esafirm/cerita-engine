@@ -21,9 +21,9 @@ See [`specs/`](specs/README.md) for the full specification.
 | Labels, `JUMP`, `CALL` / `RETURN`, `SET`, `once` choices | Prologue question hub, shared phone buzz |
 | Conditions, effects, expressions (`random()`, arithmetic), `{{VAR}}` interpolation | Choices, Day 2 greeting and ending router |
 | `persistent.*` variables | Prologue run counter |
-| Autosave, save slots with thumbnails, gallery, endings, chapter checkpoints | Title screen and in-game menu |
+| Autosave, save slots with thumbnails, gallery, endings, chapter checkpoints with a route flowchart | Title screen and in-game menu |
 | Rollback (also from the backlog, kept in saves, stable `random()`), quick save / load, hide UI | VN quick controls |
-| Settings (text speed, auto delay, skip unread, volumes), music room, chapter replay | Title screen and in-game menu |
+| Settings (text speed, auto delay, skip unread, chat typing pace, volumes), music room, chapter replay | Title screen and in-game menu |
 | Text tags (`{b}` `{i}` `{color}` `{shake}` `{wave}` `{speed}` `{w}` `{nw}`) in lines and choices, NVL page | Prologue opening and menu, Day 2, secret ending |
 | Music fades, ambience loop, overlapping sounds, per-character voice volume, voice replay | Prologue → "Nah", settings, backlog |
 | Developer panel (edit variables, jump to any label, story check, reload on hot reload) | In-game menu → Developer, debug builds |
@@ -76,6 +76,13 @@ await language.load(setup); // saved pick, else device language, else the source
 
 See [data schema section 5](specs/data-schema.md#5-localized-text) and
 [presentation modes section 5](specs/presentation-modes.md#5-language).
+
+## Credits
+
+A story can ship a `credits.json` with its people, roles and third-party assets (see
+[data schema section 9](specs/data-schema.md#9-credits-creditsjson)). `CreditsScreen` shows it with a link to the
+open-source licenses. Apps offer it from the title screen only when `setup.loader.loadCredits()` finds one. Endings
+listed in `roll_after` roll the credits when the player leaves the ending. Wrong Number has no credits file.
 
 ## Using the engine
 

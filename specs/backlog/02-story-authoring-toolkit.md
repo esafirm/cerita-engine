@@ -4,7 +4,7 @@
 
 | | |
 | :--- | :--- |
-| **Status** | In progress ([design](../authoring-toolkit.md)) |
+| **Status** | In progress ([design](../authoring-toolkit.md)). Everything ships except the `clue` and `evidence` statements for CE-05 and CE-06 (10.1, and the 10.3 clue checks at script lines) |
 | **Author** | Esa Firman |
 | **Last updated** | 2026-11-15 |
 | **Type** | Lean PRD (product scope only) |

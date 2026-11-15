@@ -70,7 +70,7 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Transcript", "Chat history and VN backlog survive app restarts."),
         ("Gallery", "Locked silhouettes with unlock hints; photos, voice notes and videos replay any time."),
         ("Endings", "Collection with unlocked / total progress."),
-        ("Chapters", "Jump back to Prologue, Day 1 or Day 2 with the variables you had there."),
+        ("Chapters", "A flowchart of the routes: reached days show their title and endings found, the rest '???'. Tap one to play from there with the variables you had. The app bar switches to a list."),
         ("Scene replay", "Chapters → replay button: plays only that chapter, then comes back. Saves are untouched."),
         ("Music room", "Title → Music: every track you have heard. The night track unlocks on Day 1."),
       ],
@@ -92,7 +92,7 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Quick save / load", "Q.SAVE and Q.LOAD on the VN stage."),
         ("Hide", "HIDE clears the dialogue box and controls to look at the stage or a CG. Auto waits until you tap to bring them back."),
         ("Auto / Skip", "VN quick controls. Skip only fast-forwards lines read before, unless the setting says otherwise."),
-        ("Settings", "Title → Settings or Menu → Settings: text speed with a preview, auto delay, skip unread, volumes."),
+        ("Settings", "Title → Settings or Menu → Settings: text speed with a preview, auto delay, skip unread, chat typing pace, volumes."),
       ],
     ),
   ];
