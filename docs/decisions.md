@@ -337,6 +337,44 @@ clue already found as viewed.
 - **Revisit if** players miss clues because opening the board clears them. Then mark a clue viewed only when
   its detail is opened.
 
+## Credits roll when the player leaves the ending summary
+
+*2026-11-15. Presentation modes §4, data schema §9. Backlog CE-08.*
+
+An ending listed in `roll_after` shows its summary as usual. Tapping Back to title or All endings rolls the
+credits first, then goes there. The endings that roll credits are listed in `credits.json`, not marked on the
+`ENDING` item.
+
+- **Why:** the PRD wants credits after the summary. Starting them on a timer would cut the summary short for slow
+  readers, and leaving is the moment the player is done with it. Keeping `roll_after` in the credits file needs
+  no new item field and no script syntax, and the linter checks the ids.
+- **Revisit if** a story wants credits before its summary, or in the middle of the story. Then an item or a
+  `STAGE` action would roll them.
+
+## `credits.json` is written by hand, also for script stories
+
+*2026-11-15. Data schema §9, authoring toolkit §2.8. Backlog CE-08.*
+
+`cerita_tools` doesn't compile or lint credits. A script story keeps a hand-written `credits.json` in its output
+folder next to the compiled files, and `cerita lint` on that folder checks it. `compile` never deletes it, since
+it only warns about stale `cvn_*.json` files.
+
+- **Why:** credits are a short list with no dialogue, references or translations to keep in step with the
+  scripts. A YAML form would only change the brackets.
+- **Revisit if** Last Seen's credits grow long enough to want comments, or authors forget to lint the output
+  folder. Then add `credits.yaml` to the story folder and compile it like `channels.yaml`.
+
+## Wrong Number ships without credits
+
+*2026-11-15. Backlog CE-08.*
+
+The demo has no `credits.json`, so its title screen shows no Credits entry. The screen and rolling credits are
+covered by widget tests with a fixture instead.
+
+- **Why:** the sources and licenses of the demo's art, music and voices aren't recorded anywhere, and credits
+  that guess them would be wrong.
+- **Revisit when** the demo assets' sources are known: add a `credits.json` and a `roll_after` for the true ending.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

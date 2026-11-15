@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../common/tagged_text.dart';
 import '../l10n/story_language.dart';
+import '../meta/credits_screen.dart';
 
 /// Visual hooks of the story views. Subclass it to restyle the story (see the `cerita_ui` package)
 /// and provide it with [StorySkinScope]. The defaults are the plain Material look.
@@ -37,6 +38,11 @@ class StorySkin {
 
   /// How long [chapterCard] stays on screen, fades included.
   Duration get chapterCardDuration => const Duration(milliseconds: 2200);
+
+  /// The story's credits, on the Credits screen and rolling after an ending ([rolling], drawn over black).
+  /// Read text in the active language with `StoryLanguage.of(context)`.
+  Widget credits(BuildContext context, Credits credits, {required bool rolling}) =>
+      CreditsList(credits: credits, rolling: rolling);
 
   /// The VN dialogue box around the typewriter [DialogueFrame.body].
   Widget dialogueFrame(BuildContext context, DialogueFrame frame) {

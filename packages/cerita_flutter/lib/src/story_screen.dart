@@ -47,9 +47,15 @@ class _StoryScreenState extends State<StoryScreen> {
   Object? _error;
   bool _started = false;
 
+  /// Rolled after the endings they name (CE-08).
+  Credits? _credits;
+
   @override
   void initState() {
     super.initState();
+    widget.setup.loader.loadCredits().then((credits) {
+      if (mounted) setState(() => _credits = credits);
+    }, onError: (Object _) {});
     _toasts = _controller.toasts.listen((message) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -268,6 +274,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 if (controller.phase == StoryPhase.ending && ending is EndingItemType)
                   EndingView(
                     ending: ending,
+                    credits: _credits,
                     onEndings: () => Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
                     ),

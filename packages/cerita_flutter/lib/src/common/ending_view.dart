@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 
 import '../l10n/cerita_strings.dart';
 import '../l10n/story_language.dart';
+import '../meta/credits_screen.dart';
 
 /// Ending summary overlay. Without an [ending] it shows [title], [CeritaStrings.theEnd] by default.
-class EndingView extends StatelessWidget {
+/// When [credits] roll after [ending], leaving the summary rolls them first (CE-08).
+class EndingView extends StatefulWidget {
   final EndingItemType? ending;
   final String? title;
   final String? backLabel;
   final VoidCallback onTitle;
   final VoidCallback? onEndings;
+
+  /// The story's credits, if any.
+  final Credits? credits;
 
   const EndingView({
     super.key,
@@ -19,11 +24,33 @@ class EndingView extends StatelessWidget {
     this.backLabel,
     required this.onTitle,
     this.onEndings,
+    this.credits,
   });
 
   @override
+  State<EndingView> createState() => _EndingViewState();
+}
+
+class _EndingViewState extends State<EndingView> {
+  /// Where the player is going once the rolling credits are done.
+  VoidCallback? _afterCredits;
+
+  /// Runs [leave], after the credits when they roll after this ending.
+  VoidCallback _leave(VoidCallback leave) => () {
+        final ending = widget.ending;
+        final rolls = ending != null && (widget.credits?.rollsAfter(ending.endingId) ?? false);
+        if (rolls) {
+          setState(() => _afterCredits = leave);
+        } else {
+          leave();
+        }
+      };
+
+  @override
   Widget build(BuildContext context) {
-    final ending = this.ending;
+    if (_afterCredits case final leave?) return RollingCredits(credits: widget.credits!, onDone: leave);
+    final ending = widget.ending;
+    final onEndings = widget.onEndings;
     final strings = StoryLanguage.of(context).strings;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
@@ -41,7 +68,7 @@ class EndingView extends StatelessWidget {
                   if (ending != null) EndingBadge(category: ending.category),
                   const SizedBox(height: 16),
                   Text(
-                    ending?.title ?? title ?? strings.theEnd,
+                    ending?.title ?? widget.title ?? strings.theEnd,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                   ),
@@ -59,11 +86,14 @@ class EndingView extends StatelessWidget {
                     children: [
                       if (onEndings != null)
                         OutlinedButton(
-                          onPressed: onEndings,
+                          onPressed: _leave(onEndings),
                           style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
                           child: Text(strings.allEndings),
                         ),
-                      FilledButton(onPressed: onTitle, child: Text(backLabel ?? strings.backToTitle)),
+                      FilledButton(
+                        onPressed: _leave(widget.onTitle),
+                        child: Text(widget.backLabel ?? strings.backToTitle),
+                      ),
                     ],
                   ),
                 ],

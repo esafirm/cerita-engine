@@ -4,6 +4,7 @@ library;
 export 'src/data/channel.dart';
 export 'src/data/clue.dart';
 export 'src/data/conversation.dart';
+export 'src/data/credits.dart';
 export 'src/data/effect.dart';
 export 'src/data/item_result.dart';
 export 'src/data/items/base.dart';

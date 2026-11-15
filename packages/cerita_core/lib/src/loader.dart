@@ -1,6 +1,7 @@
 import 'data/channel.dart';
 import 'data/clue.dart';
 import 'data/conversation.dart';
+import 'data/credits.dart';
 import 'data/items/media.dart';
 import 'data/profile.dart';
 
@@ -36,6 +37,9 @@ abstract class EngineLoader {
   /// Tells whether a file (a [LoaderConfig] path) exists, for [StoryLinter.assetExists]. Null when the
   /// loader can't tell.
   Future<bool Function(String path)?> assetChecker() async => null;
+
+  /// The story's optional `credits.json` (data schema §9). Null when the story has none.
+  Future<Credits?> loadCredits() async => null;
 }
 
 class LoaderConfig {

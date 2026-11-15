@@ -19,6 +19,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StorySetup get setup => widget.setup;
 
+  /// Null hides the Credits entry: Wrong Number has no credits.json.
+  Credits? _credits;
+
+  @override
+  void initState() {
+    super.initState();
+    setup.loader.loadCredits().then((credits) {
+      if (mounted) setState(() => _credits = credits);
+    }, onError: (Object _) {});
+  }
+
   Future<SaveSlot?> _loadAutosave() => setup.storage.loadSlot(SaveSlot.autoSlotId);
 
   // A block body: setState throws if its callback returns a Future.
@@ -133,6 +144,12 @@ class _HomeScreenState extends State<HomeScreen> {
             // A single-language story like Wrong Number has nothing to switch to.
             if (language.available.length > 1)
               TitleMenuEntry(label: strings.language, icon: Icons.translate, onTap: () => LanguagePicker.show(context)),
+            if (_credits != null)
+              TitleMenuEntry(
+                label: strings.credits,
+                icon: Icons.groups_outlined,
+                onTap: () => _push(CreditsScreen(setup: setup)),
+              ),
             TitleMenuEntry(label: "Features", icon: Icons.checklist, onTap: () => _push(const CapabilitiesScreen())),
             TitleMenuEntry(label: "Reset", icon: Icons.restart_alt, onTap: _resetProgress),
           ],

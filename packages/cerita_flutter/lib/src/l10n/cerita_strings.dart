@@ -68,6 +68,15 @@ abstract class CeritaStrings {
   String endingsProgress(int unlocked, int total);
   String get lockedEnding;
 
+  // Credits.
+  String get credits;
+  String get thirdPartyAssets;
+  String creditAuthor(String author);
+  String creditSource(String source);
+  String creditLicense(String license);
+  String get openSourceLicenses;
+  String get tapToSkip;
+
   // Save slots and chapters.
   String get autosave;
   String slot(int id);
@@ -236,6 +245,20 @@ class EnglishCeritaStrings extends CeritaStrings {
   String endingsProgress(int unlocked, int total) => "$unlocked / $total endings";
   @override
   String get lockedEnding => "??? — keep playing to discover this ending";
+  @override
+  String get credits => "Credits";
+  @override
+  String get thirdPartyAssets => "Third-party assets";
+  @override
+  String creditAuthor(String author) => "by $author";
+  @override
+  String creditSource(String source) => "Source: $source";
+  @override
+  String creditLicense(String license) => "License: $license";
+  @override
+  String get openSourceLicenses => "Open-source licenses";
+  @override
+  String get tapToSkip => "Tap to skip";
   @override
   String get autosave => "Autosave";
   @override
@@ -439,6 +462,20 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String endingsProgress(int unlocked, int total) => "$unlocked / $total ending";
   @override
   String get lockedEnding => "??? — terus main untuk menemukan ending ini";
+  @override
+  String get credits => "Kredit";
+  @override
+  String get thirdPartyAssets => "Aset pihak ketiga";
+  @override
+  String creditAuthor(String author) => "oleh $author";
+  @override
+  String creditSource(String source) => "Sumber: $source";
+  @override
+  String creditLicense(String license) => "Lisensi: $license";
+  @override
+  String get openSourceLicenses => "Lisensi open source";
+  @override
+  String get tapToSkip => "Ketuk untuk melewati";
   @override
   String get autosave => "Simpan otomatis";
   @override

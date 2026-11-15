@@ -21,6 +21,7 @@ export 'src/l10n/cerita_strings.dart';
 export 'src/l10n/localized_assets.dart';
 export 'src/l10n/story_language.dart';
 export 'src/meta/chapters_screen.dart';
+export 'src/meta/credits_screen.dart';
 export 'src/meta/developer_sheet.dart';
 export 'src/meta/endings_screen.dart';
 export 'src/meta/gallery_screen.dart';

@@ -4,6 +4,7 @@ import 'dart:io';
 import '../data/channel.dart';
 import '../data/clue.dart';
 import '../data/conversation.dart';
+import '../data/credits.dart';
 import '../data/profile.dart';
 import '../loader.dart';
 
@@ -64,6 +65,10 @@ class FileEngineLoader extends EngineLoader {
   }
 
   static String _name(String path) => path.split(Platform.pathSeparator).last;
+
+  @override
+  Future<Credits?> loadCredits() async =>
+      File("${config.storyDir}/credits.json").existsSync() ? Credits.fromJson(await _json("credits.json")) : null;
 
   @override
   Future<bool Function(String path)?> assetChecker() async => exists;

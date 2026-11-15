@@ -59,6 +59,14 @@ class AssetEngineLoader extends EngineLoader {
     return assets.contains;
   }
 
+  /// `credits.json` when the bundle has it.
+  @override
+  Future<Credits?> loadCredits() async {
+    final path = "${config.storyDir}/credits.json";
+    if (!(await AssetManifest.loadFromAssetBundle(bundle)).listAssets().contains(path)) return null;
+    return Credits.fromJson(await _loadJson(path));
+  }
+
   @override
   Future<List<String>> listConversationKeys() async {
     final manifest = await AssetManifest.loadFromAssetBundle(bundle);

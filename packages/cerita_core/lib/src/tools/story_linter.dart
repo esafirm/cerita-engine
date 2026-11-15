@@ -1,4 +1,5 @@
 import '../data/conversation.dart';
+import '../data/credits.dart';
 import '../data/effect.dart';
 import '../data/items/base.dart';
 import '../data/items/branch.dart';
@@ -339,7 +340,26 @@ class StoryLinter {
       }
     }
 
+    await _checkCredits(
+      endingIds,
+      (message) => issues.add(LintIssue(LintSeverity.error, null, null, message, fileName: "credits.json")),
+    );
+
     return issues..sort(_order);
+  }
+
+  /// `credits.json` must load, and the endings it rolls after must exist.
+  Future<void> _checkCredits(Set<String> endingIds, void Function(String message) error) async {
+    final Credits? credits;
+    try {
+      credits = await loader.loadCredits();
+    } catch (e) {
+      error("Can't load: $e");
+      return;
+    }
+    for (final ending in credits?.rollAfter ?? const <String>{}) {
+      if (!endingIds.contains(ending)) error("roll_after: no ENDING has ending_id '$ending'");
+    }
   }
 
   /// Reports each evidence question in [questions] (conversation, item index, clues with a response) for which

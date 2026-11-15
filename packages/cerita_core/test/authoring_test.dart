@@ -259,6 +259,45 @@ flowchart TD
       expect(await runCli(["lint", "--strict", story.path], out: StringBuffer()), 1);
     });
 
+    test('credits load localized, and lint checks them', () async {
+      final loader = FileEngineLoader.directory(story.path);
+      expect(await loader.loadCredits(), isNull, reason: "credits.json is optional");
+
+      File("${story.path}/credits.json").writeAsStringSync(jsonEncode({
+        "sections": [
+          {
+            "title": {"id": "Cerita", "en": "Story"},
+            "people": [
+              {"name": "Esa", "role": {"id": "Penulis", "en": "Writer"}},
+            ],
+          },
+        ],
+        "assets": [
+          {"title": "Rain", "author": "Jane", "source": "example.org/rain", "license": "CC0 1.0"},
+        ],
+        "roll_after": ["end_true"],
+      }));
+      final credits = (await loader.loadCredits())!;
+      const english = Localizer(locale: "en");
+      expect(english.resolve(credits.sections.single.title), "Story");
+      expect(english.maybe(credits.sections.single.people.single.role), "Writer");
+      expect(credits.assets.single.license, "CC0 1.0");
+      expect(credits.rollsAfter("end_true"), isTrue);
+
+      final out = StringBuffer();
+      await runCli(["lint", story.path], out: out);
+      expect(out.toString(), contains("error   credits.json  roll_after: no ENDING has ending_id 'end_true'"));
+
+      File("${story.path}/credits.json").writeAsStringSync(jsonEncode({
+        "assets": [
+          {"title": "Rain", "author": "Jane", "license": "CC0 1.0"},
+        ],
+      }));
+      final broken = StringBuffer();
+      await runCli(["lint", story.path], out: broken);
+      expect(broken.toString(), contains("error   credits.json  Can't load: FormatException: An asset needs 'source'"));
+    });
+
     test('graph prints Mermaid, and bad arguments print the usage', () async {
       final out = StringBuffer();
       expect(await runCli(["graph", story.path], out: out), 0);
