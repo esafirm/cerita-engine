@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/logo.png" alt="Cerita Engine logo" width="160">
+</p>
+
 # Cerita Engine
 
 Flutter Simple Story Engine: a JSON-driven engine for visual novels, chat simulations, and hybrids of both.
