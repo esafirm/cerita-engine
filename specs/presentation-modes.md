@@ -54,7 +54,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Typewriter text animation with tap-to-complete (first tap finishes the typewriter animation; second tap advances to `engine.next()`).
   - Text tags (data schema §6): styles, `{shake}` / `{wave}` letters, speed changes and pauses. At a `{w}` the box shows its "next" indicator, and a tap types the rest of the line. The text keeps its final layout while it types, so words don't jump between lines.
 - **Interactive Overlays**:
-  - **`CHOICE` Modal**: Centered or bottom-anchored list of choice buttons over a dimmed stage; locked choices (failing `condition`) can either be hidden or shown disabled with a lock icon.
+  - **`CHOICE` Modal**: Centered or bottom-anchored list of choice buttons over a dimmed stage; locked choices (failing `condition`) can either be hidden or shown disabled with a lock icon. Choice text can have text tags (data schema §6).
   - **`INPUT` Dialog**: Prompt modal with text field and confirmation button.
 - **NVL Page** (`textbox: "nvl"`):
   - The lines of the current page fill a dimmed full-screen panel over the stage, newest at the bottom, older ones scrolling off the top. Characters stay visible behind the panel.

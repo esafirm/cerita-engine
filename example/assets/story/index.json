@@ -67,7 +67,7 @@
           "target": "day1"
         },
         {
-          "text": "Nah. Probably spam.",
+          "text": "Nah. {i}Probably{/i} spam.",
           "value": "wary"
         },
         {

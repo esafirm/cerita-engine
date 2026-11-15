@@ -1,4 +1,5 @@
 import 'effect.dart';
+import '../utils/text_markup.dart';
 import 'items/choice.dart';
 
 /// The player's answer to an INPUT or CHOICE item, passed to `FsseEngine.next`.
@@ -8,7 +9,7 @@ class ItemResult {
   final List<Effect> effects;
   final String? target;
 
-  /// Text shown as the player's outgoing message (chat transcript / backlog).
+  /// Text shown as the player's outgoing message (chat transcript / backlog), without text tags.
   final String? text;
 
   /// [Choice.index] of the picked choice.
@@ -23,9 +24,9 @@ class ItemResult {
         choiceIndex = null;
 
   ItemResult.choice(this.variable, Choice choice)
-      : value = choice.value ?? choice.text,
+      : value = choice.value ?? TextMarkup.plain(choice.text),
         effects = choice.effects,
         target = choice.target,
-        text = choice.text,
+        text = TextMarkup.plain(choice.text),
         choiceIndex = choice.index;
 }

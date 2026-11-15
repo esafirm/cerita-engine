@@ -20,12 +20,12 @@ void main() {
     expect(find.text('Hello there'), findsOneWidget);
   });
 
-  testWidgets('choices stagger in and keep locked ones untappable', (tester) async {
+  testWidgets('choices stagger in with their text tags and keep locked ones untappable', (tester) async {
     final item = ChoiceItemType.fromJson({
       "type": "CHOICE",
       "text": "Reply?",
       "choices": [
-        {"text": "Kind"},
+        {"text": "{b}Kind{/b}"},
         {"text": "Secret", "condition": "has_photo"},
       ],
     }).withAvailability((condition) => condition == null);
@@ -36,7 +36,7 @@ void main() {
     expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     await tester.tap(find.text('Secret'));
     await tester.tap(find.text('Kind'));
-    expect(selected, ['Kind']);
+    expect(selected, ['{b}Kind{/b}']);
   });
 
   testWidgets('title screen lays out its menu', (tester) async {

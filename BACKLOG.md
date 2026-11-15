@@ -4,7 +4,6 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 
 ## Polish
 
-- **Text tags in choice options.** Choice buttons show tags as written. Render them with `TaggedText`, and strip them where plain text is needed (transcript, `playerText`).
 - **Escape tags in player input.** A typed name like `{b}` is interpolated into lines and then styled. Escape `{` in values that come from `INPUT`.
 - **Pause auto mode while the UI is hidden.** Auto keeps advancing behind HIDE.
 - **Crossfade music.** Track changes fade out, then in, because a second music player would take Android audio focus from the first. A crossfade needs a player setup that shares focus.

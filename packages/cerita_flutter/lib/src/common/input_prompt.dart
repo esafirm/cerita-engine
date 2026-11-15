@@ -1,6 +1,8 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import 'tagged_text.dart';
+
 /// Text field + confirm button for INPUT items. Empty input falls back to `default_value`.
 class InputPrompt extends StatefulWidget {
   final InputItemType item;
@@ -33,7 +35,7 @@ class _InputPromptState extends State<InputPrompt> {
         if (widget.showPrompt)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: Text(widget.item.text, style: Theme.of(context).textTheme.titleMedium),
+            child: TaggedText(widget.item.text, style: Theme.of(context).textTheme.titleMedium),
           ),
         Row(
           children: [

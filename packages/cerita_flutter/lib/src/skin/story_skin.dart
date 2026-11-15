@@ -1,6 +1,8 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../common/tagged_text.dart';
+
 /// Visual hooks of the story views. Subclass it to restyle the story (see the `cerita_ui` package)
 /// and provide it with [StorySkinScope]. The defaults are the plain Material look.
 class StorySkin {
@@ -97,7 +99,7 @@ class StorySkin {
                 const SizedBox(width: 8),
               ],
               Expanded(
-                child: Text(
+                child: TaggedText(
                   choice.text,
                   style: TextStyle(color: choice.locked ? foreground.withAlpha(120) : foreground, fontSize: 15),
                 ),

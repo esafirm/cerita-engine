@@ -322,7 +322,7 @@ class _ChoiceButton extends StatelessWidget {
                   const SizedBox(width: 8),
                 ],
                 Flexible(
-                  child: Text(
+                  child: TaggedText(
                     choice.text,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: foreground, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.3),
