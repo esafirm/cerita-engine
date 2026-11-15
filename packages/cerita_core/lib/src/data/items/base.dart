@@ -6,6 +6,7 @@ import 'package:cerita_core/src/utils/var_replacer.dart';
 import 'branch.dart';
 import 'choice.dart';
 import 'ending.dart';
+import 'evidence.dart';
 import 'flow.dart';
 import 'input.dart';
 import 'media.dart';
@@ -29,7 +30,11 @@ abstract class ItemType {
       TextItemType.type => TextItemType.fromJson(json, localizer: localizer),
       NarrationItemType.type => NarrationItemType.fromJson(json, localizer: localizer),
       MediaItemType.type => MediaItemType.fromJson(json, localizer: localizer),
-      ChoiceItemType.type => ChoiceItemType.fromJson(json, localizer: localizer),
+      ChoiceItemType.type => switch (json["source"]) {
+          null => ChoiceItemType.fromJson(json, localizer: localizer),
+          EvidenceItemType.source => EvidenceItemType.fromJson(json, localizer: localizer),
+          final source => throw FormatException("Unknown CHOICE source '$source'", json),
+        },
       InputItemType.type => InputItemType.fromJson(json, localizer: localizer),
       BranchItemType.type => BranchItemType.fromJson(json),
       WaitItemType.type => WaitItemType.fromJson(json, localizer: localizer),

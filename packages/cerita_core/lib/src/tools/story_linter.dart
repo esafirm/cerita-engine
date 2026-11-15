@@ -4,6 +4,7 @@ import '../data/items/base.dart';
 import '../data/items/branch.dart';
 import '../data/items/choice.dart';
 import '../data/items/ending.dart';
+import '../data/items/evidence.dart';
 import '../data/items/flow.dart';
 import '../data/items/input.dart';
 import '../data/items/media.dart';
@@ -12,6 +13,7 @@ import '../data/items/profile_info.dart';
 import '../data/items/stage.dart';
 import '../data/items/text.dart';
 import '../data/channel.dart';
+import '../data/clue.dart';
 import '../data/profile.dart';
 import '../data/scene.dart';
 import '../loader.dart';
@@ -31,12 +33,15 @@ class LintIssue {
   final int? itemIndex;
   final String message;
 
-  const LintIssue(this.severity, this.conversationKey, this.itemIndex, this.message);
+  /// The file when it isn't a conversation or `profiles.json`, e.g. `clues.json`.
+  final String? fileName;
+
+  const LintIssue(this.severity, this.conversationKey, this.itemIndex, this.message, {this.fileName});
 
   bool get isError => severity == LintSeverity.error;
 
   /// The file the issue is in.
-  String get file => switch (conversationKey) {
+  String get file => fileName ?? switch (conversationKey) {
         null => "profiles.json",
         Conversation.indexKey => "index.json",
         final key => "cvn_$key.json",
@@ -72,11 +77,13 @@ class StoryLinter {
 
     var profiles = const ProfileData([]);
     var channels = const <Channel>[];
+    var clues = ClueCatalog.empty;
     var profilesLoaded = false;
     try {
       final package = await loader.initialLoad();
       profiles = package.profiles;
       channels = package.channels;
+      clues = package.clues;
       profilesLoaded = true;
     } catch (e) {
       error(Conversation.indexKey, null, "Can't load the story: $e");
@@ -108,6 +115,21 @@ class StoryLinter {
       asset(null, null, profile.avatar, config.avatar, "avatar");
     }
 
+    // Clues and their images.
+    void clueError(String message) =>
+        issues.add(LintIssue(LintSeverity.error, null, null, message, fileName: "clues.json"));
+    void clueWarning(String message) =>
+        issues.add(LintIssue(LintSeverity.warning, null, null, message, fileName: "clues.json"));
+    final clueIds = <String>{};
+    for (final clue in clues.clues) {
+      if (!Clue.idPattern.hasMatch(clue.id)) clueError("Clue id '${clue.id}' can only use letters, digits and _");
+      if (!clueIds.add(clue.id)) clueError("Duplicate clue id '${clue.id}'");
+      final image = clue.image;
+      if (image != null && assetExists != null && !assetExists!(config.media(image))) {
+        clueError("Missing clue image file '${config.media(image)}'");
+      }
+    }
+
     void character(String key, int index, ProfileInfo? info) {
       if (info == null || info.isPlayer || !profilesLoaded) return;
       final profile = profiles.byId(info.id);
@@ -121,6 +143,10 @@ class StoryLinter {
     final reads = <String, (String, int)>{};
     final sets = <String, (String, int)>{};
     final endingIds = <String>{};
+
+    // Where each clue is awarded, and each evidence question with the clues it has a response for.
+    final awards = <String, List<(String, int)>>{};
+    final questions = <(String, int, Set<String>)>[];
 
     void expression(String key, int index, String? source) {
       if (source == null || source.trim().isEmpty) return;
@@ -140,6 +166,7 @@ class StoryLinter {
         // A remembered fact is read back as meta.flag.<name>.
         final variable = remembers ? "${StoryState.flagPrefix}${effect.variable}" : effect.variable;
         sets.putIfAbsent(variable, () => (key, index));
+        if (Clue.idOf(variable) case final clue?) awards.putIfAbsent(clue, () => []).add((key, index));
         expression(key, index, effect.expr);
       }
     }
@@ -206,6 +233,26 @@ class StoryLinter {
           case MediaItemType(:final sfx):
             asset(key, index, sfx, config.music, "sound");
             asset(key, index, item.uri, (_) => config.mediaPath(item), "media");
+          case EvidenceItemType(:final responses, :final variable, :final retries):
+            if (variable != null) sets.putIfAbsent(variable, () => (key, index));
+            if (responses.isEmpty) error(key, index, "Evidence question without responses");
+            if (item.json.containsKey("choices")) error(key, index, "An evidence question takes no choices");
+            if (item.json.containsKey("default_choice")) {
+              error(key, index, "An evidence question takes no default_choice. Use a timeout outcome");
+            }
+            if (retries < 0) error(key, index, "retries can't be negative");
+            final answered = <String>{};
+            for (final response in responses) {
+              if (!answered.add(response.clue)) error(key, index, "Two responses for clue '${response.clue}'");
+              if (!clueIds.contains(response.clue)) {
+                error(key, index, "Clue '${response.clue}' isn't declared in clues.json");
+              }
+              effects(key, index, response.effects);
+            }
+            for (final outcome in [item.retry, item.fallback, item.timeout].nonNulls) {
+              effects(key, index, outcome.effects);
+            }
+            questions.add((key, index, answered));
           case ChoiceItemType(:final choices, :final variable, :final defaultChoice):
             if (variable != null) sets.putIfAbsent(variable, () => (key, index));
             if (choices.isEmpty) error(key, index, "CHOICE without options");
@@ -251,7 +298,26 @@ class StoryLinter {
       if (!reachable.contains(conversation.key)) warn(conversation.key, null, "No target leads to this conversation");
     }
 
+    // In a story with clues, `clue_<x>` variables stand for clues. Declared ones are read by the board.
+    bool isClue(String variable) => clues.isNotEmpty && Clue.idOf(variable) != null;
+    final undeclared = <String>{};
+    for (final MapEntry(key: variable, value: (key, index)) in [...reads.entries, ...sets.entries]) {
+      final clue = Clue.idOf(variable);
+      if (isClue(variable) && !clueIds.contains(clue) && undeclared.add(variable)) {
+        error(key, index, "Clue '$clue' isn't declared in clues.json (used as '$variable')");
+      }
+    }
+    for (final clue in clues.clues) {
+      if (!awards.containsKey(clue.id)) {
+        clueWarning("Clue '${clue.id}' is never awarded: no effect sets '${clue.variable}'");
+      }
+    }
+    _checkAnswers(conversations, questions, awards, (key, index) {
+      error(key, index, "No clue with a response can be found before this evidence question");
+    });
+
     for (final MapEntry(key: variable, value: (key, index)) in reads.entries) {
+      if (isClue(variable)) continue;
       if (variable.startsWith(StoryState.endingPrefix)) {
         final ending = variable.substring(StoryState.endingPrefix.length);
         if (!endingIds.contains(ending)) warn(key, index, "No ENDING has ending_id '$ending' (read as '$variable')");
@@ -268,12 +334,65 @@ class StoryLinter {
       }
     }
     for (final MapEntry(key: variable, value: (key, index)) in sets.entries) {
-      if (!reads.containsKey(variable) && !_engineReads.contains(variable)) {
+      if (!reads.containsKey(variable) && !_engineReads.contains(variable) && !isClue(variable)) {
         warn(key, index, "Variable '$variable' is set but never read");
       }
     }
 
     return issues..sort(_order);
+  }
+
+  /// Reports each evidence question in [questions] (conversation, item index, clues with a response) for which
+  /// no such clue is awarded before it. "Before" is approximated from the story graph: earlier in the same
+  /// conversation, in a conversation that can reach it, or in one those `CALL`. Conditions aren't followed.
+  static void _checkAnswers(
+    List<Conversation> conversations,
+    List<(String, int, Set<String>)> questions,
+    Map<String, List<(String, int)>> awards,
+    void Function(String key, int index) report,
+  ) {
+    final into = <String, Set<String>>{};
+    final calls = <String, Set<String>>{};
+    final callsAt = <String, List<(int, String)>>{};
+    for (final conversation in conversations) {
+      for (final link in StoryLink.of(conversation)) {
+        if (link.targetKey == conversation.key) continue;
+        into.putIfAbsent(link.targetKey, () => {}).add(conversation.key);
+        if (link.kind != LinkKind.call) continue;
+        calls.putIfAbsent(conversation.key, () => {}).add(link.targetKey);
+        callsAt.putIfAbsent(conversation.key, () => []).add((link.itemIndex, link.targetKey));
+      }
+    }
+
+    /// Conversations from which [key] can be reached, plus the ones they call and the ones [key] calls before
+    /// item [index]. [key] itself only if it loops.
+    Set<String> before(String key, int index) {
+      final seen = <String>{};
+      final queue = [...?into[key]];
+      while (queue.isNotEmpty) {
+        final next = queue.removeLast();
+        if (seen.add(next)) queue.addAll(into[next] ?? const {});
+      }
+      final called = [
+        for (final from in seen) ...?calls[from],
+        for (final (at, target) in callsAt[key] ?? const <(int, String)>[])
+          if (at < index) target,
+      ];
+      while (called.isNotEmpty) {
+        final next = called.removeLast();
+        if (seen.add(next)) called.addAll(calls[next] ?? const {});
+      }
+      return seen;
+    }
+
+    for (final (key, index, answered) in questions) {
+      final earlier = before(key, index);
+      final found = answered.any((clue) => (awards[clue] ?? const []).any((award) {
+            final (from, at) = award;
+            return earlier.contains(from) || (from == key && at < index);
+          }));
+      if (!found) report(key, index);
+    }
   }
 
   /// Reports the first item of each run that can't be reached: right after an unconditional JUMP,

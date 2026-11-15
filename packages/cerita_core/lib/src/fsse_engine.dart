@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'data/channel.dart';
+import 'data/clue.dart';
 import 'data/conversation.dart';
 import 'data/item_result.dart';
 import 'data/items/base.dart';
 import 'data/items/branch.dart';
 import 'data/items/choice.dart';
 import 'data/items/ending.dart';
+import 'data/items/evidence.dart';
 import 'data/items/flow.dart';
 import 'data/items/input.dart';
 import 'data/items/media.dart';
@@ -58,6 +60,10 @@ abstract mixin class EngineListener {
   void onEndingUnlocked(EndingItemType ending) {}
 
   void onCheckpointUnlocked(Checkpoint checkpoint) {}
+
+  /// Called once for each clue a step of the story finds, in `clues.json` order. Not called when a load,
+  /// checkpoint or rollback restores clues.
+  void onClueFound(Clue clue) {}
 }
 
 /// Thrown by [FsseEngine.next] when a conversation runs out of items without a target.
@@ -97,6 +103,7 @@ class RealFsseEngine extends FsseEngine {
 
   late ProfileData profileData;
   List<Channel> channels = const [];
+  ClueCatalog clues = ClueCatalog.empty;
 
   /// The story's languages, from `index.json`.
   StoryLocales storyLocales = const StoryLocales();
@@ -126,6 +133,12 @@ class RealFsseEngine extends FsseEngine {
 
   /// `once` choices picked in this playthrough.
   final Set<String> _chosen = {};
+
+  /// Clues the player has seen on the Case Board.
+  final Set<String> _viewedClues = {};
+
+  /// Retries used by evidence questions waiting for a final answer, by `<conversation_key>#<index>`.
+  final Map<String, int> _evidenceTries = {};
 
   /// State after each recently delivered item, oldest first. The last one is the current state.
   final List<RollbackFrame> _frames = [];
@@ -176,6 +189,7 @@ class RealFsseEngine extends FsseEngine {
     final package = await loader.initialLoad();
     profileData = package.profiles;
     channels = package.channels;
+    clues = package.clues;
     storyLocales = package.conversation.locales;
     _localizedProfiles = null;
     meta = await storage?.loadMeta() ?? meta;
@@ -184,6 +198,8 @@ class RealFsseEngine extends FsseEngine {
     _history.clear();
     _callStack.clear();
     _chosen.clear();
+    _viewedClues.clear();
+    _evidenceTries.clear();
     _frames.clear();
     _conversations.clear();
     _rolls.restore();
@@ -200,6 +216,9 @@ class RealFsseEngine extends FsseEngine {
       _history.addAll(save.history);
       _callStack.addAll(save.callStack);
       _chosen.addAll(save.chosen);
+      _evidenceTries.addAll(save.evidenceTries);
+      // Older saves didn't record viewed clues: what was found counts as seen.
+      _viewedClues.addAll(save.viewedClues ?? _foundIds());
       _scene = save.scene;
       final conversation = await loader.loadConversation(save.conversationKey);
       await _enterConversation(conversation, index: save.dialogIndex);
@@ -218,6 +237,7 @@ class RealFsseEngine extends FsseEngine {
       }
     } else if (checkpoint != null) {
       dataMap.addAll(checkpoint.dataMap);
+      _viewedClues.addAll(_foundIds());
       final conversation = await loader.loadConversation(checkpoint.conversationKey);
       if (replay) {
         _replay = true;
@@ -235,12 +255,16 @@ class RealFsseEngine extends FsseEngine {
     developer.log("Request next with index: $dialogIndex", name: _tag);
 
     await _ensureStarted();
+    final found = _foundIds();
     await _handleResult(prevResult);
 
     final item = await _resolveCurrentItem();
     final executed = await _execute(item);
     _pushFrame(executed);
     await _flushMeta();
+    for (final clue in clues.clues) {
+      if (isClueFound(clue) && !found.contains(clue.id)) listener?.onClueFound(clue);
+    }
     return executed;
   }
 
@@ -287,6 +311,23 @@ class RealFsseEngine extends FsseEngine {
     await _flushMeta();
   }
 
+  /// Whether [clue] is found in this playthrough: its `clue_<id>` variable is `true`.
+  bool isClueFound(Clue clue) => dataMap[clue.variable] == true;
+
+  /// The clues found in this playthrough, in `clues.json` order.
+  List<Clue> get foundClues => clues.clues.where(isClueFound).toList();
+
+  Set<String> _foundIds() => {for (final clue in foundClues) clue.id};
+
+  /// Ids of the clues the player has seen on the Case Board.
+  Set<String> get viewedClues => Set.unmodifiable(_viewedClues);
+
+  /// Found clues the player hasn't seen on the Case Board yet.
+  List<Clue> get newClues => foundClues.where((clue) => !_viewedClues.contains(clue.id)).toList();
+
+  /// Marks clues as seen on the Case Board. Saved with the playthrough, not rolled back.
+  void markCluesViewed(Iterable<String> ids) => _viewedClues.addAll(ids);
+
   /// Whether [rollback] has a line to go back to. With [historyIndex], whether the line at that
   /// transcript index can be rolled back to.
   bool canRollback({int? historyIndex}) => _rollbackTarget(historyIndex) != null;
@@ -323,6 +364,9 @@ class RealFsseEngine extends FsseEngine {
     _chosen
       ..clear()
       ..addAll(frame.chosen);
+    _evidenceTries
+      ..clear()
+      ..addAll(frame.evidenceTries);
     stage = _copyStage(frame.stage);
     _awaitingResult = frame.awaitingResult;
     _lastItemKey = frame.lastItemKey;
@@ -354,6 +398,7 @@ class RealFsseEngine extends FsseEngine {
       historyLength: _history.length,
       callStack: _callStack.toList(),
       chosen: _chosen.toSet(),
+      evidenceTries: Map.of(_evidenceTries),
       stage: _copyStage(stage),
       awaitingResult: _awaitingResult,
       lastItemKey: _lastItemKey,
@@ -441,6 +486,8 @@ class RealFsseEngine extends FsseEngine {
       chapter: conversation.chapterText,
       title: conversation.titleText,
       rollback: _rollbackLog(),
+      viewedClues: _viewedClues.toSet(),
+      evidenceTries: Map.of(_evidenceTries),
     );
   }
 
@@ -525,6 +572,14 @@ class RealFsseEngine extends FsseEngine {
               jumps++;
           }
           continue;
+        // Nothing to present: the question isn't asked and its fallback plays.
+        case EvidenceItemType(:final fallback) when foundClues.isEmpty:
+          _evidenceTries.remove("${conversation.key}#$dialogIndex");
+          dialogIndex += 1;
+          if (await _playOutcome(fallback)) jumps++;
+          continue;
+        case EvidenceItemType():
+          break;
         case ChoiceItemType() when (_prepare(item) as ChoiceItemType).availableChoices.isEmpty:
           dialogIndex += 1;
           continue;
@@ -538,7 +593,8 @@ class RealFsseEngine extends FsseEngine {
   /// locked / chosen ones. Must be called while [dialogIndex] points at [item].
   ItemType _prepare(ItemType item) {
     final cloned = item.cloneWithData(state, localizer: localizer);
-    if (cloned is! ChoiceItemType) return cloned;
+    // An evidence question's options are the found clues, which the UI reads from the engine.
+    if (cloned is! ChoiceItemType || cloned is EvidenceItemType) return cloned;
     final itemKey = "${currentConversation!.key}#$dialogIndex";
     final choices = <Choice>[];
     for (final choice in cloned.choices) {
@@ -607,6 +663,7 @@ class RealFsseEngine extends FsseEngine {
   Future<void> _handleResult(ItemResult? itemResult) async {
     if (itemResult == null) return;
     _awaitingResult = false;
+    if (itemResult.presentedClue != null || itemResult.evidenceTimedOut) return _answerEvidence(itemResult);
 
     if (itemResult.variable != null) {
       if (itemResult.value == null) {
@@ -640,6 +697,61 @@ class RealFsseEngine extends FsseEngine {
 
     final target = itemResult.target;
     if (target != null) await _jump(target);
+  }
+
+  /// Answers the evidence question that was returned last: a presented clue or a timeout. See
+  /// `specs/data-schema.md` section 4.4.
+  Future<void> _answerEvidence(ItemResult result) async {
+    final conversation = currentConversation!;
+    final index = dialogIndex - 1;
+    final key = "${conversation.key}#$index";
+    final question = conversation.conversations.elementAtOrNull(index);
+    if (_lastItemKey != key || question is! EvidenceItemType) {
+      throw StateError("Evidence answer, but the last item isn't an evidence question ($_lastItemKey)");
+    }
+
+    final clueId = result.presentedClue;
+    EvidenceOutcome? outcome;
+    var askAgain = false;
+    if (clueId == null) {
+      _evidenceTries.remove(key);
+      outcome = question.timeout ?? question.fallback;
+    } else {
+      final clue = clues.byId(clueId) ?? (throw ArgumentError.value(clueId, "presentedClue", "No such clue"));
+      if (result.variable != null) state[result.variable!] = clue.id;
+      // The title in every language, so the reply follows a language switch like the rest of the history.
+      _history.add(TranscriptEntry(
+        conversationKey: conversation.key,
+        mode: _scene!.mode,
+        channelId: _scene!.channelId,
+        playerText: clue.title,
+        clueId: clue.id,
+      ));
+      final used = _evidenceTries[key] ?? 0;
+      if (question.responseFor(clue.id) case final response?) {
+        _evidenceTries.remove(key);
+        outcome = response;
+      } else if (used < question.retries) {
+        _evidenceTries[key] = used + 1;
+        outcome = question.retry;
+        askAgain = outcome?.target == null;
+      } else {
+        _evidenceTries.remove(key);
+        outcome = question.fallback;
+      }
+    }
+
+    if (!await _playOutcome(outcome) && askAgain) dialogIndex = index;
+  }
+
+  /// Applies the [outcome]'s effects and follows its target. True if it jumped.
+  Future<bool> _playOutcome(EvidenceOutcome? outcome) async {
+    if (outcome == null) return false;
+    _applyEffects(outcome.effects);
+    final target = outcome.target;
+    if (target == null) return false;
+    await _jump(target);
+    return true;
   }
 
   /// Continues at [target]: `conv`, `#label` (current conversation) or `conv#label`.

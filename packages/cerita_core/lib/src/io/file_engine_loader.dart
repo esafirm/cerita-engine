@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../data/channel.dart';
+import '../data/clue.dart';
 import '../data/conversation.dart';
 import '../data/profile.dart';
 import '../loader.dart';
 
-/// Loads a story folder from disk: `index.json`, `profiles.json`, the optional `channels.json` and
-/// the `cvn_*.json` files. [config] points at the folder and its `bg/`, `sprites/`, `music/` and `media/`.
+/// Loads a story folder from disk: `index.json`, `profiles.json`, the optional `channels.json` and `clues.json`,
+/// and the `cvn_*.json` files. [config] points at the folder and its `bg/`, `sprites/`, `music/` and `media/`.
 class FileEngineLoader extends EngineLoader {
   static const _prefix = "cvn_";
 
@@ -35,10 +36,14 @@ class FileEngineLoader extends EngineLoader {
     final channels = File("${config.storyDir}/channels.json").existsSync()
         ? Channel.listFromJson(await _json("channels.json"))
         : const <Channel>[];
+    final clues = File("${config.storyDir}/clues.json").existsSync()
+        ? ClueCatalog.fromJson(await _json("clues.json"))
+        : ClueCatalog.empty;
     return EnginePackage(
       profiles: ProfileData.fromJson(await _json("profiles.json")),
       conversation: await loadConversation(Conversation.indexKey),
       channels: channels,
+      clues: clues,
     );
   }
 

@@ -1,4 +1,5 @@
 import 'data/channel.dart';
+import 'data/clue.dart';
 import 'data/conversation.dart';
 import 'data/items/media.dart';
 import 'data/profile.dart';
@@ -8,11 +9,19 @@ class EnginePackage {
   final ProfileData profiles;
   final List<Channel> channels;
 
-  const EnginePackage({required this.conversation, required this.profiles, this.channels = const []});
+  /// The clues of the optional `clues.json`. Empty without it.
+  final ClueCatalog clues;
+
+  const EnginePackage({
+    required this.conversation,
+    required this.profiles,
+    this.channels = const [],
+    this.clues = ClueCatalog.empty,
+  });
 }
 
 abstract class EngineLoader {
-  /// Loads `profiles.json`, `index.json` and the optional `channels.json`.
+  /// Loads `profiles.json`, `index.json` and the optional `channels.json` and `clues.json`.
   Future<EnginePackage> initialLoad();
 
   /// Loads `cvn_<conversationId>.json`, or `index.json` for [Conversation.indexKey].

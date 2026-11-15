@@ -2,6 +2,7 @@
 library;
 
 export 'src/data/channel.dart';
+export 'src/data/clue.dart';
 export 'src/data/conversation.dart';
 export 'src/data/effect.dart';
 export 'src/data/item_result.dart';
@@ -9,6 +10,7 @@ export 'src/data/items/base.dart';
 export 'src/data/items/branch.dart';
 export 'src/data/items/choice.dart';
 export 'src/data/items/ending.dart';
+export 'src/data/items/evidence.dart';
 export 'src/data/items/flow.dart';
 export 'src/data/items/input.dart';
 export 'src/data/items/media.dart';

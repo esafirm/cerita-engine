@@ -2,6 +2,7 @@ import '../data/conversation.dart';
 import '../data/items/branch.dart';
 import '../data/items/choice.dart';
 import '../data/items/ending.dart';
+import '../data/items/evidence.dart';
 import '../data/items/flow.dart';
 
 enum LinkKind { choice, branch, fallback, jump, call }
@@ -37,6 +38,13 @@ class StoryLink {
       StoryLink link(String target, LinkKind kind, [String? label]) =>
           StoryLink(from: conversation.key, itemIndex: index, target: target, kind: kind, label: label);
       switch (item) {
+        case EvidenceItemType(:final responses, :final retry, :final fallback, :final timeout):
+          for (final response in responses) {
+            if (response.target != null) yield link(response.target!, LinkKind.choice, "Present ${response.clue}");
+          }
+          if (retry?.target case final target?) yield link(target, LinkKind.choice, "retry");
+          if (fallback?.target case final target?) yield link(target, LinkKind.fallback);
+          if (timeout?.target case final target?) yield link(target, LinkKind.choice, "time out");
         case ChoiceItemType(:final choices):
           for (final choice in choices) {
             if (choice.target != null) yield link(choice.target!, LinkKind.choice, choice.text);

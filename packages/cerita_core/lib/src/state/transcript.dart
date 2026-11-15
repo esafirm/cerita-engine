@@ -12,8 +12,12 @@ class TranscriptEntry {
   /// Interpolated item JSON, localized fields still per locale. Null for player replies.
   final Map<String, dynamic>? item;
 
-  /// The player's outgoing text: the chosen option in every language, or the typed input.
+  /// The player's outgoing text: the chosen option in every language, the typed input, or a presented
+  /// clue's title.
   final LocalizedText? playerText;
+
+  /// The `id` of the clue the player presented to an evidence question.
+  final String? clueId;
 
   const TranscriptEntry({
     required this.conversationKey,
@@ -21,6 +25,7 @@ class TranscriptEntry {
     this.channelId,
     this.item,
     this.playerText,
+    this.clueId,
   });
 
   bool get isPlayer => item == null;
@@ -37,6 +42,7 @@ class TranscriptEntry {
       channelId: json["channel_id"] as String?,
       item: json["item"] == null ? null : Map<String, dynamic>.from(json["item"] as Map),
       playerText: LocalizedText.fromJson(json["player_text"]),
+      clueId: json["clue"] as String?,
     );
   }
 
@@ -46,5 +52,6 @@ class TranscriptEntry {
         if (channelId != null) "channel_id": channelId,
         if (item != null) "item": item,
         if (playerText != null) "player_text": playerText!.toJson(),
+        if (clueId != null) "clue": clueId,
       };
 }

@@ -55,8 +55,8 @@ An evidence question needs at least one clue with a response on the board when i
 linter checks it per question with the story graph (§2), approximating "before" as:
 
 - an award earlier in the same conversation (a lower item index, in item or choice effects), or
-- an award in any conversation that can reach the question's conversation through targets, or in a
-  conversation those `CALL`.
+- an award in any conversation that can reach the question's conversation through targets, in a
+  conversation those `CALL`, or in one the question's conversation `CALL`s before the question.
 
 It doesn't follow conditions, so a clue awarded on another branch of the same day still counts. A full
 path check needs the automated playthroughs of the story authoring toolkit (CE-02).

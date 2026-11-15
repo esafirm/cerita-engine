@@ -31,6 +31,12 @@ class SaveSlot {
   /// Rollback frames and `random()` rolls, so rollback reaches back past the load. Null in older saves.
   final RollbackLog? rollback;
 
+  /// Clues already seen on the Case Board. Null in older saves, where every found clue counts as seen.
+  final Set<String>? viewedClues;
+
+  /// Retries used by evidence questions waiting for a final answer, by `<conversation_key>#<index>`.
+  final Map<String, int> evidenceTries;
+
   /// Display info for save/load menus, in every language.
   final LocalizedText? chapter;
   final LocalizedText? title;
@@ -47,6 +53,8 @@ class SaveSlot {
     this.stage,
     this.scene,
     this.rollback,
+    this.viewedClues,
+    this.evidenceTries = const {},
     this.chapter,
     this.title,
   });
@@ -63,6 +71,8 @@ class SaveSlot {
         stage: stage,
         scene: scene,
         rollback: rollback,
+        viewedClues: viewedClues,
+        evidenceTries: evidenceTries,
         chapter: chapter,
         title: title,
       );
@@ -86,6 +96,8 @@ class SaveSlot {
       rollback: json["rollback"] == null
           ? null
           : RollbackLog.fromJson(Map<String, dynamic>.from(json["rollback"] as Map)),
+      viewedClues: (json["viewed_clues"] as List<dynamic>?)?.map((e) => e.toString()).toSet(),
+      evidenceTries: evidenceTriesFromJson(json["evidence_tries"]),
       chapter: LocalizedText.fromJson(json["chapter"]),
       title: LocalizedText.fromJson(json["title"]),
     );
@@ -103,10 +115,16 @@ class SaveSlot {
         if (stage != null) "stage": stage!.toJson(),
         if (scene != null) "scene": scene!.toJson(),
         if (rollback != null) "rollback": rollback!.toJson(),
+        if (viewedClues != null) "viewed_clues": viewedClues!.toList(),
+        if (evidenceTries.isNotEmpty) "evidence_tries": evidenceTries,
         if (chapter != null) "chapter": chapter!.toJson(),
         if (title != null) "title": title!.toJson(),
       };
 }
+
+/// Reads the `evidence_tries` map of a save or rollback frame.
+Map<String, int> evidenceTriesFromJson(Object? json) =>
+    {for (final MapEntry(:key, :value) in (json as Map? ?? const {}).entries) key.toString(): (value as num).toInt()};
 
 /// Where a `RETURN` continues: item [dialogIndex] of [conversationKey].
 class CallFrame {

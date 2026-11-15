@@ -20,6 +20,9 @@ class RollbackFrame {
   final int historyLength;
   final List<CallFrame> callStack;
   final Set<String> chosen;
+
+  /// Retries used by pending evidence questions, see [SaveSlot.evidenceTries].
+  final Map<String, int> evidenceTries;
   final StageState stage;
   final bool awaitingResult;
   final String? lastItemKey;
@@ -37,6 +40,7 @@ class RollbackFrame {
     required this.historyLength,
     required this.callStack,
     required this.chosen,
+    this.evidenceTries = const {},
     required this.stage,
     required this.awaitingResult,
     required this.lastItemKey,
@@ -65,6 +69,7 @@ class RollbackFrame {
             .map((e) => CallFrame.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
         chosen: (json["chosen"] as List<dynamic>? ?? const []).map((e) => e.toString()).toSet(),
+        evidenceTries: evidenceTriesFromJson(json["evidence_tries"]),
         stage: StageState.fromJson(Map<String, dynamic>.from(json["stage"] as Map)),
         awaitingResult: json["awaiting_result"] as bool? ?? false,
         lastItemKey: json["last_item_key"] as String?,
@@ -87,6 +92,7 @@ class RollbackFrame {
         "history_length": historyLength,
         if (callStack.isNotEmpty) "call_stack": callStack.map((e) => e.toJson()).toList(),
         if (chosen.isNotEmpty) "chosen": chosen.toList(),
+        if (evidenceTries.isNotEmpty) "evidence_tries": evidenceTries,
         "stage": stage.toJson(),
         if (awaitingResult) "awaiting_result": true,
         if (lastItemKey != null) "last_item_key": lastItemKey,

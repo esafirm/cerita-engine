@@ -1,7 +1,9 @@
 import '../l10n/localized_text.dart';
 import '../utils/text_markup.dart';
+import 'clue.dart';
 import 'effect.dart';
 import 'items/choice.dart';
+import 'items/evidence.dart';
 
 /// The player's answer to an INPUT or CHOICE item, passed to `FsseEngine.next`.
 class ItemResult {
@@ -20,6 +22,12 @@ class ItemResult {
   /// another language later.
   final LocalizedText? localizedText;
 
+  /// The `id` of the clue presented to an evidence question. The engine picks the outcome.
+  final String? presentedClue;
+
+  /// An evidence question's countdown ran out. The engine plays its timeout outcome.
+  final bool evidenceTimedOut;
+
   const ItemResult({
     this.variable,
     this.value,
@@ -28,6 +36,8 @@ class ItemResult {
     this.text,
     this.choiceIndex,
     this.localizedText,
+    this.presentedClue,
+    this.evidenceTimedOut = false,
   });
 
   const ItemResult.input(this.variable, String this.value)
@@ -35,7 +45,9 @@ class ItemResult {
         target = null,
         text = value,
         choiceIndex = null,
-        localizedText = null;
+        localizedText = null,
+        presentedClue = null,
+        evidenceTimedOut = false;
 
   ItemResult.choice(this.variable, Choice choice)
       : value = choice.value ?? TextMarkup.plain(choice.text),
@@ -43,5 +55,32 @@ class ItemResult {
         target = choice.target,
         text = TextMarkup.plain(choice.text),
         choiceIndex = choice.index,
-        localizedText = choice.localizedText?.map(TextMarkup.plain);
+        localizedText = choice.localizedText?.map(TextMarkup.plain),
+        presentedClue = null,
+        evidenceTimedOut = false;
+
+  /// Presents [clue] to the evidence [question]. Its `variable` receives the clue `id`, and the transcript
+  /// keeps the clue's title in every language.
+  ItemResult.present(EvidenceItemType question, Clue clue)
+      : variable = question.variable,
+        value = clue.id,
+        effects = const [],
+        target = null,
+        text = clue.title.toString(),
+        choiceIndex = null,
+        localizedText = clue.title,
+        presentedClue = clue.id,
+        evidenceTimedOut = false;
+
+  /// The countdown of an evidence question ran out.
+  const ItemResult.evidenceTimeout()
+      : variable = null,
+        value = null,
+        effects = const [],
+        target = null,
+        text = null,
+        choiceIndex = null,
+        localizedText = null,
+        presentedClue = null,
+        evidenceTimedOut = true;
 }

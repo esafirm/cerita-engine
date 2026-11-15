@@ -25,7 +25,7 @@ class ChoiceItemType extends ItemType {
         defaultChoice = (json["default_choice"] as num?)?.toInt(),
         choices = choices ??
             [
-              for (final (index, raw) in (json["choices"] as List<dynamic>).indexed)
+              for (final (index, raw) in (json["choices"] as List<dynamic>? ?? const []).indexed)
                 Choice.fromJson(Map<String, dynamic>.from(raw as Map), index: index, localizer: localizer),
             ];
 
