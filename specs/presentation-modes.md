@@ -115,7 +115,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 5. **Music Room**:
    - Every track of the story, in story order. Tracks in `heard_music` can be played, the rest are locked.
 6. **Settings**:
-   - Text speed (with a preview line), auto-forward delay, skip unread text, and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.
+   - Text speed (with a preview line), auto-forward delay, skip unread text, chat pacing (from the author's pace to instant), and music / sound / voice volumes (engine §5.3). Changes apply right away, also to a running story.
    - A voice volume for each character with voiced lines.
    - Language, when the story offers more than one (§5).
 7. **Credits** (CE-08):

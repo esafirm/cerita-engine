@@ -216,6 +216,7 @@ Preferences live outside both scopes, so resetting progress keeps them. `StorySt
 | `text_ms_per_char` | `40` | Typewriter speed. `0` shows lines at once. |
 | `auto_delay_ms` | `1200` | Auto mode pause after a line, before the per-character reading time (which scales with it). |
 | `skip_unread` | `false` | Skip mode also fast-forwards lines never seen before. |
+| `chat_pacing` | `1.0` | How long chat and call messages type, as a share of the story's own typing time (`typing_delay_ms`, or the default for messages without one). `1.0` is the author's pace, `0.0` shows messages at once. Values above `1.0` read as `1.0`, so a player can speed chats up but never slow them down (CE-04 D2). The pause after a message is not scaled. |
 | `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. Ambience follows `sound_volume`. |
 | `voice_volumes` | `{}` | Per-character voice volume by profile id, `0.0` to `1.0`, on top of `voice_volume`. Missing characters play at `1.0`. |
 | `locale` | none | The player's language (§9.4). Unset until the player or the device picks one. |
