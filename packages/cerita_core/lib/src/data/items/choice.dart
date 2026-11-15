@@ -1,5 +1,7 @@
 import 'package:cerita_core/src/data/effect.dart';
 import 'package:cerita_core/src/data/items/profile_info.dart';
+import 'package:cerita_core/src/state/story_state.dart';
+import 'package:cerita_core/src/utils/condition_evaluator.dart';
 
 import 'base.dart';
 
@@ -63,6 +65,9 @@ class Choice {
   /// Hidden for the rest of the playthrough once picked.
   final bool once;
 
+  /// Marks the option as unlocked by past runs (`memory_marker`). The UI shows a marker while it is available.
+  final bool memoryMarker;
+
   /// Runtime flag: the choice `condition` evaluated to false.
   final bool locked;
 
@@ -77,6 +82,7 @@ class Choice {
     this.effects = const [],
     this.index = 0,
     this.once = false,
+    this.memoryMarker = false,
     this.locked = false,
     this.chosen = false,
   });
@@ -90,8 +96,13 @@ class Choice {
       effects: Effect.listFromJson(json["effects"]),
       index: index,
       once: json["once"] as bool? ?? false,
+      memoryMarker: json["memory_marker"] as bool? ?? false,
     );
   }
+
+  /// Whether the `condition` reads cross-playthrough memory (`meta.*`). Such a choice is hidden, not shown
+  /// locked, while its condition fails.
+  bool get readsMemory => condition != null && ConditionEvaluator.variablesOf(condition!).any(StoryState.isMeta);
 
   Choice copyWith({bool? locked, bool? chosen}) => Choice(
         text,
@@ -101,6 +112,7 @@ class Choice {
         effects: effects,
         index: index,
         once: once,
+        memoryMarker: memoryMarker,
         locked: locked ?? this.locked,
         chosen: chosen ?? this.chosen,
       );

@@ -103,9 +103,10 @@ class RealFsseEngine extends FsseEngine {
   /// Scene of [currentConversation], or the one it continues when it has no `scene`.
   Scene? _scene;
 
-  /// Playthrough variables. Expressions see them through [state], together with `persistent.*`.
+  /// Playthrough variables. Expressions see them through [state], together with `persistent.*` and the
+  /// read-only `meta.*` memory.
   final Map<String, dynamic> dataMap = {};
-  late final StoryState state = StoryState(dataMap, () => meta.persistent);
+  late final StoryState state = StoryState(dataMap, () => meta);
 
   /// The VN stage. Saved with the playthrough.
   StageState stage = StageState();
@@ -508,20 +509,22 @@ class RealFsseEngine extends FsseEngine {
     throw Exception("Too many jumps. Is there a loop in the story?");
   }
 
-  /// Interpolates [item] and, for a CHOICE, hides picked `once` choices and flags locked / chosen ones.
-  /// Must be called while [dialogIndex] points at [item].
+  /// Interpolates [item] and, for a CHOICE, hides picked `once` choices and locked memory-gated ones, and flags
+  /// locked / chosen ones. Must be called while [dialogIndex] points at [item].
   ItemType _prepare(ItemType item) {
     final cloned = item.cloneWithData(state);
     if (cloned is! ChoiceItemType) return cloned;
     final itemKey = "${currentConversation!.key}#$dialogIndex";
-    return cloned.withChoices([
-      for (final choice in cloned.choices)
-        if (!(choice.once && _chosen.contains("$itemKey#${choice.index}")))
-          choice.copyWith(
-            locked: !evaluate(choice.condition),
-            chosen: meta.chosenChoices.contains("$itemKey#${choice.index}"),
-          ),
-    ]);
+    final choices = <Choice>[];
+    for (final choice in cloned.choices) {
+      final key = "$itemKey#${choice.index}";
+      if (choice.once && _chosen.contains(key)) continue;
+      final locked = !evaluate(choice.condition);
+      // A past-run reward isn't shown as a lock, so a first run looks as it would without memory.
+      if (locked && choice.readsMemory) continue;
+      choices.add(choice.copyWith(locked: locked, chosen: meta.chosenChoices.contains(key)));
+    }
+    return cloned.withChoices(choices);
   }
 
   Future<ItemType> _execute(ItemType item) async {

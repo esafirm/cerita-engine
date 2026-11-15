@@ -142,7 +142,11 @@ class AnimeVnSkin extends StorySkin {
   Widget choiceButton(BuildContext context, Choice choice, int index, VoidCallback? onTap, {required bool dark}) {
     return _StaggeredEntrance(
       index: index,
-      child: _ChoiceButton(choice: choice, onTap: onTap),
+      child: _ChoiceButton(
+        choice: choice,
+        onTap: onTap,
+        marker: choice.memoryMarker && !choice.locked ? memoryMarker(context, choice, dark: dark) : null,
+      ),
     );
   }
 
@@ -294,7 +298,10 @@ class _ChoiceButton extends StatelessWidget {
   final Choice choice;
   final VoidCallback? onTap;
 
-  const _ChoiceButton({required this.choice, required this.onTap});
+  /// The skin's memory marker, null when the choice has none.
+  final Widget? marker;
+
+  const _ChoiceButton({required this.choice, required this.onTap, this.marker});
 
   @override
   Widget build(BuildContext context) {
@@ -322,6 +329,7 @@ class _ChoiceButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (locked) ...[Icon(Icons.lock_outline, size: 16, color: foreground), const SizedBox(width: 8)],
+                if (marker case final marker?) ...[marker, const SizedBox(width: 8)],
                 // Picked in an earlier playthrough.
                 if (choice.chosen && !locked) ...[
                   Icon(Icons.check_rounded, size: 16, color: foreground.withAlpha(150)),

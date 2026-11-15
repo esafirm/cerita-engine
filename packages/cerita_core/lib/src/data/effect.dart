@@ -1,6 +1,8 @@
+import '../state/story_state.dart';
 import '../utils/condition_evaluator.dart';
 
-/// A state mutation applied to the engine data map.
+/// A state mutation applied to the engine data map, or with [EffectOp.metaSet], a fact remembered across
+/// playthroughs.
 class Effect {
   final String variable;
   final EffectOp op;
@@ -25,6 +27,7 @@ class Effect {
     return json.map((e) => Effect.fromJson(Map<String, dynamic>.from(e as Map))).toList();
   }
 
+  /// Applies the effect to [dataMap]. [EffectOp.metaSet] needs the engine's [StoryState] as [dataMap].
   void apply(Map<String, dynamic> dataMap, [ConditionEvaluator evaluator = const ConditionEvaluator()]) {
     final value = expr == null ? this.value : evaluator.value(expr!, dataMap);
     switch (op) {
@@ -36,6 +39,9 @@ class Effect {
         dataMap[variable] = _number(dataMap[variable]) - _number(value);
       case EffectOp.toggle:
         dataMap[variable] = !(dataMap[variable] == true);
+      case EffectOp.metaSet:
+        if (dataMap is! StoryState) throw StateError("meta_set on '$variable' needs a StoryState to remember it in");
+        dataMap.remember(variable);
     }
   }
 
@@ -50,8 +56,14 @@ enum EffectOp {
   set,
   add,
   subtract,
-  toggle;
+  toggle,
+
+  /// `meta_set`: remembers the fact [Effect.variable] across playthroughs. Read back as `meta.flag.<name>`.
+  metaSet;
+
+  /// The `op` name in story JSON.
+  String get jsonName => this == metaSet ? "meta_set" : name;
 
   static EffectOp fromName(String name) =>
-      values.where((op) => op.name == name).firstOrNull ?? (throw Exception("Unknown effect op '$name'"));
+      values.where((op) => op.jsonName == name).firstOrNull ?? (throw Exception("Unknown effect op '$name'"));
 }

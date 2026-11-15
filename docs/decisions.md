@@ -73,6 +73,43 @@ Match the style around your change instead of formatting whole files.
 
 - **Revisit if** we want a formatter in CI. Then format everything in one commit of its own.
 
+## Remembered facts are their own set, not `persistent.*` variables
+
+*2026-11-15. Engine §2 Cross-Playthrough Memory, §5.1. Backlog CE-03.*
+
+`meta_set` adds a name to `remembered_facts` in the meta-state, read back as `meta.flag.<name>`. It doesn't
+write `persistent.<name>`, even though persistent variables already survive new games.
+
+- **Why:** the CE-03 contract is a write-once fact list. Keeping it apart means a fact can't be overwritten,
+  decremented or clash with an author's persistent counter of the same name, and the linter can tell facts
+  from variables. Reset progress clears both, since it wipes the whole meta-state.
+- **Cost:** two cross-run mechanisms. The spec says when to use which.
+- **Revisit if** authors keep mixing them up. Then `meta.flag.x` could become an alias of a persistent bool.
+
+## A locked choice that reads memory is hidden, not shown locked
+
+*2026-11-15. Engine §2 Cross-Playthrough Memory, data schema §4.4. Backlog CE-03.*
+
+A choice whose `condition` reads `meta.*` and fails is left out of the menu. Choices gated only on run
+variables keep the locked look.
+
+- **Why:** the PRD wants first playthroughs to look exactly as they would without the feature, and wants a
+  memory-gated choice to stay hidden until earned. A lock would spoil the reward on run one.
+- **Cost:** it's implicit. A condition like `meta.ending.a || trust > 5` hides the choice when locked even
+  though part of it is run state.
+- **Revisit if** an author wants a visible "locked until you've seen more" teaser. A per-choice flag can
+  override the rule then.
+
+## The memory marker is a sparkle with no screen-reader label yet
+
+*2026-11-15. Engine §2 Cross-Playthrough Memory. Backlog CE-03.*
+
+`memory_marker: true` on a choice shows `StorySkin.memoryMarker`, by default an `Icons.auto_awesome` icon,
+while the choice is available. Skins restyle it by overriding the hook or hide it by returning null.
+
+- **Why:** an icon needs no text, so it doesn't touch the UI strings that CE-01 is localizing.
+- **Revisit when** CE-01 lands: give the marker a localized semantics label, e.g. "Unlocked by a past run".
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
@@ -81,6 +118,10 @@ Match the style around your change instead of formatting whole files.
   a device. Until then, track changes fade out and then in.
 - **Rollback in chat and call scenes.** These threads move on by themselves, so rolling back into one needs
   their pacing to pause and resume. It also needs a design for what the thread shows while paused.
+- **Remembered facts in the developer panel.** It lists run and `persistent.*` variables only. Showing
+  `meta.flag.*` there needs a read-only row, since memory can only be written with `meta_set`.
+- **Reset progress wording.** The demo's confirm dialog lists saves, gallery, endings and checkpoints but not
+  remembered facts, which it also clears. CE-01 owns UI strings, so the wording waits for it.
 
 ## Device checks
 

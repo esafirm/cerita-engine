@@ -15,6 +15,9 @@ class GlobalMetaState {
   /// `persistent.*` variables, stored without the prefix.
   final Map<String, dynamic> persistent;
 
+  /// Facts remembered with the `meta_set` effect op, read as `meta.flag.<name>`.
+  final Set<String> rememberedFacts;
+
   /// Music files the stage has played. Powers the music room.
   final Set<String> heardMusic;
 
@@ -25,6 +28,7 @@ class GlobalMetaState {
     Set<String>? seenItems,
     Set<String>? chosenChoices,
     Map<String, dynamic>? persistent,
+    Set<String>? rememberedFacts,
     Set<String>? heardMusic,
   })  : unlockedMediaIds = unlockedMediaIds ?? {},
         unlockedEndingIds = unlockedEndingIds ?? {},
@@ -32,6 +36,7 @@ class GlobalMetaState {
         seenItems = seenItems ?? {},
         chosenChoices = chosenChoices ?? {},
         persistent = persistent ?? {},
+        rememberedFacts = rememberedFacts ?? {},
         heardMusic = heardMusic ?? {};
 
   factory GlobalMetaState.fromJson(Map<String, dynamic> json) {
@@ -43,6 +48,7 @@ class GlobalMetaState {
       seenItems: stringSet("seen_items"),
       chosenChoices: stringSet("chosen_choices"),
       persistent: Map<String, dynamic>.from(json["persistent"] as Map? ?? const {}),
+      rememberedFacts: stringSet("remembered_facts"),
       heardMusic: stringSet("heard_music"),
       unlockedCheckpoints: checkpoints.map(
         (key, value) => MapEntry(key, Checkpoint.fromJson(Map<String, dynamic>.from(value as Map))),
@@ -56,6 +62,7 @@ class GlobalMetaState {
         "seen_items": seenItems.toList(),
         "chosen_choices": chosenChoices.toList(),
         "persistent": persistent,
+        "remembered_facts": rememberedFacts.toList(),
         "heard_music": heardMusic.toList(),
         "unlocked_checkpoints": unlockedCheckpoints.map((key, value) => MapEntry(key, value.toJson())),
       };

@@ -77,6 +77,7 @@ class StorySkin {
 
   /// One option of a choice list. [index] is its position, handy for staggered entrances.
   /// [onTap] is null for locked choices. [Choice.chosen] marks options picked in an earlier playthrough.
+  /// Unlocked options with [Choice.memoryMarker] carry the [memoryMarker].
   Widget choiceButton(BuildContext context, Choice choice, int index, VoidCallback? onTap, {required bool dark}) {
     final scheme = Theme.of(context).colorScheme;
     final background = dark ? Colors.black.withAlpha(150) : scheme.surfaceContainerHighest;
@@ -104,6 +105,9 @@ class StorySkin {
                   style: TextStyle(color: choice.locked ? foreground.withAlpha(120) : foreground, fontSize: 15),
                 ),
               ),
+              if (choice.memoryMarker && !choice.locked)
+                if (memoryMarker(context, choice, dark: dark) case final marker?)
+                  Padding(padding: const EdgeInsets.only(left: 8), child: marker),
               // Picked in an earlier playthrough.
               if (choice.chosen && !choice.locked) Icon(Icons.check, size: 18, color: foreground.withAlpha(150)),
             ],
@@ -111,6 +115,13 @@ class StorySkin {
         ),
       ),
     );
+  }
+
+  /// Marker on an available choice the author flagged `memory_marker`, so the player notices what past
+  /// runs unlocked. [choiceButton] places it. Override to restyle it, or return null to hide it.
+  Widget? memoryMarker(BuildContext context, Choice choice, {required bool dark}) {
+    final color = dark ? Colors.amberAccent : Theme.of(context).colorScheme.tertiary;
+    return Icon(Icons.auto_awesome, size: 16, color: color.withAlpha(200));
   }
 
   /// The VN overlay with the chapter label and the quick controls: backlog, auto, skip and menu,

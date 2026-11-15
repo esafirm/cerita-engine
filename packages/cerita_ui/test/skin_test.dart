@@ -39,6 +39,21 @@ void main() {
     expect(selected, ['{b}Kind{/b}']);
   });
 
+  testWidgets('choices unlocked by past runs carry the memory marker', (tester) async {
+    final item = ChoiceItemType.fromJson({
+      "type": "CHOICE",
+      "text": "Answer",
+      "choices": [
+        {"text": "Mention the storm", "memory_marker": true},
+        {"text": "Nothing yet"},
+      ],
+    }).withAvailability((_) => true);
+    await tester.pumpWidget(_wrap(ChoiceList(item: item, dark: true, onSelected: (_) {})));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
+  });
+
   testWidgets('a long chapter label is cut short and leaves the HUD buttons in place', (tester) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;

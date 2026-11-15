@@ -3,6 +3,7 @@ import '../data/effect.dart';
 import '../data/items/base.dart';
 import '../data/items/branch.dart';
 import '../data/items/choice.dart';
+import '../data/items/ending.dart';
 import '../data/items/flow.dart';
 import '../data/items/input.dart';
 import '../data/items/media.dart';
@@ -14,6 +15,7 @@ import '../data/channel.dart';
 import '../data/profile.dart';
 import '../data/scene.dart';
 import '../loader.dart';
+import '../state/story_state.dart';
 import '../utils/condition_evaluator.dart';
 import '../utils/text_markup.dart';
 import '../utils/var_replacer.dart';
@@ -118,6 +120,7 @@ class StoryLinter {
 
     final reads = <String, (String, int)>{};
     final sets = <String, (String, int)>{};
+    final endingIds = <String>{};
 
     void expression(String key, int index, String? source) {
       if (source == null || source.trim().isEmpty) return;
@@ -130,7 +133,13 @@ class StoryLinter {
 
     void effects(String key, int index, List<Effect> effects) {
       for (final effect in effects) {
-        sets.putIfAbsent(effect.variable, () => (key, index));
+        final remembers = effect.op == EffectOp.metaSet;
+        if (!remembers && StoryState.isMeta(effect.variable)) {
+          error(key, index, "'${effect.variable}' is read-only. Remember facts with the meta_set op");
+        }
+        // A remembered fact is read back as meta.flag.<name>.
+        final variable = remembers ? "${StoryState.flagPrefix}${effect.variable}" : effect.variable;
+        sets.putIfAbsent(variable, () => (key, index));
         expression(key, index, effect.expr);
       }
     }
@@ -182,6 +191,7 @@ class StoryLinter {
       for (final (index, item) in conversation.conversations.indexed) {
         final id = item.id;
         if (id != null && !ids.add(id)) error(key, index, "Duplicate id '$id'");
+        if (item is EndingItemType) endingIds.add(item.endingId);
         expression(key, index, item.condition);
         effects(key, index, item.effects);
         text(key, index, item.json);
@@ -242,7 +252,20 @@ class StoryLinter {
     }
 
     for (final MapEntry(key: variable, value: (key, index)) in reads.entries) {
-      if (!sets.containsKey(variable)) warn(key, index, "Variable '$variable' is read but never set");
+      if (variable.startsWith(StoryState.endingPrefix)) {
+        final ending = variable.substring(StoryState.endingPrefix.length);
+        if (!endingIds.contains(ending)) warn(key, index, "No ENDING has ending_id '$ending' (read as '$variable')");
+      } else if (StoryState.isMeta(variable) && !variable.startsWith(StoryState.flagPrefix)) {
+        error(key, index, "Unknown memory variable '$variable'. Use meta.ending.<ending_id> or meta.flag.<name>");
+      } else if (!sets.containsKey(variable)) {
+        warn(
+          key,
+          index,
+          variable.startsWith(StoryState.flagPrefix)
+              ? "Fact '$variable' is read but never remembered with meta_set"
+              : "Variable '$variable' is read but never set",
+        );
+      }
     }
     for (final MapEntry(key: variable, value: (key, index)) in sets.entries) {
       if (!reads.containsKey(variable) && !_engineReads.contains(variable)) {
