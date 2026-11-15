@@ -31,6 +31,7 @@ my_story/
 ├── cerita.yaml          # Story settings (required)
 ├── profiles.yaml        # Cast and expression names (required)
 ├── channels.yaml        # Chat threads (optional), compiled to channels.json
+├── clues.yaml           # Case Board clues (optional), compiled to clues.json
 └── **/*.cerita          # Scripts, in any folder layout
 ```
 
@@ -84,6 +85,24 @@ thread_miki:
   avatar: assets/story/sprites/miki_avatar.png
   status: last seen a long time ago
   members: [miki]           # Profile keys, compiled to engine ids
+```
+
+### 1.4 `clues.yaml`
+
+The Case Board's clues (CE-05), compiled to `clues.json` ([data schema §8](data-schema.md#8-clues-cluesjson)). Clues
+are declared here once, in story order, and scripts only say where one is found (`clue <id>`, §2.4).
+
+```yaml
+show_counts: true           # "3 of 5 found" per chapter on the board. Default: false
+clues:
+  pier_photo:               # The clue id: letters, digits and _
+    title: { id: Foto dermaga, en: Pier photo }  # Required. A plain string, or one per locale
+    description: { id: Foto buram dari Tasya., en: A blurry photo from Tasya. }
+    image: clue_pier_photo.png  # In media/
+    key: true               # A key clue, marked on the board
+    chapter: { id: Hari 2, en: Day 2 }  # The board groups clues by it
+  harbor_log:
+    title: Harbor log
 ```
 
 ---
@@ -160,8 +179,38 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
   playthrough once picked. `[memory_marker]` marks an option unlocked by past runs.
 - `voice=` and a voice note's file name one clip, as written. The player looks for `name.<locale>.mp3` first and
   falls back to `name.mp3` (CE-01, data schema §5.4), so a story can ship either.
-- `clue` and `evidence` are reserved for the Case Board (CE-05) and Present evidence (CE-06). Using them is an
-  error until those features define their syntax.
+- `clue <id>` at column 0 is an effect line (§2.4), so it's a `SET` that awards the clue where the scene finds it.
+
+#### Evidence questions
+
+`evidence` (CE-06, [data schema §4.4](data-schema.md#evidence-questions-source-clues)) asks the player to present a
+clue. Its `?` lines are a clue id for each specific response, and `[retry]`, `[fallback]` and `[timeout]` for the
+outcomes. Each takes effects and a `-> <target>` in its body, but no text: the clue is what the player presents.
+
+```text
+evidence PRESENTED by=hendra:wary timeout=20s retries=1 label=ask_hendra
+  id: Petunjuk mana yang membantah dia?
+  en: Which clue contradicts him?
+? harbor_log
+  -trust_hendra 2
+  -> #hendra_caught
+? pier_photo
+  -> #hendra_pier
+? [retry]
+  -> #hendra_scoffs
+? [fallback]
+  -trust_hendra 5
+  -> #hendra_leaves
+```
+
+| Statement | Compiles to | Attributes and modifiers |
+| :--- | :--- | :--- |
+| `evidence [<VARIABLE>]` | `CHOICE` with `"source": "clues"`, followed by `?` lines | `by=`, `timeout=`, `retries=` |
+| `? <clue_id>` | One entry of `responses` | |
+| `? [retry]` / `? [fallback]` / `? [timeout]` | `retry` / `fallback` / `timeout` | |
+
+An evidence question needs at least one response, and each outcome is written at most once. `[if]`, `[default]`,
+`[once]`, `[memory_marker]` and `value` don't apply to its lines.
 
 ### 2.3 Text
 
@@ -203,6 +252,7 @@ They run when the item is reached, or when the option is picked:
 | `set <var> = <expression>` | `{"variable": var, "op": "set", "expr": expression}`. `+<var> = ...` and `-<var> = ...` work the same way |
 | `toggle <var>` | `{"variable": var, "op": "toggle"}` |
 | `remember <name>` | `{"variable": name, "op": "meta_set"}`: remembered across playthroughs (CE-03) |
+| `clue <id>` | `{"variable": "clue_<id>", "op": "set", "value": true}`: the clue is found (CE-05). `<id>` is declared in `clues.yaml` |
 
 Variable names can be `persistent.<name>` (kept across playthroughs, engine-and-state §2).
 
@@ -265,9 +315,9 @@ single-language story, and `locales` when there's more than one.
 ### 2.8 Output
 
 `compile` writes `index.json`, one `cvn_<key>.json` per other conversation, `profiles.json` and, when
-`channels.yaml` exists, `channels.json`. Keys are written in a fixed order with two-space indents and a final
-newline, so compiling an unchanged story twice gives identical files. It never deletes files and warns about
-`cvn_*.json` files in the output folder that no conversation produces.
+`channels.yaml` and `clues.yaml` exist, `channels.json` and `clues.json`. Keys are written in a fixed order with
+two-space indents and a final newline, so compiling an unchanged story twice gives identical files. It never
+deletes files and warns about `cvn_*.json` files in the output folder that no conversation produces.
 
 `compile --check` compiles in memory and fails if any output file is missing, different or stale. Generated
 files are committed (PRD D4), and CI runs `--check` so they can't drift from the scripts.
@@ -314,8 +364,11 @@ It checks in two layers and reports both together:
   note, and `--release` reports that as an error. A voice clip or voice note passes when its shared file
   exists, or when every locale has its own `name.<locale>.ext`. cerita_core's linter applies the same rule, so
   `cerita lint` on the compiled folder agrees.
-- Clue checks (declared but never found, used but not declared) come with CE-05: as story checks if clues get
-  JSON fields, as script checks if they only exist in the script.
+- Clue checks are story checks, since clues have JSON fields: a clue used but not declared is reported at its
+  `clue` line or evidence response, a clue declared but never found and a missing clue image at its `clues.yaml`
+  entry, and an evidence question no clue can answer at its `evidence` line. A `clue` line or `evidence` question
+  in a story without `clues.yaml` is a script error, since the core linter treats `clue_` variables as ordinary
+  there.
 
 ### 3.2 `stats`
 
@@ -370,6 +423,7 @@ and audio pipelines. It always exits with `0`: it's a report, and `lint` is the 
 | `sprite` | `sprites/` | `profiles.yaml` expressions |
 | `avatar` | `sprites/` or under `asset_prefix` | `profiles.yaml`, `channels.yaml` avatars |
 | `image`, `video`, `voice_note` | `media/` | `media IMAGE`, `media VIDEO`, `media AUDIO` |
+| `clue` | `media/` | `clues.yaml` images |
 | `music`, `ambience` | `music/` | `@scene music=` and `ambience=`, `stage music` and `ambience` |
 | `sfx` | `music/` | `sfx=`, `stage sound` |
 | `voice` | `music/` | `voice=` |
@@ -415,7 +469,7 @@ speaker lines with `voice=` and `media AUDIO` voice notes.
 
 ## 4. Extension Points
 
-- **New statements** (clues for CE-05, evidence choices for CE-06): a statement keyword maps to a parser that
-  builds an item, and the item compiles itself to JSON. `clue` and `evidence` are reserved keywords today.
+- **New statements**: a statement keyword maps to a parser that builds an item, and the item compiles itself to
+  JSON. `evidence` (CE-06) reuses the `choice` parser with its own `?` lines.
 - **New checks**: a check that can run on story JSON goes into cerita_core's `StoryLinter`, and `cerita_tools
   lint` picks it up. Only checks on names that exist in the script alone go into the script linter.
