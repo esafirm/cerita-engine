@@ -13,7 +13,7 @@ who vanished on the North Jakarta coast. Indonesian first, with English alongsid
 | `art/style-guide.md` | Look, framing, prompt templates and the cast sheet |
 | `art/prompts/` | One prompt per generated image, so any image can be made again |
 | `art/placeholders.txt` | Every placeholder made so far, for `tools/placeholders.sh --list` |
-| `tools/` | The image, voice and placeholder scripts |
+| `tools/` | The image, voice and placeholder scripts, and `make-icon.sh` for the app icon |
 | `lib/ui/` | The 90s PC look: `RetroSkin` for the story, the framed `RetroWindow`, the theme and the menu blips |
 | `assets/fonts/` | DotGothic16, the dot font (SIL OFL 1.1) |
 

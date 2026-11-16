@@ -42,6 +42,10 @@ class RetroSkin extends StorySkin {
     child: child,
   );
 
+  /// The dot font has no italic, and a slanted one looks broken. Narration is upright, in pale blue.
+  @override
+  TextStyle get narrationStyle => const TextStyle(fontStyle: FontStyle.normal, color: Retro.narration);
+
   @override
   Duration get chapterCardDuration => const Duration(milliseconds: 2600);
 

@@ -13,6 +13,7 @@ abstract final class Retro {
   static const line = Color(0xFF6F7BC0);
   static const accent = Color(0xFFFF8FB8);
   static const dim = Color(0xFF8C94B8);
+  static const narration = Color(0xFFB9C6F2);
 
   static const shadow = BoxShadow(color: Color(0xAA000000), offset: Offset(4, 4));
 
