@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../common/avatar.dart';
 import '../common/media_widgets.dart';
 import '../common/tagged_text.dart';
+import '../skin/story_skin.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
@@ -144,9 +145,8 @@ class _SystemPill extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: timestamp ? FontWeight.w600 : FontWeight.normal,
-              fontStyle: item.style == NarrationStyle.narration ? FontStyle.italic : null,
               color: timestamp ? scheme.onSecondaryContainer : scheme.onSurfaceVariant,
-            ),
+            ).merge(item.style == NarrationStyle.narration ? StorySkin.of(context).narrationStyle : null),
           ),
         ),
       ),

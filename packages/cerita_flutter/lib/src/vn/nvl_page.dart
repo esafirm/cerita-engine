@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/tagged_text.dart';
+import '../skin/story_skin.dart';
 import '../story_controller.dart';
 
 /// The NVL text box: the lines of the current page on a dimmed full-screen panel, newest at the bottom.
@@ -50,9 +51,9 @@ class NvlPage extends StatelessWidget {
           child: Text("› ${controller.playerTextOf(entry) ?? ""}", style: textStyle.copyWith(color: accent)),
         );
       }
-      final item = entry.itemType!;
+      final item = controller.itemOf(entry)!;
       final speaker = item is NarrationItemType ? null : controller.profileOf(item)?.name;
-      final style = TextStyle(fontStyle: item is NarrationItemType ? FontStyle.italic : null);
+      final style = item is NarrationItemType ? StorySkin.of(context).narrationStyle : null;
       final text = item.getText() ?? "";
 
       Widget withSpeaker(Widget body) => speaker == null

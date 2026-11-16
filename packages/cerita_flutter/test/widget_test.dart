@@ -38,6 +38,26 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       expect(typed, 3);
     });
+
+    testWidgets('narration takes the skin narration style', (tester) async {
+      TextStyle? styleOf(String text) {
+        final rich = tester.widgetList<RichText>(find.byType(RichText)).firstWhere((r) => r.text.toPlainText() == text);
+        final span = rich.text as TextSpan;
+        return (span.children?.whereType<TextSpan>().firstOrNull ?? span).style ?? span.style;
+      }
+
+      await tester.pumpWidget(_wrap(const DialogueBox('Night falls.', italic: true, instant: true)));
+      await tester.pump();
+      expect(styleOf('Night falls.')?.fontStyle, FontStyle.italic);
+
+      await tester.pumpWidget(_wrap(const StorySkinScope(
+        skin: _UprightSkin(),
+        child: DialogueBox('Night falls.', italic: true, instant: true),
+      )));
+      await tester.pump();
+      expect(styleOf('Night falls.')?.fontStyle, isNot(FontStyle.italic));
+      expect(styleOf('Night falls.')?.color, Colors.lightBlue);
+    });
   });
 
   group('ChoiceList', () {
@@ -74,4 +94,11 @@ void main() {
       expect(selected, ['Rude']);
     });
   });
+}
+
+class _UprightSkin extends StorySkin {
+  const _UprightSkin();
+
+  @override
+  TextStyle get narrationStyle => const TextStyle(fontStyle: FontStyle.normal, color: Colors.lightBlue);
 }

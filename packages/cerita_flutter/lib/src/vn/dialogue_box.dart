@@ -56,7 +56,7 @@ class DialogueBoxState extends State<DialogueBox> {
       child: TypewriterText(
         widget.text,
         key: _typewriter,
-        style: TextStyle(fontStyle: widget.italic ? FontStyle.italic : null),
+        style: widget.italic ? StorySkin.of(context).narrationStyle : null,
         instant: widget.instant,
         msPerChar: widget.msPerChar,
         autoResume: widget.autoResume,

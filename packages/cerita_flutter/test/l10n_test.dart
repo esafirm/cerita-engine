@@ -139,6 +139,40 @@ void main() {
     });
   });
 
+  testWidgets("the NVL page shows earlier lines in the player's language", (tester) async {
+    mockAudioChannels();
+    final storage = InMemoryStoryStorage();
+    await storage.saveSettings(const PlayerSettings(textMsPerChar: 0));
+    final setup = StorySetup(
+      config: const LoaderConfig(),
+      loader: _Loader({
+        "index": {
+          "conversation_id": "cvn_index",
+          "source_locale": "id",
+          "locales": ["id", "en"],
+          "scene": {"mode": "VN", "textbox": "nvl"},
+          "conversations": [
+            {"type": "NARRATION", "text": {"id": "Laut hitam.", "en": "Black sea."}},
+            {"type": "NARRATION", "text": {"id": "Angin dingin.", "en": "Cold wind."}},
+          ],
+        },
+      }),
+      storage: storage,
+      audio: SilentAudio.new,
+      assets: LocalizedAssets(_Bundle([])),
+    );
+    final language = StoryLanguage();
+    await language.load(setup, deviceLocale: "en");
+    await tester.pumpWidget(_app(language, StoryScreen(setup: setup)));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(200, 400));
+    await tester.pumpAndSettle();
+
+    // The first line is now an earlier line of the page, drawn from the transcript.
+    expect(find.text("Black sea."), findsOneWidget);
+    expect(find.text("Laut hitam."), findsNothing);
+  });
+
   testWidgets('switching language mid-chat re-renders the thread, menus and ending', (tester) async {
     mockAudioChannels();
     final storage = InMemoryStoryStorage();

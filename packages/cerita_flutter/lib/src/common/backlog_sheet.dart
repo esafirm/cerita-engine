@@ -2,6 +2,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/story_language.dart';
+import '../skin/story_skin.dart';
 import '../story_controller.dart';
 import 'tagged_text.dart';
 
@@ -62,7 +63,7 @@ class BacklogSheet extends StatelessWidget {
                     Text(speaker, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
                   TaggedText(
                     text,
-                    style: item is NarrationItemType ? const TextStyle(fontStyle: FontStyle.italic) : null,
+                    style: item is NarrationItemType ? StorySkin.of(context).narrationStyle : null,
                   ),
                 ],
               );

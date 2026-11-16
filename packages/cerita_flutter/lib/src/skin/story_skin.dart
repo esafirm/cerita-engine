@@ -44,6 +44,10 @@ class StorySkin {
   Widget credits(BuildContext context, Credits credits, {required bool rolling}) =>
       CreditsList(credits: credits, rolling: rolling);
 
+  /// How narration lines differ from spoken ones, in the dialogue box, the NVL page, the backlog and chat. Merged
+  /// over the surrounding text style. Italic by default; override for fonts without an italic, such as dot fonts.
+  TextStyle get narrationStyle => const TextStyle(fontStyle: FontStyle.italic);
+
   /// The VN dialogue box around the typewriter [DialogueFrame.body].
   Widget dialogueFrame(BuildContext context, DialogueFrame frame) {
     final scheme = Theme.of(context).colorScheme;
