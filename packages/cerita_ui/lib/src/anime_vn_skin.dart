@@ -1,16 +1,12 @@
-import 'dart:ui';
-
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
 
 import 'cerita_theme.dart';
 
-/// Modern anime visual novel look: frosted dialogue box with a slanted name plate,
+/// Modern anime visual novel look: flat dialogue box with a slanted name plate,
 /// fade-through-black scene changes, sprites that rise into place and a chapter title card.
 class AnimeVnSkin extends StorySkin {
   const AnimeVnSkin();
-
-  static const _textShadow = [Shadow(color: Colors.black54, blurRadius: 6)];
 
   @override
   Duration get sceneTransitionDuration => const Duration(milliseconds: 1100);
@@ -29,9 +25,9 @@ class AnimeVnSkin extends StorySkin {
       child: switch (mode) {
         // The phone rises into view.
         SceneMode.chat => SlideTransition(
-            position: Tween(begin: const Offset(0, 0.12), end: Offset.zero).animate(fadeThrough),
-            child: child,
-          ),
+          position: Tween(begin: const Offset(0, 0.12), end: Offset.zero).animate(fadeThrough),
+          child: child,
+        ),
         // The call screen settles in.
         SceneMode.call => ScaleTransition(scale: Tween(begin: 1.12, end: 1.0).animate(fadeThrough), child: child),
         SceneMode.vn => child,
@@ -78,34 +74,18 @@ class AnimeVnSkin extends StorySkin {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-            child: Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(minHeight: 124),
-              padding: const EdgeInsets.fromLTRB(22, 28, 22, 26),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withAlpha(46)),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [CeritaColors.surface.withAlpha(185), CeritaColors.night.withAlpha(225)],
-                ),
-              ),
-              child: DefaultTextStyle.merge(
-                style: const TextStyle(
-                  fontSize: 17,
-                  height: 1.55,
-                  fontWeight: FontWeight.w500,
-                  color: CeritaColors.moon,
-                  shadows: _textShadow,
-                ),
-                child: frame.body,
-              ),
-            ),
+        Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(minHeight: 124),
+          padding: const EdgeInsets.fromLTRB(22, 28, 22, 26),
+          decoration: BoxDecoration(
+            color: CeritaColors.night.withAlpha(235),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withAlpha(46), width: 1.4),
+          ),
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(fontSize: 17, height: 1.55, fontWeight: FontWeight.w500, color: CeritaColors.moon),
+            child: frame.body,
           ),
         ),
         Positioned(
@@ -221,21 +201,16 @@ class _NamePlate extends StatelessWidget {
       transform: Matrix4.skewX(-0.22),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-        decoration: BoxDecoration(
-          gradient: CeritaColors.accent,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [BoxShadow(color: CeritaColors.blossom.withAlpha(110), blurRadius: 14)],
-        ),
+        decoration: BoxDecoration(color: CeritaColors.blossom, borderRadius: BorderRadius.circular(6)),
         child: Transform(
           transform: Matrix4.skewX(0.22),
           child: Text(
             name,
             style: const TextStyle(
-              color: Colors.white,
+              color: CeritaColors.night,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.4,
               fontSize: 15,
-              shadows: [Shadow(color: Colors.black38, blurRadius: 4)],
             ),
           ),
         ),
@@ -314,43 +289,37 @@ class _ChoiceButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final locked = choice.locked;
     final foreground = locked ? CeritaColors.moon.withAlpha(110) : CeritaColors.moon;
-    return Container(
-      // Gradient border: the outer box paints the accent, the inner one the glass.
-      padding: const EdgeInsets.all(1.2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: locked ? null : CeritaColors.accent,
-        color: locked ? Colors.white12 : null,
+    return Material(
+      color: CeritaColors.night.withAlpha(locked ? 170 : 225),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: locked ? Colors.white12 : CeritaColors.blossom, width: 1.4),
       ),
-      child: Material(
-        color: CeritaColors.night.withAlpha(locked ? 170 : 215),
-        borderRadius: BorderRadius.circular(15),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(15),
-          splashColor: CeritaColors.blossom.withAlpha(70),
-          highlightColor: CeritaColors.lavender.withAlpha(40),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (locked) ...[Icon(Icons.lock_outline, size: 16, color: foreground), const SizedBox(width: 8)],
-                if (marker case final marker?) ...[marker, const SizedBox(width: 8)],
-                // Picked in an earlier playthrough.
-                if (choice.chosen && !locked) ...[
-                  Icon(Icons.check_rounded, size: 16, color: foreground.withAlpha(150)),
-                  const SizedBox(width: 8),
-                ],
-                Flexible(
-                  child: TaggedText(
-                    choice.text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: foreground, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.3),
-                  ),
-                ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        splashColor: CeritaColors.blossom.withAlpha(70),
+        highlightColor: CeritaColors.lavender.withAlpha(40),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (locked) ...[Icon(Icons.lock_outline, size: 16, color: foreground), const SizedBox(width: 8)],
+              if (marker case final marker?) ...[marker, const SizedBox(width: 8)],
+              // Picked in an earlier playthrough.
+              if (choice.chosen && !locked) ...[
+                Icon(Icons.check_rounded, size: 16, color: foreground.withAlpha(150)),
+                const SizedBox(width: 8),
               ],
-            ),
+              Flexible(
+                child: TaggedText(
+                  choice.text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: foreground, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.3),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -368,16 +337,13 @@ class _Glass extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: CeritaColors.night.withAlpha(120),
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: Colors.white.withAlpha(36)),
-          ),
-          child: child,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: CeritaColors.night.withAlpha(200),
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(color: Colors.white.withAlpha(36)),
         ),
+        child: child,
       ),
     );
   }
@@ -400,7 +366,7 @@ class _HudLabel extends StatelessWidget {
             Container(
               width: 4,
               height: 14,
-              decoration: BoxDecoration(gradient: CeritaColors.accent, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(color: CeritaColors.blossom, borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -442,13 +408,10 @@ class _HudButton extends StatelessWidget {
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
-            color: active
-                ? CeritaColors.blossom
-                : CeritaColors.moon.withAlpha(onTap == null ? 80 : 200),
+            color: active ? CeritaColors.blossom : CeritaColors.moon.withAlpha(onTap == null ? 80 : 200),
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,
-            shadows: active ? [Shadow(color: CeritaColors.blossom.withAlpha(180), blurRadius: 10)] : null,
           ),
           child: Text(label),
         ),
@@ -465,10 +428,8 @@ class _ChapterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: RadialGradient(radius: 1.1, colors: [Color(0xE6181A30), Color(0xFA0E0F1F)]),
-      ),
+    return ColoredBox(
+      color: const Color(0xF20E0F1F),
       child: Center(
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1),
@@ -477,11 +438,7 @@ class _ChapterCard extends StatelessWidget {
           builder: (context, value, _) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 160 * value,
-                height: 1.5,
-                decoration: const BoxDecoration(gradient: CeritaColors.accent),
-              ),
+              Container(width: 160 * value, height: 1.5, color: CeritaColors.blossom),
               const SizedBox(height: 18),
               Text(
                 chapter.toUpperCase(),
@@ -508,11 +465,7 @@ class _ChapterCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 18),
-              Container(
-                width: 160 * value,
-                height: 1.5,
-                decoration: const BoxDecoration(gradient: CeritaColors.accent),
-              ),
+              Container(width: 160 * value, height: 1.5, color: CeritaColors.blossom),
             ],
           ),
         ),

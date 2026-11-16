@@ -8,8 +8,6 @@ abstract final class CeritaColors {
   static const blossom = Color(0xFFFF7EB6);
   static const lavender = Color(0xFFA99BFF);
   static const moon = Color(0xFFF5F3FF);
-
-  static const accent = LinearGradient(colors: [blossom, lavender]);
 }
 
 abstract final class CeritaTheme {
