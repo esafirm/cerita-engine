@@ -44,7 +44,8 @@ if [[ -z "$img" ]]; then
   echo "no image produced; log: $log" >&2
   exit 1
 fi
-mkdir -p "$(dirname "$out")"
-# Backgrounds and photos are used as they come. Sprites need their chroma background keyed out first (spec §6.2, M1).
-cp "$img" "$out"
-echo "saved $out ($(sips -g pixelWidth -g pixelHeight "$out" | awk '/pixel/{printf "%s ", $2}'))"
+# The untouched image goes to art/.raw/ (git-ignored), so it can be keyed or graded again without a new run.
+raw="$here/art/.raw/$name.png"
+mkdir -p "$(dirname "$out")" "$(dirname "$raw")"
+cp "$img" "$raw"
+"$(dirname "$0")/finish-image.sh" "$raw" "$asset"

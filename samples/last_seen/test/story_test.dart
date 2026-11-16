@@ -1,28 +1,89 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Plays Last Seen headlessly in [locale], picking each choice by its `value` from [picks] (else the first
-/// available option), so every route and JSON file is exercised.
-Future<(EndingItemType, RealFsseEngine)> _play(String locale, Map<String, String> picks) async {
+/// One playthrough's answers: a choice `value` (or a clue id for an evidence question) per variable, and the
+/// text typed into each INPUT, in order.
+typedef _Run = ({Map<String, String> picks, List<String> inputs});
+
+/// Plays Last Seen headlessly in [locale], so every route and JSON file is exercised. A choice without an
+/// answer in [run] takes its first available option.
+Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
   final engine = RealFsseEngine(AssetEngineLoader(const LoaderConfig()))..locale = locale;
+  final inputs = [...run.inputs];
   ItemResult? result;
-  for (var step = 0; step < 500; step++) {
+  for (var step = 0; step < 2000; step++) {
     final item = await engine.next(prevResult: result);
     result = null;
     switch (item) {
       case EndingItemType():
         return (item, engine);
+      case EvidenceItemType():
+        final clue = engine.clues.byId(run.picks[item.variable]!);
+        expect(clue, isNotNull, reason: "no clue '${run.picks[item.variable]}'");
+        result = ItemResult.present(item, clue!);
       case ChoiceItemType():
-        final wanted = picks[item.variable];
+        final wanted = run.picks[item.variable];
         final choice = item.availableChoices.firstWhere((c) => c.value == wanted, orElse: () => item.availableChoices.first);
         expect(choice.locked, isFalse, reason: "'${choice.text}' is locked");
         result = ItemResult.choice(item.variable, choice);
+      case InputItemType():
+        expect(inputs, isNotEmpty, reason: "unexpected input ${item.variable}");
+        result = ItemResult.input(item.variable, inputs.removeAt(0));
       default:
         break;
     }
   }
   fail("No ending reached");
 }
+
+/// Everything kind to Dinda, every room spot, the passcode on the first try.
+const _Run _kind = (
+  picks: {
+    "FALLOUT": "silent",
+    "UNSENT": "sorry",
+    "PLAY_EP": "play",
+    "FIRST_REPLY": "worried",
+    "CALL_REACT": "safe",
+    "ANSWER": "now",
+    "ASK_FIRST": "care",
+    "NOTEBOOK": "rub",
+    "PHONE_PLAN": "careful",
+    "YUSUF_PROOF": "missing_recorder",
+    "TELL_YUSUF": "honest",
+    "LUNCH_ASK": "scared",
+    "LUNCH_COMFORT": "together",
+    "PLAY_VN": "play",
+    "ROOF_TRUTH": "truth",
+    "WULAN_REPLY": "care",
+    "THREAT_REPLY": "quiet",
+  },
+  inputs: ["0530"],
+);
+
+/// Cold all the way, a short room search, three wrong passcodes before Raka remembers.
+const _Run _cold = (
+  picks: {
+    "FALLOUT": "cruel",
+    "UNSENT": "closed",
+    "PLAY_EP": "close",
+    "FIRST_REPLY": "guarded",
+    "CALL_REACT": "alone",
+    "ANSWER": "silent",
+    "ASK_FIRST": "hedge",
+    "NOTEBOOK": "skip",
+    "PHONE_PLAN": "rush",
+    "YUSUF_PROOF": "ferry_schedule",
+    "TELL_YUSUF": "lie",
+    "LUNCH_ASK": "bima",
+    "LUNCH_MORE": "eat",
+    "LUNCH_COMFORT": "police",
+    "PLAY_VN": "later",
+    "ROOF_TRUTH": "half",
+    "WULAN_REPLY": "sorry",
+    "THREAT_REPLY": "threaten",
+  },
+  inputs: ["1234", "0500", "9999"],
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -42,29 +103,30 @@ void main() {
   });
 
   for (final locale in ["id", "en"]) {
-    test('prologue, kind route ($locale): Dinda trusts Raka', () async {
-      final (ending, engine) = await _play(locale, {
-        "FALLOUT": "silent",
-        "UNSENT": "sorry",
-        "FIRST_REPLY": "worried",
-        "CALL_REACT": "safe",
-        "ANSWER": "now",
-      });
+    test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV', () async {
+      final (ending, engine) = await _play(locale, _kind);
       expect(ending.endingId, "end_00_preview");
-      expect(engine.dataMap["trust_dinda"], 12);
-      expect(engine.dataMap["FALLOUT"], "silent");
+      expect(engine.dataMap["pass_tries"], isNull, reason: "first try");
+      expect(engine.dataMap["yusuf_cctv"], isTrue);
+      expect(engine.dataMap["told_dinda_truth"], isTrue);
+      // worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3
+      expect(engine.dataMap["trust_dinda"], 30);
+      expect(engine.dataMap["trust_yusuf"], 8);
+      for (final clue in ["unsent_message", "ep12_teaser", "stake_map", "ferry_schedule", "missing_recorder",
+          "sekar_notebook", "threat_message"]) {
+        expect(engine.dataMap["clue_$clue"], isTrue, reason: clue);
+      }
     });
 
-    test('prologue, cold route ($locale): Dinda trusts Raka less', () async {
-      final (ending, engine) = await _play(locale, {
-        "FALLOUT": "cruel",
-        "UNSENT": "closed",
-        "FIRST_REPLY": "guarded",
-        "CALL_REACT": "alone",
-        "ANSWER": "silent",
-      });
+    test('cold run ($locale): wrong passcodes, Yusuf unconvinced', () async {
+      final (ending, engine) = await _play(locale, _cold);
       expect(ending.endingId, "end_00_preview");
-      expect(engine.dataMap["trust_dinda"], -5);
+      expect(engine.dataMap["pass_tries"], 2, reason: "the third wrong code sends Raka to remember it");
+      expect(engine.dataMap["yusuf_cctv"], isNull);
+      expect(engine.dataMap["lied_to_yusuf"], isTrue);
+      // alone -3, silent -2, hedge -4, unlocked 3, ferry -3, lie 3, police -3, half -2
+      expect(engine.dataMap["trust_dinda"], -11);
+      expect(engine.dataMap["clue_sekar_notebook"], isNull);
     });
   }
 }

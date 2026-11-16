@@ -61,10 +61,10 @@ class _TitleScreenState extends State<TitleScreen> {
           title: "Last Seen",
           subtitle: language.locale == "en" ? "A North Jakarta mystery" : "Terakhir dilihat",
           art: Poi(
-            background: config.bg("bg_seawall_night.png"),
+            background: config.bg("bg_seawall_night.webp"),
             actors: [
-              PoiActor(id: "raka", sprite: config.sprite("raka_neutral.png"), position: SpritePosition.left),
-              PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.png"), position: SpritePosition.right),
+              PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
+              PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
             ],
           ),
           primary: [

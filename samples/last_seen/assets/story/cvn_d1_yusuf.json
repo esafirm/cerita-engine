@@ -1,0 +1,460 @@
+{
+  "conversation_id": "cvn_d1_yusuf",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Ipda Yusuf",
+    "en": "Officer Yusuf"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "10:05",
+    "background": "bg_sekar_living_day.webp",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "far_right"
+        },
+        {
+          "action": "show",
+          "profile": "yusuf:1",
+          "position": "center",
+          "transition": "fade",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Selamat pagi. Saya Ipda Yusuf, dari Polsek Penjaringan. Saya yang menangani laporan Mbak Sekar.",
+        "en": "Good morning. I'm Inspector Yusuf, from the Penjaringan police station. I'm handling the report on Ms. Sekar."
+      },
+      "profile": "yusuf:1",
+      "position": "center"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dan Anda?",
+        "en": "And you are?"
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Raka. Temen Sekar. Dari Bandung.",
+        "en": "Raka. Sekar's friend. From Bandung."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Teman. Hm.",
+        "en": "A friend. Hm."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ipda Yusuf duduk tanpa disuruh. Dia ngeluarin buku catatan kecil, tapi nggak nulis apa-apa. Matanya capek, tapi nggak galak.",
+        "en": "Inspector Yusuf sits down without being asked. He takes out a small notebook, but doesn't write anything. His eyes are tired, but not unkind."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya mau jujur ke keluarga. Mbak Sekar sudah dewasa. Tidak ada tanda kekerasan, tidak ada tebusan, dompet ditinggal di rumah. Pola seperti ini biasanya orang yang pergi atas kemauan sendiri.",
+        "en": "I'll be honest with the family. Ms. Sekar is an adult. No sign of violence, no ransom, wallet left at home. A pattern like this usually means someone who left of their own accord."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia nggak kabur, Pak. Saya udah bilang tiga kali.",
+        "en": "She didn't run away, sir. I've told you three times."
+      },
+      "profile": "dinda:3",
+      "position": "far_right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya tahu, Dik. Tapi saya butuh sesuatu yang bisa saya tulis di laporan. Bukan perasaan.",
+        "en": "I know. But I need something I can put in a report. Not a feeling."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Anda kenal dia lama. Apa yang bikin Anda yakin dia tidak pergi sendiri?",
+        "en": "Mr. Raka. You've known her a long time. What makes you sure she didn't leave on her own?"
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "CHOICE",
+      "id": "ask_yusuf",
+      "source": "clues",
+      "text": {
+        "id": "Tunjukkan petunjuk yang membantah \"kabur dari rumah\".",
+        "en": "Show a clue that contradicts \"ran away from home\"."
+      },
+      "variable": "YUSUF_PROOF",
+      "profile": "yusuf:0",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "missing_recorder",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 5
+            }
+          ],
+          "target": "#proof_recorder"
+        },
+        {
+          "clue": "unsent_message",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 2
+            },
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 2
+            }
+          ],
+          "target": "#proof_message"
+        },
+        {
+          "clue": "ferry_schedule",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 3
+            }
+          ],
+          "target": "#proof_ferry"
+        }
+      ],
+      "retry": {
+        "target": "#proof_retry"
+      },
+      "fallback": {
+        "target": "#proof_none"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_retry",
+      "text": {
+        "id": "Itu tidak membuktikan apa-apa soal dia pergi atau tidak. Ada yang lain?",
+        "en": "That doesn't prove anything about whether she left. Anything else?"
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "#ask_yusuf"
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_recorder",
+      "text": {
+        "id": "Perekamnya hilang. Baterai cadangan, kabel, headphone, semuanya. Orang yang kabur nggak bawa alat kerja, Pak. Dia pergi buat rekaman. Buat liputan.",
+        "en": "Her recorder is gone. Spare batteries, cable, headphones, all of it. People running away don't take their work gear, sir. She went out to record. For a story."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Dompet ditinggal, tapi alat rekam dibawa.",
+        "en": "...Leaves her wallet, takes her recorder."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu masuk akal. Saya bisa minta rekaman CCTV di sekitar TPI Muara Angke dengan alasan itu. Tidak janji, tapi bisa saya coba.",
+        "en": "That makes sense. I can request the CCTV footage around the Muara Angke fish auction on those grounds. No promises, but I can try."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "yusuf_cctv",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#after_proof"
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_message",
+      "text": {
+        "id": "Ada pesan buat saya. Ditulis sepuluh menit sebelum dia pergi. \"Inget jam lima pagi itu? Gue masih di sana.\"",
+        "en": "There's a message for me. Written ten minutes before she left. \"Remember five in the morning? I'm still there.\""
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pesan untuk... teman lama. Yang sudah setahun tidak bicara, kalau saya tebak dari muka Anda.",
+        "en": "A message to... an old friend. One she hasn't spoken to in a year, if I'm reading your face right."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Maaf, Mas. Tapi itu bisa dibaca dua arah. Bisa jadi minta tolong. Bisa jadi pamit.",
+        "en": "I'm sorry. But that reads two ways. It could be a call for help. It could be a goodbye."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ka. Itu bukan buat polisi.",
+        "en": "Ka. That wasn't for the police."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#after_proof"
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_ferry",
+      "text": {
+        "id": "Dia nandain jadwal kapal ke Pulau Pari. Jam setengah enam pagi.",
+        "en": "She marked the ferry schedule to Pulau Pari. The five-thirty morning boat."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapal ke pulau. Pagi buta. Tanpa pamit ke keluarga.",
+        "en": "A boat to an island. Before dawn. Without telling her family."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas, itu justru terdengar seperti orang yang merencanakan pergi.",
+        "en": "That actually sounds like someone planning to leave."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo malah bikin dia makin yakin Kak Sekar kabur.",
+        "en": "You just made him even more sure she ran away."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "JUMP",
+      "target": "#after_proof"
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_none",
+      "text": {
+        "id": "Saya mengerti. Perasaan keluarga itu penting. Tapi untuk sekarang, statusnya tetap orang hilang dewasa. Saya tinggalkan kartu nama saya.",
+        "en": "I understand. How the family feels matters. But for now, the status stays an adult missing person. I'll leave you my card."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "TEXT",
+      "id": "after_proof",
+      "text": {
+        "id": "Satu lagi. Barang pribadi Mbak Sekar. Laptop, HP, buku catatan. Ada yang belum kami lihat?",
+        "en": "One more thing. Ms. Sekar's personal things. Laptop, phones, notebooks. Anything we haven't seen?"
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP cadangan itu lagi dicas di belakang sofa. Kabelnya kelihatan, kalau orang mau ngelihat.",
+        "en": "The spare phone is charging behind the sofa. The cable is visible, if anyone cares to look."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda ngelirik lo. Pelan, dia geleng.",
+        "en": "Dinda glances at you. Slowly, she shakes her head."
+      },
+      "variable": "TELL_YUSUF",
+      "profile": "yusuf:0",
+      "timeout_ms": 10000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "\"Nggak ada, Pak.\"",
+            "en": "\"No, sir. Nothing.\""
+          },
+          "value": "lie",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 3
+            },
+            {
+              "variable": "lied_to_yusuf",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Ada HP cadangan. Kami pegang dulu, nanti saya kabari.\"",
+            "en": "\"There's a spare phone. We'll hold on to it for now, I'll keep you posted.\""
+          },
+          "value": "honest",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 3
+            },
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Diam.)",
+            "en": "(Say nothing.)"
+          },
+          "value": "silent"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'lie'",
+      "text": {
+        "id": "Baik.{w} Kalau ada yang Anda ingat nanti, telepon saya. Kebohongan kecil di awal biasanya jadi masalah besar di akhir.",
+        "en": "Very well.{w} If you remember anything later, call me. Small lies at the start usually become big problems at the end."
+      },
+      "profile": "yusuf:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'honest'",
+      "text": {
+        "id": "Terima kasih sudah jujur. Silakan dipegang. Kalau ada yang penting, kirim salinannya ke saya. Jangan bertindak sendiri.",
+        "en": "Thank you for being honest. Keep it for now. If you find anything important, send me a copy. Don't act on your own."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'silent'",
+      "text": {
+        "id": "Diam juga jawaban, Mas.{w} Saya permisi.",
+        "en": "Silence is an answer too.{w} I'll see myself out."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "yusuf",
+          "transition": "fade",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'lie'",
+      "text": {
+        "id": "Makasih. Gue nggak percaya polisi. Mereka udah mutusin dia kabur sebelum nyari.",
+        "en": "Thanks. I don't trust the police. They decided she ran away before they even looked."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'honest'",
+      "text": {
+        "id": "Lo ngasih tahu dia. Kenapa?",
+        "en": "You told him. Why?"
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_YUSUF == 'honest'",
+      "text": {
+        "id": "Karena kalau kita nemu sesuatu yang gede, kita butuh orang yang bisa ngapa-ngapain. Gue cuma tukang edit audio, Din.",
+        "en": "Because if we find something big, we'll need someone who can actually do something. I just edit audio, Din."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Gue laper. Lo laper? Dari pagi gue cuma minum teh.",
+        "en": "...I'm hungry. Are you hungry? I've only had tea since this morning."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_warung"
+    }
+  ]
+}

@@ -29,7 +29,7 @@
     {
       "type": "MEDIA",
       "media_type": "IMAGE",
-      "uri": "photo_unsent_message.png",
+      "uri": "photo_unsent_message.webp",
       "caption": {
         "id": "ini screenshot dari HP cadangannya",
         "en": "screenshot from her spare phone"
@@ -37,12 +37,19 @@
       "profile": "dinda:0",
       "unlock_id": "photo_unsent_message",
       "typing_delay_ms": 2400,
-      "sfx": "sfx_msg_receive.mp3"
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_unsent_message",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "MEDIA",
       "media_type": "IMAGE",
-      "uri": "photo_ep12_teaser.png",
+      "uri": "photo_ep12_teaser.webp",
       "caption": {
         "id": "postingan terakhir dia. 3 hari sebelum ilang",
         "en": "her last post. 3 days before she vanished"
@@ -50,7 +57,14 @@
       "profile": "dinda:0",
       "unlock_id": "photo_ep12_teaser",
       "typing_delay_ms": 2800,
-      "sfx": "sfx_msg_receive.mp3"
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_ep12_teaser",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "TEXT",

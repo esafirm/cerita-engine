@@ -145,7 +145,7 @@
     },
     {
       "type": "JUMP",
-      "target": "p_now"
+      "target": "p_bandung"
     }
   ]
 }

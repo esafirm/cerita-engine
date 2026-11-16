@@ -1,0 +1,408 @@
+{
+  "conversation_id": "cvn_d1_warung",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Warung Bu Sari",
+    "en": "Bu Sari's Stall"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "12:20",
+    "background": "bg_warung_day.webp",
+    "music": "bgm_quiet_house.mp3",
+    "ambience": "amb_kampung_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Warung Bu Sari ada di mulut gang, di bawah terpal biru yang udah bolong di tiga tempat. Dua meja, enam kursi plastik, dan kipas angin yang muter pelan kayak lagi mikir.",
+        "en": "Bu Sari's stall sits at the mouth of the alley, under a blue tarp with three holes in it. Two tables, six plastic chairs, and a fan that turns slowly, like it's thinking."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue sama Sekar dulu makan di sini hampir tiap minggu. Nasi uduk, tempe orek, dan sambal yang bikin dia nangis tapi tetep nambah.",
+        "en": "Sekar and I used to eat here almost every week. Coconut rice, sweet fried tempeh, and a chili sauce that made her cry but she always took seconds."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bu Sari masih inget lo. Tadi dia bilang, \"Itu yang dulu suka pesen teh tawar, ya? Kayak orang tua.\"",
+        "en": "Bu Sari still remembers you. She just said, \"Isn't that the one who always ordered unsweetened tea? Like an old man.\""
+      },
+      "profile": "dinda:1",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Teh tawar itu pilihan hidup yang dewasa.",
+        "en": "Unsweetened tea is a mature life choice."
+      },
+      "profile": "raka:1",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kak Sekar juga bilang gitu. Maksudnya ngeledek.",
+        "en": "Sekar used to say that too. She meant it as an insult."
+      },
+      "profile": "dinda:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Itu pertama kalinya hari ini Dinda senyum. Cuma sebentar, kayak lampu yang konslet.",
+        "en": "It's the first time Dinda has smiled today. Just for a second, like a light with a loose wire."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Apa yang lo tanyain soal bulan-bulan terakhir Sekar?",
+        "en": "What do you ask about Sekar's last few months?"
+      },
+      "variable": "LUNCH_ASK",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Dia keliatan takut nggak, belakangan?",
+            "en": "Did she seem scared, lately?"
+          },
+          "value": "scared",
+          "target": "#ask_scared"
+        },
+        {
+          "text": {
+            "id": "Ceritain soal Bima.",
+            "en": "Tell me about Bima."
+          },
+          "value": "bima",
+          "target": "#ask_bima"
+        },
+        {
+          "text": {
+            "id": "Podcast-nya lagi kenapa?",
+            "en": "What was going on with the podcast?"
+          },
+          "value": "podcast",
+          "target": "#ask_podcast"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "id": "ask_scared",
+      "text": {
+        "id": "Takut... iya. Tapi dia nggak bakal ngaku.",
+        "en": "Scared... yeah. But she'd never admit it."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dua minggu terakhir dia tutup gorden kamar siang-siang. Kalau ada motor berhenti di depan rumah, dia ngintip dari jendela atas.",
+        "en": "The last two weeks she kept her curtains closed in the middle of the day. Whenever a motorbike stopped outside, she'd peek out the upstairs window."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue tanya kenapa, dia bilang, \"Paranoid aja, Din. Kebanyakan baca berita.\"",
+        "en": "I asked why, and she said, \"Just paranoid, Din. Too much news.\""
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "knows_sekar_scared",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#lunch_more"
+    },
+    {
+      "type": "TEXT",
+      "id": "ask_bima",
+      "text": {
+        "id": "Bima itu... baik. Ganteng, sopan ke Ibu, selalu bawain martabak kalau dateng.",
+        "en": "Bima is... nice. Good-looking, polite to Mom, always brings martabak when he visits."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tapi dia kerja di kantor konsultan. Kliennya perusahaan-perusahaan properti. Kak Sekar sama dia sering ribut soal itu, pelan-pelan, di teras, kirain gue nggak denger.",
+        "en": "But he works at a consulting firm. Their clients are property companies. He and Sekar fought about it a lot, quietly, out on the terrace, like I couldn't hear."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Habis Kak Sekar hilang, dia dateng sekali. Nanya HP cadangan. Nggak nanya Ibu gimana.",
+        "en": "After Sekar went missing, he came over once. Asked about the spare phone. Didn't ask how Mom was doing."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "knows_bima_job",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#lunch_more"
+    },
+    {
+      "type": "TEXT",
+      "id": "ask_podcast",
+      "text": {
+        "id": "Lagi naik. Pendengarnya dua kali lipat sejak episode soal ibu-ibu kerang. Ada yang mau sponsorin, malah.",
+        "en": "It was taking off. Listeners doubled after the mussel-shellers episode. Someone even wanted to sponsor it."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sponsor? Siapa?",
+        "en": "A sponsor? Who?"
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nggak tahu. \"Orang PT\", katanya. Nawarin duit gede buat \"konten positif soal pembangunan pesisir\". Kak Sekar nolak. Tasya pengen terima.",
+        "en": "No idea. \"Some company guy,\" she said. Offered big money for \"positive content about coastal development\". Sekar said no. Tasya wanted to take it."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Abis itu mereka nggak rekaman bareng dua minggu.",
+        "en": "They didn't record together for two weeks after that."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "knows_sponsor_offer",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#lunch_more"
+    },
+    {
+      "type": "NARRATION",
+      "id": "lunch_more",
+      "text": {
+        "id": "Bu Sari naruh dua piring di meja tanpa ditanya. Pesenan yang sama kayak setahun lalu. Gue nggak tahu dia inget atau cuma nebak.",
+        "en": "Bu Sari sets two plates down without asking. The same order as a year ago. I don't know if she remembered or just guessed."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Tanya satu hal lagi?",
+        "en": "Ask one more thing?"
+      },
+      "variable": "LUNCH_MORE",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Dia keliatan takut nggak, belakangan?",
+            "en": "Did she seem scared, lately?"
+          },
+          "value": "scared",
+          "condition": "LUNCH_ASK != 'scared' && knows_sekar_scared != true",
+          "target": "#ask_scared"
+        },
+        {
+          "text": {
+            "id": "Ceritain soal Bima.",
+            "en": "Tell me about Bima."
+          },
+          "value": "bima",
+          "condition": "LUNCH_ASK != 'bima' && knows_bima_job != true",
+          "target": "#ask_bima"
+        },
+        {
+          "text": {
+            "id": "Podcast-nya lagi kenapa?",
+            "en": "What was going on with the podcast?"
+          },
+          "value": "podcast",
+          "condition": "LUNCH_ASK != 'podcast' && knows_sponsor_offer != true",
+          "target": "#ask_podcast"
+        },
+        {
+          "text": {
+            "id": "Udah. Makan dulu.",
+            "en": "That's enough. Let's eat."
+          },
+          "value": "eat"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue tahu lo pengen nanya kenapa gue nggak cerita ini semua ke polisi.",
+        "en": "I know you want to ask why I didn't tell the police any of this."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Karena tiap gue ngomong, Pak Yusuf nulis \"keluarga cemas\" di bukunya. Bukan \"tolong cari\".",
+        "en": "Because every time I talk, Inspector Yusuf writes \"family is anxious\" in his notebook. Not \"please search\"."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue capek jadi \"keluarga cemas\", Ka.",
+        "en": "I'm tired of being \"the anxious family\", Ka."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda ngelap matanya pake lengan sweater Sekar.",
+        "en": "Dinda wipes her eyes with the sleeve of Sekar's sweater."
+      },
+      "variable": "LUNCH_COMFORT",
+      "profile": "dinda:2",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Mulai sekarang, kita cari bareng.\"",
+            "en": "\"From now on, we look together.\""
+          },
+          "value": "together",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Geser piring sambal ke dia, kayak dulu ke Sekar.)",
+            "en": "(Slide the chili sauce over to her, like you used to for Sekar.)"
+          },
+          "value": "sambal",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Polisi pasti punya alasan.\"",
+            "en": "\"The police must have their reasons.\""
+          },
+          "value": "police",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "LUNCH_COMFORT == 'sambal'",
+      "text": {
+        "id": "...Lo inget Kak Sekar selalu nangis gara-gara sambel ini.{w} Bego.",
+        "en": "...You remember Sekar always cried over this sambal.{w} Idiot."
+      },
+      "profile": "dinda:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "LUNCH_COMFORT == 'together'",
+      "text": {
+        "id": "Oke. Bareng. Jangan ngilang di tengah jalan.",
+        "en": "Okay. Together. Don't vanish halfway."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "LUNCH_COMFORT == 'police'",
+      "text": {
+        "id": "Lo kedengeran kayak dia.",
+        "en": "You sound just like him."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_drafts"
+    }
+  ]
+}

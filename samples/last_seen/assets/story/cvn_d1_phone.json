@@ -1,0 +1,397 @@
+{
+  "conversation_id": "cvn_d1_phone",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Kata Sandi",
+    "en": "Passcode"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "09:10",
+    "background": "bg_sekar_living_day.webp",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nih.",
+        "en": "Here."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda nyodorin HP Android jadul dengan casing retak. Wallpaper lock screen-nya foto dermaga waktu subuh. Perahu kayu, langit oranye, dan laut yang masih abu-abu.",
+        "en": "Dinda hands me an old Android phone in a cracked case. The lock screen wallpaper is a photo of a pier at dawn. A wooden boat, an orange sky, and sea that's still grey."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Empat kotak kosong di tengah layar, nunggu diisi.",
+        "en": "Four empty boxes in the middle of the screen, waiting."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kak Sekar selalu pake jam buat sandinya. Katanya angka yang paling gampang diinget itu angka yang ada ceritanya.",
+        "en": "Sekar always uses a time for her passcodes. She says the easiest numbers to remember are the ones with a story."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue udah coba jam dia lahir, jam Ayah meninggal, jam podcast-nya pertama tayang. Salah semua. Sisa berapa kali coba sebelum HP-nya ngunci, gue nggak tahu.",
+        "en": "I tried the time she was born, the time Dad died, the time her podcast first aired. All wrong. I don't know how many tries are left before it locks."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam yang ada ceritanya.{w} \"Ka. Inget jam lima pagi itu?\"",
+        "en": "A time with a story.{w} \"Ka. Remember five in the morning?\""
+      }
+    },
+    {
+      "type": "INPUT",
+      "id": "passcode",
+      "text": {
+        "id": "Masukkan kode empat angka.",
+        "en": "Enter the four-digit code."
+      },
+      "variable": "PASSCODE",
+      "profile": "dinda:0"
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "PASSCODE == '0530' || PASSCODE == '05:30' || PASSCODE == '05.30'",
+          "target": "#unlocked"
+        },
+        {
+          "condition": "PASSCODE == '0500' || PASSCODE == '05:00' || PASSCODE == '05.00'",
+          "target": "#almost"
+        },
+        {
+          "condition": "pass_tries >= 2",
+          "target": "#remember"
+        }
+      ]
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "pass_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_wrong_code.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 3
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Kode salah",
+        "en": "Wrong code"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "pass_tries == 1",
+      "text": {
+        "id": "Bukan. Mikir, Raka. Jam yang ada ceritanya buat dia. Dan buat gue.",
+        "en": "No. Think, Raka. A time with a story for her. And for me."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "pass_tries >= 2",
+      "text": {
+        "id": "Dermaga. Subuh. Kapal.{w} Wallpaper-nya bukan kebetulan.",
+        "en": "The pier. Dawn. A boat.{w} The wallpaper isn't a coincidence."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "JUMP",
+      "target": "#passcode"
+    },
+    {
+      "type": "STAGE",
+      "id": "almost",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_wrong_code.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Kode salah",
+        "en": "Wrong code"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Hampir. Jam lima itu jam ketemuannya. Tapi kapalnya nggak berangkat jam lima.",
+        "en": "Close. Five was when we were supposed to meet. But the boat didn't leave at five."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "clue_ferry_schedule == true",
+      "text": {
+        "id": "Jadwal kapal di papan gabusnya. Yang dilingkarin itu jam berapa?",
+        "en": "The ferry schedule on her corkboard. What time was circled?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "pass_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#passcode"
+    },
+    {
+      "type": "NARRATION",
+      "id": "remember",
+      "text": {
+        "id": "Gue tutup mata. Tanggul. Es teh yang esnya cair. \"Kapalnya Pak Karta berangkat jam setengah enam. Lo ikut, kan?\"",
+        "en": "I close my eyes. The seawall. The iced tea with its ice all melted. \"Pak Karta's boat leaves at five thirty. You're coming, right?\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jari gue ngetik sendiri. Nol. Lima. Tiga. Nol.",
+        "en": "My fingers type it on their own. Zero. Five. Three. Zero."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#unlocked"
+    },
+    {
+      "type": "STAGE",
+      "id": "unlocked",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_unlock.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Terbuka",
+        "en": "Unlocked"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "pass_tries == 0",
+      "text": {
+        "id": "Sekali coba?? Lo... gimana?",
+        "en": "First try?? How did you..."
+      },
+      "profile": "dinda:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "pass_tries > 0",
+      "text": {
+        "id": "Kebuka! Kodenya apa?",
+        "en": "It's open! What was it?"
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lima tiga puluh. Jam kapal yang harusnya gue naikin bareng dia.",
+        "en": "Five thirty. The boat I was supposed to take with her."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "phone_unlocked",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "trust_dinda",
+          "op": "add",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Layar utamanya penuh notifikasi. Grup \"Pendengar Ep. 12\", sembilan puluh sembilan pesan lebih. Tasya, dua puluh tiga. Bima, empat puluh. Ibu. Nomor-nomor yang nggak disimpen.",
+        "en": "The home screen is full of notifications. The group \"Pendengar Ep. 12\", ninety-nine plus messages. Tasya, twenty-three. Bima, forty. Mom. Numbers with no name."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dan satu chat yang gue kenal. Nama gue sendiri, dengan tanda seru merah di sebelahnya.",
+        "en": "And one chat I know. My own name, with a red exclamation mark beside it."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bima itu pacarnya. Udah setahunan. Tasya partner podcast-nya. Dua-duanya bilang nggak tahu apa-apa.",
+        "en": "Bima is her boyfriend. About a year now. Tasya's her podcast partner. Both of them say they don't know anything."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bima nanya terus HP cadangannya di mana. Tiga kali kemarin. Gue bilang nggak tahu.",
+        "en": "Bima keeps asking where her spare phone is. Three times yesterday. I said I don't know."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Baterainya sembilan persen. Apa dulu?",
+        "en": "The battery's at nine percent. What first?"
+      },
+      "variable": "PHONE_PLAN",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Cas dulu. Bacanya nanti, pelan-pelan.",
+            "en": "Charge it first. Read it later, carefully."
+          },
+          "value": "careful",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Langsung buka chat Bima.",
+            "en": "Open Bima's chat right now."
+          },
+          "value": "rush"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PHONE_PLAN == 'careful'",
+      "text": {
+        "id": "Iya. Jangan sampai mati pas lagi baca sesuatu yang penting.",
+        "en": "Yeah. Don't want it dying in the middle of something important."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "PHONE_PLAN == 'rush'",
+      "text": {
+        "id": "Gue buka chat Bima. Layar langsung meredup. \"Baterai lemah.\" Lalu mati.",
+        "en": "I open Bima's chat. The screen dims at once. \"Battery low.\" Then it dies."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "PHONE_PLAN == 'rush'",
+      "text": {
+        "id": "Ka! Ya udah, cas dulu. Sabar dikit kenapa sih.",
+        "en": "Ka! Fine, charge it. Would it kill you to be patient?"
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_gate.mp3"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Ada yang dateng. Itu mobil polisi.",
+        "en": "...Someone's here. That's a police car."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_yusuf"
+    }
+  ]
+}

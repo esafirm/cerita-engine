@@ -1,0 +1,167 @@
+{
+  "conversation_id": "cvn_p_bandung",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Sekarang",
+    "en": "Now"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 0,
+    "time": "02:02",
+    "background": "bg_raka_room_night.webp",
+    "music": "amb_room_night.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Setahun kemudian. Bandung, jam dua pagi.",
+        "en": "A year later. Bandung, two in the morning."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kamar kos tiga kali empat. Kasur di lantai, rice cooker di pojok, dan laptop yang kipasnya bunyi kayak mau terbang.",
+        "en": "A three-by-four rented room. A mattress on the floor, a rice cooker in the corner, and a laptop whose fan sounds like it's about to take off."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kerjaan gue sekarang ngedit audio iklan. Suara orang senyum-senyum jualan asuransi. Gue potong napasnya, gue rapihin \"eee\"-nya, gue kirim. Lima puluh ribu per menit jadi.",
+        "en": "These days I edit audio for ads. People smiling their way through insurance pitches. I cut their breaths, clean up their \"umm\"s, send it off. Fifty thousand rupiah per finished minute."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kerjaannya rapi. Bosnya puas. Gue nggak pernah inget satu pun isinya.",
+        "en": "The work is clean. The client's happy. I never remember a single word of it."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di tab sebelah, kebuka dari tadi sore, ada satu hal yang gue nggak berani tutup.",
+        "en": "In the next tab, open since this afternoon, is the one thing I can't bring myself to close."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Suara Pesisir, Episode 11.\" Diunggah tiga minggu lalu. Empat ratus dua belas kali diputar.",
+        "en": "\"Suara Pesisir, Episode 11.\" Uploaded three weeks ago. Four hundred and twelve plays."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pendengarnya udah dua kali lipat. Gue nggak tahu harus ngerasa apa soal itu.",
+        "en": "Her listeners have doubled. I don't know how to feel about that."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Putar episodenya?",
+        "en": "Play the episode?"
+      },
+      "variable": "PLAY_EP",
+      "profile": "raka:5",
+      "choices": [
+        {
+          "text": {
+            "id": "Putar.",
+            "en": "Play it."
+          },
+          "value": "play"
+        },
+        {
+          "text": {
+            "id": "Tutup tabnya. Kali ini beneran.",
+            "en": "Close the tab. For real this time."
+          },
+          "value": "close"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "PLAY_EP == 'close'",
+      "text": {
+        "id": "Kursor gue udah di tanda silang. Udah setahun kursor gue di situ.{w} Jari gue malah ngeklik tombol putar.",
+        "en": "My cursor is already on the X. It's been there for a year.{w} My finger clicks play instead."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Halo, pendengar Suara Pesisir. Gue Sekar, dan ini episode sebelas. Malam ini kita ngobrol sama ibu-ibu pengupas kerang di Muara Angke.",
+        "en": "Hi, Suara Pesisir listeners. I'm Sekar, and this is episode eleven. Tonight we're talking with the women who shell mussels in Muara Angke."
+      },
+      "profile": "sekar:0",
+      "voice": "vo_p_sekar_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mereka kerja dari subuh, tangannya penuh luka kecil, dan tiap tahun kerangnya makin sedikit. Kenapa? Nah. Itu yang mau kita cari tahu.",
+        "en": "They work from before dawn, their hands covered in tiny cuts, and every year there are fewer mussels. Why? Well. That's what we're going to find out."
+      },
+      "profile": "sekar:0",
+      "voice": "vo_p_sekar_02.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Audionya bersih. Anginnya nggak bunyi kayak pesawat jatuh.{w} Siapa pun yang ngedit sekarang, dia lebih rajin dari gue.",
+        "en": "The audio is clean. The wind doesn't sound like a plane crash.{w} Whoever edits it now is more careful than I ever was."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oh iya. Episode dua belas lagi gue garap. Yang ini... beda. Doain ya.",
+        "en": "Oh, and. I'm working on episode twelve. This one is... different. Wish me luck."
+      },
+      "profile": "sekar:0",
+      "voice": "vo_p_sekar_03.mp3"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_msg_receive.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP gue bunyi. Jam dua lewat empat belas.{w} Nggak ada yang ngechat gue jam segini. Nggak ada yang ngechat gue, titik.",
+        "en": "My phone buzzes. Fourteen minutes past two.{w} Nobody texts me at this hour. Nobody texts me, period."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "p_now"
+    }
+  ]
+}

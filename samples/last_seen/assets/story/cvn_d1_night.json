@@ -1,0 +1,165 @@
+{
+  "conversation_id": "cvn_d1_night",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Tengah Malam",
+    "en": "Midnight"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_unknown",
+    "day": 1,
+    "time": "23:58",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "HP Sekar · 23.58",
+        "en": "Sekar's phone · 11:58 PM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Gue tidur di sofa ruang tamu. HP cadangan Sekar udah delapan puluh persen. Gue belum berani buka chat apa pun.",
+        "en": "I'm sleeping on the living room sofa. Sekar's spare phone is at eighty percent. I haven't dared open any chat yet."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Pesan baru dari nomor tak dikenal",
+        "en": "New message from an unknown number"
+      },
+      "sfx": "sfx_notification.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "lo yang buka hp ini kan",
+        "en": "you're the one who opened this phone right"
+      },
+      "profile": "unknown",
+      "typing_delay_ms": 2800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "berhenti nyari. demi adiknya",
+        "en": "stop looking. for her sister's sake"
+      },
+      "profile": "unknown",
+      "typing_delay_ms": 3600,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_threat_message",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Tangan gue dingin.",
+        "en": "My hands go cold."
+      },
+      "variable": "THREAT_REPLY",
+      "profile": "unknown",
+      "timeout_ms": 15000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "siapa ini?",
+            "en": "who is this?"
+          },
+          "value": "ask"
+        },
+        {
+          "text": {
+            "id": "Screenshot, terus diam.",
+            "en": "Screenshot it, say nothing."
+          },
+          "value": "quiet",
+          "effects": [
+            {
+              "variable": "threat_screenshot",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "kalau lo sentuh dinda, gue cari lo duluan",
+            "en": "touch dinda and i'll find you first"
+          },
+          "value": "threaten"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "THREAT_REPLY == 'ask'",
+      "text": {
+        "id": "siapa ini?",
+        "en": "who is this?"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "THREAT_REPLY == 'threaten'",
+      "text": {
+        "id": "kalau lo sentuh dinda, gue cari lo duluan",
+        "en": "touch dinda and i'll find you first"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THREAT_REPLY != 'quiet'",
+      "style": "system",
+      "text": {
+        "id": "Dibaca 23.59",
+        "en": "Read 11:59 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "THREAT_REPLY == 'threaten'",
+      "text": {
+        "id": "lucu",
+        "en": "cute"
+      },
+      "profile": "unknown",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Nomor ini terakhir dilihat baru saja",
+        "en": "This number was last seen just now"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_stub"
+    }
+  ]
+}

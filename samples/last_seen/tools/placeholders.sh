@@ -42,6 +42,9 @@ owner() { local base; base=$(basename "$1"); echo "${base%%_*}"; }
 
 make_one() { # kind path
   local kind=$1 path=$2 out="$assets/$2" name
+  # ffmpeg here has no WebP encoder: draw a PNG, then cwebp it.
+  local final=$out
+  [[ "$final" == *.webp ]] && out="${TMPDIR:-/tmp}/placeholder.$$.png"
   name=$(basename "${path%.*}")
   mkdir -p "$(dirname "$out")"
   case "$kind" in
@@ -72,6 +75,9 @@ make_one() { # kind path
     *)
       return 1 ;;
   esac
+  if [[ "$final" != "$out" ]]; then
+    [[ -s "$out" ]] && cwebp -quiet -q 80 "$out" -o "$final"; out=$final
+  fi
   [[ -s "$out" ]] || { echo "failed: $path" >&2; return 1; }
   echo "$path $(shasum "$out" | cut -d' ' -f1)" >> "$ledger"
   echo "placeholder $path"

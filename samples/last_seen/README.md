@@ -31,12 +31,15 @@ make run-last-seen    # run the app
 One image at a time, from its prompt in `art/prompts/<name>.txt`:
 
 ```bash
-samples/last_seen/tools/codex-image.sh bg/bg_seawall_night.png
+samples/last_seen/tools/codex-image.sh bg/bg_seawall_night.webp
 ```
 
 `tools/placeholders.sh --list` prints the placeholders no real asset has replaced yet.
 
 ## Status
 
-M0: the prologue in both languages, with placeholder art (one real background) and Dinda's call voiced. Day 1 is
-a stub that ends in a "To Be Continued" ending, which M1 replaces.
+M1 (vertical slice): the prologue and Day 1 in both languages, with real art in the flat house style
+(`art/style-guide.md`), CC0 music and sound, and every call line and voice note voiced. Day 2 is a stub that ends in
+a "To Be Continued" ending. Tasya, Bima, Hendra and Didit are still placeholders: they first appear in Day 2.
+
+Character references live in `art/refs/`: pass one to `codex-image.sh` so new expressions stay on-model.

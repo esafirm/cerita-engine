@@ -1,0 +1,258 @@
+{
+  "conversation_id": "cvn_d1_roof",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Atap",
+    "en": "The Roof"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "18:05",
+    "background": "bg_sekar_roof_dusk.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_kampung_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Atap rumah Sekar cuma dak beton dengan jemuran dan dua ember cat bekas yang dijadiin pot cabai. Dari sini, magrib kedengeran dari tiga masjid sekaligus, saling nyusul.",
+        "en": "The roof of Sekar's house is just a concrete slab with a clothesline and two old paint buckets turned into chili pots. From up here, the call to prayer comes from three mosques at once, each one chasing the last."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right",
+          "transition": "slide_left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo udah buka chatnya.",
+        "en": "You opened the chat."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kok tahu?",
+        "en": "How'd you know?"
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Muka lo kayak orang abis nemu surat wasiat.",
+        "en": "Your face looks like someone who just found a will."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ka. Gue mau nanya sesuatu, dan gue mau lo jawab jujur. Kalian berantem soal apa, setahun lalu?",
+        "en": "Ka. I want to ask you something, and I want an honest answer. What did you two fight about, a year ago?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kak Sekar nggak pernah cerita. Dia cuma bilang, \"Raka ngomong sesuatu yang bener, dan itu yang bikin sakit.\"",
+        "en": "Sekar never told me. She just said, \"Raka said something true, and that's what hurt.\""
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Jawab Dinda.",
+        "en": "Answer Dinda."
+      },
+      "variable": "ROOF_TRUTH",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Ceritain semuanya. Termasuk yang lo omongin.",
+            "en": "Tell her everything. Including what you said."
+          },
+          "value": "truth",
+          "target": "#truth"
+        },
+        {
+          "text": {
+            "id": "\"Gue pergi ke Bandung tanpa bilang. Itu aja.\"",
+            "en": "\"I left for Bandung without telling her. That's all.\""
+          },
+          "value": "half",
+          "target": "#half"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "id": "truth",
+      "text": {
+        "id": "Gue tarik napas. Udah setahun gue nggak ngomongin ini ke siapa pun.",
+        "en": "I take a breath. I haven't said this out loud to anyone in a year."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'cruel'",
+      "text": {
+        "id": "Gue bilang dia bukan jurnalis. Bahwa dia cuma cewek yang punya mic.",
+        "en": "I told her she wasn't a journalist. That she was just a girl with a mic."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'cold'",
+      "text": {
+        "id": "Gue bilang nggak semua orang bisa hidup dari mimpi. Kayak mimpinya nggak penting.",
+        "en": "I told her not everyone gets to live on dreams. Like her dream didn't matter."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'silent'",
+      "text": {
+        "id": "Gue nggak bilang apa-apa. Dia minta gue ikut sekali aja, dan gue diem. Terus dia pergi.{w} Kadang diem itu lebih jahat.",
+        "en": "I didn't say anything. She asked me to come just once, and I stayed quiet. Then she left.{w} Sometimes silence is worse."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Terus dia nunggu gue di dermaga, Sabtu subuh. Sampai jam enam lewat dua belas. Gue tahu karena dia kirim \"ok\".{w} Gue nggak dateng.",
+        "en": "And then she waited for me at the pier, Saturday at dawn. Until twelve past six. I know because she texted \"ok\".{w} I didn't show up."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Jam lima pagi itu.",
+        "en": "...Five in the morning."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Makasih udah jujur. Gue masih kesel. Tapi makasih.",
+        "en": "Thanks for being honest. I'm still mad. But thanks."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "trust_dinda",
+          "op": "add",
+          "value": 5
+        },
+        {
+          "variable": "told_dinda_truth",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#roof_end"
+    },
+    {
+      "type": "TEXT",
+      "id": "half",
+      "text": {
+        "id": "Gue pergi ke Bandung tanpa bilang. Itu aja.",
+        "en": "I left for Bandung without telling her. That's all."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Itu aja.\" Oke.",
+        "en": "\"That's all.\" Okay."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo tahu nggak, Kak Sekar juga selalu jawab \"itu aja\" kalau lagi bohong. Kalian mirip banget, nyebelin.",
+        "en": "You know Sekar always says \"that's all\" when she's lying too? You two are so alike, it's annoying."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "trust_dinda",
+          "op": "subtract",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "id": "roof_end",
+      "text": {
+        "id": "Matahari tenggelam di belakang crane-crane reklamasi. Langitnya oranye, lautnya abu-abu. Persis wallpaper HP Sekar.",
+        "en": "The sun sets behind the reclamation cranes. Orange sky, grey sea. Exactly like the wallpaper on Sekar's phone."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Besok gue mau buka grup pendengarnya. Lo ikut baca?",
+        "en": "Tomorrow I want to open the listener group. You'll read it with me?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Iya. Besok.",
+        "en": "Yeah. Tomorrow."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_wulan"
+    }
+  ]
+}

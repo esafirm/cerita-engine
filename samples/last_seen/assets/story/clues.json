@@ -1,0 +1,116 @@
+{
+  "show_counts": true,
+  "clues": [
+    {
+      "id": "unsent_message",
+      "title": {
+        "id": "Pesan tak terkirim",
+        "en": "The unsent message"
+      },
+      "description": {
+        "id": "\"Ka. Inget jam lima pagi itu? Gue masih di sana.\" Dikirim dari HP cadangan Sekar, nggak pernah sampai.",
+        "en": "\"Ka. Remember five in the morning? I'm still there.\" Sent from Sekar's spare phone, never delivered."
+      },
+      "image": "photo_unsent_message.webp",
+      "key": true,
+      "chapter": {
+        "id": "Prolog",
+        "en": "Prologue"
+      }
+    },
+    {
+      "id": "ep12_teaser",
+      "title": {
+        "id": "Teaser Episode 12",
+        "en": "Episode 12 teaser"
+      },
+      "description": {
+        "id": "\"Episode 12: Siapa yang punya laut?\" Diposting tiga hari sebelum Sekar hilang.",
+        "en": "\"Episode 12: Who owns the sea?\" Posted three days before Sekar vanished."
+      },
+      "image": "photo_ep12_teaser.webp",
+      "chapter": {
+        "id": "Prolog",
+        "en": "Prologue"
+      }
+    },
+    {
+      "id": "stake_map",
+      "title": {
+        "id": "Peta patok laut",
+        "en": "Map of the sea stakes"
+      },
+      "description": {
+        "id": "Peta Teluk Jakarta di meja Sekar. Patok-patok di laut ditandai spidol merah, dengan tanggal dan inisial \"PT. B\".",
+        "en": "A map of Jakarta Bay on Sekar's desk. The stakes in the sea are marked in red, with dates and the initials \"PT. B\"."
+      },
+      "chapter": {
+        "id": "Hari 1",
+        "en": "Day 1"
+      }
+    },
+    {
+      "id": "ferry_schedule",
+      "title": {
+        "id": "Jadwal kapal Pulau Pari",
+        "en": "Pulau Pari ferry times"
+      },
+      "description": {
+        "id": "Jadwal kapal Kali Adem ke Pulau Pari, disematkan di papan gabus. Keberangkatan 05.30 dilingkari.",
+        "en": "The Kali Adem to Pulau Pari ferry schedule, pinned to the corkboard. The 5:30 departure is circled."
+      },
+      "key": true,
+      "chapter": {
+        "id": "Hari 1",
+        "en": "Day 1"
+      }
+    },
+    {
+      "id": "missing_recorder",
+      "title": {
+        "id": "Perekam yang hilang",
+        "en": "The missing recorder"
+      },
+      "description": {
+        "id": "Perekam Zoom Sekar nggak ada di kamar. Kabel, baterai cadangan dan headphone-nya juga ikut hilang. Orang kabur nggak bawa alat kerja.",
+        "en": "Sekar's Zoom recorder isn't in her room. Its cable, spare batteries and her headphones are gone too. People who run away don't pack their work gear."
+      },
+      "key": true,
+      "chapter": {
+        "id": "Hari 1",
+        "en": "Day 1"
+      }
+    },
+    {
+      "id": "sekar_notebook",
+      "title": {
+        "id": "Buku catatan Sekar",
+        "en": "Sekar's notebook"
+      },
+      "description": {
+        "id": "Halaman terakhir disobek. Bekas tekanan pulpennya masih kebaca sebagian, \"...jangan percaya T...\"",
+        "en": "The last page is torn out. The pen pressure left part of it legible, \"...don't trust T...\""
+      },
+      "chapter": {
+        "id": "Hari 1",
+        "en": "Day 1"
+      }
+    },
+    {
+      "id": "threat_message",
+      "title": {
+        "id": "Pesan dari nomor asing",
+        "en": "Message from an unknown number"
+      },
+      "description": {
+        "id": "Masuk ke HP cadangan Sekar tengah malam, Hari 1, \"Berhenti nyari. Demi adiknya.\"",
+        "en": "Arrived on Sekar's spare phone at midnight, Day 1, \"Stop looking. For her sister's sake.\""
+      },
+      "key": true,
+      "chapter": {
+        "id": "Hari 1",
+        "en": "Day 1"
+      }
+    }
+  ]
+}

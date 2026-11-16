@@ -1,0 +1,79 @@
+{
+  "sections": [
+    {
+      "title": { "id": "Cerita", "en": "Story" },
+      "people": [
+        { "name": "Esa Firman", "role": { "id": "Penulis dan sutradara", "en": "Writer and director" } }
+      ]
+    },
+    {
+      "title": { "id": "Gambar", "en": "Art" },
+      "people": [
+        { "name": "OpenAI image generation (Codex CLI)", "role": { "id": "Latar, karakter dan foto", "en": "Backgrounds, characters and photos" } }
+      ]
+    },
+    {
+      "title": { "id": "Suara", "en": "Voice" },
+      "people": [
+        { "name": "Google Gemini TTS", "role": { "id": "Pesan suara dan telepon", "en": "Voice notes and calls" } }
+      ]
+    },
+    {
+      "title": { "id": "Mesin", "en": "Engine" },
+      "people": [
+        { "name": "Cerita Engine" }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "title": "At the End of Hope",
+      "author": "emmama",
+      "source": "opengameart.org/content/at-the-end-of-hope",
+      "license": "CC0 1.0",
+      "note": { "id": "Tema utama", "en": "Main theme" }
+    },
+    {
+      "title": "Regret (short emotional piano)",
+      "author": "wolfgang",
+      "source": "opengameart.org/content/regret-short-emotional-piano",
+      "license": "CC0 1.0",
+      "note": { "id": "Draf yang tak terkirim", "en": "The unsent drafts" }
+    },
+    {
+      "title": "Emotional Soundtrack 1",
+      "author": "pro-sensory",
+      "source": "opengameart.org/content/emotional-soundtrack-1",
+      "license": "CC0 1.0",
+      "note": { "id": "Rumah Sekar", "en": "Sekar's house" }
+    },
+    {
+      "title": "Unsolved Investigation",
+      "author": "isaiah658",
+      "source": "opengameart.org/content/unsolved-investigation",
+      "license": "CC0 1.0",
+      "note": { "id": "Ketegangan", "en": "Tension" }
+    },
+    {
+      "title": "Streets After Midnight",
+      "author": "tsorthan-grove",
+      "source": "opengameart.org/content/streets-after-midnight",
+      "license": "CC0 1.0",
+      "note": { "id": "Suasana malam", "en": "Night ambience" }
+    },
+    {
+      "title": "Beach Ocean Waves",
+      "author": "jasinski, packed by qubodup",
+      "source": "opengameart.org/content/beach-ocean-waves",
+      "license": "CC0 1.0",
+      "note": { "id": "Ombak di tanggul", "en": "Waves at the seawall" }
+    },
+    {
+      "title": "100 CC0 SFX #2",
+      "author": "rubberduck",
+      "source": "opengameart.org/content/100-cc0-sfx-2",
+      "license": "CC0 1.0",
+      "note": { "id": "Pagar, kunci dan suasana jalan", "en": "Gate, lock and street ambience" }
+    }
+  ]
+}

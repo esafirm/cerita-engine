@@ -1,0 +1,434 @@
+{
+  "conversation_id": "cvn_d1_room",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Kamar Sekar",
+    "en": "Sekar's Room"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "08:30",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_quiet_house.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kamar Sekar di lantai dua, di ujung tangga yang bunyi tiap diinjek.",
+        "en": "Sekar's room is upstairs, at the top of stairs that creak with every step."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue pernah ke sini ratusan kali. Kamarnya masih bau yang sama, kertas, kopi sachet, dan sabun bayi yang dia pake dari SMP karena \"kulit gue sensitif, Ka, jangan ketawa\".",
+        "en": "I've been in here hundreds of times. It still smells the same, paper, instant coffee, and the baby soap she's used since middle school because \"my skin is sensitive, Ka, don't laugh\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bedanya, sekarang dinding di atas mejanya penuh. Peta, foto, kertas tempel, benang merah. Kayak kamar detektif di film murahan.",
+        "en": "The difference is the wall above her desk is covered now. Maps, photos, sticky notes, red string. Like a detective's room in a cheap movie."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Polisi udah ke sini Selasa. Lihat-lihat lima menit, foto-foto, terus pergi. Nggak ada yang dipindah.",
+        "en": "The police came on Tuesday. Looked around for five minutes, took photos, left. Nothing's been moved."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue tunggu di bawah. Gue... nggak kuat lama-lama di sini.",
+        "en": "I'll wait downstairs. I... can't stay in here too long."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "dinda",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "id": "room_look",
+      "text": {
+        "id": "Gue berdiri di tengah kamar. Dari mana mulainya?",
+        "en": "I stand in the middle of the room. Where do I start?"
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Periksa apa?",
+        "en": "Look at what?"
+      },
+      "variable": "ROOM",
+      "profile": "raka:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Meja kerjanya",
+            "en": "Her desk"
+          },
+          "once": true,
+          "effects": [
+            {
+              "variable": "room_looked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#desk"
+        },
+        {
+          "text": {
+            "id": "Papan gabus di dinding",
+            "en": "The corkboard on the wall"
+          },
+          "once": true,
+          "effects": [
+            {
+              "variable": "room_looked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#corkboard"
+        },
+        {
+          "text": {
+            "id": "Rak alat rekaman",
+            "en": "The recording gear shelf"
+          },
+          "once": true,
+          "effects": [
+            {
+              "variable": "room_looked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#shelf"
+        },
+        {
+          "text": {
+            "id": "Bingkai foto di samping kasur",
+            "en": "The photo frame by the bed"
+          },
+          "once": true,
+          "effects": [
+            {
+              "variable": "room_looked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#photo"
+        },
+        {
+          "text": {
+            "id": "Jendela",
+            "en": "The window"
+          },
+          "once": true,
+          "target": "#window"
+        },
+        {
+          "text": {
+            "id": "Cukup. Turun ke Dinda.",
+            "en": "That's enough. Go down to Dinda."
+          },
+          "condition": "room_looked >= 3",
+          "target": "#room_done"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "id": "desk",
+      "text": {
+        "id": "Mejanya berantakan dengan cara yang Sekar banget. Tumpukan print-an, tiga gelas kopi kosong, dan laptop yang kabelnya dicabut.",
+        "en": "The desk is a mess in a very Sekar way. Stacks of printouts, three empty coffee glasses, and a laptop with its charger unplugged."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di tengahnya, ada peta Teluk Jakarta ukuran A2. Patok-patok di laut ditandai spidol merah. Di sebelah tiap tanda, ada tanggal, dan inisial yang sama, \"PT. B\".",
+        "en": "In the middle is an A2 map of Jakarta Bay. The stakes in the sea are marked in red. Next to each mark is a date, and the same initials, \"PT. B\"."
+      },
+      "effects": [
+        {
+          "variable": "clue_stake_map",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ini bukan riset buat episode santai.",
+        "en": "This isn't research for a chill episode."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di bawah peta ada buku catatan bersampul kain. Halaman terakhirnya disobek, rapi, dekat jilidan.",
+        "en": "Under the map is a cloth-covered notebook. Its last page has been torn out, neatly, close to the binding."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Halaman terakhirnya hilang.",
+        "en": "The last page is gone."
+      },
+      "variable": "NOTEBOOK",
+      "profile": "raka:2",
+      "choices": [
+        {
+          "text": {
+            "id": "Gosok halaman berikutnya pakai pensil",
+            "en": "Rub the next page with a pencil"
+          },
+          "value": "rub"
+        },
+        {
+          "text": {
+            "id": "Tutup bukunya",
+            "en": "Close the notebook"
+          },
+          "value": "skip"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "NOTEBOOK == 'rub'",
+      "text": {
+        "id": "Trik lama dari komik detektif yang dia pinjemin pas SMA. Grafit pensil nempel di bekas tekanan pulpen.",
+        "en": "An old trick from the detective comics she lent me in high school. The pencil lead catches the dents left by her pen."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "NOTEBOOK == 'rub'",
+      "text": {
+        "id": "Kebanyakan nggak kebaca. Tapi satu baris muncul jelas di tengah, garis bawahnya dua kali.{w} \"...jangan percaya T...\"",
+        "en": "Most of it is unreadable. But one line comes through clearly in the middle, underlined twice.{w} \"...don't trust T...\""
+      }
+    },
+    {
+      "type": "SET",
+      "condition": "NOTEBOOK == 'rub'",
+      "effects": [
+        {
+          "variable": "clue_sekar_notebook",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "NOTEBOOK == 'rub'",
+      "text": {
+        "id": "T. Tasya? Partner podcastnya?",
+        "en": "T. Tasya? Her podcast partner?"
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "NOTEBOOK == 'skip'",
+      "text": {
+        "id": "Ini buku catatan Sekar. Rasanya kayak baca pikirannya tanpa izin.{w} Lagian, gue udah setahun nggak punya izin itu.",
+        "en": "It's Sekar's notebook. It feels like reading her mind without asking.{w} Besides, I haven't had that permission for a year."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#room_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "corkboard",
+      "text": {
+        "id": "Papan gabusnya penuh foto. Nelayan, ibu-ibu pengupas kerang, perahu-perahu kayu warna-warni di dermaga.",
+        "en": "The corkboard is full of photos. Fishermen, women shelling mussels, colorful wooden boats at the pier."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di pojok kanan bawah, ditempel pake push pin merah, ada jadwal kapal penumpang dari Kali Adem ke Pulau Pari. Jam lima tiga puluh pagi dilingkari pulpen. Dua kali.",
+        "en": "In the bottom right corner, held up with a red push pin, is the passenger ferry schedule from Kali Adem to Pulau Pari. The five-thirty morning departure is circled in pen. Twice."
+      },
+      "effects": [
+        {
+          "variable": "clue_ferry_schedule",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Setengah enam.{w} Kayak kapalnya Pak Karta, setahun lalu.",
+        "en": "Five thirty.{w} Like Pak Karta's boat, a year ago."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di sebelahnya ada foto Sekar dan cewek berambut cokelat panjang, dua-duanya pake headset, ketawa di depan mic. Di bawahnya ditulis, \"Suara Pesisir, Ep. 1. Kita & Tasya!!\"",
+        "en": "Next to it is a photo of Sekar and a girl with long brown hair, both in headsets, laughing in front of a mic. Underneath, it says, \"Suara Pesisir, Ep. 1. Us & Tasya!!\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#room_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "shelf",
+      "text": {
+        "id": "Rak alat rekamannya rapi, beda sama mejanya. Mic, stand, kabel-kabel yang digulung pake karet.",
+        "en": "Unlike the desk, her gear shelf is neat. Mics, stands, cables coiled with rubber bands."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ada satu kotak busa yang kosong. Bentuknya pas buat perekam genggam. Zoom H5, kalau gue nggak salah inget. Hadiah ulang tahun dari gue, waktu kita masih ngobrol.",
+        "en": "There's one empty foam case. It's shaped for a handheld recorder. A Zoom H5, if I remember right. A birthday present from me, back when we still talked."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Baterai cadangannya nggak ada. Kabelnya nggak ada. Headphone-nya juga nggak ada.",
+        "en": "The spare batteries are gone. The cable is gone. Her headphones are gone too."
+      },
+      "effects": [
+        {
+          "variable": "clue_missing_recorder",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia bawa semuanya. Orang yang kabur dari rumah nggak bawa alat kerja.{w} Dia lagi kerja.",
+        "en": "She took all of it. People running away from home don't pack their work gear.{w} She was working."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "#room_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "photo",
+      "text": {
+        "id": "Foto di bingkai itu gue kenal. Tanggul Pluit, tiga tahun lalu. Sekar ketawa, rambutnya berantakan kena angin. Gue di sebelahnya, setengah kepotong, lagi pura-pura nggak mau difoto.",
+        "en": "I know the photo in that frame. The Pluit seawall, three years ago. Sekar laughing, her hair a mess in the wind. Me next to her, half cut off, pretending I didn't want my picture taken."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue kira dia udah buang semua foto kita. Gue kira gue udah dibuang.",
+        "en": "I thought she'd thrown out every photo of us. I thought she'd thrown me out."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo nyimpen ini, Kar.",
+        "en": "You kept this, Kar."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "saw_old_photo",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#room_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "window",
+      "text": {
+        "id": "Dari jendela kelihatan kali yang item, atap-atap seng, dan di kejauhan, crane-crane proyek reklamasi yang berdiri kayak jerapah besi.",
+        "en": "The window looks out over the black canal, tin roofs, and in the distance, the cranes of the reclamation project, standing like iron giraffes."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar dulu bilang, tiap tahun crane-nya nambah satu, dan tiap tahun kapal di dermaga berkurang satu.",
+        "en": "Sekar used to say that every year there's one more crane, and every year there's one less boat at the pier."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#room_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "room_done",
+      "text": {
+        "id": "Gue turun. Tangganya bunyi lagi. Kali ini kedengeran kayak orang yang lagi ngomel.",
+        "en": "I go downstairs. The stairs creak again. This time it sounds like someone grumbling."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_phone"
+    }
+  ]
+}

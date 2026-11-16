@@ -1,0 +1,14 @@
+# Day 2: Grup Chat. M1 placeholder: Day 2 is written in M2, which replaces this stub and its ending.
+
+@conversation d2_stub chapter="Hari 2" chapter.en="Day 2" title="Grup Chat" title.en="Group Chat" checkpoint
+@scene VN bg=bg_sekar_living_day.webp music=bgm_quiet_house.mp3 day=2 time=07:00
+
+narration
+  id: Hari 2 belum ditulis. Ceritanya berlanjut di versi berikutnya.
+  en: Day 2 isn't written yet. The story continues in the next build.
+
+ending end_00_preview NORMAL
+  id: Bersambung
+  en: To Be Continued
+  summary id: Seseorang nggak mau Sekar ditemukan. Raka baru saja membuka HP-nya.
+  summary en: Someone doesn't want Sekar found. Raka has only just opened her phone.

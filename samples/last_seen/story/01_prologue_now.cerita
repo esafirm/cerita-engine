@@ -1,11 +1,80 @@
-# Prologue, present day: Dinda reaches Raka in Bandung.
+# Prologue, present day: Raka in Bandung, then Dinda reaches him.
 
-@conversation p_now chapter=Prolog chapter.en=Prologue title="Sekarang" title.en="Now" checkpoint
+@conversation p_bandung chapter=Prolog chapter.en=Prologue title="Sekarang" title.en="Now" checkpoint
+@scene VN bg=bg_raka_room_night.webp music=amb_room_night.mp3 day=0 time=02:02 textbox=nvl
+
+narration
+  id: Setahun kemudian. Bandung, jam dua pagi.
+  en: A year later. Bandung, two in the morning.
+narration
+  id: Kamar kos tiga kali empat. Kasur di lantai, rice cooker di pojok, dan laptop yang kipasnya bunyi kayak mau terbang.
+  en: A three-by-four rented room. A mattress on the floor, a rice cooker in the corner, and a laptop whose fan sounds like it's about to take off.
+narration
+  id: Kerjaan gue sekarang ngedit audio iklan. Suara orang senyum-senyum jualan asuransi. Gue potong napasnya, gue rapihin "eee"-nya, gue kirim. Lima puluh ribu per menit jadi.
+  en: These days I edit audio for ads. People smiling their way through insurance pitches. I cut their breaths, clean up their "umm"s, send it off. Fifty thousand rupiah per finished minute.
+narration
+  id: Kerjaannya rapi. Bosnya puas. Gue nggak pernah inget satu pun isinya.
+  en: The work is clean. The client's happy. I never remember a single word of it.
+
+stage
+  textbox adv
+
+narration
+  id: Di tab sebelah, kebuka dari tadi sore, ada satu hal yang gue nggak berani tutup.
+  en: In the next tab, open since this afternoon, is the one thing I can't bring myself to close.
+narration
+  id: "Suara Pesisir, Episode 11." Diunggah tiga minggu lalu. Empat ratus dua belas kali diputar.
+  en: "Suara Pesisir, Episode 11." Uploaded three weeks ago. Four hundred and twelve plays.
+narration
+  id: Pendengarnya udah dua kali lipat. Gue nggak tahu harus ngerasa apa soal itu.
+  en: Her listeners have doubled. I don't know how to feel about that.
+
+choice PLAY_EP by=raka:sad
+  id: Putar episodenya?
+  en: Play the episode?
+? Putar. | Play it.
+  value play
+? Tutup tabnya. Kali ini beneran. | Close the tab. For real this time.
+  value close
+
+narration [if PLAY_EP == 'close']
+  id: Kursor gue udah di tanda silang. Udah setahun kursor gue di situ.{w} Jari gue malah ngeklik tombol putar.
+  en: My cursor is already on the X. It's been there for a year.{w} My finger clicks play instead.
+
+sekar voice=vo_p_sekar_01.mp3
+  id: Halo, pendengar Suara Pesisir. Gue Sekar, dan ini episode sebelas. Malam ini kita ngobrol sama ibu-ibu pengupas kerang di Muara Angke.
+  en: Hi, Suara Pesisir listeners. I'm Sekar, and this is episode eleven. Tonight we're talking with the women who shell mussels in Muara Angke.
+  delivery: bright podcast intro, a little playful, recorded close to the mic
+sekar voice=vo_p_sekar_02.mp3
+  id: Mereka kerja dari subuh, tangannya penuh luka kecil, dan tiap tahun kerangnya makin sedikit. Kenapa? Nah. Itu yang mau kita cari tahu.
+  en: They work from before dawn, their hands covered in tiny cuts, and every year there are fewer mussels. Why? Well. That's what we're going to find out.
+  delivery: warm, then curious, leaning in on the question
+
+narration
+  id: Audionya bersih. Anginnya nggak bunyi kayak pesawat jatuh.{w} Siapa pun yang ngedit sekarang, dia lebih rajin dari gue.
+  en: The audio is clean. The wind doesn't sound like a plane crash.{w} Whoever edits it now is more careful than I ever was.
+
+sekar voice=vo_p_sekar_03.mp3
+  id: Oh iya. Episode dua belas lagi gue garap. Yang ini... beda. Doain ya.
+  en: Oh, and. I'm working on episode twelve. This one is... different. Wish me luck.
+  delivery: the playfulness drops, quieter, almost nervous
+
+stage
+  sound sfx_msg_receive.mp3
+
+narration
+  id: HP gue bunyi. Jam dua lewat empat belas.{w} Nggak ada yang ngechat gue jam segini. Nggak ada yang ngechat gue, titik.
+  en: My phone buzzes. Fourteen minutes past two.{w} Nobody texts me at this hour. Nobody texts me, period.
+
+-> p_now
+
+
+@conversation p_now chapter=Prolog chapter.en=Prologue title="Pesan Masuk" title.en="Incoming"
 @scene CHAT channel=thread_dinda day=0 time=02:14 music=amb_room_night.mp3
 
 timestamp
-  id: Setahun kemudian · Bandung, 02.14
-  en: A year later · Bandung, 2:14 AM
+  id: Bandung, 02.14
+  en: Bandung, 2:14 AM
 system
   id: Nomor ini menyimpan kontak kamu sebagai "Raka (temen Kak Sekar)"
   en: This number saved you as "Raka (Sekar's friend)"
@@ -47,7 +116,7 @@ dinda typing=2.2s sfx=sfx_msg_receive.mp3
 
 
 @conversation p_call chapter=Prolog chapter.en=Prologue title="Telepon Dinda" title.en="Dinda's Call"
-@scene CALL channel=thread_dinda day=0 time=02:17 bg=bg_raka_room_night.png music=amb_room_night.mp3
+@scene CALL channel=thread_dinda day=0 time=02:17 bg=bg_raka_room_night.webp music=amb_room_night.mp3
 
 system sfx=sfx_phone_ring.mp3
   id: Dinda memanggil…
@@ -152,12 +221,14 @@ system
 dinda typing=2s sfx=sfx_msg_receive.mp3
   id: Jl. Pluit Karang Indah 7 no. 12
   en: Jl. Pluit Karang Indah 7 no. 12
-media IMAGE photo_unsent_message.png by=dinda unlock=photo_unsent_message typing=2.4s sfx=sfx_msg_receive.mp3
+media IMAGE photo_unsent_message.webp by=dinda unlock=photo_unsent_message typing=2.4s sfx=sfx_msg_receive.mp3
   id: ini screenshot dari HP cadangannya
   en: screenshot from her spare phone
-media IMAGE photo_ep12_teaser.png by=dinda unlock=photo_ep12_teaser typing=2.8s sfx=sfx_msg_receive.mp3
+  clue unsent_message
+media IMAGE photo_ep12_teaser.webp by=dinda unlock=photo_ep12_teaser typing=2.8s sfx=sfx_msg_receive.mp3
   id: postingan terakhir dia. 3 hari sebelum ilang
   en: her last post. 3 days before she vanished
+  clue ep12_teaser
 dinda:hopeful typing=1.6s sfx=sfx_msg_receive.mp3 [if trust_dinda >= 5]
   id: makasih ka
   en: thanks ka

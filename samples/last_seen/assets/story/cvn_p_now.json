@@ -5,10 +5,9 @@
     "en": "Prologue"
   },
   "title": {
-    "id": "Sekarang",
-    "en": "Now"
+    "id": "Pesan Masuk",
+    "en": "Incoming"
   },
-  "checkpoint": true,
   "scene": {
     "mode": "CHAT",
     "channel_id": "thread_dinda",
@@ -21,8 +20,8 @@
       "type": "NARRATION",
       "style": "timestamp",
       "text": {
-        "id": "Setahun kemudian · Bandung, 02.14",
-        "en": "A year later · Bandung, 2:14 AM"
+        "id": "Bandung, 02.14",
+        "en": "Bandung, 2:14 AM"
       }
     },
     {

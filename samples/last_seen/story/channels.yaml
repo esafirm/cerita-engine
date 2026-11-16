@@ -2,12 +2,25 @@
 
 thread_sekar:
   name: Sekar
-  avatar: assets/story/sprites/sekar_avatar.png
+  avatar: assets/story/sprites/sekar_avatar.webp
   status: { id: terakhir dilihat Sabtu 06.12, en: last seen Saturday 6:12 AM }
   members: [sekar]
 
 thread_dinda:
   name: Dinda
-  avatar: assets/story/sprites/dinda_avatar.png
+  avatar: assets/story/sprites/dinda_avatar.webp
   status: online
   members: [dinda]
+
+thread_wulan:
+  name: Bu Wulan
+  avatar: assets/story/sprites/wulan_avatar.webp
+  status: { id: terakhir dilihat baru saja, en: last seen just now }
+  members: [wulan]
+
+# On Sekar's spare phone.
+thread_unknown:
+  name: "+62 812-9047-xxxx"
+  avatar: assets/story/sprites/unknown_avatar.webp
+  status: online
+  members: [unknown]

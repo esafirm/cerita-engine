@@ -2,7 +2,7 @@
 # Budget: 1.5k Indonesian words, about 10 minutes.
 
 @conversation index chapter=Prolog chapter.en=Prologue title="Setahun Lalu" title.en="A Year Ago" checkpoint
-@scene VN bg=bg_seawall_night.png music=bgm_low_tide.mp3 ambience=amb_sea_night.mp3 day=0 time=21:40 textbox=nvl
+@scene VN bg=bg_seawall_night.webp music=bgm_low_tide.mp3 ambience=amb_sea_night.mp3 day=0 time=21:40 textbox=nvl
 
 narration
   id: Tanggul Pluit. Setahun yang lalu.
@@ -31,6 +31,37 @@ raka:smirk [left]
 sekar:smile
   id: Muka lo udah ngomong dari tadi, Ka.
   en: Your face has been talking the whole time, Ka.
+raka:smirk
+  id: Muka gue emang begini dari lahir.
+  en: My face has looked like this since birth.
+sekar:laugh
+  id: Iya, dan dari lahir juga lo nyebelin.
+  en: Yeah, and you've been annoying since birth too.
+
+narration
+  id: Gue naik ke tembok dan duduk di sebelahnya, agak jauh dari pinggir. Gue nggak pernah suka ketinggian. Dia tahu, makanya dia selalu ngajak ke sini.
+  en: I climb up and sit next to her, a little further from the edge. I've never liked heights. She knows, which is why she always drags me here.
+narration
+  id: Kita kenal dari SMA. Dia yang pertama nyapa, di hari pertama, karena gue satu-satunya anak yang bawa headphone segede helm.
+  en: We met in high school. She talked to me first, on the first day, because I was the only kid with headphones the size of a helmet.
+narration
+  id: Lima tahun kemudian, dia punya podcast dengan dua ratus pendengar, dan gue tukang edit suaranya yang nggak pernah dibayar.
+  en: Five years later, she has a podcast with two hundred listeners, and I'm the unpaid guy who cleans up its audio.
+
+choice BANTER by=sekar:smile
+  id: Sekar nyenggol bahu lo.
+  en: Sekar bumps your shoulder.
+? "Oke. Gue dengerin." | "Okay. I'm listening."
+  value listen
+? "Dua ratus pendengar, Kar. Sembilan puluhnya bokap lo." | "Two hundred listeners, Kar. Ninety of them are your dad."
+  value tease
+
+sekar:laugh [if BANTER == 'tease']
+  id: Bokap gue cuma satu orang, ya. Walaupun dia punya tiga akun.
+  en: My dad is one person, thank you. Even if he has three accounts.
+sekar:smile [if BANTER == 'listen']
+  id: Tumben. Catet tanggalnya.
+  en: That's a first. Write down the date.
 
 narration
   id: Dia nyodorin HP-nya. Di layar, gelombang suara dari rekaman yang dia ambil sore tadi di Muara Angke.
@@ -201,4 +232,4 @@ system
   id: Sekar terakhir dilihat Sabtu 06.12
   en: Sekar was last seen Saturday 6:12 AM
 
--> p_now
+-> p_bandung

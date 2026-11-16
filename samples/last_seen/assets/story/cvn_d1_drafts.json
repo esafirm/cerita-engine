@@ -1,0 +1,183 @@
+{
+  "conversation_id": "cvn_d1_drafts",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Draf",
+    "en": "Drafts"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "16:45",
+    "background": "bg_sekar_living_dusk.webp",
+    "music": "bgm_unsent.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "center"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sore. HP-nya udah tujuh puluh persen. Dinda ketiduran di sofa, akhirnya, dengan buku kuliah kebuka di dadanya.",
+        "en": "Late afternoon. The phone is at seventy percent. Dinda has finally fallen asleep on the sofa, a textbook open on her chest."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue belum buka grup, belum buka chat Bima atau Tasya. Ada satu hal yang harus gue lihat duluan, sebelum gue bisa mikir jernih soal yang lain.",
+        "en": "I haven't opened the group, or Bima's chat, or Tasya's. There's one thing I have to see first, before I can think straight about anything else."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Chat atas nama gue.",
+        "en": "The chat with my name on it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Isinya bukan cuma satu pesan gagal kirim. Di atasnya, ada puluhan pesan yang nggak pernah dikirim sama sekali. Masih draf. Tanggalnya macem-macem, sepanjang setahun.",
+        "en": "It's not just one failed message. Above it are dozens of messages that were never sent at all. Still drafts. All different dates, spread across the year."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "center"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Maret. \"gue denger lo di bandung. dingin ga\"",
+        "en": "March. \"heard you're in bandung. is it cold\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Juni. \"ep 9 tayang. editornya baru. dia ga sebawel lo soal noise. gue kangen dibawelin\"",
+        "en": "June. \"ep 9 is out. new editor. he doesn't nag about noise like you did. i miss being nagged\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Agustus. \"ka gue takut\"",
+        "en": "August. \"ka i'm scared\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Yang Agustus nggak ada lanjutannya.",
+        "en": "The August one doesn't go any further."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kenapa nggak lo kirim, Kar.{w} ...Kenapa gue nggak pernah nanya.",
+        "en": "Why didn't you send it, Kar.{w} ...Why didn't I ever ask."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Paling bawah, sebelum pesan yang gagal itu, ada satu voice note yang juga belum kekirim. Durasinya empat puluh dua detik.",
+        "en": "At the very bottom, before the failed message, there's a voice note that was never sent either. Forty-two seconds long."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dengerin?",
+        "en": "Listen to it?"
+      },
+      "variable": "PLAY_VN",
+      "profile": "raka:5",
+      "choices": [
+        {
+          "text": {
+            "id": "Putar.",
+            "en": "Play it."
+          },
+          "value": "play"
+        },
+        {
+          "text": {
+            "id": "Belum sanggup. Nanti.",
+            "en": "Not ready. Later."
+          },
+          "value": "later"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_VN == 'play'",
+      "text": {
+        "id": "Ka. Ini konyol, gue ngomong ke HP yang nggak bakal ngirim apa-apa. Tapi gue butuh ngomong ke seseorang yang bukan Tasya, bukan Bima.",
+        "en": "Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima."
+      },
+      "profile": "sekar:0",
+      "voice": "vo_unsent_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_VN == 'play'",
+      "text": {
+        "id": "Gue nemu sesuatu. Sesuatu yang gede. Dan gue rasa ada yang ngebocorin kalau gue punya itu.{w} Kalau gue ngilang, lo tahu harus mulai dari mana.",
+        "en": "I found something. Something big. And I think someone leaked that I have it.{w} If I disappear, you'll know where to start."
+      },
+      "profile": "sekar:0",
+      "voice": "vo_unsent_02.mp3"
+    },
+    {
+      "type": "SET",
+      "condition": "PLAY_VN == 'play'",
+      "effects": [
+        {
+          "variable": "heard_unsent_01",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "heard_unsent_01",
+          "op": "meta_set"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "PLAY_VN == 'later'",
+      "text": {
+        "id": "Gue kunci layarnya. Empat puluh dua detik. Gue udah setahun nggak denger suaranya langsung ke gue. Empat puluh dua detik lagi bisa nunggu sampai gue siap.",
+        "en": "I lock the screen. Forty-two seconds. I haven't heard her voice talking to me in a year. Forty-two more seconds can wait until I'm ready."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_roof"
+    }
+  ]
+}

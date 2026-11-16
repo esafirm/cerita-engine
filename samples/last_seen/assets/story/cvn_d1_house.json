@@ -12,37 +12,333 @@
   "scene": {
     "mode": "VN",
     "day": 1,
-    "time": "07:30",
-    "background": "bg_sekar_house_day.png",
-    "music": "bgm_low_tide.mp3"
+    "time": "07:40",
+    "background": "bg_sekar_house_day.webp",
+    "music": "bgm_quiet_house.mp3",
+    "ambience": "amb_kampung_day.mp3",
+    "textbox": "nvl"
   },
   "conversations": [
     {
       "type": "NARRATION",
       "text": {
-        "id": "Pluit, pagi. Rumah keluarga Sekar sepi kayak lagi nahan napas juga.",
-        "en": "Pluit, morning. Sekar's family home is quiet, like it's holding its breath too."
+        "id": "Hari 1. Pluit, jam tujuh lewat empat puluh.",
+        "en": "Day 1. Pluit, twenty to eight in the morning."
       }
     },
     {
       "type": "NARRATION",
       "text": {
-        "id": "Hari 1 belum ditulis. Ceritanya berlanjut di versi berikutnya.",
-        "en": "Day 1 isn't written yet. The story continues in the next build."
+        "id": "Travel pertama dari Bandung nurunin gue di Grogol jam enam. Ojek dari sana muter-muter lewat jalan inspeksi kali, yang baunya masih sama kayak setahun lalu. Lumpur, solar, dan ikan asin yang dijemur di atas seng.",
+        "en": "The first shuttle from Bandung dropped me in Grogol at six. The bike taxi from there wound along the canal road, which smells exactly like it did a year ago. Mud, diesel, and salted fish drying on tin roofs."
       }
     },
     {
-      "type": "ENDING",
-      "ending_id": "end_00_preview",
-      "title": {
-        "id": "Bersambung",
-        "en": "To Be Continued"
-      },
-      "category": "NORMAL",
-      "summary": {
-        "id": "Raka sampai di Jakarta. Pencarian Sekar baru dimulai.",
-        "en": "Raka reaches Jakarta. The search for Sekar has only begun."
+      "type": "NARRATION",
+      "text": {
+        "id": "Rumah Sekar ada di ujung gang, dua lantai, cat hijau pucat yang udah ngelupas di bagian bawah. Bekas banjir tahun lalu masih kelihatan kayak garis pensil di tembok.",
+        "en": "Sekar's house is at the end of an alley, two floors, pale green paint peeling near the bottom. Last year's flood line is still on the wall like a pencil mark."
       }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Motor matic-nya parkir di carport. Ada debu tipis di joknya. Tiga hari nggak disentuh.",
+        "en": "Her scooter is parked in the carport. There's a thin layer of dust on the seat. Three days untouched."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "sound",
+          "file": "sfx_gate.mp3"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right",
+          "transition": "slide_left",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_dinda >= 5",
+      "text": {
+        "id": "Ka. Lo beneran dateng.",
+        "en": "Ka. You actually came."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_dinda < 5",
+      "text": {
+        "id": "Oh. Dateng juga.",
+        "en": "Oh. You came after all."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:2",
+          "position": "left",
+          "transition": "slide_right",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Hai, Din.",
+        "en": "Hey, Din."
+      },
+      "profile": "raka:2",
+      "position": "left"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Terakhir gue lihat Dinda, dia masih pake seragam SMA dan nyebut gue \"Kak Raka\" dengan nada ngeledek. Sekarang rambutnya dipotong pendek, matanya merah, dan dia pake sweater kampus yang kegedean, kayaknya punya Sekar.",
+        "en": "The last time I saw Dinda, she was still in a high school uniform and called me \"Kak Raka\" in a mocking voice. Now her hair is cut short, her eyes are red, and she's wearing an oversized campus sweater that I'm pretty sure is Sekar's."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Masuk. Ibu lagi di kamar. Dari Senin Ibu nggak keluar kecuali buat salat.",
+        "en": "Come in. Mom's in her room. Since Monday she only comes out to pray."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan ketok pintunya, ya. Nanti Ibu yang nyari lo sendiri kalau udah siap.",
+        "en": "Don't knock on her door, okay? She'll come find you herself when she's ready."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "background",
+          "image": "bg_sekar_living_day.webp",
+          "transition": "fade",
+          "duration_ms": 800
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ruang tamunya kecil dan rapi. Terlalu rapi. Kayak ada yang ngebersihin terus karena nggak tahu harus ngapain lagi.",
+        "en": "The living room is small and tidy. Too tidy. Like someone keeps cleaning because they don't know what else to do."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di dinding ada foto keluarga. Sekar umur sepuluh, giginya ompong, megang ikan yang lebih gede dari kepalanya.",
+        "en": "There's a family photo on the wall. Sekar at ten, missing a tooth, holding a fish bigger than her head."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda duduk di lengan sofa, nunggu lo ngomong duluan.",
+        "en": "Dinda perches on the arm of the sofa, waiting for you to talk first."
+      },
+      "variable": "ASK_FIRST",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Ceritain dari awal. Senin malem.",
+            "en": "Tell me from the start. Monday night."
+          },
+          "value": "timeline",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Lo udah tidur belum, Din?",
+            "en": "Have you slept at all, Din?"
+          },
+          "value": "care",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Gue cuma bisa sehari-dua hari di sini.",
+            "en": "I can only stay a day or two."
+          },
+          "value": "hedge",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "ASK_FIRST == 'care'",
+      "text": {
+        "id": "...Dua jam, mungkin. Nggak penting. Nanti aja tidurnya.",
+        "en": "...Two hours, maybe. Doesn't matter. I'll sleep later."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ASK_FIRST == 'hedge'",
+      "text": {
+        "id": "Oke. Makasih udah bilang dari awal. Kak Sekar dulu bilang lo selalu udah pegang tiket pulang bahkan sebelum dateng.",
+        "en": "Okay. Thanks for saying it up front. Sekar used to say you always had a ticket home before you'd even arrived."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ASK_FIRST == 'hedge'",
+      "text": {
+        "id": "...",
+        "en": "..."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin, jam sembilan malem. Kak Sekar pamit, katanya mau rekaman. Nggak bawa motor. Katanya dijemput.",
+        "en": "Monday, nine at night. Sekar said bye, said she was going out to record. She didn't take the scooter. She said someone was picking her up."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dijemput siapa?",
+        "en": "Picked up by who?"
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nggak bilang. Gue juga nggak nanya. Gue lagi ngerjain tugas, pake headphone.{w} Gue cuma bilang \"hati-hati\" tanpa noleh.",
+        "en": "She didn't say. I didn't ask. I was doing an assignment with my headphones on.{w} I just said \"be careful\" without looking up."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu yang terakhir.",
+        "en": "That was the last thing."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 1200
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "HP utamanya mati jam sepuluh empat puluh. Kata polisi, sinyal terakhirnya di sekitar Muara Angke.",
+        "en": "Her main phone went dead at ten forty. The police say its last signal was near Muara Angke."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "HP cadangannya ketinggalan di laci. Baterainya habis. Kemarin gue cas, terus nyala, terus muncul notif itu.",
+        "en": "Her spare phone was left in a drawer. Dead battery. Yesterday I charged it, it turned on, and then that notification popped up."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Pesan gagal terkirim. Kuota habis.\" Pesannya ditulis Senin, jam delapan lewat lima puluh. Sepuluh menit sebelum dia pergi.",
+        "en": "\"Message failed to send. Out of data.\" It was written Monday, at eight fifty. Ten minutes before she left."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia nulis itu buat gue... sebelum pergi.",
+        "en": "She wrote it to me... before she left."
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Iya. Dan HP-nya dikunci. Gue cuma bisa lihat potongan notifnya. Gue udah coba tanggal lahir, nomor rumah, semuanya. Nggak bisa.",
+        "en": "Yeah. And the phone's locked. I could only see the notification preview. I've tried birthdays, the house number, everything. Nothing works."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Makanya lo di sini. Kalau ada yang bisa nebak isi kepala Kak Sekar, itu lo.",
+        "en": "That's why you're here. If anyone can guess what's in Sekar's head, it's you."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu dulu, Din.",
+        "en": "That was a long time ago, Din."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Setahun bukan \"dulu\". Ayo, ke kamarnya.",
+        "en": "A year isn't \"a long time ago\". Come on. Her room."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_room"
     }
   ]
 }

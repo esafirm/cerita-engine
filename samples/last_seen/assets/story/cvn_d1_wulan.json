@@ -1,0 +1,152 @@
+{
+  "conversation_id": "cvn_d1_wulan",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Pesan dari Ibu",
+    "en": "A Message from Her Mother"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_wulan",
+    "day": 1,
+    "time": "21:12",
+    "music": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Hari 1, 21.12",
+        "en": "Day 1, 9:12 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nak Raka, ini Tante Wulan, ibunya Sekar. Nomornya Tante dapat dari Dinda.",
+        "en": "Raka dear, this is Auntie Wulan, Sekar's mother. Dinda gave me your number."
+      },
+      "profile": "wulan",
+      "typing_delay_ms": 4500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Maaf Tante belum bisa keluar kamar. Tante dengar suaramu dari tadi siang. Terima kasih sudah datang jauh-jauh.",
+        "en": "I'm sorry I haven't been able to leave my room. I've heard your voice since this afternoon. Thank you for coming all this way."
+      },
+      "profile": "wulan",
+      "typing_delay_ms": 5200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sekar dulu sering cerita soal kamu. Setahun ini juga. Dia bilang, \"Raka itu kalau takut suka lari, Bu. Tapi dia selalu balik.\"",
+        "en": "Sekar used to talk about you a lot. This past year too. She said, \"Raka runs when he's scared, Mom. But he always comes back.\""
+      },
+      "profile": "wulan",
+      "typing_delay_ms": 6000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Balas Bu Wulan.",
+        "en": "Reply to Mrs. Wulan."
+      },
+      "variable": "WULAN_REPLY",
+      "profile": "wulan",
+      "choices": [
+        {
+          "text": {
+            "id": "Saya bakal cari Sekar sampai ketemu, Tante.",
+            "en": "I'll keep looking for Sekar until I find her, Auntie."
+          },
+          "value": "promise",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            },
+            {
+              "variable": "promised_wulan",
+              "op": "meta_set"
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Maaf saya baru dateng sekarang, Tante.",
+            "en": "I'm sorry it took me this long to come, Auntie."
+          },
+          "value": "sorry"
+        },
+        {
+          "text": {
+            "id": "Tante istirahat dulu. Dinda biar saya yang temenin.",
+            "en": "Please get some rest, Auntie. I'll keep Dinda company."
+          },
+          "value": "care",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "WULAN_REPLY == 'promise'",
+      "text": {
+        "id": "Saya bakal cari Sekar sampai ketemu, Tante.",
+        "en": "I'll keep looking for Sekar until I find her, Auntie."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "WULAN_REPLY == 'sorry'",
+      "text": {
+        "id": "Maaf saya baru dateng sekarang, Tante.",
+        "en": "I'm sorry it took me this long to come, Auntie."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "WULAN_REPLY == 'care'",
+      "text": {
+        "id": "Tante istirahat dulu. Dinda biar saya yang temenin.",
+        "en": "Please get some rest, Auntie. I'll keep Dinda company."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tante titip Dinda ya, Nak. Dia sok kuat, sama kayak kakaknya.",
+        "en": "Please look after Dinda for me. She pretends to be strong, just like her sister."
+      },
+      "profile": "wulan",
+      "typing_delay_ms": 3200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_night"
+    }
+  ]
+}

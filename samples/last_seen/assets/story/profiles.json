@@ -4,15 +4,15 @@
       "id": "raka",
       "name": "Raka",
       "handle": "@rakapradipta",
-      "avatar": "assets/story/sprites/raka_avatar.png",
+      "avatar": "assets/story/sprites/raka_avatar.webp",
       "sprites": [
-        "raka_neutral.png",
-        "raka_smirk.png",
-        "raka_worried.png",
-        "raka_angry.png",
-        "raka_shocked.png",
-        "raka_sad.png",
-        "raka_determined.png"
+        "raka_neutral.webp",
+        "raka_smirk.webp",
+        "raka_worried.webp",
+        "raka_angry.webp",
+        "raka_shocked.webp",
+        "raka_sad.webp",
+        "raka_determined.webp"
       ]
     },
     {
@@ -23,86 +23,86 @@
         "id": "Suara dari pesisir utara. Ep. 12 segera.",
         "en": "Voices from the north coast. Ep. 12 soon."
       },
-      "avatar": "assets/story/sprites/sekar_avatar.png",
+      "avatar": "assets/story/sprites/sekar_avatar.webp",
       "sprites": [
-        "sekar_neutral.png",
-        "sekar_smile.png",
-        "sekar_laugh.png",
-        "sekar_serious.png",
-        "sekar_scared.png",
-        "sekar_tired.png"
+        "sekar_neutral.webp",
+        "sekar_smile.webp",
+        "sekar_laugh.webp",
+        "sekar_serious.webp",
+        "sekar_scared.webp",
+        "sekar_tired.webp"
       ]
     },
     {
       "id": "dinda",
       "name": "Dinda",
       "handle": "@dindaaa",
-      "avatar": "assets/story/sprites/dinda_avatar.png",
+      "avatar": "assets/story/sprites/dinda_avatar.webp",
       "sprites": [
-        "dinda_neutral.png",
-        "dinda_smile.png",
-        "dinda_crying.png",
-        "dinda_angry.png",
-        "dinda_hopeful.png"
+        "dinda_neutral.webp",
+        "dinda_smile.webp",
+        "dinda_crying.webp",
+        "dinda_angry.webp",
+        "dinda_hopeful.webp"
       ]
     },
     {
       "id": "tasya",
       "name": "Tasya",
-      "avatar": "assets/story/sprites/tasya_avatar.png",
+      "avatar": "assets/story/sprites/tasya_avatar.webp",
       "sprites": [
-        "tasya_neutral.png",
-        "tasya_smile.png",
-        "tasya_nervous.png",
-        "tasya_defensive.png",
-        "tasya_guilty.png",
-        "tasya_crying.png"
+        "tasya_neutral.webp",
+        "tasya_smile.webp",
+        "tasya_nervous.webp",
+        "tasya_defensive.webp",
+        "tasya_guilty.webp",
+        "tasya_crying.webp"
       ]
     },
     {
       "id": "bima",
       "name": "Bima",
-      "avatar": "assets/story/sprites/bima_avatar.png",
+      "avatar": "assets/story/sprites/bima_avatar.webp",
       "sprites": [
-        "bima_neutral.png",
-        "bima_charming.png",
-        "bima_irritated.png",
-        "bima_panicked.png",
-        "bima_ashamed.png"
+        "bima_neutral.webp",
+        "bima_charming.webp",
+        "bima_irritated.webp",
+        "bima_panicked.webp",
+        "bima_ashamed.webp"
       ]
     },
     {
       "id": "hendra",
       "name": "Pak Hendra",
-      "avatar": "assets/story/sprites/hendra_avatar.png",
+      "avatar": "assets/story/sprites/hendra_avatar.webp",
       "sprites": [
-        "hendra_neutral.png",
-        "hendra_gruff.png",
-        "hendra_wary.png",
-        "hendra_kind.png",
-        "hendra_worried.png"
+        "hendra_neutral.webp",
+        "hendra_gruff.webp",
+        "hendra_wary.webp",
+        "hendra_kind.webp",
+        "hendra_worried.webp"
       ]
     },
     {
       "id": "yusuf",
       "name": "Ipda Yusuf",
-      "avatar": "assets/story/sprites/yusuf_avatar.png",
+      "avatar": "assets/story/sprites/yusuf_avatar.webp",
       "sprites": [
-        "yusuf_neutral.png",
-        "yusuf_polite.png",
-        "yusuf_stern.png",
-        "yusuf_conflicted.png"
+        "yusuf_neutral.webp",
+        "yusuf_polite.webp",
+        "yusuf_stern.webp",
+        "yusuf_conflicted.webp"
       ]
     },
     {
       "id": "wulan",
       "name": "Bu Wulan",
-      "avatar": "assets/story/sprites/wulan_avatar.png"
+      "avatar": "assets/story/sprites/wulan_avatar.webp"
     },
     {
       "id": "didit",
       "name": "Didit",
-      "avatar": "assets/story/sprites/didit_avatar.png"
+      "avatar": "assets/story/sprites/didit_avatar.webp"
     },
     {
       "id": "unknown",
@@ -110,7 +110,7 @@
         "id": "Nomor Tak Dikenal",
         "en": "Unknown Number"
       },
-      "avatar": "assets/story/sprites/unknown_avatar.png"
+      "avatar": "assets/story/sprites/unknown_avatar.webp"
     }
   ]
 }
