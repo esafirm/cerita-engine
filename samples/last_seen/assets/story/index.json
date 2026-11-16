@@ -1,0 +1,402 @@
+{
+  "conversation_id": "cvn_index",
+  "source_locale": "id",
+  "locales": [
+    "id",
+    "en"
+  ],
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Setahun Lalu",
+    "en": "A Year Ago"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 0,
+    "time": "21:40",
+    "background": "bg_seawall_night.png",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_sea_night.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tanggul Pluit. Setahun yang lalu.",
+        "en": "The Pluit seawall. A year ago."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dari atas sini, Jakarta kelihatan kayak orang yang lagi nahan napas.{w} Gedung-gedung nyala di belakang, laut hitam di depan, dan tembok beton di tengah-tengahnya.",
+        "en": "From up here, Jakarta looks like it's holding its breath.{w} Towers lit up behind us, black sea in front, and a concrete wall in between."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar duduk di atas tembok itu, kaki menggantung ke sisi laut, seolah jatuh itu sesuatu yang cuma terjadi ke orang lain.",
+        "en": "Sekar sits on top of that wall, legs dangling over the sea side, like falling is something that only happens to other people."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue berdiri di belakangnya, megangin dua gelas es teh plastik yang udah mulai keringetan.",
+        "en": "I'm standing behind her, holding two plastic cups of iced tea that have started to sweat."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "sekar:2",
+          "position": "right",
+          "transition": "slide_left",
+          "duration_ms": 600
+        },
+        {
+          "action": "show",
+          "profile": "raka:1",
+          "position": "left",
+          "transition": "slide_right",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dengerin dulu. Serius, dengerin sampai habis, baru boleh ngeledek.",
+        "en": "Just listen. Seriously, hear the whole thing first, then you can make fun of me."
+      },
+      "profile": "sekar:2",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue belum ngomong apa-apa.",
+        "en": "I haven't said anything."
+      },
+      "profile": "raka:1",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Muka lo udah ngomong dari tadi, Ka.",
+        "en": "Your face has been talking the whole time, Ka."
+      },
+      "profile": "sekar:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia nyodorin HP-nya. Di layar, gelombang suara dari rekaman yang dia ambil sore tadi di Muara Angke.",
+        "en": "She holds out her phone. On the screen, the waveform of a recording she made this afternoon in Muara Angke."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Karta. Nelayan, udah tiga puluh tahun melaut dari dermaga yang sama. Katanya, dulu dari sini sampai Pulau Pari airnya masih bisa buat ngaca.",
+        "en": "Pak Karta. A fisherman, thirty years out of the same pier. He says that from here to Pulau Pari, the water used to be clear enough to see your face in."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sekarang ada patok-patok di tengah laut. Ada yang bilang itu buat pulau baru. Nggak ada yang pernah nanya ke nelayan.",
+        "en": "Now there are stakes driven into the open water. Some people say it's for a new island. Nobody ever asked the fishermen."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Terus?",
+        "en": "And?"
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Terus gue mau bikin satu episode penuh soal itu. Bukan obrolan santai kayak biasanya. Yang beneran. Wawancara, data, peta.",
+        "en": "And I want to do a whole episode on it. Not the usual chill chat. A real one. Interviews, data, maps."
+      },
+      "profile": "sekar:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dan gue butuh orang yang bisa ngedit audio tanpa bikin suara angin kayak pesawat jatuh.",
+        "en": "And I need someone who can edit audio without making the wind sound like a plane crash."
+      },
+      "profile": "sekar:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia nengok ke gue. Matanya nyala kayak tiap kali dia nemu ide yang terlalu besar buat dia sendiri.",
+        "en": "She turns to look at me. Her eyes light up the way they always do when she finds an idea too big for one person."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sabtu ini. Jam lima pagi, di dermaga Muara Angke. Kapalnya Pak Karta berangkat jam setengah enam. Lo ikut, kan?",
+        "en": "This Saturday. Five in the morning, at the Muara Angke pier. Pak Karta's boat leaves at five thirty. You're coming, right?"
+      },
+      "profile": "sekar:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ini saatnya ngomong. Gue udah nunda dua minggu.",
+        "en": "This is when I tell her. I've put it off for two weeks."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kar.{w} Gue keterima kerja. Di Bandung.",
+        "en": "Kar.{w} I got a job. In Bandung."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Oh. Wah. Itu bagus, kan? Kapan mulai?",
+        "en": "...Oh. Wow. That's good, right? When do you start?"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin. Gue berangkat Minggu pagi.",
+        "en": "Monday. I leave Sunday morning."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "music",
+          "file": null,
+          "fade_ms": 2000
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Minggu ini?",
+        "en": "This Sunday?"
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Iya.",
+        "en": "Yeah."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo udah tahu dari kapan?",
+        "en": "How long have you known?"
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak jawab. Itu udah jawaban.",
+        "en": "I don't answer. That's an answer."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dua minggu? Tiga? Kita ketemu tiap hari, Ka. Tiap. Hari.",
+        "en": "Two weeks? Three? We see each other every day, Ka. Every. Day."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ya karena gue tahu bakal kayak gini.",
+        "en": "Because I knew it would go like this."
+      },
+      "profile": "raka:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kayak gimana? Gue nanya, lo jawab. Itu namanya ngobrol.",
+        "en": "Like what? I ask, you answer. That's called talking."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo selalu gitu. Kalau ada yang berat, lo diem, terus tiba-tiba lo udah pergi. Kayak waktu bokap lo. Kayak waktu kuliah.",
+        "en": "You always do this. When something gets heavy, you go quiet, and then suddenly you're gone. Like with your dad. Like with college."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "shake",
+          "intensity": 4
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan bawa-bawa bokap gue.",
+        "en": "Leave my dad out of this."
+      },
+      "profile": "raka:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oke. Terus Sabtu? Lo masih bisa ikut Sabtu. Satu hari. Abis itu lo bebas ke mana aja.",
+        "en": "Fine. So, Saturday? You can still come on Saturday. One day. Then you can go wherever you want."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Sekar nungguin jawaban.",
+        "en": "Sekar is waiting for an answer."
+      },
+      "variable": "FALLOUT",
+      "profile": "sekar:3",
+      "timeout_ms": 12000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "\"Lo bukan jurnalis, Kar. Lo cuma punya mic.\"",
+            "en": "\"You're not a journalist, Kar. You just own a mic.\""
+          },
+          "value": "cruel"
+        },
+        {
+          "text": {
+            "id": "\"Nggak semua orang bisa hidup dari mimpi.\"",
+            "en": "\"Not everyone gets to live on dreams.\""
+          },
+          "value": "cold"
+        },
+        {
+          "text": {
+            "id": "(Nggak usah jawab.)",
+            "en": "(Don't answer.)"
+          },
+          "value": "silent"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'cruel'",
+      "text": {
+        "id": "...",
+        "en": "..."
+      },
+      "profile": "sekar:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'cruel'",
+      "text": {
+        "id": "Wow. Oke. Seenggaknya sekarang gue tahu lo mikir apa selama ini.",
+        "en": "Wow. Okay. At least now I know what you've been thinking all this time."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'cold'",
+      "text": {
+        "id": "Mimpi. Iya. Pak Karta juga mimpi, kali ya. Mimpi lautnya balik.",
+        "en": "Dreams. Right. I guess Pak Karta's dreaming too. Dreaming his sea comes back."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'silent'",
+      "text": {
+        "id": "Tuh kan. Diem lagi.",
+        "en": "See? Quiet again."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "sekar",
+          "transition": "fade",
+          "duration_ms": 900
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia turun dari tembok, ngambil tasnya, dan jalan ke arah motor tanpa nengok.",
+        "en": "She climbs down from the wall, grabs her bag and walks toward her scooter without looking back."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua gelas es teh masih di tangan gue. Esnya udah cair semua.",
+        "en": "Both cups of iced tea are still in my hands. The ice has all melted."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue bisa ngejar dia. Gue tahu persis harus ngomong apa.{w} Gue nggak ngejar.",
+        "en": "I could go after her. I know exactly what to say.{w} I don't go."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "p_unsent"
+    }
+  ]
+}

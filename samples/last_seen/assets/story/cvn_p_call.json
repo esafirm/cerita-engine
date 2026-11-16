@@ -1,0 +1,277 @@
+{
+  "conversation_id": "cvn_p_call",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Telepon Dinda",
+    "en": "Dinda's Call"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_dinda",
+    "day": 0,
+    "time": "02:17",
+    "background": "bg_raka_room_night.png",
+    "music": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Dinda memanggil…",
+        "en": "Dinda is calling…"
+      },
+      "sfx": "sfx_phone_ring.mp3"
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 2200
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Tersambung",
+        "en": "Connected"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ka? Sori. Gue tahu kalian udah nggak ngomong. Gue nggak tahu harus nelpon siapa lagi.",
+        "en": "Ka? Sorry. I know you two don't talk anymore. I didn't know who else to call."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin malem dia pamit mau rekaman. Abis itu HP-nya mati. Motornya masih di rumah. Dompetnya juga.",
+        "en": "Monday night she said she was going out to record. After that her phone went dead. Her scooter's still at home. Her wallet too."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_02.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Apa yang lo bilang?",
+        "en": "What do you say?"
+      },
+      "variable": "CALL_REACT",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Polisi udah dikabarin?",
+            "en": "Have you told the police?"
+          },
+          "value": "police",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Mungkin dia cuma butuh waktu sendiri.",
+            "en": "Maybe she just needs some time alone."
+          },
+          "value": "alone",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Lo sekarang di mana? Lo aman?",
+            "en": "Where are you now? Are you safe?"
+          },
+          "value": "safe",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "CALL_REACT == 'police'",
+      "text": {
+        "id": "Udah. Mereka bilang tunggu. Katanya cewek umur dua puluh dua kabur dari rumah itu biasa.",
+        "en": "Yeah. They said to wait. They said a twenty-two-year-old girl running away from home is normal."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "CALL_REACT == 'alone'",
+      "text": {
+        "id": "Itu yang polisi bilang. Gue kira lo beda.",
+        "en": "That's what the police said. I thought you'd be different."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "CALL_REACT == 'safe'",
+      "text": {
+        "id": "Gue di rumah. Sama Ibu. Ibu nggak tidur dari Senin.{w} Makasih udah nanya.",
+        "en": "I'm at home. With Mom. Mom hasn't slept since Monday.{w} Thanks for asking."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ka, dengerin. Tadi siang HP cadangannya Kak Sekar nyala sebentar di kamarnya. Ada satu pesan keluar yang nggak terkirim.",
+        "en": "Ka, listen. This afternoon Sekar's spare phone turned on for a moment in her room. There was one outgoing message that never went through."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_06.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Buat lo.",
+        "en": "To you."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_07.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Isinya apa?",
+        "en": "What does it say?"
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Ka. Inget jam lima pagi itu? Gue masih di sana.\"",
+        "en": "\"Ka. Remember five in the morning? I'm still there.\""
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_08.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak ngerti maksudnya. Lo ngerti?",
+        "en": "I don't get it. Do you?"
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_09.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Jam lima pagi. Dermaga Muara Angke.",
+        "en": "Five in the morning. The Muara Angke pier."
+      },
+      "variable": "ANSWER",
+      "profile": "dinda:0",
+      "timeout_ms": 10000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "Gue ngerti. Gue ke Jakarta sekarang.",
+            "en": "I get it. I'm coming to Jakarta now."
+          },
+          "value": "now",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Nggak tahu. Tapi gue ke sana besok.",
+            "en": "No idea. But I'll come tomorrow."
+          },
+          "value": "tomorrow"
+        },
+        {
+          "text": {
+            "id": "...",
+            "en": "..."
+          },
+          "value": "silent",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "subtract",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "ANSWER == 'now'",
+      "text": {
+        "id": "Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue kirim alamatnya.",
+        "en": "Now? It's two in the morning, Ka.{w} ...Okay. I'll send the address."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_10.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ANSWER == 'tomorrow'",
+      "text": {
+        "id": "Oke. Gue kirim alamatnya. Jangan nggak dateng.",
+        "en": "Okay. I'll send the address. Don't not show up."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_11.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ANSWER == 'silent'",
+      "text": {
+        "id": "Ka? Halo? ...Dia selalu bilang lo kabur kalau ada yang berat. Jangan kali ini.",
+        "en": "Ka? Hello? ...She always said you run when things get heavy. Not this time."
+      },
+      "profile": "dinda:0",
+      "voice": "vo_p_dinda_12.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir · 04:51",
+        "en": "Call ended · 04:51"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "p_after"
+    }
+  ]
+}

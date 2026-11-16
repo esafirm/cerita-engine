@@ -1,0 +1,172 @@
+# Prologue, present day: Dinda reaches Raka in Bandung.
+
+@conversation p_now chapter=Prolog chapter.en=Prologue title="Sekarang" title.en="Now" checkpoint
+@scene CHAT channel=thread_dinda day=0 time=02:14 music=amb_room_night.mp3
+
+timestamp
+  id: Setahun kemudian · Bandung, 02.14
+  en: A year later · Bandung, 2:14 AM
+system
+  id: Nomor ini menyimpan kontak kamu sebagai "Raka (temen Kak Sekar)"
+  en: This number saved you as "Raka (Sekar's friend)"
+
+dinda typing=1.8s sfx=sfx_msg_receive.mp3
+  id: ka
+  en: ka
+dinda typing=2.6s sfx=sfx_msg_receive.mp3
+  id: ini dinda. adeknya kak sekar
+  en: it's dinda. sekar's sister
+dinda typing=3.4s sfx=sfx_msg_receive.mp3
+  id: maaf jam segini. lo masih pake nomor ini kan?
+  en: sorry it's so late. you still use this number right?
+
+choice FIRST_REPLY by=dinda
+  id: Dinda masih mengetik...
+  en: Dinda is still typing...
+? Din? Ada apa? | Din? What's going on?
+  value worried
+  +trust_dinda 2
+? Iya. Kenapa? | Yeah. Why?
+  value guarded
+
+player sfx=sfx_msg_send.mp3 [if FIRST_REPLY == 'worried']
+  id: din? ada apa?
+  en: din? what's going on?
+player sfx=sfx_msg_send.mp3 [if FIRST_REPLY == 'guarded']
+  id: iya. kenapa?
+  en: yeah. why?
+
+dinda typing=4.2s sfx=sfx_msg_receive.mp3
+  id: kak sekar ilang. udah 3 hari
+  en: sekar's missing. 3 days now
+dinda typing=2.2s sfx=sfx_msg_receive.mp3
+  id: boleh gue telpon? susah ngetiknya
+  en: can i call you? it's hard to type this
+
+-> p_call
+
+
+@conversation p_call chapter=Prolog chapter.en=Prologue title="Telepon Dinda" title.en="Dinda's Call"
+@scene CALL channel=thread_dinda day=0 time=02:17 bg=bg_raka_room_night.png music=amb_room_night.mp3
+
+system sfx=sfx_phone_ring.mp3
+  id: Dinda memanggil…
+  en: Dinda is calling…
+wait 2.2s
+system
+  id: Tersambung
+  en: Connected
+
+dinda voice=vo_p_dinda_01.mp3
+  id: Ka? Sori. Gue tahu kalian udah nggak ngomong. Gue nggak tahu harus nelpon siapa lagi.
+  en: Ka? Sorry. I know you two don't talk anymore. I didn't know who else to call.
+  delivery: shaky, trying to sound steady, late at night
+dinda voice=vo_p_dinda_02.mp3
+  id: Senin malem dia pamit mau rekaman. Abis itu HP-nya mati. Motornya masih di rumah. Dompetnya juga.
+  en: Monday night she said she was going out to record. After that her phone went dead. Her scooter's still at home. Her wallet too.
+  delivery: listing facts quickly, holding it together
+
+choice CALL_REACT by=dinda
+  id: Apa yang lo bilang?
+  en: What do you say?
+? Polisi udah dikabarin? | Have you told the police?
+  value police
+  +trust_dinda 3
+? Mungkin dia cuma butuh waktu sendiri. | Maybe she just needs some time alone.
+  value alone
+  -trust_dinda 3
+? Lo sekarang di mana? Lo aman? | Where are you now? Are you safe?
+  value safe
+  +trust_dinda 5
+
+dinda voice=vo_p_dinda_03.mp3 [if CALL_REACT == 'police']
+  id: Udah. Mereka bilang tunggu. Katanya cewek umur dua puluh dua kabur dari rumah itu biasa.
+  en: Yeah. They said to wait. They said a twenty-two-year-old girl running away from home is normal.
+  delivery: bitter, tired
+dinda voice=vo_p_dinda_04.mp3 [if CALL_REACT == 'alone']
+  id: Itu yang polisi bilang. Gue kira lo beda.
+  en: That's what the police said. I thought you'd be different.
+  delivery: hurt, cold
+dinda voice=vo_p_dinda_05.mp3 [if CALL_REACT == 'safe']
+  id: Gue di rumah. Sama Ibu. Ibu nggak tidur dari Senin.{w} Makasih udah nanya.
+  en: I'm at home. With Mom. Mom hasn't slept since Monday.{w} Thanks for asking.
+  delivery: surprised, softening
+
+dinda voice=vo_p_dinda_06.mp3
+  id: Ka, dengerin. Tadi siang HP cadangannya Kak Sekar nyala sebentar di kamarnya. Ada satu pesan keluar yang nggak terkirim.
+  en: Ka, listen. This afternoon Sekar's spare phone turned on for a moment in her room. There was one outgoing message that never went through.
+  delivery: lower, careful
+dinda voice=vo_p_dinda_07.mp3
+  id: Buat lo.
+  en: To you.
+  delivery: quiet
+
+player
+  id: Isinya apa?
+  en: What does it say?
+
+dinda voice=vo_p_dinda_08.mp3
+  id: "Ka. Inget jam lima pagi itu? Gue masih di sana."
+  en: "Ka. Remember five in the morning? I'm still there."
+  delivery: reading slowly off a screen
+dinda voice=vo_p_dinda_09.mp3
+  id: Gue nggak ngerti maksudnya. Lo ngerti?
+  en: I don't get it. Do you?
+  delivery: hopeful, pleading
+
+choice ANSWER by=dinda timeout=10s
+  id: Jam lima pagi. Dermaga Muara Angke.
+  en: Five in the morning. The Muara Angke pier.
+? Gue ngerti. Gue ke Jakarta sekarang. | I get it. I'm coming to Jakarta now.
+  value now
+  +trust_dinda 5
+? Nggak tahu. Tapi gue ke sana besok. | No idea. But I'll come tomorrow.
+  value tomorrow
+? ... | ... [default]
+  value silent
+  -trust_dinda 2
+
+dinda voice=vo_p_dinda_10.mp3 [if ANSWER == 'now']
+  id: Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue kirim alamatnya.
+  en: Now? It's two in the morning, Ka.{w} ...Okay. I'll send the address.
+  delivery: stunned, then relieved
+dinda voice=vo_p_dinda_11.mp3 [if ANSWER == 'tomorrow']
+  id: Oke. Gue kirim alamatnya. Jangan nggak dateng.
+  en: Okay. I'll send the address. Don't not show up.
+  delivery: wary, half joking
+dinda voice=vo_p_dinda_12.mp3 [if ANSWER == 'silent']
+  id: Ka? Halo? ...Dia selalu bilang lo kabur kalau ada yang berat. Jangan kali ini.
+  en: Ka? Hello? ...She always said you run when things get heavy. Not this time.
+  delivery: frustrated, almost crying
+
+system
+  id: Panggilan berakhir · 04:51
+  en: Call ended · 04:51
+
+-> p_after
+
+
+@conversation p_after chapter=Prolog chapter.en=Prologue title="Terakhir Dilihat" title.en="Last Seen"
+@scene CHAT channel=thread_dinda day=0 time=02:22 music=bgm_low_tide.mp3
+
+dinda typing=2s sfx=sfx_msg_receive.mp3
+  id: Jl. Pluit Karang Indah 7 no. 12
+  en: Jl. Pluit Karang Indah 7 no. 12
+media IMAGE photo_unsent_message.png by=dinda unlock=photo_unsent_message typing=2.4s sfx=sfx_msg_receive.mp3
+  id: ini screenshot dari HP cadangannya
+  en: screenshot from her spare phone
+media IMAGE photo_ep12_teaser.png by=dinda unlock=photo_ep12_teaser typing=2.8s sfx=sfx_msg_receive.mp3
+  id: postingan terakhir dia. 3 hari sebelum ilang
+  en: her last post. 3 days before she vanished
+dinda:hopeful typing=1.6s sfx=sfx_msg_receive.mp3 [if trust_dinda >= 5]
+  id: makasih ka
+  en: thanks ka
+
+narration
+  id: Gue buka chat Sekar. Setahun nggak gue sentuh.
+  en: I open Sekar's chat. I haven't touched it in a year.
+system
+  id: Sekar terakhir dilihat 3 hari yang lalu
+  en: Sekar was last seen 3 days ago
+
+-> d1_house

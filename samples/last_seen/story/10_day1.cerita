@@ -1,0 +1,17 @@
+# Day 1: Rumah Kosong. M0 placeholder: Day 1 is written in M1, which replaces this stub and its ending.
+
+@conversation d1_house chapter="Hari 1" chapter.en="Day 1" title="Rumah Kosong" title.en="The Empty House" checkpoint
+@scene VN bg=bg_sekar_house_day.png music=bgm_low_tide.mp3 day=1 time=07:30
+
+narration
+  id: Pluit, pagi. Rumah keluarga Sekar sepi kayak lagi nahan napas juga.
+  en: Pluit, morning. Sekar's family home is quiet, like it's holding its breath too.
+narration
+  id: Hari 1 belum ditulis. Ceritanya berlanjut di versi berikutnya.
+  en: Day 1 isn't written yet. The story continues in the next build.
+
+ending end_00_preview NORMAL
+  id: Bersambung
+  en: To Be Continued
+  summary id: Raka sampai di Jakarta. Pencarian Sekar baru dimulai.
+  summary en: Raka reaches Jakarta. The search for Sekar has only begun.

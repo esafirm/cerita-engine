@@ -1,0 +1,151 @@
+{
+  "conversation_id": "cvn_p_unsent",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Belum Terkirim",
+    "en": "Unsent"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_sekar",
+    "day": 0,
+    "time": "23:58",
+    "music": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Kamis, 23.58",
+        "en": "Thursday, 11:58 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "gue nggak marah",
+        "en": "i'm not mad"
+      },
+      "profile": "sekar:0",
+      "typing_delay_ms": 2400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ok gue marah. tapi lebih ke capek",
+        "en": "ok i'm angry. but mostly tired"
+      },
+      "profile": "sekar:0",
+      "typing_delay_ms": 3100,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kalau lo berubah pikiran, sabtu jam 5 pagi. dermaga muara angke. gue tunggu sampai jam 6",
+        "en": "if you change your mind, saturday 5am. muara angke pier. i'll wait until 6"
+      },
+      "profile": "sekar:0",
+      "typing_delay_ms": 3800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Balas Sekar?",
+        "en": "Reply to Sekar?"
+      },
+      "variable": "UNSENT",
+      "profile": "sekar:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Ketik \"maaf\"",
+            "en": "Type \"sorry\""
+          },
+          "value": "sorry"
+        },
+        {
+          "text": {
+            "id": "Ketik \"gue dateng\"",
+            "en": "Type \"i'll be there\""
+          },
+          "value": "coming"
+        },
+        {
+          "text": {
+            "id": "Tutup aplikasinya",
+            "en": "Close the app"
+          },
+          "value": "closed"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "UNSENT == 'sorry'",
+      "style": "system",
+      "text": {
+        "id": "maaf_",
+        "en": "sorry_"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "UNSENT == 'coming'",
+      "style": "system",
+      "text": {
+        "id": "gue dateng_",
+        "en": "i'll be there_"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "UNSENT != 'closed'",
+      "style": "system",
+      "text": {
+        "id": "Draf dihapus",
+        "en": "Draft deleted"
+      }
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 2000
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Sabtu, 06.12",
+        "en": "Saturday, 6:12 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ok",
+        "en": "ok"
+      },
+      "profile": "sekar:0",
+      "typing_delay_ms": 1600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sekar terakhir dilihat Sabtu 06.12",
+        "en": "Sekar was last seen Saturday 6:12 AM"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "p_now"
+    }
+  ]
+}

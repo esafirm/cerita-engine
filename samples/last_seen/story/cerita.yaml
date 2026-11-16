@@ -1,0 +1,11 @@
+# Last Seen. Written in Indonesian first, translated to English after each milestone.
+source_locale: id
+locales: [id, en]
+out: ../assets/story
+assets: ../assets/story
+stats:
+  # First guesses. Calibrate from the M1 playtest (spec §10).
+  wpm: { id: 180, en: 220 }
+  choice_seconds: 4
+  input_seconds: 8
+  media_seconds: 4

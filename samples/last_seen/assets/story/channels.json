@@ -1,0 +1,25 @@
+{
+  "channels": [
+    {
+      "id": "thread_sekar",
+      "name": "Sekar",
+      "avatar": "assets/story/sprites/sekar_avatar.png",
+      "status": {
+        "id": "terakhir dilihat Sabtu 06.12",
+        "en": "last seen Saturday 6:12 AM"
+      },
+      "members": [
+        "sekar"
+      ]
+    },
+    {
+      "id": "thread_dinda",
+      "name": "Dinda",
+      "avatar": "assets/story/sprites/dinda_avatar.png",
+      "status": "online",
+      "members": [
+        "dinda"
+      ]
+    }
+  ]
+}

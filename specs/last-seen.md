@@ -178,7 +178,7 @@ raka:worried [left]
 
 | Kind | Count | Notes |
 | :--- | ---: | :--- |
-| Backgrounds | ~30 | Day/dusk/night variants of ~14 locations. WebP, 1920x1080 |
+| Backgrounds | ~30 | Day/dusk/night variants of ~14 locations. Portrait 9:16 like the phone layout (`example/` uses portrait too). PNG until the size budget needs WebP |
 | Sprites | ~42 | 7 characters x ~6 expressions, transparent PNG/WebP, consistent framing |
 | Avatars | ~11 | Cast + chat-only contacts |
 | CGs | ~15 | Key moments, all gallery unlocks |
@@ -190,7 +190,9 @@ raka:worried [left]
 
 - `credits.json` records the source and license of every audio file.
 - App size target is under 200MB. If the budget breaks, we compress to WebP/Opus first.
-- Placeholders (labeled silhouettes and gradients) let writing and code move before the art lands.
+- Placeholders (a silhouette per character, a gradient per place, silent audio) let writing and code move before
+  the art lands. `tools/placeholders.sh` makes them from the `assets` missing list. They carry no text labels, since
+  the local ffmpeg has no drawtext: the file name and the speaker box say what they are.
 
 ### 6.1 Voice: Gemini TTS (adapted from menolakngantor)
 

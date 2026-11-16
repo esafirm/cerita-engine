@@ -1,0 +1,86 @@
+{
+  "conversation_id": "cvn_p_after",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Terakhir Dilihat",
+    "en": "Last Seen"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_dinda",
+    "day": 0,
+    "time": "02:22",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jl. Pluit Karang Indah 7 no. 12",
+        "en": "Jl. Pluit Karang Indah 7 no. 12"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_unsent_message.png",
+      "caption": {
+        "id": "ini screenshot dari HP cadangannya",
+        "en": "screenshot from her spare phone"
+      },
+      "profile": "dinda:0",
+      "unlock_id": "photo_unsent_message",
+      "typing_delay_ms": 2400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_ep12_teaser.png",
+      "caption": {
+        "id": "postingan terakhir dia. 3 hari sebelum ilang",
+        "en": "her last post. 3 days before she vanished"
+      },
+      "profile": "dinda:0",
+      "unlock_id": "photo_ep12_teaser",
+      "typing_delay_ms": 2800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_dinda >= 5",
+      "text": {
+        "id": "makasih ka",
+        "en": "thanks ka"
+      },
+      "profile": "dinda:4",
+      "typing_delay_ms": 1600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue buka chat Sekar. Setahun nggak gue sentuh.",
+        "en": "I open Sekar's chat. I haven't touched it in a year."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sekar terakhir dilihat 3 hari yang lalu",
+        "en": "Sekar was last seen 3 days ago"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_house"
+    }
+  ]
+}

@@ -44,3 +44,9 @@ app.*.map.json
 /example/android/app/profile
 /example/android/app/release
 .cxx/
+/samples/last_seen/android/app/debug
+/samples/last_seen/android/app/profile
+/samples/last_seen/android/app/release
+
+# Voice and image pipeline scratch output (raw takes, request bodies, billing logs)
+/samples/last_seen/tools/.takes/

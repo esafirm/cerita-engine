@@ -1,0 +1,48 @@
+{
+  "conversation_id": "cvn_d1_house",
+  "chapter": {
+    "id": "Hari 1",
+    "en": "Day 1"
+  },
+  "title": {
+    "id": "Rumah Kosong",
+    "en": "The Empty House"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 1,
+    "time": "07:30",
+    "background": "bg_sekar_house_day.png",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pluit, pagi. Rumah keluarga Sekar sepi kayak lagi nahan napas juga.",
+        "en": "Pluit, morning. Sekar's family home is quiet, like it's holding its breath too."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 1 belum ditulis. Ceritanya berlanjut di versi berikutnya.",
+        "en": "Day 1 isn't written yet. The story continues in the next build."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_00_preview",
+      "title": {
+        "id": "Bersambung",
+        "en": "To Be Continued"
+      },
+      "category": "NORMAL",
+      "summary": {
+        "id": "Raka sampai di Jakarta. Pencarian Sekar baru dimulai.",
+        "en": "Raka reaches Jakarta. The search for Sekar has only begun."
+      }
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+# Prologue (spec §2): a year ago, the falling out. Then tonight, Dinda's call.
+# Budget: 1.5k Indonesian words, about 10 minutes.
+
+@conversation index chapter=Prolog chapter.en=Prologue title="Setahun Lalu" title.en="A Year Ago" checkpoint
+@scene VN bg=bg_seawall_night.png music=bgm_low_tide.mp3 ambience=amb_sea_night.mp3 day=0 time=21:40 textbox=nvl
+
+narration
+  id: Tanggul Pluit. Setahun yang lalu.
+  en: The Pluit seawall. A year ago.
+narration
+  id: Dari atas sini, Jakarta kelihatan kayak orang yang lagi nahan napas.{w} Gedung-gedung nyala di belakang, laut hitam di depan, dan tembok beton di tengah-tengahnya.
+  en: From up here, Jakarta looks like it's holding its breath.{w} Towers lit up behind us, black sea in front, and a concrete wall in between.
+narration
+  id: Sekar duduk di atas tembok itu, kaki menggantung ke sisi laut, seolah jatuh itu sesuatu yang cuma terjadi ke orang lain.
+  en: Sekar sits on top of that wall, legs dangling over the sea side, like falling is something that only happens to other people.
+narration
+  id: Gue berdiri di belakangnya, megangin dua gelas es teh plastik yang udah mulai keringetan.
+  en: I'm standing behind her, holding two plastic cups of iced tea that have started to sweat.
+
+stage
+  textbox adv
+  show sekar:laugh right transition=slide_left duration=600
+  show raka:smirk left transition=slide_right duration=600
+
+sekar:laugh [right]
+  id: Dengerin dulu. Serius, dengerin sampai habis, baru boleh ngeledek.
+  en: Just listen. Seriously, hear the whole thing first, then you can make fun of me.
+raka:smirk [left]
+  id: Gue belum ngomong apa-apa.
+  en: I haven't said anything.
+sekar:smile
+  id: Muka lo udah ngomong dari tadi, Ka.
+  en: Your face has been talking the whole time, Ka.
+
+narration
+  id: Dia nyodorin HP-nya. Di layar, gelombang suara dari rekaman yang dia ambil sore tadi di Muara Angke.
+  en: She holds out her phone. On the screen, the waveform of a recording she made this afternoon in Muara Angke.
+
+sekar:serious
+  id: Pak Karta. Nelayan, udah tiga puluh tahun melaut dari dermaga yang sama. Katanya, dulu dari sini sampai Pulau Pari airnya masih bisa buat ngaca.
+  en: Pak Karta. A fisherman, thirty years out of the same pier. He says that from here to Pulau Pari, the water used to be clear enough to see your face in.
+sekar:serious
+  id: Sekarang ada patok-patok di tengah laut. Ada yang bilang itu buat pulau baru. Nggak ada yang pernah nanya ke nelayan.
+  en: Now there are stakes driven into the open water. Some people say it's for a new island. Nobody ever asked the fishermen.
+raka:neutral
+  id: Terus?
+  en: And?
+sekar:smile
+  id: Terus gue mau bikin satu episode penuh soal itu. Bukan obrolan santai kayak biasanya. Yang beneran. Wawancara, data, peta.
+  en: And I want to do a whole episode on it. Not the usual chill chat. A real one. Interviews, data, maps.
+sekar:laugh
+  id: Dan gue butuh orang yang bisa ngedit audio tanpa bikin suara angin kayak pesawat jatuh.
+  en: And I need someone who can edit audio without making the wind sound like a plane crash.
+
+narration
+  id: Dia nengok ke gue. Matanya nyala kayak tiap kali dia nemu ide yang terlalu besar buat dia sendiri.
+  en: She turns to look at me. Her eyes light up the way they always do when she finds an idea too big for one person.
+
+sekar:smile
+  id: Sabtu ini. Jam lima pagi, di dermaga Muara Angke. Kapalnya Pak Karta berangkat jam setengah enam. Lo ikut, kan?
+  en: This Saturday. Five in the morning, at the Muara Angke pier. Pak Karta's boat leaves at five thirty. You're coming, right?
+
+narration
+  id: Ini saatnya ngomong. Gue udah nunda dua minggu.
+  en: This is when I tell her. I've put it off for two weeks.
+
+raka:worried
+  id: Kar.{w} Gue keterima kerja. Di Bandung.
+  en: Kar.{w} I got a job. In Bandung.
+sekar:neutral
+  id: ...Oh. Wah. Itu bagus, kan? Kapan mulai?
+  en: ...Oh. Wow. That's good, right? When do you start?
+raka:worried
+  id: Senin. Gue berangkat Minggu pagi.
+  en: Monday. I leave Sunday morning.
+
+stage
+  music none fade=2s
+
+sekar:serious
+  id: Minggu ini?
+  en: This Sunday?
+raka:neutral
+  id: Iya.
+  en: Yeah.
+sekar:serious
+  id: Lo udah tahu dari kapan?
+  en: How long have you known?
+
+narration
+  id: Gue nggak jawab. Itu udah jawaban.
+  en: I don't answer. That's an answer.
+
+sekar:tired
+  id: Dua minggu? Tiga? Kita ketemu tiap hari, Ka. Tiap. Hari.
+  en: Two weeks? Three? We see each other every day, Ka. Every. Day.
+raka:angry
+  id: Ya karena gue tahu bakal kayak gini.
+  en: Because I knew it would go like this.
+sekar:serious
+  id: Kayak gimana? Gue nanya, lo jawab. Itu namanya ngobrol.
+  en: Like what? I ask, you answer. That's called talking.
+sekar:tired
+  id: Lo selalu gitu. Kalau ada yang berat, lo diem, terus tiba-tiba lo udah pergi. Kayak waktu bokap lo. Kayak waktu kuliah.
+  en: You always do this. When something gets heavy, you go quiet, and then suddenly you're gone. Like with your dad. Like with college.
+
+stage
+  shake intensity=4
+
+raka:angry
+  id: Jangan bawa-bawa bokap gue.
+  en: Leave my dad out of this.
+sekar:serious
+  id: Oke. Terus Sabtu? Lo masih bisa ikut Sabtu. Satu hari. Abis itu lo bebas ke mana aja.
+  en: Fine. So, Saturday? You can still come on Saturday. One day. Then you can go wherever you want.
+
+choice FALLOUT by=sekar:serious timeout=12s
+  id: Sekar nungguin jawaban.
+  en: Sekar is waiting for an answer.
+? "Lo bukan jurnalis, Kar. Lo cuma punya mic." | "You're not a journalist, Kar. You just own a mic."
+  value cruel
+? "Nggak semua orang bisa hidup dari mimpi." | "Not everyone gets to live on dreams."
+  value cold
+? (Nggak usah jawab.) | (Don't answer.) [default]
+  value silent
+
+sekar:scared [if FALLOUT == 'cruel']
+  id: ...
+  en: ...
+sekar:tired [if FALLOUT == 'cruel']
+  id: Wow. Oke. Seenggaknya sekarang gue tahu lo mikir apa selama ini.
+  en: Wow. Okay. At least now I know what you've been thinking all this time.
+sekar:tired [if FALLOUT == 'cold']
+  id: Mimpi. Iya. Pak Karta juga mimpi, kali ya. Mimpi lautnya balik.
+  en: Dreams. Right. I guess Pak Karta's dreaming too. Dreaming his sea comes back.
+sekar:tired [if FALLOUT == 'silent']
+  id: Tuh kan. Diem lagi.
+  en: See? Quiet again.
+
+stage
+  hide sekar transition=fade duration=900
+
+narration
+  id: Dia turun dari tembok, ngambil tasnya, dan jalan ke arah motor tanpa nengok.
+  en: She climbs down from the wall, grabs her bag and walks toward her scooter without looking back.
+narration
+  id: Dua gelas es teh masih di tangan gue. Esnya udah cair semua.
+  en: Both cups of iced tea are still in my hands. The ice has all melted.
+narration
+  id: Gue bisa ngejar dia. Gue tahu persis harus ngomong apa.{w} Gue nggak ngejar.
+  en: I could go after her. I know exactly what to say.{w} I don't go.
+
+-> p_unsent
+
+
+@conversation p_unsent chapter=Prolog chapter.en=Prologue title="Belum Terkirim" title.en="Unsent"
+@scene CHAT channel=thread_sekar day=0 time=23:58 music=amb_room_night.mp3
+
+timestamp
+  id: Kamis, 23.58
+  en: Thursday, 11:58 PM
+
+sekar typing=2.4s sfx=sfx_msg_receive.mp3
+  id: gue nggak marah
+  en: i'm not mad
+sekar typing=3.1s sfx=sfx_msg_receive.mp3
+  id: ok gue marah. tapi lebih ke capek
+  en: ok i'm angry. but mostly tired
+sekar typing=3.8s sfx=sfx_msg_receive.mp3
+  id: kalau lo berubah pikiran, sabtu jam 5 pagi. dermaga muara angke. gue tunggu sampai jam 6
+  en: if you change your mind, saturday 5am. muara angke pier. i'll wait until 6
+
+choice UNSENT by=sekar
+  id: Balas Sekar?
+  en: Reply to Sekar?
+? Ketik "maaf" | Type "sorry"
+  value sorry
+? Ketik "gue dateng" | Type "i'll be there"
+  value coming
+? Tutup aplikasinya | Close the app
+  value closed
+
+system [if UNSENT == 'sorry']
+  id: maaf_
+  en: sorry_
+system [if UNSENT == 'coming']
+  id: gue dateng_
+  en: i'll be there_
+system [if UNSENT != 'closed']
+  id: Draf dihapus
+  en: Draft deleted
+
+wait 2s
+timestamp
+  id: Sabtu, 06.12
+  en: Saturday, 6:12 AM
+sekar typing=1.6s sfx=sfx_msg_receive.mp3
+  id: ok
+  en: ok
+system
+  id: Sekar terakhir dilihat Sabtu 06.12
+  en: Sekar was last seen Saturday 6:12 AM
+
+-> p_now

@@ -1,0 +1,17 @@
+{
+  "model": "gemini-3.8-flash-tts",
+  "style": "Natural and conversational, not reading aloud.",
+  "aliases": { "player": "raka" },
+  "cast": {
+    "raka": { "voice": "Puck", "style": "Male, 22. Dry and sarcastic, but tired underneath." },
+    "sekar": { "voice": "Aoede", "style": "Female, 22. Warm, quick, a podcaster's clear voice." },
+    "dinda": { "voice": "Leda", "style": "Female, 19. Young and direct, fraying under stress." },
+    "tasya": { "voice": "Zephyr", "style": "Female, 23. Bright South Jakarta energy, mixes in English words lightly." },
+    "bima": { "voice": "Fenrir", "style": "Male, 24. Easy charm that turns defensive fast." },
+    "hendra": { "voice": "Algenib", "style": "Male, 56. Gruff fisherman, few words, slow." },
+    "yusuf": { "voice": "Orus", "style": "Male, 34. Police officer, formal and measured." },
+    "didit": { "voice": "Iapetus", "style": "Male, 40s. Smooth PR voice, friendly on the surface." },
+    "wulan": { "voice": "Sulafat", "style": "Female, 50s. A worried mother, soft and tired." },
+    "unknown": { "voice": "Enceladus", "style": "Male. Low and flat, deliberately hard to place." }
+  }
+}

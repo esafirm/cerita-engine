@@ -20,18 +20,31 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze packages example
+        run: flutter analyze packages example samples
 
       - name: Test core
         working-directory: packages/cerita_core
         run: dart test
 
+      - name: Test the authoring toolkit
+        working-directory: packages/cerita_tools
+        run: dart test
+
+      - name: Check Last Seen scripts match the compiled JSON
+        run: |
+          dart run cerita_tools compile samples/last_seen/story --check
+          dart run cerita_tools lint samples/last_seen/story
+
       - name: Test Flutter packages and example
         run: |
-          for dir in packages/cerita_flutter packages/cerita_ui example; do
+          for dir in packages/cerita_flutter packages/cerita_ui example samples/last_seen; do
             (cd "$dir" && flutter test)
           done
 
       - name: Build web
         working-directory: example
+        run: flutter build web
+
+      - name: Build Last Seen for the web
+        working-directory: samples/last_seen
         run: flutter build web

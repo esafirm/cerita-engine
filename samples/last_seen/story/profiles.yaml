@@ -1,0 +1,94 @@
+# The cast (spec §2). Expressions are in sprite order: the first one is used when a script names none.
+# Keep the order: appending is safe, reordering changes every compiled sprite index.
+
+raka:
+  handle: "@rakapradipta"
+  name: Raka
+  avatar: assets/story/sprites/raka_avatar.png
+  expressions:
+    neutral: raka_neutral.png
+    smirk: raka_smirk.png
+    worried: raka_worried.png
+    angry: raka_angry.png
+    shocked: raka_shocked.png
+    sad: raka_sad.png
+    determined: raka_determined.png
+
+sekar:
+  handle: "@sekar.ayu"
+  bio: { id: "Suara dari pesisir utara. Ep. 12 segera.", en: "Voices from the north coast. Ep. 12 soon." }
+  name: Sekar
+  avatar: assets/story/sprites/sekar_avatar.png
+  expressions:
+    neutral: sekar_neutral.png
+    smile: sekar_smile.png
+    laugh: sekar_laugh.png
+    serious: sekar_serious.png
+    scared: sekar_scared.png
+    tired: sekar_tired.png
+
+dinda:
+  handle: "@dindaaa"
+  name: Dinda
+  avatar: assets/story/sprites/dinda_avatar.png
+  expressions:
+    neutral: dinda_neutral.png
+    smile: dinda_smile.png
+    crying: dinda_crying.png
+    angry: dinda_angry.png
+    hopeful: dinda_hopeful.png
+
+tasya:
+  name: Tasya
+  avatar: assets/story/sprites/tasya_avatar.png
+  expressions:
+    neutral: tasya_neutral.png
+    smile: tasya_smile.png
+    nervous: tasya_nervous.png
+    defensive: tasya_defensive.png
+    guilty: tasya_guilty.png
+    crying: tasya_crying.png
+
+bima:
+  name: Bima
+  avatar: assets/story/sprites/bima_avatar.png
+  expressions:
+    neutral: bima_neutral.png
+    charming: bima_charming.png
+    irritated: bima_irritated.png
+    panicked: bima_panicked.png
+    ashamed: bima_ashamed.png
+
+hendra:
+  name: "Pak Hendra"
+  avatar: assets/story/sprites/hendra_avatar.png
+  expressions:
+    neutral: hendra_neutral.png
+    gruff: hendra_gruff.png
+    wary: hendra_wary.png
+    kind: hendra_kind.png
+    worried: hendra_worried.png
+
+yusuf:
+  name: "Ipda Yusuf"
+  avatar: assets/story/sprites/yusuf_avatar.png
+  expressions:
+    neutral: yusuf_neutral.png
+    polite: yusuf_polite.png
+    stern: yusuf_stern.png
+    conflicted: yusuf_conflicted.png
+
+# Chat-only contacts: an avatar, no sprites.
+
+wulan:
+  name: "Bu Wulan"
+  avatar: assets/story/sprites/wulan_avatar.png
+
+didit:
+  name: Didit
+  avatar: assets/story/sprites/didit_avatar.png
+
+unknown:
+  name: { id: Nomor Tak Dikenal, en: Unknown Number }
+  avatar: assets/story/sprites/unknown_avatar.png
+

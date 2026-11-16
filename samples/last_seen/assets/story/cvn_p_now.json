@@ -1,0 +1,143 @@
+{
+  "conversation_id": "cvn_p_now",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Sekarang",
+    "en": "Now"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_dinda",
+    "day": 0,
+    "time": "02:14",
+    "music": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Setahun kemudian · Bandung, 02.14",
+        "en": "A year later · Bandung, 2:14 AM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Nomor ini menyimpan kontak kamu sebagai \"Raka (temen Kak Sekar)\"",
+        "en": "This number saved you as \"Raka (Sekar's friend)\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ka",
+        "en": "ka"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 1800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ini dinda. adeknya kak sekar",
+        "en": "it's dinda. sekar's sister"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 2600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "maaf jam segini. lo masih pake nomor ini kan?",
+        "en": "sorry it's so late. you still use this number right?"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 3400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda masih mengetik...",
+        "en": "Dinda is still typing..."
+      },
+      "variable": "FIRST_REPLY",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Din? Ada apa?",
+            "en": "Din? What's going on?"
+          },
+          "value": "worried",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Iya. Kenapa?",
+            "en": "Yeah. Why?"
+          },
+          "value": "guarded"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "FIRST_REPLY == 'worried'",
+      "text": {
+        "id": "din? ada apa?",
+        "en": "din? what's going on?"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FIRST_REPLY == 'guarded'",
+      "text": {
+        "id": "iya. kenapa?",
+        "en": "yeah. why?"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak sekar ilang. udah 3 hari",
+        "en": "sekar's missing. 3 days now"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 4200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "boleh gue telpon? susah ngetiknya",
+        "en": "can i call you? it's hard to type this"
+      },
+      "profile": "dinda:0",
+      "typing_delay_ms": 2200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "p_call"
+    }
+  ]
+}

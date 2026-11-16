@@ -1,0 +1,116 @@
+{
+  "profiles": [
+    {
+      "id": "raka",
+      "name": "Raka",
+      "handle": "@rakapradipta",
+      "avatar": "assets/story/sprites/raka_avatar.png",
+      "sprites": [
+        "raka_neutral.png",
+        "raka_smirk.png",
+        "raka_worried.png",
+        "raka_angry.png",
+        "raka_shocked.png",
+        "raka_sad.png",
+        "raka_determined.png"
+      ]
+    },
+    {
+      "id": "sekar",
+      "name": "Sekar",
+      "handle": "@sekar.ayu",
+      "bio": {
+        "id": "Suara dari pesisir utara. Ep. 12 segera.",
+        "en": "Voices from the north coast. Ep. 12 soon."
+      },
+      "avatar": "assets/story/sprites/sekar_avatar.png",
+      "sprites": [
+        "sekar_neutral.png",
+        "sekar_smile.png",
+        "sekar_laugh.png",
+        "sekar_serious.png",
+        "sekar_scared.png",
+        "sekar_tired.png"
+      ]
+    },
+    {
+      "id": "dinda",
+      "name": "Dinda",
+      "handle": "@dindaaa",
+      "avatar": "assets/story/sprites/dinda_avatar.png",
+      "sprites": [
+        "dinda_neutral.png",
+        "dinda_smile.png",
+        "dinda_crying.png",
+        "dinda_angry.png",
+        "dinda_hopeful.png"
+      ]
+    },
+    {
+      "id": "tasya",
+      "name": "Tasya",
+      "avatar": "assets/story/sprites/tasya_avatar.png",
+      "sprites": [
+        "tasya_neutral.png",
+        "tasya_smile.png",
+        "tasya_nervous.png",
+        "tasya_defensive.png",
+        "tasya_guilty.png",
+        "tasya_crying.png"
+      ]
+    },
+    {
+      "id": "bima",
+      "name": "Bima",
+      "avatar": "assets/story/sprites/bima_avatar.png",
+      "sprites": [
+        "bima_neutral.png",
+        "bima_charming.png",
+        "bima_irritated.png",
+        "bima_panicked.png",
+        "bima_ashamed.png"
+      ]
+    },
+    {
+      "id": "hendra",
+      "name": "Pak Hendra",
+      "avatar": "assets/story/sprites/hendra_avatar.png",
+      "sprites": [
+        "hendra_neutral.png",
+        "hendra_gruff.png",
+        "hendra_wary.png",
+        "hendra_kind.png",
+        "hendra_worried.png"
+      ]
+    },
+    {
+      "id": "yusuf",
+      "name": "Ipda Yusuf",
+      "avatar": "assets/story/sprites/yusuf_avatar.png",
+      "sprites": [
+        "yusuf_neutral.png",
+        "yusuf_polite.png",
+        "yusuf_stern.png",
+        "yusuf_conflicted.png"
+      ]
+    },
+    {
+      "id": "wulan",
+      "name": "Bu Wulan",
+      "avatar": "assets/story/sprites/wulan_avatar.png"
+    },
+    {
+      "id": "didit",
+      "name": "Didit",
+      "avatar": "assets/story/sprites/didit_avatar.png"
+    },
+    {
+      "id": "unknown",
+      "name": {
+        "id": "Nomor Tak Dikenal",
+        "en": "Unknown Number"
+      },
+      "avatar": "assets/story/sprites/unknown_avatar.png"
+    }
+  ]
+}

@@ -10,3 +10,4 @@ workspace:
   - packages/cerita_ui
   - packages/cerita_tools
   - example
+  - samples/last_seen
