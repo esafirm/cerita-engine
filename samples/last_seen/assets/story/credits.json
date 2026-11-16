@@ -74,6 +74,13 @@
       "source": "opengameart.org/content/100-cc0-sfx-2",
       "license": "CC0 1.0",
       "note": { "id": "Pagar, kunci dan suasana jalan", "en": "Gate, lock and street ambience" }
+    },
+    {
+      "title": "DotGothic16",
+      "author": "The DotGothic16 Project Authors (Fontworks)",
+      "source": "github.com/fontworks-fonts/DotGothic16",
+      "license": "SIL OFL 1.1",
+      "note": { "id": "Huruf", "en": "Font" }
     }
   ]
 }

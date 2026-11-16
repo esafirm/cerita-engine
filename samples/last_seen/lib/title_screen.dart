@@ -1,8 +1,9 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
-import 'package:cerita_ui/cerita_ui.dart';
 import 'package:flutter/material.dart';
 
-/// The Last Seen title screen, built on [CeritaTitleScreen].
+import 'ui/retro.dart';
+
+/// The Last Seen title screen: key art and logo with a blinking "tap to start", then a text menu with a cursor.
 class TitleScreen extends StatefulWidget {
   final StorySetup setup;
 
@@ -13,19 +14,40 @@ class TitleScreen extends StatefulWidget {
 }
 
 class _TitleScreenState extends State<TitleScreen> {
+  static const _music = "bgm_low_tide.mp3";
+
   late Future<SaveSlot?> _autosave = _loadAutosave();
+  final AudioHelper _audio = AudioHelper();
 
   /// Null hides the Credits entry until the story ships a credits.json.
   Credits? _credits;
+
+  bool _started = false;
+  bool _extras = false;
+  int _cursor = 0;
 
   StorySetup get setup => widget.setup;
 
   @override
   void initState() {
     super.initState();
+    _audio.addObserver();
+    _playMusic();
     setup.loader.loadCredits().then((credits) {
       if (mounted) setState(() => _credits = credits);
     }, onError: (Object _) {});
+  }
+
+  @override
+  void dispose() {
+    _audio.removeObserver();
+    super.dispose();
+  }
+
+  void _playMusic() {
+    final settings = setup.settings.value;
+    _audio.setVolumes(music: settings.musicVolume, sound: settings.soundVolume, voice: settings.voiceVolume);
+    _audio.playBgm(setup.config.music(_music));
   }
 
   Future<SaveSlot?> _loadAutosave() => setup.storage.loadSlot(SaveSlot.autoSlotId);
@@ -36,8 +58,12 @@ class _TitleScreenState extends State<TitleScreen> {
   }
 
   Future<void> _push(Widget screen) async {
+    // The story plays its own music.
+    if (screen is StoryScreen) _audio.playBgm(null, fadeMs: 400);
     await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-    if (mounted) setState(_reloadAutosave);
+    if (!mounted) return;
+    _playMusic();
+    setState(_reloadAutosave);
   }
 
   Future<void> _play({SaveSlot? save, Checkpoint? checkpoint}) =>
@@ -48,78 +74,230 @@ class _TitleScreenState extends State<TitleScreen> {
     _play(save: save, checkpoint: checkpoint);
   }
 
+  void _start() {
+    UiSounds.instance?.start();
+    setState(() => _started = true);
+  }
+
+  void _showExtras(bool extras) {
+    extras ? UiSounds.instance?.confirm() : UiSounds.instance?.cancel();
+    setState(() {
+      _extras = extras;
+      _cursor = 0;
+    });
+  }
+
+  List<(String, VoidCallback)> _entries(SaveSlot? save) {
+    final language = StoryLanguage.of(context);
+    final strings = language.strings;
+    final en = language.locale == "en";
+    if (_extras) {
+      return [
+        (strings.gallery, () => _push(GalleryScreen(setup: setup))),
+        (strings.endings, () => _push(EndingsScreen(setup: setup))),
+        if (_credits != null) (strings.credits, () => _push(CreditsScreen(setup: setup))),
+        (strings.back, () => _showExtras(false)),
+      ];
+    }
+    return [
+      if (save != null) ("${strings.continueGame} · ${language.maybe(save.chapter) ?? ""}", () => _play(save: save)),
+      (strings.newGame, () => _play()),
+      (
+        strings.load,
+        () => _push(
+          SaveSlotsScreen(
+            setup: setup,
+            onLoad: (save) => _replaceWithStory(save: save),
+          ),
+        ),
+      ),
+      (
+        strings.chapters,
+        () => _push(
+          ChaptersScreen(
+            setup: setup,
+            onSelect: (checkpoint) => _replaceWithStory(checkpoint: checkpoint),
+            onReplay: (checkpoint) => _push(StoryScreen(setup: setup, checkpoint: checkpoint, replay: true)),
+          ),
+        ),
+      ),
+      (en ? "Extras" : "Ekstra", () => _showExtras(true)),
+      (strings.settings, () => _push(SettingsScreen(settings: setup.settings, loader: setup.loader))),
+      (strings.language, () => LanguagePicker.show(context)),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final config = setup.config;
     final language = StoryLanguage.of(context);
-    final strings = language.strings;
-    return FutureBuilder(
-      future: _autosave,
-      builder: (context, snapshot) {
-        final save = snapshot.data;
-        return CeritaTitleScreen(
-          title: "Last Seen",
-          subtitle: language.locale == "en" ? "A North Jakarta mystery" : "Terakhir dilihat",
-          art: Poi(
-            background: config.bg("bg_seawall_night.webp"),
-            actors: [
-              PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
-              PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
-            ],
-          ),
-          primary: [
-            if (save != null)
-              TitleMenuEntry(
-                label: "${strings.continueGame} · ${language.maybe(save.chapter) ?? ""}",
-                icon: Icons.play_arrow_rounded,
-                onTap: () => _play(save: save),
-              ),
-            TitleMenuEntry(label: strings.newGame, icon: Icons.auto_stories, onTap: () => _play()),
-          ],
-          secondary: [
-            TitleMenuEntry(
-              label: strings.load,
-              icon: Icons.folder_open,
-              onTap: () => _push(SaveSlotsScreen(setup: setup, onLoad: (save) => _replaceWithStory(save: save))),
+    final en = language.locale == "en";
+    return PopScope(
+      canPop: !_started,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        _extras ? _showExtras(false) : setState(() => _started = false);
+      },
+      child: Scaffold(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Poi(
+              background: config.bg("bg_seawall_night.webp"),
+              actors: [
+                PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
+                PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
+              ],
             ),
-            TitleMenuEntry(
-              label: strings.chapters,
-              icon: Icons.timeline,
-              onTap: () => _push(
-                ChaptersScreen(
-                  setup: setup,
-                  onSelect: (checkpoint) => _replaceWithStory(checkpoint: checkpoint),
-                  onReplay: (checkpoint) => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => StoryScreen(setup: setup, checkpoint: checkpoint, replay: true),
-                  )),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 36, 20, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _Logo(subtitle: en ? "A North Jakarta mystery" : "Misteri Jakarta Utara"),
+                    const Spacer(),
+                    if (_started)
+                      FutureBuilder(
+                        future: _autosave,
+                        builder: (context, snapshot) => _Menu(
+                          entries: _entries(snapshot.data),
+                          cursor: _cursor,
+                          onSelect: (index, action) {
+                            if (index != _cursor) setState(() => _cursor = index);
+                            UiSounds.instance?.confirm();
+                            action();
+                          },
+                        ),
+                      )
+                    else
+                      Blink(
+                        child: Text(
+                          en ? "- TAP TO START -" : "- SENTUH UNTUK MULAI -",
+                          textAlign: TextAlign.center,
+                          style: Retro.text.copyWith(
+                            fontSize: 18,
+                            letterSpacing: 3,
+                            shadows: const [Shadow(color: Retro.night, offset: Offset(2, 2))],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 18),
+                    Text(
+                      "© 2026 CERITA ENGINE",
+                      textAlign: TextAlign.center,
+                      style: Retro.text.copyWith(
+                        color: Retro.dim,
+                        fontSize: 11,
+                        letterSpacing: 2,
+                        shadows: const [Shadow(color: Retro.night, offset: Offset(1, 1))],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            TitleMenuEntry(
-              label: strings.gallery,
-              icon: Icons.photo_library_outlined,
-              onTap: () => _push(GalleryScreen(setup: setup)),
-            ),
-            TitleMenuEntry(
-              label: strings.endings,
-              icon: Icons.emoji_events_outlined,
-              onTap: () => _push(EndingsScreen(setup: setup)),
-            ),
-            TitleMenuEntry(
-              label: strings.settings,
-              icon: Icons.tune,
-              onTap: () => _push(SettingsScreen(settings: setup.settings, loader: setup.loader)),
-            ),
-            TitleMenuEntry(label: strings.language, icon: Icons.translate, onTap: () => LanguagePicker.show(context)),
-            if (_credits != null)
-              TitleMenuEntry(
-                label: strings.credits,
-                icon: Icons.groups_outlined,
-                onTap: () => _push(CreditsScreen(setup: setup)),
-              ),
+            // Before the menu is up, a tap anywhere starts.
+            if (!_started) GestureDetector(behavior: HitTestBehavior.opaque, onTap: _start),
           ],
-        );
-      },
+        ),
+      ),
+    );
+  }
+}
+
+class _Logo extends StatelessWidget {
+  final String subtitle;
+
+  const _Logo({required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          "LAST SEEN",
+          textAlign: TextAlign.center,
+          style: Retro.text.copyWith(
+            fontSize: 50,
+            height: 1.1,
+            letterSpacing: 4,
+            // Stacked hard shadows, like a logo printed in two inks.
+            shadows: const [
+              Shadow(color: Retro.accent, offset: Offset(3, 3)),
+              Shadow(color: Retro.night, offset: Offset(6, 6)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          subtitle.toUpperCase(),
+          textAlign: TextAlign.center,
+          style: Retro.text.copyWith(
+            fontSize: 13,
+            letterSpacing: 3,
+            shadows: const [Shadow(color: Retro.night, offset: Offset(2, 2))],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Menu extends StatelessWidget {
+  final List<(String, VoidCallback)> entries;
+  final int cursor;
+  final void Function(int index, VoidCallback action) onSelect;
+
+  const _Menu({required this.entries, required this.cursor, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300),
+        child: RetroWindow(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final (index, (label, action)) in entries.indexed)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onSelect(index, action),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 26,
+                          child: index == cursor
+                              ? Blink(
+                                  period: const Duration(milliseconds: 800),
+                                  child: const Align(alignment: Alignment.centerLeft, child: RetroCursor(size: 14)),
+                                )
+                              : null,
+                        ),
+                        Flexible(
+                          child: Text(
+                            label.toUpperCase(),
+                            overflow: TextOverflow.ellipsis,
+                            style: Retro.text.copyWith(
+                              fontSize: 17,
+                              height: 1.2,
+                              letterSpacing: 2.4,
+                              color: index == cursor ? Retro.frame : Retro.frame.withAlpha(200),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

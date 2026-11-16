@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:cerita_flutter/cerita_flutter.dart';
-import 'package:cerita_ui/cerita_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'title_screen.dart';
+import 'ui/retro.dart';
+import 'ui/retro_skin.dart';
 
 class LastSeenApp extends StatelessWidget {
   final StorySetup setup;
@@ -17,10 +18,13 @@ class LastSeenApp extends StatelessWidget {
     return MaterialApp(
       title: "Last Seen",
       debugShowCheckedModeBanner: false,
-      theme: CeritaTheme.dark(),
+      theme: Retro.theme(),
       builder: (context, child) => StoryLanguageScope(
         language: language,
-        child: StorySkinScope(skin: const AnimeVnSkin(), child: _PhoneFrame(child: child!)),
+        child: StorySkinScope(
+          skin: const RetroSkin(),
+          child: _PhoneFrame(child: child!),
+        ),
       ),
       home: TitleScreen(setup: setup),
     );
@@ -43,7 +47,7 @@ class _PhoneFrame extends StatelessWidget {
 
     final height = min(media.size.height - 32, _maxHeight);
     return ColoredBox(
-      color: const Color(0xFF0E1A24),
+      color: Retro.night,
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),

@@ -34,3 +34,9 @@ flutter:
     - assets/story/media/
     - assets/story/music/
     - assets/story/sprites/
+
+  # DotGothic16 (SIL OFL 1.1, assets/fonts/OFL.txt): the dot font of the 90s PC look.
+  fonts:
+    - family: DotGothic16
+      fonts:
+        - asset: assets/fonts/DotGothic16-Regular.ttf
