@@ -699,6 +699,20 @@ like the player's, without avatar, name or typing indicator. The header still sh
   sending it. That fits Raka typing on Sekar's phone.
 - **Revisit if** a story needs one thread seen from two phones. That is two threads today.
 
+## Public domain recordings count as CC0 for Last Seen's sound
+
+*2026-11-17. Last Seen spec §6.*
+
+Three M2 sounds (the harbor, the generator night and the courier's motorbike) come from PDSounds recordings on
+Wikimedia Commons, marked public domain by their authors. `credits.json` lists them as "Public domain" with the
+Commons page as the source.
+
+- **Why:** the spec asks for CC0 so the sound needs no attribution rules. A public domain release gives the same
+  freedom. OpenGameArt had no CC0 harbor, motorbike or diesel recordings, and freesound downloads need a login.
+- **Not accepted:** "free" sounds without a stated license, CC-BY, Pixabay, and packs whose CC0 label is doubtful
+  (an OpenGameArt gull pack ripped from a video was skipped).
+- **Revisit if** a store review or the M5 license pass wants CC0 by name. The three files would then be replaced.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
