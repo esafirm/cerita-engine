@@ -8,10 +8,14 @@ class Channel {
   final String? status;
   final List<String> members;
 
+  /// The profile id whose phone this thread is on. Their messages are outgoing, like the player's. Null for the
+  /// player's own threads.
+  final String? owner;
+
   /// The JSON it was read from, to show it in another language. Null when built in code.
   final Map<String, dynamic>? _json;
 
-  const Channel({required this.id, required this.name, this.avatar, this.status, this.members = const []})
+  const Channel({required this.id, required this.name, this.avatar, this.status, this.members = const [], this.owner})
       : _json = null;
 
   Channel._fromJson(Map<String, dynamic> json, Localizer localizer)
@@ -20,6 +24,7 @@ class Channel {
         avatar = json["avatar"] as String?,
         status = localizer.json(json["status"]),
         members = [for (final member in json["members"] as List<dynamic>? ?? const []) member.toString()],
+        owner = json["owner"] as String?,
         _json = json;
 
   factory Channel.fromJson(Map<String, dynamic> json, {Localizer localizer = const Localizer()}) =>

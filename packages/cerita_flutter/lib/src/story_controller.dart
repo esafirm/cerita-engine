@@ -170,6 +170,11 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Channel? get channel => engine.getChannel(scene.channelId);
 
+  /// Whether [profile]'s messages sit on the outgoing side of the current thread: the player's, and the thread
+  /// owner's when the thread is on another character's phone (data schema §2, chat threads).
+  bool isOutgoing(Profile? profile) =>
+      profile != null && (profile.isPlayer || (scene.mode == SceneMode.chat && profile.id == channel?.owner));
+
   Profile? profileOf(ItemType item) => engine.getProfile(item);
 
   Profile? profileById(String id) => engine.getProfileById(id);
@@ -460,10 +465,12 @@ class StoryController extends ChangeNotifier with EngineListener {
     final typingDelay = switch (item) {
       TextItemType(:final typingDelayMs) || MediaItemType(:final typingDelayMs) when typingDelayMs != null =>
         typingDelayMs,
+      // The owner of the phone being read writes their own messages: no typing from them.
+      _ when scene.mode == SceneMode.chat && isOutgoing(profile) => null,
       // Incoming messages without an explicit delay still take a moment to type.
-      TextItemType(:final text) when scene.mode == SceneMode.chat && !(profile?.isPlayer ?? true) =>
+      TextItemType(:final text) when scene.mode == SceneMode.chat && profile != null =>
         min(_typingDelayMs + TextMarkup.plain(text).length * _typingDelayPerCharMs, _maxTypingDelayMs),
-      MediaItemType() when scene.mode == SceneMode.chat && !(profile?.isPlayer ?? true) => _typingDelayMs * 2,
+      MediaItemType() when scene.mode == SceneMode.chat && profile != null => _typingDelayMs * 2,
       _ => null,
     };
 
@@ -471,7 +478,8 @@ class StoryController extends ChangeNotifier with EngineListener {
     final typingMs = typingDelay == null ? 0 : settings.value.chatTypingFor(typingDelay);
     if (scene.mode != SceneMode.vn && typingMs > 0 && !skipMode) {
       phase = StoryPhase.typing;
-      typingProfile = profile;
+      // An explicit delay on the owner's message is a pause: the phone being read doesn't show its owner typing.
+      typingProfile = profile?.isPlayer == false && isOutgoing(profile) ? null : profile;
       _typingEntry = history.lastOrNull;
       _notify();
       await Future.delayed(Duration(milliseconds: typingMs));

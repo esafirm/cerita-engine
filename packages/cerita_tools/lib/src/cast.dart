@@ -148,6 +148,10 @@ class ChannelDef {
   final List<String> members;
   final List<SourceSpan> memberSpans;
 
+  /// The character whose phone the thread is on (`owner:`), or null for the player's own threads.
+  final String? owner;
+  final SourceSpan? ownerSpan;
+
   const ChannelDef({
     required this.id,
     required this.span,
@@ -157,6 +161,8 @@ class ChannelDef {
     this.avatar,
     this.avatarSpan,
     this.status,
+    this.owner,
+    this.ownerSpan,
   });
 
   static const fileName = "channels.yaml";
@@ -177,7 +183,7 @@ class ChannelDef {
         diagnostics.error(span, "Thread '$id' must be a map");
         return;
       }
-      const known = {"name", "avatar", "status", "members"};
+      const known = {"name", "avatar", "status", "members", "owner"};
       for (final field in node.nodes.keys.cast<YamlNode>()) {
         if (!known.contains(field.value)) diagnostics.error(yamlSpan(file, field), "Unknown thread field '${field.value}'");
       }
@@ -194,6 +200,10 @@ class ChannelDef {
       } else if (membersNode != null && membersNode.value != null) {
         diagnostics.error(yamlSpan(file, membersNode), "'members' must be a list of character names");
       }
+      final ownerNode = node.nodes["owner"];
+      if (ownerNode != null && ownerNode.value is! String) {
+        diagnostics.error(yamlSpan(file, ownerNode), "'owner' must be a character name");
+      }
       final avatarNode = node.nodes["avatar"];
       channels.add(ChannelDef(
         id: id,
@@ -204,6 +214,8 @@ class ChannelDef {
         status: config.localizedFromYaml(file, node.nodes["status"], diagnostics, "status"),
         members: members,
         memberSpans: memberSpans,
+        owner: ownerNode?.value is String ? ownerNode!.value as String : null,
+        ownerSpan: ownerNode == null ? null : yamlSpan(file, ownerNode),
       ));
     });
     return channels;

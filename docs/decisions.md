@@ -684,6 +684,21 @@ Didit's first contact moves from Day 4 to Day 3, as a chat. Day 4 keeps his firs
 - **Cost:** Day 3 carries four threads (the auction, Hendra, Yusuf, Didit), so it's the fullest day of M2.
 - **Revisit if** the M1 playtest shrinks the day budgets enough that Day 3 can't hold all four.
 
+## A chat thread can be on another character's phone
+
+*2026-11-17. Data schema §2, presentation modes §1.1.*
+
+A thread in `channels.json` takes an `owner`, a profile id. The owner's messages in it sit on the outgoing side
+like the player's, without avatar, name or typing indicator. The header still shows the thread's contact.
+
+- **Why:** Last Seen's Day 2 reads Sekar's threads on her phone. Her messages there are the ones she sent, and
+  showing them as incoming made her phone look like Raka's.
+- **On the thread, not the scene:** a thread's history is shown across every scene that uses it. An owner per
+  scene would flip old bubbles from side to side when a later scene left it out.
+- **Cost:** the player's own replies in such a thread are outgoing too, so a choice there reads as the owner
+  sending it. That fits Raka typing on Sekar's phone.
+- **Revisit if** a story needs one thread seen from two phones. That is two threads today.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

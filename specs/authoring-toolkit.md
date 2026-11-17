@@ -85,6 +85,11 @@ thread_miki:
   avatar: assets/story/sprites/miki_avatar.png
   status: last seen a long time ago
   members: [miki]           # Profile keys, compiled to engine ids
+
+sekar_tasya:                # A thread on another character's phone
+  name: Tasya
+  members: [tasya]
+  owner: sekar              # Sekar's messages show as outgoing. A profile key
 ```
 
 ### 1.4 `clues.yaml`

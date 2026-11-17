@@ -104,10 +104,9 @@ long, the budgets shrink so the critical path still lands near 3 hours.
 
 **Engine (spec first, then code):**
 
-- **Someone else's phone in CHAT.** Day 2 shows Sekar's threads. Her own messages must sit on the outgoing side,
-  but outgoing today means the player profile. A scene field such as `owner: sekar` would put that profile on the
-  outgoing side for the scene, and show the owner's contacts in the header. Needs data-schema and
-  presentation-modes changes, the compiler's `@scene owner=` and tests.
+- **Someone else's phone in CHAT.** Done: a thread in `channels.yaml` takes `owner: sekar`, and Sekar's messages
+  in it sit on the outgoing side without her typing (data schema §2, chat threads). Sekar's threads with Tasya,
+  Bima and the group set it when Day 2 is written.
 - **Deleted messages** need nothing new: an italic `{i}` line in the sender's bubble.
 
 **Art:**

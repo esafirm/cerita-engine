@@ -42,7 +42,7 @@ class MessageBubble extends StatelessWidget {
     if (item is NarrationItemType) return _SystemPill(item: item);
 
     final profile = item == null ? null : controller.profileOf(item);
-    final outgoing = entry.isPlayer || (profile?.isPlayer ?? false);
+    final outgoing = entry.isPlayer || controller.isOutgoing(profile);
     final scheme = Theme.of(context).colorScheme;
     final bubbleColor = outgoing ? scheme.primary : scheme.surfaceContainerHighest;
     final textColor = outgoing ? scheme.onPrimary : scheme.onSurface;

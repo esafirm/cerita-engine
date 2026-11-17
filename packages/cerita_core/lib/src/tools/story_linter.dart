@@ -147,6 +147,18 @@ class StoryLinter {
       asset(null, null, profile.avatar, config.avatar, "avatar");
     }
 
+    // Chat threads name their contacts and owner by profile id.
+    if (profilesLoaded) {
+      for (final channel in channels) {
+        for (final id in [...channel.members, ?channel.owner]) {
+          if (profiles.byId(id) == null) {
+            issues.add(LintIssue(LintSeverity.error, null, null, "Thread '${channel.id}' names unknown character '$id'",
+                fileName: "channels.json"));
+          }
+        }
+      }
+    }
+
     // Clues and their images.
     void clueError(String message) =>
         issues.add(LintIssue(LintSeverity.error, null, null, message, fileName: "clues.json"));

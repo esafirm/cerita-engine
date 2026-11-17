@@ -113,6 +113,7 @@ class _ScriptLinter {
       for (final member in channel.members) {
         used.putIfAbsent(member, () => {});
       }
+      if (channel.owner case final owner?) used.putIfAbsent(owner, () => {});
     }
     for (final conversation in project.conversations) {
       for (final item in conversation.items) {

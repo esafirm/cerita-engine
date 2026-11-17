@@ -28,14 +28,14 @@ class ChatView extends StatelessWidget {
     required this.onGallery,
   });
 
-  /// The thread's contact: first channel member, else the latest incoming speaker.
+  /// The thread's contact: first channel member, else the latest incoming speaker (not the player or the owner).
   Profile? _contact(List<TranscriptEntry> entries) {
     final memberId = controller.channel?.members.firstOrNull;
     if (memberId != null) return controller.profileById(memberId);
     for (final entry in entries.reversed) {
       final item = entry.itemType;
       final profile = item == null ? null : controller.profileOf(item);
-      if (profile != null && !profile.isPlayer) return profile;
+      if (profile != null && !controller.isOutgoing(profile)) return profile;
     }
     return null;
   }

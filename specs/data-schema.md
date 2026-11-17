@@ -62,6 +62,29 @@ Dialogue items reference a character and expression using the shorthand `<id>:<s
 - `"123aaa:0"` resolves to profile `"123aaa"` (`Nora`) and `sprites[0]` (`"nora_open.png"`).
 - `"player"` (or omitted `profile` on outgoing chat items) represents the player character.
 
+### Chat threads (`channels.json`)
+
+Optional. Lists the chat threads a `CHAT` scene's `channel_id` can name.
+
+```json
+{
+  "channels": [
+    { "id": "thread_miki", "name": "Unknown Number", "avatar": "assets/story/sprites/miki_avatar.png",
+      "status": "last seen a long time ago", "members": ["123aaa"] },
+    { "id": "sekar_tasya", "name": "Tasya", "members": ["456bbb"], "owner": "789ccc" }
+  ]
+}
+```
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `String` | Yes | The `channel_id` scenes use. |
+| `name` | text | Yes | The thread's name in the chat header. |
+| `avatar` | `String` | No | The header avatar. Left out, the contact's avatar is used. |
+| `status` | text | No | The header's status line, unless the scene sets its own (§3). |
+| `members` | `List<String>` | No | Profile ids. The first one is the thread's contact: its avatar, bio and profile sheet. |
+| `owner` | `String` | No | The profile whose phone this thread is on, for a story that reads another character's messages. Messages from the owner sit on the outgoing side like the player's, without avatar or name, and the owner's typing isn't shown. Left out, the thread is the player's. |
+
 ---
 
 ## 3. Conversation Script (`index.json` & `cvn_<id>.json`)

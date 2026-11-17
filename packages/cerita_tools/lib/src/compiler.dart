@@ -291,6 +291,7 @@ class _Compiler {
                 "members": [
                   for (var i = 0; i < channel.members.length; i++) _member(channel.members[i], channel.memberSpans[i]),
                 ],
+              if (channel.owner != null) "owner": _member(channel.owner!, channel.ownerSpan!),
             },
         ],
       };

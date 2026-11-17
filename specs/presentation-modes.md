@@ -19,6 +19,7 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
   - Renders the delivered transcript for the active `channel_id`.
   - **Incoming Bubbles**: Left-aligned with character avatar and name; styled according to character theme.
   - **Outgoing (Player) Bubbles**: Right-aligned; automatically appended when the player selects a `CHOICE` or submits an `INPUT`.
+  - **Someone else's phone**: a thread with an `owner` (data schema §2, chat threads) is on that character's phone. Their messages are outgoing bubbles, and their typing isn't shown, so the player reads the thread the way its owner saw it.
   - **System / Timestamp Dividers**: Centered pills for `NARRATION` items (`"Day 2 — 09:15 AM"`, `"Luna sent a photo"`).
 - **Typing Indicator & Pacing**:
   - When the next item is an incoming `TEXT` or `MEDIA` item with `typing_delay_ms`, displays an animated typing bubble (`"Miki is typing..."`) before revealing the message and playing a notification SFX.
