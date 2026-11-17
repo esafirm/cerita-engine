@@ -184,6 +184,7 @@ class ScriptParser {
       ..background = st.take("bg")
       ..music = st.take("music")
       ..ambience = st.take("ambience")
+      ..ring = st.take("ring")
       ..textbox = st.choose("textbox", _textboxStyles)
       ..channel = st.take("channel")
       ..time = st.take("time");
@@ -199,6 +200,7 @@ class ScriptParser {
       scene.day = int.tryParse(day);
       if (scene.day == null) _error(st.span, "day must be a whole number, not '$day'");
     }
+    if (scene.ring != null && mode != "CALL") _error(st.span, "ring is only for CALL scenes");
     st.finish(allowCondition: false);
     conversation.scene = scene;
     _body = null;

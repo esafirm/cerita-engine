@@ -51,6 +51,12 @@ class SilentAudio extends AudioHelper {
   Future<void> stopVoice() async {}
 
   @override
+  Future<void> startRing(String path) async => calls.add("ring $path");
+
+  @override
+  Future<void> stopRing() async => calls.add("ring stop");
+
+  @override
   Future<void> stopAll() async {}
 
   @override

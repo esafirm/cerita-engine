@@ -56,6 +56,7 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
       add("background", "bg", scene.background, scene.span);
       add("music", "music", scene.music, scene.span);
       add("ambience", "music", scene.ambience, scene.span);
+      add("sound", "music", scene.ring, scene.span);
     }
     for (final item in conversation.items) {
       switch (item) {

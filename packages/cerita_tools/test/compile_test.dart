@@ -354,6 +354,17 @@ ending caught GOOD label=caught
         ["a.cerita:2: error: `silent` is a keyword here, name the variable differently"]);
   });
 
+  test('ring= makes a CALL scene ring in, and only a CALL scene', () {
+    final json = _compileOne(story({
+      "a.cerita": "@conversation index\n@scene CALL ring=ring.mp3\nnora\n  en: Hi\n",
+    }));
+    expect(json["scene"], {"mode": "CALL", "ring": "ring.mp3"});
+    expect(core.Scene.fromJson(json["scene"] as Map<String, dynamic>).ring, "ring.mp3");
+
+    final result = compileStory(story({"a.cerita": "@conversation index\n@scene VN ring=ring.mp3\nnora\n  en: Hi\n"}));
+    expect(result.diagnostics.sorted().map((d) => d.format()), ["a.cerita:2: error: ring is only for CALL scenes"]);
+  });
+
   test('fails without output on syntax errors and unknown speakers or expressions', () {
     final result = compileStory(story({
       "a.cerita": "@conversation index\nnora:sad\n  en: Hi\nbob\n  en: Hi\nwait soon\n",

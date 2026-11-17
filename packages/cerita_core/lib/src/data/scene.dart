@@ -27,6 +27,9 @@ class Scene {
 
   /// Looping background sound under the music.
   final String? ambience;
+
+  /// `CALL` scenes: the call is incoming and rings with this sound until the player answers it.
+  final String? ring;
   final TextboxStyle textbox;
   final String? channelId;
   final int? day;
@@ -41,6 +44,7 @@ class Scene {
     this.background,
     this.music,
     this.ambience,
+    this.ring,
     this.textbox = TextboxStyle.adv,
     this.channelId,
     this.day,
@@ -55,6 +59,7 @@ class Scene {
       background: json["background"] as String?,
       music: json["music"] as String?,
       ambience: json["ambience"] as String?,
+      ring: json["ring"] as String?,
       textbox: TextboxStyle.fromName(json["textbox"] as String?) ?? TextboxStyle.adv,
       channelId: json["channel_id"] as String?,
       day: (json["day"] as num?)?.toInt(),
@@ -68,6 +73,7 @@ class Scene {
         "background": ?background,
         "music": ?music,
         "ambience": ?ambience,
+        "ring": ?ring,
         if (textbox != TextboxStyle.adv) "textbox": textbox.name,
         "channel_id": ?channelId,
         "day": ?day,

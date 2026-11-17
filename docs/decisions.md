@@ -713,6 +713,56 @@ Commons page as the source.
   (an OpenGameArt gull pack ripped from a video was skipped).
 - **Revisit if** a store review or the M5 license pass wants CC0 by name. The three files would then be replaced.
 
+## An ended call rings back
+
+*2026-11-17. Presentation modes §1.2, data schema §3.*
+
+A `CALL` scene with `ring=` rings until the player answers, and its first line waits for the answer. Every call
+button works: mute, speaker and the keypad are the player's own, and hold stops the line and the story. Ending or
+declining the call ends it, and after 2.6 seconds the caller calls back. Answering picks the call up where it
+was cut and says the cut line again.
+
+- **Why:** the playtest asked for a call screen where every button can be pressed. The story can't go on without
+  its call, so a hang-up can't skip it. A worried caller ringing back is what a real phone does, and it needs
+  nothing from the writer.
+- **Not done:** a script branch for hanging up (`hangup=` to another conversation). No scene needs one yet.
+- **Mute and speaker change nothing in the story.** They are there for the feel of the phone.
+- **Cost:** the keypad plays the platform's key click, not real phone tones, because the engine ships no sounds.
+- **Revisit if** a scene wants the hang-up to matter, or a puzzle wants tones typed during a call.
+
+## The outgoing scene is frozen while it fades out
+
+*2026-11-17. Presentation modes §1 and §2.*
+
+During a scene switch the outgoing view is shown as a snapshot of how it last looked.
+
+- **Why:** the views read the story state as it is now, which already holds the incoming scene. The call view
+  redraws every second for its timer, so after Dinda's call the outgoing call lost its background and caption
+  mid-fade. Any rebuild of the outgoing view (a language switch, a line still typing) had the same risk.
+- **Cost:** anything animated in the outgoing scene stops for the 0.45 s it takes to fade out.
+
+## A chapter card that comes with its scene starts fully shown
+
+*2026-11-17.*
+
+When a scene arrives with a chapter card, the card is up from the scene's first frame and the scene fades in as
+the card. A new chapter in a scene already on screen still fades its card in over it.
+
+- **Why:** the card used to start its own fade in after the scene had faded in, so the new scene showed for a
+  moment and was then covered. The playtest called the Prologue's start and the switch after Dinda's call
+  glitchy.
+- **Cost:** the card fades in 0.5 s sooner and is shown that much longer behind the scene transition.
+
+## Sprites stand on the bottom edge of the stage
+
+*2026-11-17. Presentation modes §2.1.*
+
+A sprite sits at the bottom of its slot. Before, the expression cross-fade centered it, and on a portrait stage
+the slot is taller than the sprite, so the cut-off legs floated about 110 dp above the screen edge. The title
+screen showed it most.
+
+Holding the stage (or the title screen) hides the UI until the finger lifts, so the art can be seen whole.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
@@ -731,4 +781,6 @@ showing as written, a tagged choice option rendering in italics and its backlog 
 mode waiting while HIDE is on and resuming after.
 
 Not yet checked: the desktop mouse wheel rollback, story hot reload on a device, and fades and volumes by ear.
+Also not yet checked: the ringtone loop of a `ring=` call, the vibration while it rings, the keypad click, and
+holding the stage to hide the UI.
 See the backlog.

@@ -32,6 +32,16 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
   - **Choice Selection (`CHOICE`)**: Expands a tray of selectable reply cards at the bottom of the chat (with an optional countdown bar if `timeout_ms` is set). An evidence question shows the Case Board picker there instead (§6.3), and the presented clue is sent as a clue message (§6.4).
   - **Text Input (`INPUT`)**: Activates the message text field and Send button. With `"keyboard": "digits"` the number pad opens and only digits can be typed. Typing stops at `max_length`, and Send stays disabled until the answer has `min_length` characters (data schema §4.5). The VN dialog and the call view use the same field.
 
+### 1.2 Phone calls (`CALL` scenes)
+- **Layout**: like a phone's call screen. The caller's avatar and name over the blurred scene background, a status line (the call timer once the first line is spoken, or a narration line), the line being said as a caption, and the call buttons at the bottom. A tap anywhere else moves the call on.
+- **Ringing** (`scene.ring`, data schema §3): the call is incoming. The phone rings with the `ring` sound on loop and vibrates, the status reads "Incoming call", and the story waits with its first line until the player taps **Answer**. Without `ring` the call is already connected when the scene starts, like a call the player makes.
+- **Call buttons**: every one works.
+  - **Mute** and **Speaker** toggle. Mute shows a muted microphone next to the status.
+  - **Keypad** swaps the buttons for a dial pad that plays key clicks and shows the keys pressed. **Hide** brings the buttons back.
+  - **Hold** stops the line and the story, and the status reads "On hold". Taking the call off hold says the line again.
+  - **End call** and **Decline**: the story can't go on without its call, so the call ends ("Call ended"), and after a moment the caller calls back. Answering picks the call up where it was cut, and says the cut line again.
+- **Choices, inputs and evidence** take the place of the call buttons while they are open.
+
 ---
 
 ## 2. Visual Novel (VN) Stage Mode
@@ -51,6 +61,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - A line spoken by someone off stage (`offstage`, data schema §4.1) leaves the stage as it is and dims everyone on it.
   - An expression change fades the new sprite in over the old one, then fades the old one out under it, so the character is never see-through midway.
   - Smooth sprite swapping when a character changes expression (`123aaa:0` -> `123aaa:2`).
+  - Sprites stand on the bottom edge of the stage. On a portrait stage a sprite's slot is taller than the sprite, and the sprite sits at the bottom of it, so a cut-off waist or thigh is hidden by the screen edge.
 - **Stage Direction (`STAGE` items)**:
   - Character and background `transition`s: `fade`, `dissolve`, `fade_black`, `slide_*`, `zoom`, `wipe_*`, `none`. Without one, the skin's default transition is used.
   - Camera: `shake` and `flash` play once; `zoom` scales the background and characters towards a slot.
@@ -74,7 +85,7 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **Back**: Rolls back to the previous line (engine §7). A mouse wheel scroll up does the same. Rolled-back lines and stage changes show instantly.
   - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
   - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
-  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Auto and skip wait while the UI is hidden and carry on when it comes back.
+  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Holding the stage anywhere does the same until the finger lifts. Auto and skip wait while the UI is hidden and carry on when it comes back.
   - **Case Board**: Opens the board (§6) in stories with clues, with a badge counting new clues.
 
 ---

@@ -113,15 +113,7 @@ dinda typing=2.2s sfx=sfx_msg_receive.mp3
 
 
 @conversation p_call chapter=Prolog chapter.en=Prologue title="Telepon Dinda" title.en="Dinda's Call"
-@scene CALL channel=thread_dinda day=0 time=02:17 bg=bg_raka_room_night.webp music=amb_room_night.mp3
-
-system sfx=sfx_phone_ring.mp3
-  id: Dinda memanggil…
-  en: Dinda is calling…
-wait 2.2s
-system
-  id: Tersambung
-  en: Connected
+@scene CALL channel=thread_dinda day=0 time=02:17 bg=bg_raka_room_night.webp music=amb_room_night.mp3 ring=sfx_phone_ring.mp3
 
 dinda voice=vo_p_dinda_01.mp3
   id: Ka? Sori. Gue tahu kalian udah nggak ngomong. Gue nggak tahu harus nelpon siapa lagi.

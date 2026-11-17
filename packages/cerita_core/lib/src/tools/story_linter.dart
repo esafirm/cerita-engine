@@ -251,6 +251,7 @@ class StoryLinter {
         asset(key, null, scene.background, config.bg, "background");
         asset(key, null, scene.music, config.music, "music");
         asset(key, null, scene.ambience, config.music, "ambience");
+        asset(key, null, scene.ring, config.music, "sound");
         if (scene.mode == SceneMode.chat) {
           if (scene.channelId == null) {
             error(key, null, "CHAT scene without a channel_id");

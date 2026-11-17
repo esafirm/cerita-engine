@@ -22,6 +22,10 @@ class AudioHelper with WidgetsBindingObserver {
   final List<AudioPlayer> _sfx = [for (var i = 0; i < _sfxPlayers; i++) createPlayer()];
   final AudioPlayer _voice = createPlayer();
 
+  /// An incoming call's ringtone, on loop until it is answered or declined.
+  final AudioPlayer _ring = createPlayer()..setReleaseMode(ReleaseMode.loop);
+  bool _ringing = false;
+
   late final _bgmChannel = _LoopChannel(_bgm, () => _bgmLevel);
   late final _ambienceChannel = _LoopChannel(_ambience, () => _ambienceVolume * _soundVolume);
 
@@ -66,6 +70,7 @@ class AudioHelper with WidgetsBindingObserver {
     for (final player in _sfx) {
       player.setVolume(sound);
     }
+    _ring.setVolume(sound);
     _voice.setVolume(voice * _voiceCharacter);
   }
 
@@ -77,7 +82,7 @@ class AudioHelper with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _bgmChannel.cancel();
     _ambienceChannel.cancel();
-    for (final player in [_bgm, _ambience, ..._sfx, _voice]) {
+    for (final player in [_bgm, _ambience, ..._sfx, _voice, _ring]) {
       player.dispose();
     }
   }
@@ -108,6 +113,17 @@ class AudioHelper with WidgetsBindingObserver {
     await _voice.stop();
   }
 
+  /// Rings [path] on loop at the sound volume until [stopRing].
+  Future<void> startRing(String path) {
+    _ringing = true;
+    return _safePlay(_ring, path, _soundVolume);
+  }
+
+  Future<void> stopRing() {
+    _ringing = false;
+    return _ring.stop();
+  }
+
   /// Lowers the BGM while another channel (voice-over, voice note, video) is audible.
   void duck() {
     _duckCount++;
@@ -122,11 +138,13 @@ class AudioHelper with WidgetsBindingObserver {
 
   Future<void> stopAll() async {
     _duckCount = 0;
+    _ringing = false;
     await Future.wait([
       _bgmChannel.play(null, 0),
       _ambienceChannel.play(null, 0),
       for (final player in _sfx) player.stop(),
       _voice.stop(),
+      _ring.stop(),
     ]);
   }
 
@@ -135,10 +153,12 @@ class AudioHelper with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _bgmChannel.resume();
       _ambienceChannel.resume();
+      if (_ringing) _ring.resume();
     } else if (state == AppLifecycleState.paused) {
       _bgm.pause();
       _ambience.pause();
       _voice.pause();
+      _ring.pause();
     }
   }
 }

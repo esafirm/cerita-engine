@@ -159,7 +159,7 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
 | Statement | Compiles to | Attributes and modifiers |
 | :--- | :--- | :--- |
 | `@conversation <key>` | A conversation file: `index.json` for `index`, else `cvn_<key>.json` | `id=` (`conversation_id`, default `cvn_<key>`), `chapter=`, `title=`, `checkpoint` |
-| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `textbox=adv\|nvl`, `channel=`, `day=`, `time=`, `status=` (`status=none` hides the chat status) |
+| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `ring=` (`CALL` only: the call rings in with this sound until answered), `textbox=adv\|nvl`, `channel=`, `day=`, `time=`, `status=` (`status=none` hides the chat status) |
 | `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `[offstage]`, `typing=`, `sfx=`, `voice=` |
 | `narration` / `system` / `timestamp` | `NARRATION` (no style / `system` / `timestamp`) | `sfx=` |
 | `media <IMAGE\|AUDIO\|VIDEO\|CG> <file>` | `MEDIA` | `by=`, `unlock=`, `typing=`, `sfx=` |
@@ -440,7 +440,7 @@ and audio pipelines. It always exits with `0`: it's a report, and `lint` is the 
 | `avatar` | `sprites/` or under `asset_prefix` | `profiles.yaml`, `channels.yaml` avatars |
 | `image`, `video`, `voice_note` | `media/` | `media IMAGE`, `media VIDEO`, `media AUDIO` |
 | `clue` | `media/` | `clues.yaml` images |
-| `music`, `ambience` | `music/` | `@scene music=` and `ambience=`, `stage music` and `ambience` |
+| `music`, `ambience` | `music/` | `@scene music=` and `ambience=`, `@scene ring=`, `stage music` and `ambience` |
 | `sfx` | `music/` | `sfx=`, `stage sound` |
 | `voice` | `music/` | `voice=` |
 

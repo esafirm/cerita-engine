@@ -339,6 +339,9 @@ class SceneNode {
   String? background;
   String? music;
   String? ambience;
+
+  /// `ring=`: a `CALL` scene rings with this sound until the player answers.
+  String? ring;
   String? textbox;
   String? channel;
   int? day;

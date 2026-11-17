@@ -14,30 +14,10 @@
     "day": 0,
     "time": "02:17",
     "background": "bg_raka_room_night.webp",
-    "music": "amb_room_night.mp3"
+    "music": "amb_room_night.mp3",
+    "ring": "sfx_phone_ring.mp3"
   },
   "conversations": [
-    {
-      "type": "NARRATION",
-      "style": "system",
-      "text": {
-        "id": "Dinda memanggil…",
-        "en": "Dinda is calling…"
-      },
-      "sfx": "sfx_phone_ring.mp3"
-    },
-    {
-      "type": "WAIT",
-      "duration_ms": 2200
-    },
-    {
-      "type": "NARRATION",
-      "style": "system",
-      "text": {
-        "id": "Tersambung",
-        "en": "Connected"
-      }
-    },
     {
       "type": "TEXT",
       "text": {

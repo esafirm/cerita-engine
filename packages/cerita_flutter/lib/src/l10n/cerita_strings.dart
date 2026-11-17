@@ -65,6 +65,18 @@ abstract class CeritaStrings {
   String get calling;
   String get unknownCaller;
 
+  /// Call screen: the status while the phone rings, its buttons, and the status once the call is cut.
+  String get incomingCall;
+  String get answer;
+  String get decline;
+  String get callEnded;
+  String get onHold;
+  String get mute;
+  String get speaker;
+  String get keypad;
+  String get hold;
+  String get hideKeypad;
+
   /// The player's name until the story sets `NAME`.
   String get you;
 
@@ -251,6 +263,26 @@ class EnglishCeritaStrings extends CeritaStrings {
   String get calling => "Calling…";
   @override
   String get unknownCaller => "Unknown";
+  @override
+  String get incomingCall => "Incoming call";
+  @override
+  String get answer => "Answer";
+  @override
+  String get decline => "Decline";
+  @override
+  String get callEnded => "Call ended";
+  @override
+  String get onHold => "On hold";
+  @override
+  String get mute => "Mute";
+  @override
+  String get speaker => "Speaker";
+  @override
+  String get keypad => "Keypad";
+  @override
+  String get hold => "Hold";
+  @override
+  String get hideKeypad => "Hide";
   @override
   String get you => "You";
   @override
@@ -476,6 +508,26 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get calling => "Memanggil…";
   @override
   String get unknownCaller => "Tidak dikenal";
+  @override
+  String get incomingCall => "Panggilan masuk";
+  @override
+  String get answer => "Angkat";
+  @override
+  String get decline => "Tolak";
+  @override
+  String get callEnded => "Panggilan berakhir";
+  @override
+  String get onHold => "Ditahan";
+  @override
+  String get mute => "Bisukan";
+  @override
+  String get speaker => "Speaker";
+  @override
+  String get keypad => "Papan tombol";
+  @override
+  String get hold => "Tahan";
+  @override
+  String get hideKeypad => "Tutup";
   @override
   String get you => "Kamu";
   @override

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../clues/case_board.dart';
 import '../common/avatar.dart';
@@ -13,7 +14,9 @@ import '../l10n/story_language.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
-/// Phone call mode: caller card, call timer, live captions and reply options.
+/// Phone call mode, laid out like a phone's call screen: caller card, call timer, live captions and reply
+/// options. A `ring=` scene rings until the player answers. Mute, speaker, keypad and hold work like on a phone,
+/// and ending the call makes the caller call back (see [StoryController.endCall]).
 class CallView extends StatefulWidget {
   final StoryController controller;
   final StorySetup setup;
@@ -28,11 +31,21 @@ class CallView extends StatefulWidget {
 class _CallViewState extends State<CallView> {
   late final Timer _ticker;
   final _stopwatch = Stopwatch();
+  bool _muted = false;
+  bool _speaker = false;
+  bool _keypad = false;
+  String _digits = "";
+
+  StoryController get controller => widget.controller;
 
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
+      // A ringing phone vibrates every other second.
+      if (controller.callState == CallState.ringing && timer.tick.isEven) HapticFeedback.vibrate();
+      setState(() {});
+    });
   }
 
   @override
@@ -41,20 +54,56 @@ class _CallViewState extends State<CallView> {
     super.dispose();
   }
 
+  void _press(VoidCallback action) {
+    HapticFeedback.lightImpact();
+    setState(action);
+  }
+
+  void _dial(String key) {
+    HapticFeedback.lightImpact();
+    SystemSound.play(SystemSoundType.click);
+    // A long run of tones only keeps its end, like the phone's own keypad field.
+    setState(() => _digits = "$_digits$key".characters.takeLast(14).toString());
+  }
+
+  void _end() {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _keypad = false;
+      _digits = "";
+    });
+    controller.endCall();
+  }
+
+  void _answer() {
+    HapticFeedback.mediumImpact();
+    controller.answerCall();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controller = widget.controller;
     final config = widget.setup.config;
     final scene = controller.scene;
     final item = controller.current;
     final memberId = controller.channel?.members.firstOrNull;
     final strings = StoryLanguage.of(context).strings;
     final caller = memberId == null ? controller.currentProfile : controller.profileById(memberId);
+    final state = controller.callState;
+    final connected = state == CallState.connected;
 
-    // The call timer starts once the first line is spoken.
-    if (item is TextItemType && !_stopwatch.isRunning) _stopwatch.start();
+    // The call timer starts once the first line is spoken, and starts over when a cut call is picked up again.
+    if (!connected) {
+      _stopwatch
+        ..stop()
+        ..reset();
+    } else if (item is TextItemType && !_stopwatch.isRunning) {
+      _stopwatch.start();
+    }
     final elapsed = _stopwatch.elapsed;
     final status = switch (item) {
+      _ when state == CallState.ringing => strings.incomingCall,
+      _ when state == CallState.ended => strings.callEnded,
+      _ when controller.onHold => strings.onHold,
       NarrationItemType(:final text) => text,
       _ when _stopwatch.isRunning =>
         "${elapsed.inMinutes.toString().padLeft(2, "0")}:${(elapsed.inSeconds % 60).toString().padLeft(2, "0")}",
@@ -65,7 +114,7 @@ class _CallViewState extends State<CallView> {
       (entry) => entry.conversationKey == controller.conversation?.key && entry.itemType is TextItemType,
       orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.call),
     );
-    final caption = controller.itemOf(spoken)?.getText();
+    final caption = connected ? controller.itemOf(spoken)?.getText() : null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -90,7 +139,9 @@ class _CallViewState extends State<CallView> {
                 ),
                 const SizedBox(height: 24),
                 _Pulse(
-                  active: controller.phase == StoryPhase.typing || item is NarrationItemType,
+                  active:
+                      state == CallState.ringing ||
+                      (connected && (controller.phase == StoryPhase.typing || item is NarrationItemType)),
                   child: StoryAvatar(
                     asset: caller?.avatar == null ? null : config.avatar(caller!.avatar!),
                     name: caller?.name ?? "",
@@ -103,9 +154,20 @@ class _CallViewState extends State<CallView> {
                   style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 6),
-                Text(status, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_muted && connected) ...[
+                      const Icon(Icons.mic_off, color: Colors.white70, size: 16),
+                      const SizedBox(width: 6),
+                    ],
+                    Flexible(
+                      child: Text(status, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+                    ),
+                  ],
+                ),
                 const Spacer(),
-                if (caption != null)
+                if (caption != null && !_keypad)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: AnimatedSwitcher(
@@ -114,7 +176,11 @@ class _CallViewState extends State<CallView> {
                         caption,
                         key: ValueKey(caption),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontSize: 19, height: 1.4),
+                        style: TextStyle(
+                          color: controller.onHold ? Colors.white38 : Colors.white,
+                          fontSize: 19,
+                          height: 1.4,
+                        ),
                       ),
                     ),
                   ),
@@ -122,22 +188,86 @@ class _CallViewState extends State<CallView> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: switch (controller.phase) {
+                    _ when state == CallState.ringing => _RingingButtons(
+                      strings: (answer: strings.answer, decline: strings.decline),
+                      onAnswer: _answer,
+                      onDecline: _end,
+                    ),
+                    // Hung up: the screen waits for the call back.
+                    _ when state == CallState.ended => const SizedBox(height: 172),
                     StoryPhase.choice when item is EvidenceItemType => SizedBox(
-                        height: MediaQuery.sizeOf(context).height * 0.55,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
-                        ),
+                      height: MediaQuery.sizeOf(context).height * 0.55,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
                       ),
-                    StoryPhase.choice when item is ChoiceItemType =>
-                      ChoiceList(key: ValueKey(item), item: item, dark: true, onSelected: controller.choose),
+                    ),
+                    StoryPhase.choice when item is ChoiceItemType => ChoiceList(
+                      key: ValueKey(item),
+                      item: item,
+                      dark: true,
+                      onSelected: controller.choose,
+                    ),
                     StoryPhase.input when item is InputItemType => Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: InputPrompt(item: item, onSubmit: controller.submitInput),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: InputPrompt(item: item, onSubmit: controller.submitInput),
                       ),
-                    _ => const _CallButtons(),
+                    ),
+                    _ => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_keypad)
+                          _Keypad(digits: _digits, onKey: _dial)
+                        else
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _CallButton(
+                                icon: _muted ? Icons.mic_off : Icons.mic_none,
+                                label: strings.mute,
+                                active: _muted,
+                                onTap: () => _press(() => _muted = !_muted),
+                              ),
+                              _CallButton(
+                                icon: Icons.volume_up,
+                                label: strings.speaker,
+                                active: _speaker,
+                                onTap: () => _press(() => _speaker = !_speaker),
+                              ),
+                              _CallButton(
+                                icon: Icons.dialpad,
+                                label: strings.keypad,
+                                onTap: () => _press(() => _keypad = true),
+                              ),
+                              _CallButton(
+                                icon: Icons.pause,
+                                label: strings.hold,
+                                active: controller.onHold,
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  controller.holdCall(!controller.onHold);
+                                },
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            const Expanded(child: SizedBox()),
+                            _CallButton(icon: Icons.call_end, color: Colors.redAccent, onTap: _end),
+                            Expanded(
+                              child: _keypad
+                                  ? TextButton(
+                                      onPressed: () => _press(() => _keypad = false),
+                                      child: Text(strings.hideKeypad, style: const TextStyle(color: Colors.white)),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   },
                 ),
               ],
@@ -149,22 +279,167 @@ class _CallViewState extends State<CallView> {
   }
 }
 
-class _CallButtons extends StatelessWidget {
-  const _CallButtons();
+/// A round call screen button with an optional label under it. An [active] toggle turns white.
+class _CallButton extends StatelessWidget {
+  final IconData icon;
+  final String? label;
+  final bool active;
+  final Color? color;
+  final VoidCallback onTap;
+
+  const _CallButton({required this.icon, required this.onTap, this.label, this.active = false, this.color});
 
   @override
   Widget build(BuildContext context) {
-    Widget button(IconData icon, Color color) => CircleAvatar(
-          radius: 30,
-          backgroundColor: color,
-          child: Icon(icon, color: Colors.white, size: 28),
-        );
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    final background = color ?? (active ? Colors.white : Colors.white24);
+    // The label takes taps too, so a finger a little low doesn't miss the button.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: background,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onTap,
+              child: SizedBox.square(
+                dimension: 64,
+                child: Icon(icon, color: active && color == null ? Colors.black87 : Colors.white, size: 28),
+              ),
+            ),
+          ),
+          if (label != null) ...[
+            const SizedBox(height: 8),
+            Text(label!, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Decline and answer, the answer button nudging like a phone asking to be picked up.
+class _RingingButtons extends StatefulWidget {
+  final ({String answer, String decline}) strings;
+  final VoidCallback onAnswer;
+  final VoidCallback onDecline;
+
+  const _RingingButtons({required this.strings, required this.onAnswer, required this.onDecline});
+
+  @override
+  State<_RingingButtons> createState() => _RingingButtonsState();
+}
+
+class _RingingButtonsState extends State<_RingingButtons> with SingleTickerProviderStateMixin {
+  late final AnimationController _nudge = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))
+    ..repeat();
+
+  @override
+  void dispose() {
+    _nudge.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 48),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _CallButton(
+            icon: Icons.call_end,
+            label: widget.strings.decline,
+            color: Colors.redAccent,
+            onTap: widget.onDecline,
+          ),
+          AnimatedBuilder(
+            animation: _nudge,
+            // A hop in the first third of each beat, then still.
+            builder: (context, child) => Transform.translate(
+              offset: Offset(0, -10 * Curves.easeOut.transform((1 - (_nudge.value * 3 - 1).abs()).clamp(0, 1))),
+              child: child,
+            ),
+            child: _CallButton(
+              icon: Icons.call,
+              label: widget.strings.answer,
+              color: Colors.green,
+              onTap: widget.onAnswer,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The in-call keypad: tones only, like on a real call.
+class _Keypad extends StatelessWidget {
+  static const _keys = [
+    ("1", ""),
+    ("2", "ABC"),
+    ("3", "DEF"),
+    ("4", "GHI"),
+    ("5", "JKL"),
+    ("6", "MNO"),
+    ("7", "PQRS"),
+    ("8", "TUV"),
+    ("9", "WXYZ"),
+    ("*", ""),
+    ("0", "+"),
+    ("#", ""),
+  ];
+
+  final String digits;
+  final ValueChanged<String> onKey;
+
+  const _Keypad({required this.digits, required this.onKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        button(Icons.mic_off, Colors.white24),
-        button(Icons.call_end, Colors.redAccent),
-        button(Icons.volume_up, Colors.white24),
+        SizedBox(
+          height: 36,
+          child: Text(digits, style: const TextStyle(color: Colors.white, fontSize: 28, letterSpacing: 2)),
+        ),
+        const SizedBox(height: 8),
+        for (var row = 0; row < 4; row++)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (final (key, letters) in _keys.skip(row * 3).take(3))
+                  Material(
+                    color: Colors.white12,
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => onKey(key),
+                      child: SizedBox.square(
+                        dimension: 64,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(key, style: const TextStyle(color: Colors.white, fontSize: 26, height: 1.1)),
+                            if (letters.isNotEmpty)
+                              Text(
+                                letters,
+                                style: const TextStyle(color: Colors.white60, fontSize: 9, letterSpacing: 1.5),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -181,8 +456,10 @@ class _Pulse extends StatefulWidget {
 }
 
 class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
-  late final AnimationController _animation =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat();
+  late final AnimationController _animation = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat();
 
   @override
   void dispose() {

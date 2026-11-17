@@ -1,3 +1,4 @@
+| `ring` | `String` | No | `"CALL"` only. The call is incoming: the phone rings with this sound (in `musicDir`, on loop) until the player answers, and the first item waits for the answer (presentation modes §1.2). Left out, the call is already connected. |
 # Data & JSON Schemas
 
 This document defines the asset layout and JSON schemas consumed by `EngineLoader`.

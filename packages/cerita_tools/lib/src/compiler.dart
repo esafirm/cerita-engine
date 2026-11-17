@@ -121,6 +121,7 @@ class _Compiler {
       _put(sceneJson, "background", scene.background);
       _put(sceneJson, "music", scene.music);
       _put(sceneJson, "ambience", scene.ambience);
+      _put(sceneJson, "ring", scene.ring);
       _put(sceneJson, "textbox", scene.textbox);
       json["scene"] = sceneJson;
     }
