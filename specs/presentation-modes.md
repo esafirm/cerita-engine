@@ -42,6 +42,8 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Supports up to 5 simultaneous character slots (`far_left`, `left`, `center`, `right`, `far_right`). The 3 inner slots keep their wide spacing until a `far_*` slot is used.
   - Characters are tracked by profile id, so moving one to another slot slides it across instead of fading it out and in.
   - Active speaker is rendered at full opacity and slight scale-up; inactive sprites on stage are dimmed.
+  - On a narrow (portrait) stage a sprite is capped to a share of the stage width (all of it alone, 62% with two characters, 46% with three or more), so characters stand side by side instead of all landing in the middle. Wide stages are unaffected. Characters keep a fixed paint order: the speaker is not moved to the front.
+  - An expression change fades the new sprite in over the old one, then fades the old one out under it, so the character is never see-through midway.
   - Smooth sprite swapping when a character changes expression (`123aaa:0` -> `123aaa:2`).
 - **Stage Direction (`STAGE` items)**:
   - Character and background `transition`s: `fade`, `dissolve`, `fade_black`, `slide_*`, `zoom`, `wipe_*`, `none`. Without one, the skin's default transition is used.

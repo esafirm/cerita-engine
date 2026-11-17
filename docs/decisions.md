@@ -571,6 +571,24 @@ chat option that isn't silent is followed by a player line.
 - **Revisit if** authors want a reply that differs from the button text without a scripted line, e.g. a
   `reply` field per option.
 
+## Characters stand side by side on a portrait stage
+
+*2026-11-17. Presentation modes §2. Found in the Last Seen M1 playtest.*
+
+On a phone held upright, a sprite drawn at 82% of the stage height is as wide as the stage, so the `left` and
+`right` slots couldn't move it and two characters both landed in the middle, one hidden behind the other. Every
+speaker change then swapped which one was in front in a single frame, and an expression change cross-faded both
+sprites to half opacity, so the character behind showed through. Now a sprite is capped to a share of the stage
+width when several characters are on stage, the paint order stays fixed, and an expression change fades the new
+sprite in before the old one fades out.
+
+- **Why side by side and not only the speaker:** scripts say who is on stage, and a reply lands better when the
+  listener stays visible. Dimming already shows who speaks.
+- **Cost:** with two characters on a phone, each is smaller, about 60% of the stage width. A lone character
+  keeps its size, and landscape stages don't change because their sprites are already narrower than the cap.
+- **Revisit if** a story needs close-ups of two people at once. A per-scene option to show only the speaker
+  would fit there.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

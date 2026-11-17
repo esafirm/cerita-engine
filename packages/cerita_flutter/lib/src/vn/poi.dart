@@ -53,6 +53,15 @@ class Poi extends StatefulWidget {
   /// Slot x positions while only the three inner slots are used: wide apart, partly off-screen.
   static const _wideX = {SpritePosition.left: -1.3, SpritePosition.center: 0.0, SpritePosition.right: 1.3};
 
+  /// The widest a sprite may be, as a share of the stage width, with [present] characters on stage. Only
+  /// narrow stages hit it: there a lone character keeps the full width and two or more stand side by side,
+  /// overlapping a little in the middle.
+  static double widthShare(int present) => switch (present) {
+        <= 1 => 1.0,
+        2 => 0.62,
+        _ => 0.46,
+      };
+
   static const _fiveX = {
     SpritePosition.farLeft: -1.5,
     SpritePosition.left: -0.75,
@@ -216,8 +225,8 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
                 ? Container(key: const ValueKey("no-bg"), color: Colors.black)
                 : Image.asset(widget.background!, key: ValueKey(widget.background), fit: BoxFit.cover, gaplessPlayback: true),
           ),
-          // The speaker is painted last so it overlaps its neighbours.
-          for (final entry in [...entries.where((e) => e.actor.id != speaker), ...entries.where((e) => e.actor.id == speaker)])
+          // A fixed paint order: moving the speaker to the front made the sprites swap places in one frame.
+          for (final entry in entries)
             AnimatedAlign(
               key: ValueKey(entry.actor.id),
               duration: _duration(
@@ -226,11 +235,18 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
               ),
               curve: Curves.easeInOut,
               alignment: Alignment(xs[entry.actor.position] ?? 0, 1),
-              child: FractionallySizedBox(
-                heightFactor: present > 2 ? 0.66 : 0.82,
-                child: entry.transition == null
-                    ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
-                    : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
+              // On a narrow (portrait) stage a sprite would be as wide as the stage, so every slot would put it in
+              // the middle. Capping its width lets the characters on stage stand side by side.
+              child: LayoutBuilder(
+                builder: (context, box) => ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: box.maxWidth * Poi.widthShare(present)),
+                  child: FractionallySizedBox(
+                    heightFactor: present > 2 ? 0.66 : 0.82,
+                    child: entry.transition == null
+                        ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
+                        : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
+                  ),
+                ),
               ),
             ),
         ],
@@ -288,7 +304,10 @@ class _SpriteSlot extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       child: AnimatedSwitcher(
         duration: skin.spriteTransitionDuration,
-        transitionBuilder: (child, animation) => skin.spriteTransition(animation, child),
+        // The new expression fades in over the old one in the first half, and the old one fades out under it in
+        // the second. A plain cross-fade leaves both half see-through midway, which shows what's behind.
+        transitionBuilder: (child, animation) =>
+            skin.spriteTransition(CurvedAnimation(parent: animation, curve: const Interval(0, 0.5)), child),
         child: TweenAnimationBuilder<double>(
           key: ValueKey(sprite),
           tween: Tween(end: active ? 0 : 0.45),
@@ -300,6 +319,7 @@ class _SpriteSlot extends StatelessWidget {
           child: Image.asset(
             sprite,
             fit: BoxFit.contain,
+            alignment: Alignment.bottomCenter,
             gaplessPlayback: true,
             // A missing sprite should not break the scene.
             errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),

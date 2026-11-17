@@ -37,6 +37,33 @@ void main() {
     expect(_alignmentOf(tester, "miki").x, 1.5);
   });
 
+  testWidgets('on a portrait stage two characters are capped to stand side by side, in a fixed paint order',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    double cap(String id) => tester
+        .widget<ConstrainedBox>(find.descendant(of: find.byKey(ValueKey(id)), matching: find.byType(ConstrainedBox)).first)
+        .constraints
+        .maxWidth;
+    List<String> paintOrder() => [
+          for (final align in tester.widgetList<AnimatedAlign>(find.byType(AnimatedAlign)))
+            if (align.key case ValueKey<String>(:final value)) value,
+        ];
+
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
+    expect(cap("nora"), 400, reason: "a lone character keeps the full width");
+
+    final actors = [_actor("nora", SpritePosition.left), _actor("miki", SpritePosition.right)];
+    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "nora")));
+    await tester.pumpAndSettle();
+    expect(cap("nora"), closeTo(400 * Poi.widthShare(2), 0.01));
+    expect(cap("miki"), closeTo(400 * Poi.widthShare(2), 0.01));
+    expect(paintOrder(), ["nora", "miki"]);
+
+    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "miki")));
+    expect(paintOrder(), ["nora", "miki"], reason: "the speaker doesn't jump to the front");
+  });
+
   testWidgets('a hidden character plays its exit transition, or leaves at once when instant', (tester) async {
     await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
     await tester.pumpWidget(_wrap(Poi(
