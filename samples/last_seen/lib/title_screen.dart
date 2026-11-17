@@ -23,6 +23,9 @@ class _TitleScreenState extends State<TitleScreen> {
   Credits? _credits;
 
   bool _started = false;
+
+  /// Held down: the logo and menu step aside to show the key art.
+  bool _peek = false;
   bool _extras = false;
   int _cursor = 0;
 
@@ -77,6 +80,10 @@ class _TitleScreenState extends State<TitleScreen> {
   void _start() {
     UiSounds.instance?.start();
     setState(() => _started = true);
+  }
+
+  void _setPeek(bool peek) {
+    if (_peek != peek) setState(() => _peek = peek);
   }
 
   void _showExtras(bool extras) {
@@ -139,67 +146,80 @@ class _TitleScreenState extends State<TitleScreen> {
         _extras ? _showExtras(false) : setState(() => _started = false);
       },
       child: Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Poi(
-              background: config.bg("bg_seawall_night.webp"),
-              actors: [
-                PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
-                PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
-              ],
-            ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 36, 20, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Logo(subtitle: en ? "A North Jakarta mystery" : "Misteri Jakarta Utara"),
-                    const Spacer(),
-                    if (_started)
-                      FutureBuilder(
-                        future: _autosave,
-                        builder: (context, snapshot) => _Menu(
-                          entries: _entries(snapshot.data),
-                          cursor: _cursor,
-                          onSelect: (index, action) {
-                            if (index != _cursor) setState(() => _cursor = index);
-                            UiSounds.instance?.confirm();
-                            action();
-                          },
-                        ),
-                      )
-                    else
-                      Blink(
-                        child: Text(
-                          en ? "- TAP TO START -" : "- SENTUH UNTUK MULAI -",
-                          textAlign: TextAlign.center,
-                          style: Retro.text.copyWith(
-                            fontSize: 18,
-                            letterSpacing: 3,
-                            shadows: const [Shadow(color: Retro.night, offset: Offset(2, 2))],
+        // Holding anywhere shows the art without the logo and menu, until the finger lifts.
+        body: GestureDetector(
+          onLongPressStart: (_) => _setPeek(true),
+          onLongPressEnd: (_) => _setPeek(false),
+          onLongPressCancel: () => _setPeek(false),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Poi(
+                background: config.bg("bg_seawall_night.webp"),
+                actors: [
+                  PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
+                  PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
+                ],
+              ),
+              IgnorePointer(
+                ignoring: _peek,
+                child: AnimatedOpacity(
+                  opacity: _peek ? 0 : 1,
+                  duration: const Duration(milliseconds: 200),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Logo(subtitle: en ? "A North Jakarta mystery" : "Misteri Jakarta Utara"),
+                          const Spacer(),
+                          if (_started)
+                            FutureBuilder(
+                              future: _autosave,
+                              builder: (context, snapshot) => _Menu(
+                                entries: _entries(snapshot.data),
+                                cursor: _cursor,
+                                onSelect: (index, action) {
+                                  if (index != _cursor) setState(() => _cursor = index);
+                                  UiSounds.instance?.confirm();
+                                  action();
+                                },
+                              ),
+                            )
+                          else
+                            Blink(
+                              child: Text(
+                                en ? "- TAP TO START -" : "- SENTUH UNTUK MULAI -",
+                                textAlign: TextAlign.center,
+                                style: Retro.text.copyWith(
+                                  fontSize: 18,
+                                  letterSpacing: 3,
+                                  shadows: const [Shadow(color: Retro.night, offset: Offset(2, 2))],
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 18),
+                          Text(
+                            "© 2026 CERITA ENGINE",
+                            textAlign: TextAlign.center,
+                            style: Retro.text.copyWith(
+                              color: Retro.dim,
+                              fontSize: 11,
+                              letterSpacing: 2,
+                              shadows: const [Shadow(color: Retro.night, offset: Offset(1, 1))],
+                            ),
                           ),
-                        ),
-                      ),
-                    const SizedBox(height: 18),
-                    Text(
-                      "© 2026 CERITA ENGINE",
-                      textAlign: TextAlign.center,
-                      style: Retro.text.copyWith(
-                        color: Retro.dim,
-                        fontSize: 11,
-                        letterSpacing: 2,
-                        shadows: const [Shadow(color: Retro.night, offset: Offset(1, 1))],
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            // Before the menu is up, a tap anywhere starts.
-            if (!_started) GestureDetector(behavior: HitTestBehavior.opaque, onTap: _start),
-          ],
+              // Before the menu is up, a tap anywhere starts.
+              if (!_started) GestureDetector(behavior: HitTestBehavior.opaque, onTap: _start),
+            ],
+          ),
         ),
       ),
     );

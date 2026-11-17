@@ -40,6 +40,17 @@ void main() {
     expect(tester.widget<AnimatedAlign>(find.byKey(const ValueKey("nora"))).duration, const Duration(milliseconds: 600));
   });
 
+  testWidgets('a sprite stands on the bottom edge of its slot, not in its middle', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    // On a portrait stage the slot is taller than the sprite. Centered in it, the cut-off legs floated.
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.left), _actor("miki", SpritePosition.right)])));
+    await tester.pumpAndSettle();
+    for (final image in find.byType(Image).evaluate()) {
+      expect(tester.getBottomLeft(find.byWidget(image.widget)).dy, 800);
+    }
+  });
+
   testWidgets('far slots switch to the five slot layout', (tester) async {
     await tester.pumpWidget(_wrap(Poi(actors: [
       _actor("nora", SpritePosition.left),

@@ -25,13 +25,15 @@ Widget _wrap(Conversation conversation) => MaterialApp(
 );
 
 void main() {
-  testWidgets('waits for the scene switch, shows the card, then hides it', (tester) async {
+  testWidgets('comes in with its scene already shown, waits for the switch, then hides', (tester) async {
     await tester.pumpWidget(_wrap(_conversation("a", "Day 1")));
-    // Half of the default 500 ms scene transition belongs to the outgoing scene.
+    // Up from the first frame, so the scene never shows before the card covers it.
+    final fade = find.ancestor(of: find.text("card Day 1"), matching: find.byType(FadeTransition)).first;
+    expect(tester.widget<FadeTransition>(fade).opacity.value, 1);
+    // Half of the default 500 ms scene transition belongs to the outgoing scene: the countdown waits for it.
     await tester.pump(const Duration(milliseconds: 200));
     await tester.pump(const Duration(milliseconds: 100));
-    final fade = find.ancestor(of: find.text("card Day 1"), matching: find.byType(FadeTransition)).first;
-    expect(tester.widget<FadeTransition>(fade).opacity.value, 0);
+    expect(tester.widget<FadeTransition>(fade).opacity.value, 1);
 
     await tester.pump(const Duration(milliseconds: 1000));
     expect(find.text("card Day 1"), findsOneWidget);

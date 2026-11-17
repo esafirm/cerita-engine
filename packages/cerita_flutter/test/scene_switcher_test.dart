@@ -57,4 +57,18 @@ void main() {
 
     expect(taps, ["b"]);
   });
+
+  testWidgets('the outgoing scene is frozen as it last looked, the incoming one stays live', (tester) async {
+    await tester.pumpWidget(_switcher("a", SceneMode.vn, const Text("a")));
+    await tester.pumpWidget(_switcher("b", SceneMode.call, const Text("b")));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    bool frozen(String text) => tester
+        .widget<SnapshotWidget>(find.ancestor(of: find.text(text), matching: find.byType(SnapshotWidget)))
+        .controller
+        .allowSnapshotting;
+    // A view rebuilt from the story state now would draw the incoming scene in the outgoing one.
+    expect(frozen("a"), isTrue);
+    expect(frozen("b"), isFalse);
+  });
 }

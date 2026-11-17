@@ -347,6 +347,10 @@ class _SpriteSlot extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       child: AnimatedSwitcher(
         duration: skin.spriteTransitionDuration,
+        // Stands on the stage floor. The default layout centers the sprite in its slot, which is taller than the
+        // sprite on a portrait stage, so the cut-off legs floated above the bottom edge.
+        layoutBuilder: (current, previous) =>
+            Stack(alignment: Alignment.bottomCenter, children: [...previous, ?current]),
         // The new expression fades in over the old one in the first half, and the old one fades out under it in
         // the second. A plain cross-fade leaves both half see-through midway, which shows what's behind.
         // drive() adds no listeners until the transition listens, so nothing is left to dispose.

@@ -26,7 +26,8 @@ class ChapterCardOverlay extends StatefulWidget {
 }
 
 class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTickerProviderStateMixin {
-  /// Where the fade out starts, see [_opacity].
+  /// Where the fade in ends and the fade out starts, see [_opacity].
+  static const _fadeInEnd = 0.2;
   static const _fadeOutStart = 0.8;
 
   // The duration is how long the card is readable, not decoration, so it is kept even when the
@@ -64,7 +65,9 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
     final skin = StorySkin.of(context);
     if (widget.conversation.chapter == null || skin.chapterCard(context, widget.conversation) == null) return;
     _controller.duration = skin.chapterCardDuration;
-    _controller.value = 0;
+    // A card that comes with its scene is up from the first frame, so the scene fades in as the card and never
+    // shows for a moment before the card covers it. A new chapter in a scene already on screen fades in over it.
+    _controller.value = entering ? _fadeInEnd : 0;
     _delay?.cancel();
     _hold.value = true;
     // Wait for the page transition into the story, so the card isn't spent behind it.
@@ -72,7 +75,7 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
     if (route == null || route.isCompleted) {
       if (entering) {
         // Mounted by a scene switch: start once the outgoing scene is gone.
-        _delay = Timer(skin.sceneTransitionDuration * 0.5, () => _controller.forward(from: 0));
+        _delay = Timer(skin.sceneTransitionDuration * 0.5, () => _controller.forward());
       } else {
         _controller.forward(from: 0);
       }
@@ -80,7 +83,7 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
       void start(AnimationStatus status) {
         if (!status.isCompleted) return;
         route.removeStatusListener(start);
-        if (mounted) _controller.forward(from: 0);
+        if (mounted) _controller.forward();
       }
 
       route.addStatusListener(start);

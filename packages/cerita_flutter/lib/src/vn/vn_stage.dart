@@ -41,6 +41,9 @@ class _VnStageState extends State<VnStage> {
   /// The dialogue box, overlays and controls are hidden to look at the stage.
   bool _hidden = false;
 
+  /// [_hidden] by holding the stage, not by the hide button.
+  bool _peeking = false;
+
   StoryController get controller => widget.controller;
 
   LoaderConfig get config => widget.setup.config;
@@ -65,6 +68,13 @@ class _VnStageState extends State<VnStage> {
   void _setHidden(bool hidden) {
     setState(() => _hidden = hidden);
     controller.setUiHidden(hidden);
+  }
+
+  /// Hides the UI while the stage is held. A release brings it back, unless the hide button had hidden it.
+  void _peek(bool held) {
+    if (held == _hidden || (!held && !_peeking)) return;
+    _peeking = held;
+    _setHidden(held);
   }
 
   @override
@@ -144,6 +154,9 @@ class _VnStageState extends State<VnStage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _onTap,
+        // Holding anywhere hides the UI to look at the stage, until the finger lifts.
+        onLongPressStart: (_) => _peek(true),
+        onLongPressEnd: (_) => _peek(false),
         child: Stack(
           fit: StackFit.expand,
           children: [
