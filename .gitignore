@@ -51,3 +51,6 @@ app.*.map.json
 # Voice and image pipeline scratch output (raw takes, request bodies, billing logs)
 /samples/last_seen/tools/.takes/
 /samples/last_seen/art/.raw/
+
+# Local secrets, e.g. the Telegram bot for build uploads
+.env.local
