@@ -1,3 +1,5 @@
+import 'package:cerita_core/src/l10n/localized_text.dart';
+
 enum SceneMode {
   vn("VN"),
   chat("CHAT"),
@@ -30,6 +32,10 @@ class Scene {
   final int? day;
   final String? time;
 
+  /// The chat header's status for this scene, in place of the channel's (`"status"` in JSON). Null keeps the
+  /// channel's status. Empty text hides it, which `"status": null` and `""` in JSON give.
+  final LocalizedText? status;
+
   const Scene({
     this.mode = SceneMode.vn,
     this.background,
@@ -39,6 +45,7 @@ class Scene {
     this.channelId,
     this.day,
     this.time,
+    this.status,
   });
 
   factory Scene.fromJson(Map<String, dynamic>? json) {
@@ -52,6 +59,7 @@ class Scene {
       channelId: json["channel_id"] as String?,
       day: (json["day"] as num?)?.toInt(),
       time: json["time"] as String?,
+      status: json.containsKey("status") ? LocalizedText.fromJson(json["status"]) ?? const LocalizedText("") : null,
     );
   }
 
@@ -64,5 +72,6 @@ class Scene {
         "channel_id": ?channelId,
         "day": ?day,
         "time": ?time,
+        if (status != null) "status": status!.toJson(),
       };
 }

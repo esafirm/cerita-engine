@@ -8,6 +8,7 @@ import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
 import '../common/media_widgets.dart';
 import '../common/tagged_text.dart';
+import '../l10n/story_language.dart';
 import '../skin/story_skin.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
@@ -116,7 +117,8 @@ class _VnStageState extends State<VnStage> {
           label: scene.day != null || scene.time != null
               ? [
                   if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
-                  if (scene.time != null) scene.time!,
+                  // The same clock as chat headers and story timestamps: "9:40 PM", "21.40".
+                  if (scene.time != null) StoryLanguage.of(context).strings.sceneTime(scene.time!),
                 ].join(" · ")
               : null,
           autoMode: controller.autoMode,

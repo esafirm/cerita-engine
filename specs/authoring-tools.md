@@ -53,7 +53,7 @@ Probably a mistake, but the story still runs.
 | Unknown chat thread | A `channel_id` that `channels.json` doesn't list (when the file exists). |
 | Clue never awarded | A clue in `clues.json` that no effect sets. Clue variables are not reported as "set but never read": the board reads them. |
 | Story stops | A conversation entered by a target (or `index`) can run out of items with no `ENDING`, `JUMP`, `RETURN` or `BRANCH` fallback after its last entry point (its start, or a label a target uses). The engine then ends the story without an ending. Reported at the last item. Conversations only reached through `CALL` return to their caller instead and aren't checked. A `CHOICE` leads on when every option has a target and one of them has no condition and isn't `once`. An evidence question (`"source": "clues"`) leads on when every response and its `fallback` (and `timeout`, if given) have a target. Conditions aren't evaluated. |
-| Reply sent twice | In a `CHAT` scene, an option that isn't `silent` is followed by a player `TEXT` line: the next item, or the `#label` it jumps to. The option is sent as the player's message and then the scripted line repeats it. Warning, reported at the option. |
+| Reply sent twice | In a `CHAT` scene, the first item the player sees after an option that isn't `silent` is a player `TEXT` line in the same thread. The option is sent as the player's message and then the scripted line repeats it. Warning, reported at the option. See §1.4 for how the linter follows the story after the pick. |
 
 ### 1.3 Clues awardable before an evidence question
 
@@ -66,6 +66,28 @@ linter checks it per question with the story graph (§2), approximating "before"
 
 It doesn't follow conditions, so a clue awarded on another branch of the same day still counts. A full
 path check needs the automated playthroughs of the story authoring toolkit (CE-02).
+
+### 1.4 What plays after a chat option
+
+For "Reply sent twice" the linter plays the story forward from each option that isn't `silent`, without a
+player:
+
+- **What it knows.** The pick stores the option's `value` in the `CHOICE` variable (its text when it has no
+  `value`), then runs the option's effects. These are the only values it knows. Effects that need anything
+  else, and `random()`, make their variable unknown.
+- **Conditions.** An item whose condition is false with these values is skipped, like the engine skips it. A
+  condition that reads an unknown variable might go either way, so the linter stops there and reports nothing.
+  A player line that only might play isn't reported.
+- **Items nobody sees.** `SET`, `STAGE` and `WAIT` are walked past, with their effects. A `WAIT` notification
+  isn't a chat message, so it doesn't count either.
+- **Targets.** It follows the option's target, `JUMP`, `CALL`, `RETURN` and `BRANCH` (when its conditions
+  are known), to `#label`, `conv` or `conv#label`. A conversation with another scene or chat thread stops the
+  walk: the line isn't next to the reply there.
+- **The first item the player sees** decides it: a player `TEXT` is reported, anything else isn't.
+
+A conversation without a `scene` keeps the one it is entered from. It is checked as a chat when every
+conversation whose targets lead to it plays in the same chat thread. A conversation entered from different
+scenes, or from nowhere, isn't checked. Coming back from a `CALL` isn't followed for this.
 
 ---
 

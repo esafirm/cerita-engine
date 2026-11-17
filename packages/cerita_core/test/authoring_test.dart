@@ -382,6 +382,119 @@ flowchart TD
     expect(loud.history.where((entry) => entry.isPlayer).length, 1, reason: "other options still send their text");
   });
 
+  group('reply sent twice', () {
+    const chat = {"mode": "CHAT", "channel_id": "thread_nora"};
+    Map<String, dynamic> choice(List<Map<String, dynamic>> options, {String? variable = "R"}) =>
+        {"type": "CHOICE", "text": "Reply?", "variable": ?variable, "choices": options};
+    Map<String, dynamic> option(String text, {String? value, String? target, bool silent = false, List? effects}) =>
+        {"text": text, "value": ?value, "target": ?target, if (silent) "silent": true, "effects": ?effects};
+    Map<String, dynamic> player(String text, {String? condition, String? id}) =>
+        {..._text(text, profile: "player", condition: condition), "id": ?id};
+
+    /// The "shows twice" warnings, as `file #item choices[option]`, sorted.
+    Future<List<String>> doubled(Map<String, Object> files) async => [
+          for (final issue in await StoryLinter(_FakeEngineLoader(files)).lint())
+            if (issue.message.contains("shows twice")) "${issue.file} #${issue.itemIndex} ${issue.part}",
+        ]..sort();
+
+    test('a player line whose condition fails for the option is not reported', () async {
+      expect(
+        await doubled({
+          "index": _conversation([
+            choice([option("Yes", value: "yes", silent: true), option("Leave it", value: "no")]),
+            player("Yes", condition: "R == 'yes'"),
+            // An option's effects count too: only "Later" plays the line.
+            choice([
+              option("Now", value: "now", effects: [{"variable": "mood", "op": "set", "value": "calm"}]),
+              option("Later", value: "later", effects: [{"variable": "mood", "op": "set", "value": "busy"}]),
+            ], variable: "WHEN"),
+            player("Later then", condition: "mood == 'busy'"),
+            // A variable the pick doesn't set may hold anything, so the line may not play: not reported.
+            choice([option("Sure", value: "sure")], variable: "OK"),
+            player("Sure", condition: "trust > 2 && OK == 'sure'"),
+            // Without a value the option stores its text.
+            choice([option("Fine"), option("No")], variable: "ANSWER"),
+            player("Fine", condition: "ANSWER == 'Fine'"),
+          ], scene: chat),
+        }),
+        ["index.json #2 choices[1]", "index.json #6 choices[0]"],
+      );
+    });
+
+    test('walks past what the player doesn\'t see, into labels and other conversations', () async {
+      final ending = {"type": "ENDING", "ending_id": "e", "title": "E", "category": "GOOD"};
+      expect(
+        await doubled({
+          "index": _conversation([
+            choice([option("Hi", value: "hi")]),
+            {"type": "SET", "effects": [{"variable": "trust", "op": "add", "value": 1}]},
+            {"type": "WAIT", "duration_ms": 500},
+            {"type": "STAGE", "actions": [{"action": "shake"}]},
+            _text("Hi?", condition: "R == 'bye'"),
+            player("Hi"),
+            choice([
+              option("Label", target: "#again"),
+              option("Same thread", target: "later"),
+              option("Other thread", target: "elsewhere"),
+              option("Shared", target: "shared#reply"),
+              option("Branch", value: "branch", target: "#route"),
+            ], variable: "PICK"),
+            {"type": "BRANCH", "id": "route", "branches": [{"condition": "PICK == 'branch'", "target": "#again"}]},
+            ending,
+            {"type": "JUMP", "id": "again", "target": "#reply"},
+            ending,
+            player("Again", id: "reply"),
+            ending,
+          ], scene: chat),
+          "later": _conversation([player("Later"), ending], scene: chat),
+          "elsewhere": _conversation([player("Elsewhere"), ending], scene: {"mode": "CHAT", "channel_id": "thread_x"}),
+          "shared": {
+            "conversation_id": "cvn",
+            "conversations": [
+              _text("Hello"),
+              player("Hello", id: "reply"),
+              // Entered only from the chat, so it is checked in the chat's scene.
+              choice([option("Ok", value: "ok")], variable: "OK"),
+              player("Ok"),
+              ending,
+            ],
+          },
+        }),
+        [
+          "cvn_shared.json #2 choices[0]",
+          "index.json #0 choices[0]",
+          "index.json #6 choices[0]",
+          "index.json #6 choices[1]",
+          "index.json #6 choices[3]",
+          "index.json #6 choices[4]",
+        ],
+      );
+    });
+
+    test('a conversation without a scene entered from different scenes is not checked', () async {
+      final ending = {"type": "ENDING", "ending_id": "e", "title": "E", "category": "GOOD"};
+      expect(
+        await doubled({
+          "index": _conversation([
+            choice([option("Chat", target: "shared"), option("Room", target: "room")], variable: null),
+          ], scene: chat),
+          "room": _conversation([
+            {"type": "JUMP", "target": "shared"},
+          ]),
+          "shared": {
+            "conversation_id": "cvn",
+            "conversations": [
+              choice([option("Ok", value: "ok")], variable: "OK"),
+              player("Ok"),
+              ending,
+            ],
+          },
+        }),
+        isEmpty,
+      );
+    });
+  });
+
   group('cerita command', () {
     late Directory story;
 

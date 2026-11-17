@@ -1,3 +1,5 @@
+import 'package:cerita_core/cerita_core.dart' as core;
+
 import 'cast.dart';
 import 'compiler.dart';
 import 'config.dart';
@@ -50,6 +52,37 @@ class _ScriptLinter {
     _assetFolder();
     _translations();
     _withoutClues();
+    _silentVariable();
+  }
+
+  /// `silent` on a `choice` line is a keyword, so `choice silent` is a silent choice without a variable. A script
+  /// written before the keyword may have meant a variable named `silent`: reported when the story reads one.
+  void _silentVariable() {
+    final choices = [
+      for (final conversation in project.conversations)
+        for (final item in conversation.items)
+          if (item is ChoiceItem && item is! EvidenceItem && item.silent && item.variable == null) item,
+    ];
+    if (choices.isEmpty) return;
+
+    bool reads(String? expression) =>
+        expression != null && core.ConditionEvaluator.variablesOf(expression).contains("silent");
+    bool readsIn(TextHolder holder) =>
+        holder.effects.any((effect) => reads(effect.expr)) ||
+        holder.texts.values.any((text) => text.values.values.any((value) => value.contains("{{silent}}")));
+    final read = project.conversations.any((conversation) => conversation.items.any((item) =>
+        reads(item.condition) ||
+        readsIn(item) ||
+        (item is BranchItem && item.routes.any((route) => reads(route.condition))) ||
+        (item is ChoiceItem && item.options.any((option) => reads(option.condition) || readsIn(option)))));
+    if (!read) return;
+    for (final choice in choices) {
+      diagnostics.error(
+        choice.span,
+        "`silent` is a keyword here, so this choice stores no variable, but the story reads 'silent'. "
+        "Name the variable differently, e.g. choice PICK silent",
+      );
+    }
   }
 
   void _conversations() {

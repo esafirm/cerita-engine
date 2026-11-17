@@ -17,10 +17,15 @@ class TextItemType extends ItemType {
   /// Voice-over clip. Players try its per-locale variant first, see [localizedAssetName].
   final String? voice;
 
+  /// Spoken by someone who isn't on the VN stage, like a voice on a recording or from another room. The stage
+  /// stays as it is: the speaker isn't shown and [position] is ignored.
+  final bool offstage;
+
   TextItemType.fromJson(super.json, {Localizer localizer = const Localizer()})
       : text = localizer.required(json, "text"),
         profile = ProfileInfo.parse(json["profile"]),
         position = SpritePosition.fromName(json["position"] as String?),
+        offstage = json["offstage"] == true,
         typingDelayMs = (json["typing_delay_ms"] as num?)?.toInt(),
         sfx = json["sfx"] as String?,
         voice = json["voice"] as String?;

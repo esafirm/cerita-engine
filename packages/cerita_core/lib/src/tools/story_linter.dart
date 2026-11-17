@@ -1,6 +1,7 @@
 import '../data/conversation.dart';
 import '../data/credits.dart';
 import '../data/effect.dart';
+import '../data/item_result.dart';
 import '../data/items/base.dart';
 import '../data/items/branch.dart';
 import '../data/items/choice.dart';
@@ -13,6 +14,7 @@ import '../data/items/narration.dart';
 import '../data/items/profile_info.dart';
 import '../data/items/stage.dart';
 import '../data/items/text.dart';
+import '../data/items/wait.dart';
 import '../data/channel.dart';
 import '../data/clue.dart';
 import '../data/profile.dart';
@@ -26,6 +28,9 @@ import '../utils/var_replacer.dart';
 import 'story_graph.dart';
 
 enum LintSeverity { error, warning }
+
+/// A scene as the linter tells them apart: its mode and chat thread.
+typedef _SceneKey = (SceneMode, String?);
 
 class LintIssue {
   final LintSeverity severity;
@@ -328,17 +333,24 @@ class StoryLinter {
 
       StoryLink.of(conversation).forEach(target);
       _deadItems(conversation, (index) => warn(key, index, "Never reached: it follows a JUMP or RETURN"));
-      if (conversation.hasScene && conversation.scene.mode == SceneMode.chat) {
-        _doubleReplies(
-          conversation,
-          (index, option) => warn(
-              key,
-              index,
-              "Option ${option + 1} is sent as the player's message and a player line follows it, so the message "
-              "shows twice. Mark the option silent",
-              ["choices", option]),
-        );
-      }
+    }
+
+    final scenes = _scenes(conversations);
+    for (final conversation in conversations) {
+      final key = conversation.key;
+      final scene = scenes[key];
+      if (scene == null || scene.$1 != SceneMode.chat) continue;
+      _doubleReplies(
+        conversation,
+        scene,
+        byKey,
+        (index, option) => warn(
+            key,
+            index,
+            "Option ${option + 1} is sent as the player's message and a player line follows it, so the message "
+            "shows twice. Mark the option silent",
+            ["choices", option]),
+      );
     }
 
     final graph = StoryGraph(conversations);
@@ -520,28 +532,216 @@ class StoryLinter {
         _ => _endsFlow(item),
       };
 
-  /// Reports the first item of each run that can't be reached: right after an unconditional JUMP,
-  /// RETURN or BRANCH with a fallback, without an `id` a target could use.
-  /// In a chat, a picked option is sent as the player's message. Reports options that are followed by a player
-  /// line anyway (the next item, or the `#label` they jump to), which would send the message twice.
-  static void _doubleReplies(Conversation conversation, void Function(int index, int option) report) {
-    final items = conversation.conversations;
-    for (final (index, item) in items.indexed) {
+  /// The scene each conversation plays in, as its mode and chat thread. A conversation without a `scene` keeps
+  /// the one it is entered from, so it gets the scene of every conversation whose targets lead to it (and the
+  /// default VN scene if the story can start in it). Null when that isn't a single scene: entered from different
+  /// scenes, or from nowhere. Coming back from a `CALL` into a scene isn't followed.
+  static Map<String, _SceneKey?> _scenes(List<Conversation> conversations) {
+    final into = <String, Set<String>>{};
+    for (final conversation in conversations) {
+      for (final link in StoryLink.of(conversation)) {
+        if (link.targetKey != conversation.key) into.putIfAbsent(link.targetKey, () => {}).add(conversation.key);
+      }
+    }
+    const _SceneKey start = (SceneMode.vn, null);
+    final possible = <String, Set<_SceneKey>>{
+      for (final conversation in conversations)
+        conversation.key: {
+          if (conversation.hasScene) (conversation.scene.mode, conversation.scene.channelId),
+          if (!conversation.hasScene && conversation.key == Conversation.indexKey) start,
+        },
+    };
+    for (var changed = true; changed;) {
+      changed = false;
+      for (final conversation in conversations.where((conversation) => !conversation.hasScene)) {
+        final scenes = possible[conversation.key]!;
+        for (final from in into[conversation.key] ?? const <String>{}) {
+          for (final scene in possible[from] ?? const <_SceneKey>{}) {
+            if (scenes.add(scene)) changed = true;
+          }
+        }
+      }
+    }
+    return {for (final MapEntry(:key, :value) in possible.entries) key: value.length == 1 ? value.single : null};
+  }
+
+  /// In a chat, a picked option is sent as the player's message. Reports options after which the first item the
+  /// player sees is a player line anyway, which would send the message twice. See [_playerLineFollows].
+  static void _doubleReplies(
+    Conversation conversation,
+    _SceneKey scene,
+    Map<String, Conversation> byKey,
+    void Function(int index, int option) report,
+  ) {
+    for (final (index, item) in conversation.conversations.indexed) {
       if (item is! ChoiceItemType || item is EvidenceItemType) continue;
       for (final option in item.choices) {
         if (option.silent) continue;
-        final target = option.target;
-        final next = switch (target) {
-          null => index + 1,
-          final target when target.startsWith("#") => items.indexWhere((other) => other.id == target.substring(1)),
-          _ => -1,
-        };
-        final follower = next >= 0 && next < items.length ? items[next] : null;
-        if (follower is TextItemType && (follower.getProfileInfo()?.isPlayer ?? false)) report(index, option.index);
+        final known = <String, dynamic>{};
+        _applyKnown(item.effects, known);
+        final variable = item.variable;
+        if (variable != null) {
+          // An option without a `value` stores its text, which can't be known when it shows a variable.
+          if (option.value == null && option.text.contains("{{")) {
+            known.remove(variable);
+          } else {
+            known[variable] = ItemResult.choice(variable, option).value;
+          }
+        }
+        _applyKnown(option.effects, known);
+        if (_playerLineFollows(conversation, index + 1, option.target, scene, byKey, known)) {
+          report(index, option.index);
+        }
       }
     }
   }
 
+  /// Whether the first item the player sees after an option is a player `TEXT` in the same chat thread. Starts at
+  /// [index] in [conversation], or at the option's [target]. Walks past `SET`, `STAGE` and `WAIT` items (a
+  /// `WAIT`'s notification isn't a chat message), items whose condition is false, and follows `JUMP`, `CALL`,
+  /// `RETURN` and `BRANCH` into other conversations with no scene or the same chat scene.
+  ///
+  /// [known] holds the variables set by the pick: the choice variable and simple effects. Everything else is
+  /// unknown, so a condition that reads it may or may not hold. The walk then stops without a report, so a line
+  /// that only might play isn't reported.
+  static bool _playerLineFollows(
+    Conversation conversation,
+    int index,
+    String? target,
+    _SceneKey scene,
+    Map<String, Conversation> byKey,
+    Map<String, dynamic> known,
+  ) {
+    var current = conversation;
+    var at = index;
+    final calls = <(Conversation, int)>[];
+
+    bool go(String target) {
+      final hash = target.indexOf("#");
+      final key = hash < 0 ? target : target.substring(0, hash);
+      final next = key.isEmpty ? current : byKey[key];
+      // Another scene or thread: the line isn't sent next to the reply.
+      if (next == null || (next.hasScene && (next.scene.mode, next.scene.channelId) != scene)) return false;
+      final start = hash < 0 ? 0 : next.conversations.indexWhere((item) => item.id == target.substring(hash + 1));
+      if (start < 0) return false;
+      current = next;
+      at = start;
+      return true;
+    }
+
+    if (target != null && !go(target)) return false;
+    final seen = <(String, int, int)>{};
+    while (seen.add((current.key, at, calls.length))) {
+      final items = current.conversations;
+      if (at >= items.length) {
+        if (calls.isEmpty) return false;
+        (current, at) = calls.removeLast();
+        continue;
+      }
+      final item = items[at];
+      final plays = _holds(item.condition, known);
+      if (plays == false) {
+        at++;
+        continue;
+      }
+      switch (item) {
+        case SetItemType() || StageItemType() || WaitItemType():
+          // Shown to nobody in a chat: only its effects matter.
+          if (plays == null) {
+            for (final effect in item.effects) {
+              known.remove(_setsVariable(effect));
+            }
+          } else {
+            _applyKnown(item.effects, known);
+          }
+          at++;
+        case _ when plays == null:
+          return false;
+        case JumpItemType(:final target):
+          _applyKnown(item.effects, known);
+          if (!go(target)) return false;
+        case CallItemType(:final target):
+          _applyKnown(item.effects, known);
+          if (calls.length > 50) return false;
+          calls.add((current, at + 1));
+          if (!go(target)) return false;
+        case ReturnItemType():
+          _applyKnown(item.effects, known);
+          if (calls.isEmpty) return false;
+          (current, at) = calls.removeLast();
+        case BranchItemType(:final branches, :final fallbackTarget):
+          String? next;
+          for (final branch in branches) {
+            final taken = _holds(branch.condition, known);
+            if (taken == null) return false;
+            if (taken) {
+              next = branch.target;
+              break;
+            }
+          }
+          next ??= fallbackTarget;
+          if (next == null) {
+            at++;
+          } else if (!go(next)) {
+            return false;
+          }
+        case TextItemType():
+          return item.getProfileInfo()?.isPlayer ?? false;
+        default:
+          return false;
+      }
+    }
+    return false;
+  }
+
+  /// A call to `random()`, whose result can't be known.
+  static final _random = RegExp(r"\brandom\s*\(");
+
+  /// Whether [condition] holds with the [known] variables. Null when it reads anything else, uses `random()` or
+  /// can't be evaluated.
+  static bool? _holds(String? condition, Map<String, dynamic> known) {
+    if (condition == null || condition.trim().isEmpty) return true;
+    if (condition.contains(_random)) return null;
+    if (!ConditionEvaluator.variablesOf(condition).every(known.containsKey)) return null;
+    try {
+      return const ConditionEvaluator().evaluate(condition, known);
+    } on ConditionException {
+      return null;
+    }
+  }
+
+  /// The variable [effect] changes in the data map.
+  static String _setsVariable(Effect effect) =>
+      effect.op == EffectOp.metaSet ? "${StoryState.flagPrefix}${effect.variable}" : effect.variable;
+
+  /// Applies [effects] to [known] where the result can be worked out from it. The variables of the others become
+  /// unknown.
+  static void _applyKnown(List<Effect> effects, Map<String, dynamic> known) {
+    for (final effect in effects) {
+      final variable = _setsVariable(effect);
+      if (effect.op == EffectOp.metaSet) {
+        known[variable] = true;
+        continue;
+      }
+      final expr = effect.expr;
+      final reads = {
+        if (expr != null) ...ConditionEvaluator.variablesOf(expr),
+        if (effect.op != EffectOp.set) effect.variable,
+      };
+      if ((expr != null && expr.contains(_random)) || !reads.every(known.containsKey)) {
+        known.remove(variable);
+        continue;
+      }
+      try {
+        effect.apply(known);
+      } on ConditionException {
+        known.remove(variable);
+      }
+    }
+  }
+
+  /// Reports the first item of each run that can't be reached: right after an unconditional JUMP,
+  /// RETURN or BRANCH with a fallback, without an `id` a target could use.
   static void _deadItems(Conversation conversation, void Function(int index) report) {
     var dead = false;
     var reported = false;

@@ -122,6 +122,9 @@ sealed class ItemNode implements TextHolder {
 class LineItem extends ItemNode {
   final ProfileRef speaker;
   String? position;
+
+  /// `[offstage]`: spoken by someone who isn't on the VN stage.
+  bool offstage = false;
   int? typingMs;
   String? sfx;
   String? voice;
@@ -218,6 +221,11 @@ class InputItem extends ItemNode {
   final String variable;
   Localized? defaultValue;
   ProfileRef? by;
+
+  /// `keyboard=digits`. Null for the default text keyboard.
+  String? keyboard;
+  int? minLength;
+  int? maxLength;
 
   InputItem(super.span, this.variable);
 
@@ -335,6 +343,12 @@ class SceneNode {
   String? channel;
   int? day;
   String? time;
+
+  /// `status=`: the chat header status in place of the channel's.
+  Localized? status;
+
+  /// `status=none`: no status in the chat header for this scene.
+  bool hideStatus = false;
 
   SceneNode(this.span, this.mode);
 }

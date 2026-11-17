@@ -55,12 +55,17 @@ class Poi extends StatefulWidget {
 
   /// The widest a sprite may be, as a share of the stage width, with [present] characters on stage. Only
   /// narrow stages hit it: there a lone character keeps the full width and two or more stand side by side,
-  /// overlapping a little in the middle.
-  static double widthShare(int present) => switch (present) {
-        <= 1 => 1.0,
-        2 => 0.62,
-        _ => 0.46,
-      };
+  /// overlapping a little in the middle. A fractional [present] is between two counts, while the share eases
+  /// from one to the other.
+  static double widthShare(num present) => _between(present, 1.0, 0.62, 0.46);
+
+  /// The height of a sprite, as a share of the stage height, with [present] characters on stage.
+  static double heightShare(num present) => _between(present, 0.82, 0.82, 0.66);
+
+  static double _between(num present, double one, double two, double more) {
+    final count = present.clamp(1, 3).toDouble();
+    return count <= 2 ? one + (two - one) * (count - 1) : two + (more - two) * (count - 2);
+  }
 
   static const _fiveX = {
     SpritePosition.farLeft: -1.5,
@@ -80,6 +85,9 @@ class _ActorEntry {
   StageTransition? transition;
   bool leaving = false;
 
+  /// Alignment x on a narrow stage, kept while the character leaves.
+  double? narrowX;
+
   _ActorEntry(this.actor, this.controller);
 }
 
@@ -91,6 +99,9 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
   late final AnimationController _flash = AnimationController(vsync: this, value: 1);
   double _shakeIntensity = 0;
   Color _flashColor = Colors.white;
+
+  /// Characters on stage that size the sprites, 1 to 3. See [Poi.widthShare].
+  int _crowd = 1;
 
   @override
   void didChangeDependencies() {
@@ -199,13 +210,9 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final skin = StorySkin.of(context);
-    final entries = _entries.values.toList();
-    final xs = entries.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
-    final present = entries.where((e) => !e.leaving).length;
     final backgroundAction = _action<BackgroundAction>();
     final backgroundTransition = backgroundAction?.transition;
     final zoom = _action<ZoomAction>();
-    final speaker = widget.speakerId;
 
     final stage = AnimatedScale(
       scale: widget.zoom,
@@ -225,30 +232,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
                 ? Container(key: const ValueKey("no-bg"), color: Colors.black)
                 : Image.asset(widget.background!, key: ValueKey(widget.background), fit: BoxFit.cover, gaplessPlayback: true),
           ),
-          // A fixed paint order: moving the speaker to the front made the sprites swap places in one frame.
-          for (final entry in entries)
-            AnimatedAlign(
-              key: ValueKey(entry.actor.id),
-              duration: _duration(
-                _action<MoveAction>((action) => action.profileId == entry.actor.id),
-                _moveDuration,
-              ),
-              curve: Curves.easeInOut,
-              alignment: Alignment(xs[entry.actor.position] ?? 0, 1),
-              // On a narrow (portrait) stage a sprite would be as wide as the stage, so every slot would put it in
-              // the middle. Capping its width lets the characters on stage stand side by side.
-              child: LayoutBuilder(
-                builder: (context, box) => ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: box.maxWidth * Poi.widthShare(present)),
-                  child: FractionallySizedBox(
-                    heightFactor: present > 2 ? 0.66 : 0.82,
-                    child: entry.transition == null
-                        ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
-                        : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
-                  ),
-                ),
-              ),
-            ),
+          LayoutBuilder(builder: (context, box) => _characters(skin, box)),
         ],
       ),
     );
@@ -284,6 +268,65 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     );
   }
 
+  /// The characters on a stage of size [box].
+  Widget _characters(StorySkin skin, BoxConstraints box) {
+    final entries = _entries.values.toList();
+    final present = entries.where((e) => !e.leaving).toList();
+    // While the last characters leave, they keep their size.
+    if (present.isNotEmpty) _crowd = min(present.length, 3);
+    final narrow = box.maxWidth < box.maxHeight;
+    if (narrow) _spread(present);
+    final xs = entries.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
+    final speaker = widget.speakerId;
+
+    // Eases the size over the sprite transition, so the others don't jump when a character enters or leaves.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: _crowd.toDouble()),
+      duration: widget.instant ? Duration.zero : skin.spriteTransitionDuration,
+      curve: Curves.easeInOut,
+      builder: (context, crowd, _) => Stack(
+        fit: StackFit.expand,
+        children: [
+          // A fixed paint order: moving the speaker to the front made the sprites swap places in one frame.
+          for (final entry in entries)
+            AnimatedAlign(
+              key: ValueKey(entry.actor.id),
+              duration: _duration(
+                _action<MoveAction>((action) => action.profileId == entry.actor.id),
+                _moveDuration,
+              ),
+              curve: Curves.easeInOut,
+              alignment: Alignment((narrow ? entry.narrowX : null) ?? xs[entry.actor.position] ?? 0, 1),
+              // On a narrow (portrait) stage a sprite would be as wide as the stage, so every slot would put it in
+              // the middle. Capping its width lets the characters on stage stand side by side.
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: box.maxWidth * Poi.widthShare(crowd)),
+                child: FractionallySizedBox(
+                  heightFactor: Poi.heightShare(crowd),
+                  child: entry.transition == null
+                      ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
+                      : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Places the [present] characters on a narrow stage. There the slots can't keep their spacing: a `far_*`
+  /// slot would push its character off the edge and the inner ones would cover each other. So they are spread
+  /// evenly from edge to edge, left to right in slot order. A lone character stands at its slot, kept on screen.
+  void _spread(List<_ActorEntry> present) {
+    final ordered = present.toList()..sort((a, b) => a.actor.position.index.compareTo(b.actor.position.index));
+    final xs = ordered.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
+    for (final (rank, entry) in ordered.indexed) {
+      entry.narrowX = ordered.length == 1
+          ? xs[entry.actor.position]!.clamp(-1.0, 1.0)
+          : -1 + 2 * rank / (ordered.length - 1);
+    }
+  }
+
   Widget _sprite(_ActorEntry entry, String? speaker) =>
       _SpriteSlot(sprite: entry.actor.sprite, active: speaker == null || speaker == entry.actor.id);
 }
@@ -306,8 +349,9 @@ class _SpriteSlot extends StatelessWidget {
         duration: skin.spriteTransitionDuration,
         // The new expression fades in over the old one in the first half, and the old one fades out under it in
         // the second. A plain cross-fade leaves both half see-through midway, which shows what's behind.
+        // drive() adds no listeners until the transition listens, so nothing is left to dispose.
         transitionBuilder: (child, animation) =>
-            skin.spriteTransition(CurvedAnimation(parent: animation, curve: const Interval(0, 0.5)), child),
+            skin.spriteTransition(animation.drive(CurveTween(curve: const Interval(0, 0.5))), child),
         child: TweenAnimationBuilder<double>(
           key: ValueKey(sprite),
           tween: Tween(end: active ? 0 : 0.45),

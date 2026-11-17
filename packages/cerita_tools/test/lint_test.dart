@@ -257,6 +257,23 @@ ending end GOOD
         ["a.cerita:4: error: Invalid conversation key 'bad-key': use letters, digits and _"]);
   });
 
+  test('`choice silent` next to a read of a variable named silent is reported', () async {
+    const choice = "@conversation index\nchoice silent\n  en: Reply?\n? Yes\n? No\n";
+    Future<List<String>> silentIssues(String rest) async => [
+          for (final issue in await _lint(story({"a.cerita": "$choice$rest"})))
+            if (issue.contains("silent")) issue,
+        ];
+
+    expect(await silentIssues("nora [if silent == 'Yes']\n  en: Good\nending e GOOD\n  en: E\n"), [
+      "a.cerita:2: error: `silent` is a keyword here, so this choice stores no variable, but the story reads "
+          "'silent'. Name the variable differently, e.g. choice PICK silent",
+      "a.cerita:6: warning: Variable 'silent' is read but never set",
+    ]);
+    expect(await silentIssues("nora\n  en: You said {{silent}}\nending e GOOD\n  en: E\n"), hasLength(2));
+    expect(await silentIssues("nora\n  en: Good\nending e GOOD\n  en: E\n"), isEmpty,
+        reason: "a silent choice without a variable is fine when nothing reads one");
+  });
+
   test('Wrong Number has no problems, even in release mode', () async {
     expect(await _lint(loadWrongNumber(), release: true), isEmpty);
   });

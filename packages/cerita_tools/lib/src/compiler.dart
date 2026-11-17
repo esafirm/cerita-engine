@@ -113,6 +113,11 @@ class _Compiler {
       _put(sceneJson, "channel_id", scene.channel);
       _put(sceneJson, "day", scene.day);
       _put(sceneJson, "time", scene.time);
+      if (scene.hideStatus) {
+        sceneJson["status"] = null;
+      } else {
+        _put(sceneJson, "status", _text(scene.status));
+      }
       _put(sceneJson, "background", scene.background);
       _put(sceneJson, "music", scene.music);
       _put(sceneJson, "ambience", scene.ambience);
@@ -132,6 +137,7 @@ class _Compiler {
         _put(json, "text", _required(item.texts["text"]));
         _put(json, "profile", _profile(item.speaker));
         _put(json, "position", item.position);
+        if (item.offstage) json["offstage"] = true;
         _put(json, "typing_delay_ms", item.typingMs);
         _put(json, "sfx", item.sfx);
         _put(json, "voice", item.voice);
@@ -173,6 +179,9 @@ class _Compiler {
         json["variable"] = item.variable;
         _put(json, "default_value", _text(item.defaultValue));
         _put(json, "profile", _profile(item.by));
+        _put(json, "keyboard", item.keyboard);
+        _put(json, "min_length", item.minLength);
+        _put(json, "max_length", item.maxLength);
       case WaitItem():
         json["duration_ms"] = item.durationMs;
         _put(json, "notification_text", _text(item.texts["notification_text"]));

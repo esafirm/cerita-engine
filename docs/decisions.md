@@ -589,6 +589,89 @@ sprite in before the old one fades out.
 - **Revisit if** a story needs close-ups of two people at once. A per-scene option to show only the speaker
   would fit there.
 
+## Characters spread edge to edge on a portrait stage
+
+*2026-11-17. Presentation modes §2. Found in the Last Seen M1 bug sweep.*
+
+With two or more characters on a stage narrower than it is tall, they are placed evenly from edge to edge in
+slot order instead of at the fixed slot positions, and the width cap eases to its new value over the sprite
+transition when someone enters or leaves.
+
+- **Why:** a phone held upright has no room for five slots. `far_*` slots pushed a third character off screen and
+  `center` covered most of `left`. A cap that changed in one frame made everyone jump about 30% in size.
+- **Cost:** on a phone `left` and `center` look the same as `left` and `right`, and a character slides when
+  another enters further out. The character layer rebuilds every frame for about 250 ms during the ease.
+  The zoom focus still uses the landscape slot positions.
+- **Revisit if** a story needs exact slot placement on phones, or profiling shows the eased rebuild.
+
+## Off-stage speakers and who comes on stage by speaking
+
+*2026-11-17. Data schema §4.1, §4.4. Found in the Last Seen M1 bug sweep.*
+
+A `TEXT` line can be `offstage` (`[offstage]` in scripts): it shows the speaker's name, dims everyone on stage
+and leaves the stage as it is. Only a `TEXT` speaker comes on stage by speaking. A `CHOICE`, `INPUT` or `MEDIA`
+speaker changes expression if already there, but is never added.
+
+- **Why:** Last Seen plays recordings of a missing character. Her sprite walked into rooms she isn't in and
+  pushed the protagonist out. A prompt's asker is often the point-of-view character, and with no position on
+  those items they always landed at center.
+- **Cost:** a script that relied on a choice speaker appearing now needs a `stage show`.
+- **Revisit if** off-screen voices need their own look, such as a nameplate style.
+
+## The reply-twice check plays the story forward
+
+*2026-11-17. Authoring tools §1.4.*
+
+The double-reply lint now follows what plays after a chat option: it applies the option's `value` and effects,
+walks past items the player doesn't see, follows jumps, calls and labels into other conversations, and works out
+the scene of a conversation that has none from the conversations that lead to it. It reports only when a player
+line definitely plays next.
+
+- **Why:** strict lint fails CI, and the first version flagged options whose player line was gated on another
+  answer, with advice that would have removed the only reply.
+- **Cost:** a condition that reads anything the pick didn't set stops the check without a report, so a mixed
+  condition like `R == 'no' && trust > 2` isn't checked. Scene-less conversations entered from different scenes
+  aren't checked, and every `WAIT` is walked past, even one with a notification.
+- **Revisit if** real double replies slip through. A three-valued evaluator would close the gap.
+
+`silent` on a `choice` line is always the keyword. `choice silent silent` is an error, and lint reports a bare
+`choice silent` when the story reads a variable named `silent`, which catches scripts that meant a variable.
+
+## INPUT digits and length
+
+*2026-11-17. Data schema §4.5.*
+
+`INPUT` takes `keyboard` (`text` or `digits`), `min_length` and `max_length` (`keyboard=digits length=4` in
+scripts). The answer is still text, so "0530" keeps its leading zero, and the send button waits until it fits.
+
+- **Why:** Last Seen asks for a four-digit code and a letter keyboard opened and accepted any length.
+- **Cost:** with `min_length`, an empty answer can't fall back to `default_value`.
+- **Revisit if** stories need decimals, signs or a masked PIN field.
+
+## The chat header shows the time and a status, not the day
+
+*2026-11-17. Presentation modes §1.1, data schema §3.*
+
+The chat subtitle shows the scene time first, in the player's language ("11:58 PM", "23.58"), then the status,
+wrapping to a second line before anything is cut. It no longer shows the day. A scene can override the
+channel's status with `status`, or hide it with `null` (`status=none` in scripts). The VN HUD uses the same clock.
+
+- **Why:** "Day 0 · 02:1…" cut off the time, "Day 0" read oddly, and a flashback showed the thread's present-day
+  "last seen" while the contact was still typing.
+- **Cost:** a slightly taller app bar, and the day is gone from the chat header.
+- **Revisit if** players lose track of the day in long chat-only stretches.
+
+## No engine "Call ended" duration
+
+*2026-11-17. Presentation modes §1.*
+
+The engine doesn't add a call-duration line. Stories write their own "Call ended" line and don't state a
+duration.
+
+- **Why:** the call timer is real time, which means nothing under skip, auto or after a load, and isn't saved.
+  A story's hard-coded duration contradicted the timer.
+- **Revisit if** call records become a feature, like a "Voice call · 0:43" line in the thread.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

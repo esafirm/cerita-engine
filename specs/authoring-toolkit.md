@@ -154,13 +154,13 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
 | Statement | Compiles to | Attributes and modifiers |
 | :--- | :--- | :--- |
 | `@conversation <key>` | A conversation file: `index.json` for `index`, else `cvn_<key>.json` | `id=` (`conversation_id`, default `cvn_<key>`), `chapter=`, `title=`, `checkpoint` |
-| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `textbox=adv\|nvl`, `channel=`, `day=`, `time=` |
-| `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `typing=`, `sfx=`, `voice=` |
+| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `textbox=adv\|nvl`, `channel=`, `day=`, `time=`, `status=` (`status=none` hides the chat status) |
+| `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `[offstage]`, `typing=`, `sfx=`, `voice=` |
 | `narration` / `system` / `timestamp` | `NARRATION` (no style / `system` / `timestamp`) | `sfx=` |
 | `media <IMAGE\|AUDIO\|VIDEO\|CG> <file>` | `MEDIA` | `by=`, `unlock=`, `typing=`, `sfx=` |
 | `choice [<VARIABLE>]` | `CHOICE`, followed by `?` options | `by=`, `timeout=`, `silent` |
 | `? <text>` | One choice option | `[if <condition>]`, `[default]`, `[once]`, `[memory_marker]`, `[silent]` |
-| `input <VARIABLE>` | `INPUT` | `default=`, `by=` |
+| `input <VARIABLE>` | `INPUT` | `default=`, `by=`, `keyboard=text\|digits`, `length=`, `min_length=`, `max_length=` |
 | `wait <duration>` | `WAIT` | |
 | `branch` | `BRANCH`, with routes in its body (§2.4) | |
 | `-> <target>` | `JUMP` | |
@@ -172,12 +172,21 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
 
 - `<speaker>` is a `profiles.yaml` key or `player`. Without an expression, the first expression is used.
 - `by=` takes a speaker the same way and becomes the item's `profile`.
+- `input` takes `keyboard=digits` for the number pad and digits only, and `min_length=` and `max_length=` for the
+  answer's length (data schema §4.5). `length=4` is short for both, so a four-digit code is
+  `input PASSCODE keyboard=digits length=4`. `keyboard=text` is the default.
+- `[offstage]` marks a line spoken by someone who isn't on the VN stage, like a voice on a recording or a phone (`offstage`, data schema §4.1). The stage stays as it is, so the speaker isn't brought on. It doesn't go with a position. Example: `sekar [offstage] voice=vo_tape_01.mp3`.
+- A line's speaker comes on stage by itself when it isn't there yet. A `by=` speaker doesn't: use `stage` `show` (§2.6) to bring them on.
 - `@conversation` starts a conversation and every statement up to the next `@conversation` belongs to it.
   `@scene` comes right after it.
 - An effect line at column 0 (§2.4) is a `SET` of its own. Effect lines that follow each other share one `SET`.
 - `[default]` marks the option picked when `timeout=` runs out. `[once]` hides an option for the rest of the
   playthrough once picked. `[memory_marker]` marks an option unlocked by past runs. `[silent]` sends no reply
   when the option is picked (data schema §4.4), and `silent` on the `choice` line does that for every option.
+- On a `choice` line `silent` is a keyword, never a variable name. `choice silent` and `choice silent by=nora` are
+  silent choices without a variable, and `choice PICK silent` stores the pick in `PICK`. `choice silent silent` is
+  an error. A script written before the keyword may use `choice silent` for a variable named `silent`, so `lint`
+  reports a `choice silent` without a variable as an error when the story reads `silent` anywhere.
 - `voice=` and a voice note's file name one clip, as written. The player looks for `name.<locale>.mp3` first and
   falls back to `name.mp3` (CE-01, data schema §5.4), so a story can ship either.
 - `clue <id>` at column 0 is an effect line (§2.4), so it's a `SET` that awards the clue where the scene finds it.
@@ -351,6 +360,7 @@ It checks in two layers and reports both together:
    | Unused cast | A character or expression in `profiles.yaml` that no script uses (warning) |
    | Missing translation | A localized field without one of the `locales` (warning) |
    | Structure | No `index` conversation, two conversations with one key |
+   | `silent` read as a variable | A `choice silent` without a variable while the story reads a variable named `silent` (§2.2) |
 
 2. **Story checks**: the story is compiled, and cerita_core's `StoryLinter` runs on the JSON, once per locale
    ([authoring tools §1](authoring-tools.md#1-story-linter-storylinter)). Its errors and warnings keep their

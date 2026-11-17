@@ -234,8 +234,8 @@ The VN stage is engine state, so a loaded save looks the way it did when it was 
 | `ambience` | The conversation `scene.ambience`, then `STAGE` `ambience` actions. |
 | `textbox` | `adv` or `nvl`: the conversation `scene.textbox`, then `STAGE` `textbox` actions. |
 | `page_start` | Transcript index where the current NVL page starts. Set when a conversation with a `scene` starts, when the text box switches to `nvl`, and by `STAGE` `page` actions. |
-| `sprites` | `position → <id>:<sprite>`. `STAGE` `show` / `hide` / `move` / `clear`, and the speaker of every `TEXT` / `CHOICE` (placed at its `position`, its current slot, or `center`). |
-| `speaker` | Profile id of the last speaking character. Narration clears it. |
+| `sprites` | `position → <id>:<sprite>`. `STAGE` `show` / `hide` / `move` / `clear`, and the speaker of a `TEXT` line (placed at its `position`, its current slot, or `center`), unless the line is `offstage`. A `CHOICE`, `INPUT` or `MEDIA` `profile` only changes the expression of a character already on stage. |
+| `speaker` | Profile id of the last speaking character. Narration clears it. It can be a character who isn't on stage (an `offstage` line or a `CHOICE` asked by someone off stage). Then everyone on stage is dimmed. |
 | `weather`, `zoom`, `zoom_focus` | `STAGE` `weather` and `zoom` actions. |
 
 Entering a conversation whose background or mode differs from the previous one clears the sprites, weather and zoom.

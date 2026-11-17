@@ -301,6 +301,19 @@ ending caught GOOD label=caught
     expect(question.retries, 1);
   });
 
+  test('[offstage] compiles to "offstage": true and has no position', () {
+    final json = _compileOne(story({
+      "a.cerita": "@conversation index\nnora:smile [offstage] voice=tape.mp3\n  en: Hello?\nnora\n  en: Hi\n",
+    }));
+    final [offstage, onStage] = json["conversations"] as List;
+    expect(offstage["offstage"], isTrue);
+    expect(offstage["voice"], "tape.mp3");
+    expect(onStage.containsKey("offstage"), isFalse);
+
+    final result = compileStory(story({"a.cerita": "@conversation index\nnora [offstage] [left]\n  en: Hi\n"}));
+    expect(result.diagnostics.sorted().map((d) => d.format()), ["a.cerita:2: error: An [offstage] line has no position"]);
+  });
+
   test('a choice timeout and [default] compile to timeout_ms and default_choice', () {
     final json = _compileOne(story({
       "a.cerita": "@conversation index\nchoice PICK timeout=10s\n  en: Pick\n? A\n  value 1\n? B [default]\n  value b\n",
@@ -322,6 +335,23 @@ ending caught GOOD label=caught
     expect(one["choices"].map((c) => c["silent"]), [null, true]);
     expect(all["silent"], isTrue);
     expect(all.containsKey("variable"), isFalse, reason: "`silent` isn't taken as the variable");
+  });
+
+  test('`silent` on a choice line is a keyword: never a variable, and a silent choice needs none', () {
+    final json = _compileOne(story({
+      "a.cerita": "@conversation index\nchoice silent by=nora timeout=5s\n  en: Reply?\n? Ok\n"
+          "choice PICK silent\n  en: Pick\n? A\n",
+    }));
+    final [bySpeaker, named] = json["conversations"] as List;
+    expect(bySpeaker["silent"], isTrue);
+    expect(bySpeaker.containsKey("variable"), isFalse);
+    expect(bySpeaker["profile"], startsWith("nora"));
+    expect(named["variable"], "PICK");
+    expect(named["silent"], isTrue);
+
+    final result = compileStory(story({"a.cerita": "@conversation index\nchoice silent silent\n  en: Pick\n? A\n"}));
+    expect(result.diagnostics.sorted().map((d) => d.format()),
+        ["a.cerita:2: error: `silent` is a keyword here, name the variable differently"]);
   });
 
   test('fails without output on syntax errors and unknown speakers or expressions', () {

@@ -311,6 +311,47 @@ void main() {
       expect(restored.stage.weather, "rain");
     });
 
+    test('an offstage line keeps the stage as it is and dims everyone on it', () async {
+      final engine = RealFsseEngine(_FakeEngineLoader({
+        "index": _conversation([
+          _text("listening", position: "left"),
+          {"type": "TEXT", "text": "on the tape", "profile": "miki:0", "position": "right", "offstage": true},
+          {"type": "TEXT", "text": "aside", "profile": "nora:1", "offstage": true},
+        ]),
+      }));
+
+      expect(await _nextText(engine), "listening");
+      final item = await engine.next() as TextItemType;
+      expect(item.offstage, isTrue);
+      expect(engine.stage.sprites.map((k, v) => MapEntry(k, v.id)), {SpritePosition.left: "nora"});
+      expect(engine.stage.speakerId, "miki", reason: "not on stage, so Poi dims everyone");
+
+      await engine.next();
+      expect(engine.stage.sprites[SpritePosition.left]?.spriteIndex, 0, reason: "an offstage line changes nothing");
+      expect(engine.stage.speakerId, "nora");
+    });
+
+    test('a CHOICE speaker is not brought on stage, but one already there changes expression', () async {
+      Map<String, dynamic> choice(String profile) => {
+            "type": "CHOICE",
+            "text": "Well?",
+            "profile": profile,
+            "choices": [{"text": "Go on"}],
+          };
+      final engine = RealFsseEngine(_FakeEngineLoader({
+        "index": _conversation([_text("hi", position: "left"), choice("miki:0"), choice("nora:1")]),
+      }));
+
+      await engine.next();
+      final first = await engine.next() as ChoiceItemType;
+      expect(engine.stage.slotOf("miki"), isNull);
+      expect(engine.stage.speakerId, "miki");
+
+      await engine.next(prevResult: ItemResult.choice(null, first.choices.single));
+      expect(engine.stage.sprites.map((k, v) => MapEntry(k, "${v.id}:${v.spriteIndex}")), {SpritePosition.left: "nora:1"});
+      expect(engine.stage.speakerId, "nora");
+    });
+
     test('unknown actions and transitions throw', () {
       expect(() => StageAction.fromJson({"action": "dance"}), throwsException);
       expect(() => StageAction.fromJson({"action": "background", "transition": "spin"}), throwsException);

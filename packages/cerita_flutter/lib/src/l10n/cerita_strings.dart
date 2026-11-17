@@ -46,6 +46,19 @@ abstract class CeritaStrings {
   // Chat and call.
   String get typing;
   String day(int day);
+
+  /// An in-world time of day, as the story's timestamps write it: "11:58 PM" in English, "23.58" in Indonesian.
+  String clock(int hour, int minute);
+
+  /// A scene's `time` ("23:58" or "23.58") in [clock]'s format. Any other text is shown as written.
+  String sceneTime(String time) {
+    final match = RegExp(r"^(\d{1,2})[:.](\d{2})$").firstMatch(time.trim());
+    if (match == null) return time;
+    final hour = int.parse(match.group(1)!);
+    final minute = int.parse(match.group(2)!);
+    return hour < 24 && minute < 60 ? clock(hour, minute) : time;
+  }
+
   String get chat;
   String get profile;
   String get messageHint;
@@ -225,6 +238,9 @@ class EnglishCeritaStrings extends CeritaStrings {
   String get typing => "typing…";
   @override
   String day(int day) => "Day $day";
+  @override
+  String clock(int hour, int minute) =>
+      "${(hour + 11) % 12 + 1}:${minute.toString().padLeft(2, "0")} ${hour < 12 ? "AM" : "PM"}";
   @override
   String get chat => "Chat";
   @override
@@ -448,6 +464,8 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get typing => "mengetik…";
   @override
   String day(int day) => "Hari $day";
+  @override
+  String clock(int hour, int minute) => "${hour.toString().padLeft(2, "0")}.${minute.toString().padLeft(2, "0")}";
   @override
   String get chat => "Chat";
   @override

@@ -10,7 +10,10 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
 
 ### 1.1 Layout & Components
 - **Top App Bar**:
-  - Displays the active contact's avatar, `name`, online status or `bio` from `Profile`, and in-game `day` / `time` from `Scene`.
+  - Displays the active contact's avatar and `name`, and under them a subtitle: the scene's `time`, then the status.
+  - The time is written the way the player's language writes a time, like the story's own timestamps: `"23:58"` shows as `"11:58 PM"` in English and `"23.58"` in Indonesian (`CeritaStrings.clock`). Time that isn't `HH:MM` shows as written. The header shows no day: a messenger doesn't, and the chapter and the story's timestamps already say it.
+  - The status is the scene's `status` when it sets one (data schema §3), else the channel's `status`, else the contact's `bio`. A scene with `"status": null` shows none, for a flashback where the channel's "last seen" would contradict the story.
+  - The time comes first and the subtitle wraps onto a second line before it is cut, so a long status is what gets cut short, never the time. While a message is being typed the subtitle says so instead (`"typing…"`).
   - Action buttons for **Profile Details**, **Gallery**, **Case Board** (stories with clues, §6) and **Chapter/Settings**.
 - **Scrollable Message Timeline**:
   - Renders the delivered transcript for the active `channel_id`.
@@ -26,7 +29,7 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
 - **Bottom Composer / Interaction Tray**:
   - **Normal Progression**: Tap anywhere or tap the bottom "Continue" prompt to advance incoming messages.
   - **Choice Selection (`CHOICE`)**: Expands a tray of selectable reply cards at the bottom of the chat (with an optional countdown bar if `timeout_ms` is set). An evidence question shows the Case Board picker there instead (§6.3), and the presented clue is sent as a clue message (§6.4).
-  - **Text Input (`INPUT`)**: Activates the message text field and Send button.
+  - **Text Input (`INPUT`)**: Activates the message text field and Send button. With `"keyboard": "digits"` the number pad opens and only digits can be typed. Typing stops at `max_length`, and Send stays disabled until the answer has `min_length` characters (data schema §4.5). The VN dialog and the call view use the same field.
 
 ---
 
@@ -42,7 +45,9 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Supports up to 5 simultaneous character slots (`far_left`, `left`, `center`, `right`, `far_right`). The 3 inner slots keep their wide spacing until a `far_*` slot is used.
   - Characters are tracked by profile id, so moving one to another slot slides it across instead of fading it out and in.
   - Active speaker is rendered at full opacity and slight scale-up; inactive sprites on stage are dimmed.
-  - On a narrow (portrait) stage a sprite is capped to a share of the stage width (all of it alone, 62% with two characters, 46% with three or more), so characters stand side by side instead of all landing in the middle. Wide stages are unaffected. Characters keep a fixed paint order: the speaker is not moved to the front.
+  - On a narrow (portrait) stage a sprite is capped to a share of the stage width (all of it alone, 62% with two characters, 46% with three or more), so characters stand side by side instead of all landing in the middle. When a character enters or leaves, the others ease to their new size over the sprite transition. Wide stages are unaffected. Characters keep a fixed paint order: the speaker is not moved to the front.
+  - On a narrow stage two or more characters are spread evenly from edge to edge, left to right in slot order, so none is pushed off screen and three are each mostly visible. A lone character stands at its slot, kept on screen. Wide stages keep the slot spacing.
+  - A line spoken by someone off stage (`offstage`, data schema §4.1) leaves the stage as it is and dims everyone on it.
   - An expression change fades the new sprite in over the old one, then fades the old one out under it, so the character is never see-through midway.
   - Smooth sprite swapping when a character changes expression (`123aaa:0` -> `123aaa:2`).
 - **Stage Direction (`STAGE` items)**:

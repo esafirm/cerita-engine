@@ -187,6 +187,13 @@ class ScriptParser {
       ..textbox = st.choose("textbox", _textboxStyles)
       ..channel = st.take("channel")
       ..time = st.take("time");
+    // `status=none` hides the channel status for this scene, any other text replaces it.
+    final status = st.localized("status");
+    if (status != null && status.values.length == 1 && status.values.values.single == "none") {
+      scene.hideStatus = true;
+    } else {
+      scene.status = status;
+    }
     final day = st.take("day");
     if (day != null) {
       scene.day = int.tryParse(day);
@@ -239,10 +246,13 @@ class ScriptParser {
   }
 
   ItemNode? _choiceItem(_Statement st) {
-    // Read before the variable, so `choice silent` isn't taken as a variable named "silent".
+    // `silent` is a keyword here, never a variable: `choice silent` is a silent choice without a variable. The
+    // linter reports a script that reads a variable named `silent` next to one.
     final silent = st.flag("silent");
     final variable = st.next();
-    if (variable != null && !variablePattern.hasMatch(variable)) {
+    if (variable == "silent") {
+      _error(st.span, "`silent` is a keyword here, name the variable differently");
+    } else if (variable != null && !variablePattern.hasMatch(variable)) {
       _error(st.span, "Invalid variable name '$variable'");
     }
     return ChoiceItem(st.span, variable)
@@ -276,9 +286,37 @@ class ScriptParser {
       );
       return null;
     }
-    return InputItem(st.span, variable)
+    final item = InputItem(st.span, variable)
       ..defaultValue = st.localized("default")
-      ..by = st.profile("by");
+      ..by = st.profile("by")
+      ..keyboard = st.choose("keyboard", const {"text", "digits"});
+    if (item.keyboard == "text") item.keyboard = null;
+    // `length=4` is short for `min_length=4 max_length=4`.
+    final length = _inputLength(st, "length");
+    var min = _inputLength(st, "min_length");
+    var max = _inputLength(st, "max_length");
+    if (length != null) {
+      if (min != null || max != null) _error(st.span, "Use length= or min_length= and max_length=, not both");
+      min = max = length;
+    }
+    if (min != null && max != null && min > max) {
+      _error(st.span, "min_length ($min) is more than max_length ($max)");
+    }
+    return item
+      ..minLength = min
+      ..maxLength = max;
+  }
+
+  /// A positive whole number of characters for an input's `length=`, `min_length=` or `max_length=`.
+  int? _inputLength(_Statement st, String key) {
+    final raw = st.take(key);
+    if (raw == null) return null;
+    final value = int.tryParse(raw);
+    if (value == null || value < 1) {
+      _error(st.span, "$key must be a whole number from 1, not '$raw'");
+      return null;
+    }
+    return value;
   }
 
   ItemNode? _wait(_Statement st) {
@@ -318,6 +356,8 @@ class ScriptParser {
         item.position = position;
       }
     }
+    item.offstage = st.modifier("offstage");
+    if (item.offstage && item.position != null) _error(st.span, "An [offstage] line has no position");
     item
       ..typingMs = st.duration("typing")
       ..sfx = st.take("sfx")

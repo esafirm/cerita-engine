@@ -40,6 +40,14 @@ class ChatView extends StatelessWidget {
     return null;
   }
 
+  /// The header's status: the scene's `status` when it sets one, else the channel's, else the contact's bio.
+  /// Null when there is none or the scene hides it.
+  String? _status(Profile? contact) {
+    final override = controller.scene.status;
+    final status = override != null ? controller.localizer.resolve(override) : controller.channel?.status ?? contact?.bio;
+    return status == null || status.trim().isEmpty ? null : status;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scene = controller.scene;
@@ -51,27 +59,37 @@ class ChatView extends StatelessWidget {
     final typing = controller.phase == StoryPhase.typing ? controller.typingProfile : null;
     final strings = StoryLanguage.of(context).strings;
 
+    // The scene's time first, so a long status is what gets cut, never the time. No day: a messenger doesn't
+    // show one, and the chapter and the story's timestamps already say it.
     final subtitle = typing != null
         ? strings.typing
         : [
-            if (scene.day != null) strings.day(scene.day!),
-            scene.time,
-            channel?.status ?? contact?.bio,
-          ].whereType<String>().join(" · ");
+            if (scene.time case final time?) strings.sceneTime(time),
+            ?_status(contact),
+          ].join(" · ");
 
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
+        // Room for a status that wraps onto a second line.
+        toolbarHeight: 64,
         title: Row(
           children: [
             StoryAvatar(asset: avatar == null ? null : config.avatar(avatar), name: channel?.name ?? contact?.name ?? ""),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(channel?.name ?? contact?.name ?? strings.chat, style: const TextStyle(fontSize: 17)),
-                  Text(subtitle, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                  Text(
+                    channel?.name ?? contact?.name ?? strings.chat,
+                    style: const TextStyle(fontSize: 17),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (subtitle.isNotEmpty)
+                    Text(subtitle, style: const TextStyle(fontSize: 12), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),

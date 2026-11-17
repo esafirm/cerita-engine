@@ -101,7 +101,8 @@ Each conversation file represents a scene, chat session, or story chapter.
 | `textbox` | `"adv"` \| `"nvl"` | No (defaults to `"adv"`) | VN text display: one line in the dialogue box (`adv`), or a full-screen page of lines (`nvl`). |
 | `channel_id` | `String` | For `"CHAT"` | Identifier of the messaging thread or contact. |
 | `day` | `int` | No | In-game day number (e.g., `1` to `7`). |
-| `time` | `String` | No | In-game timestamp displayed in UI headers (e.g., `"23:45"`). |
+| `time` | `String` | No | In-game timestamp displayed in UI headers (e.g., `"23:45"`). Written `"HH:MM"` (24 hours), the chat header shows it the way the player's language writes a time: `"11:45 PM"` in English, `"23.45"` in Indonesian. Any other text is shown as written. |
+| `status` | `String`, locale object or `null` | No | Chat only. The status line in the chat header for this scene, in place of the channel's `status` from `channels.json` (e.g., `"online"` during a flashback in a thread whose channel says `"last seen Saturday"`). `null` or `""` shows no status. Left out, the channel's status is shown. |
 
 A conversation **without** a `scene` object continues the current scene and stage. Use it for shared `CALL` subroutines that should not reset the background or characters.
 
@@ -151,6 +152,7 @@ Displays a character line in the VN dialogue box or a message bubble in Chat mod
 }
 ```
 - `position` (`"far_left"` \| `"left"` \| `"center"` \| `"right"` \| `"far_right"`): Sprite slot in VN mode. Defaults to the speaker's current slot, or `"center"`.
+- `offstage` (`bool`, default `false`): The line is spoken by someone who isn't on the VN stage, like a voice on a recording, a phone or another room. The stage stays as it is: the speaker isn't brought on, an expression change is ignored and `position` is ignored. The dialogue box shows the speaker's name, and the characters on stage are dimmed as listeners. Without it, a speaker who isn't on stage is shown at `position`, or `"center"`.
 - `typing_delay_ms` (`int?`): Simulated `"is typing..."` duration in Chat mode before the bubble appears.
 - `text` can use [text tags](#6-text-tags), like `NARRATION` text and the prompt of `CHOICE` / `INPUT`.
 
@@ -233,6 +235,7 @@ Presents interactive options to the player. Choices can mutate state variables, 
   ]
 }
 ```
+- `profile` (`String?`): Who asks. In VN mode this character becomes the speaker, and one already on stage takes the given expression. Unlike a `TEXT` speaker, it is not brought on stage: show it with a `STAGE` `show` or a `TEXT` line first. The `profile` of `INPUT` and `MEDIA` works the same way.
 - `once` (`bool`, default `false`): The choice disappears for the rest of the playthrough after it is picked, for "ask everything" hub menus that loop back on themselves. A `CHOICE` left with no visible options is skipped.
 - `silent` (`bool`, default `false`): Picking the option sends no reply. Normally the chosen option becomes the player's line: a sent bubble in a chat, and a line in the backlog. Use it for options that are actions, not words (`Close the app`, `Screenshot it, say nothing`), and for options a scripted player line repeats right after. `"silent": true` on the `CHOICE` itself makes every option silent. The option's `value`, `effects` and `target` apply as usual.
 - Choices picked in any earlier playthrough are flagged `chosen` so the UI can mark them.
@@ -319,6 +322,25 @@ Prompts the player to enter custom text (e.g., player name, passcodes, or puzzle
   "default_value": "Alex"
 }
 ```
+
+A code or a number asks for digits and a length:
+
+```json
+{
+  "type": "INPUT",
+  "text": "Enter the four-digit code.",
+  "variable": "PASSCODE",
+  "keyboard": "digits",
+  "min_length": 4,
+  "max_length": 4
+}
+```
+
+- `default_value` (`String?`): Stored when the player sends an empty answer. The field shows it as a hint.
+- `keyboard` (`"text"` \| `"digits"`, default `"text"`): `"digits"` opens the number pad and the field takes only the digits 0 to 9. The answer is stored as text, so `"0530"` keeps its leading zero and conditions compare it as a string (`PASSCODE == '0530'`).
+- `min_length` (`int?`): The fewest characters the answer needs. The send button stays disabled until the answer is that long. With `min_length`, an empty answer can't be sent, so `default_value` is only a hint.
+- `max_length` (`int?`): The most characters the field takes. Typing stops there.
+- The answer is trimmed before these checks and before it is stored.
 
 ### 4.6 `BRANCH` — Conditional Router
 Silently evaluates state conditions in order and jumps to the first matching `target` conversation (used for routing into different chapters or endings based on accumulated affection/flags).
@@ -424,6 +446,8 @@ Runs a list of `actions` on the VN stage at once, then continues by itself once 
 
 Every action takes an optional `duration_ms`. `transition` is one of `"fade"` (default), `"dissolve"`, `"fade_black"` (backgrounds), `"slide_left"`, `"slide_right"`, `"slide_up"`, `"zoom"`, `"wipe_left"`, `"wipe_right"` or `"none"`.
 
+Characters come on stage through `show` and through a `TEXT` speaker who isn't there yet (§4.1). A `CHOICE`, `INPUT` or `MEDIA` `profile` and an `offstage` line don't add anyone.
+
 The stage (background, characters, music, ambience, weather, zoom, text box and NVL page) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene.
 
 ---
@@ -497,7 +521,7 @@ A plain string is the same text in every language, so single-language stories ne
 
 | Where | Fields |
 | :--- | :--- |
-| Conversation file | `chapter`, `title` |
+| Conversation file | `chapter`, `title`, `scene.status` |
 | `TEXT`, `NARRATION` | `text` |
 | `MEDIA` | `title`, `caption`, `transcript` |
 | `CHOICE` | `text` (the prompt) and each option's `text` |
@@ -509,8 +533,8 @@ A plain string is the same text in every language, so single-language stories ne
 | `clues.json` | each clue's `title`, `description`, `chapter` |
 
 Logic fields never take a locale object: `id`, `condition`, `effects`, `variable`, `target`, `value`,
-`profile`, `uri`, `voice`, `sfx`, `music`, `background`, `unlock_id`, `ending_id`, `handle`, `scene.time`, and a
-clue's `id` and `image`.
+`profile`, `uri`, `voice`, `sfx`, `music`, `background`, `unlock_id`, `ending_id`, `handle`, `scene.time`, an
+`INPUT`'s `keyboard`, `min_length` and `max_length`, and a clue's `id` and `image`.
 
 ### 7.2 Fallback
 

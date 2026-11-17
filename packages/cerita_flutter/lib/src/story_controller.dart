@@ -381,6 +381,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> submitInput(String value) async {
     final item = current;
     if (phase != StoryPhase.input || item is! InputItemType) return;
+    // Too short, too long or not digits for a digits input: not sent, the prompt stays.
+    if (!item.accepts(value.trim())) return;
     final text = value.trim().isEmpty ? (item.defaultValue ?? "") : value.trim();
     await _next(ItemResult.input(item.variable, text));
   }

@@ -637,15 +637,23 @@ class RealFsseEngine extends FsseEngine {
     return prepared;
   }
 
-  /// Puts the speaking character on stage: at the item's `position`, its current slot, or center.
+  /// Makes the item's character the speaker. A `TEXT` line puts its speaker on stage: at the line's `position`,
+  /// its current slot, or center. Other items (a `CHOICE` or `INPUT` prompt, a `MEDIA` sender) only change the
+  /// expression of a character already on stage, and an offstage line leaves the stage as it is. A speaker who
+  /// isn't on stage leaves everyone on stage dimmed.
   void _placeSpeaker(ItemType item) {
     final info = item.getProfileInfo();
     if (info == null || info.isPlayer || item is NarrationItemType) {
       stage.speakerId = null;
       return;
     }
-    stage.place(info, item is TextItemType ? item.position : null);
     stage.speakerId = info.id;
+    if (item is TextItemType && item.offstage) return;
+    if (item is TextItemType) {
+      stage.place(info, item.position);
+    } else if (stage.slotOf(info.id) != null) {
+      stage.place(info);
+    }
   }
 
   Future<void> _registerUnlocks(ItemType item) async {
