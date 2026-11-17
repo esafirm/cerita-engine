@@ -672,6 +672,18 @@ duration.
   A story's hard-coded duration contradicted the timer.
 - **Revisit if** call records become a feature, like a "Voice call · 0:43" line in the thread.
 
+## Didit first writes on Day 3
+
+*2026-11-17. Last Seen spec §2, M2 beat plan §8.*
+
+Didit's first contact moves from Day 4 to Day 3, as a chat. Day 4 keeps his first call. The early bad end
+*Handed Over* is sending him the spare phone by courier.
+
+- **Why:** the Day 3 bad end needs someone to hand the phone to, and Didit is chat and call only, so he can't
+  come to the house.
+- **Cost:** Day 3 carries four threads (the auction, Hendra, Yusuf, Didit), so it's the fullest day of M2.
+- **Revisit if** the M1 playtest shrinks the day budgets enough that Day 3 can't hold all four.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

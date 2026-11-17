@@ -64,8 +64,8 @@ Budgets are Indonesian words. The compiler's playtime estimator checks them ever
 | Prologue | VN + CHAT | A year ago: the falling out. Present: Dinda's call | 1.5k | 10m |
 | Day 1: Rumah Kosong | VN | Sekar's house, family, the empty room, getting her phone | 4.0k | 25m |
 | Day 2: Grup Chat | CHAT | Unlocking her threads, the listener group, first contradictions | 4.5k | 30m |
-| Day 3: Dermaga | VN + CALL | Muara Angke, Pak Hendra, first deduction. **Early bad end** possible | 4.5k | 28m |
-| Day 4: Malam Itu | CALL + CHAT | Reconstructing the night she vanished, Didit's first contact | 4.5k | 28m |
+| Day 3: Dermaga | VN + CALL | Muara Angke, Pak Hendra, first deduction, Didit's first contact. **Early bad end** possible | 4.5k | 28m |
+| Day 4: Malam Itu | CALL + CHAT | Reconstructing the night she vanished, Didit's first call | 4.5k | 28m |
 | Day 5: Retak | mix | **Route split**: Harbor route (Hendra, physical trail) or Network route (Tasya/Bima, digital trail) | 4.5k x 2 | 28m |
 | Day 6: Badai | VN | Route confrontation, storm crossing. **Bad ends** possible | 4.5k x 2 | 28m |
 | Day 7: Terakhir Terlihat | mix | Ending router, final deduction | 3.0k | 18m |
@@ -254,7 +254,7 @@ Each milestone is a PR (or a short stack) that builds, passes `make check` and i
 | :--- | :--- | :--- |
 | M0 | Foundations | Localized text, locale audio, meta conditions, `cerita_tools` compile/lint/stats, app skeleton with placeholders |
 | M1 | Vertical slice | Prologue + Day 1 fully produced in ID + EN with real art, TTS and music. Settings screen. **Check: does real playtime match the estimator?** |
-| M2 | Investigation core | Clues, Case Board, present-evidence choice. Days 2-4 + early bad end |
+| M2 | Investigation core | Clues, Case Board, present-evidence choice. Days 2-4 + early bad end. Beat plan: [`last-seen-m2.md`](last-seen-m2.md) |
 | M3 | Routes | Day 5-6 both routes, flowchart, read-skip fix, bad endings |
 | M4 | Endings | Day 7 router, all 10 endings, secret ending, cross-run true ending |
 | M5 | Release polish | Manual Indonesian review, full EN pass, credits, icons, size budget, release builds, playtest and pacing fixes |
