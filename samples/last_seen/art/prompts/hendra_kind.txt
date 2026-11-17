@@ -1,0 +1,15 @@
+Anime visual novel character sprite, knees-up: the bottom edge of the frame cuts across his knees, so no shins and
+no boots show. Same framing and scale as the other cast sprites: the top of his cap about 3% below the top edge, his
+eyes about 13% down from the top, his belt about half way down. Portrait 1:2, the character centered and fully
+inside the frame side to side, flat pure green #00FF00 background with nothing else on it, no shadow, no floor,
+clean hard edges, no green in the clothes, hair or props. Pak Hendra, a 56-year-old Indonesian boatman from the
+fishing port, wiry and strong, still upright, a man of few words, clearly mid-fifties and not elderly. Sun-darkened
+face, drawn simply, with a few sharp crease lines at the eyes and one fold beside the mouth (no hatching, no texture
+on the skin), short grey stubble on his jaw, thick greying brows, narrow wary eyes. Short grey-black hair under a
+faded navy cap with no logo. A faded brown and indigo batik shirt worn open over a stained white singlet, old dark
+grey work trousers, tall white rubber boots (below the frame, not visible), rough hands. Deep brown skin.
+Expression: kind, a small warm smile that softens his eyes, one hand raised a little as if to reassure, facing a
+little to the left. Style: 1990s TV anime cel look. Flat colors with two-tone cel shading and hard shadow edges, no
+gradients, no glow, no bloom, no rim light. Clean line art with varied line weight. Limited muted palette.
+Simplified shapes. Same face, cap, batik shirt, singlet and line weight as the attached reference, but framed closer
+than the reference, cut at the knees.
