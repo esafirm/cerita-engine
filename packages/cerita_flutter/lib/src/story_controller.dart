@@ -35,11 +35,11 @@ enum CallState {
   /// Talking. Every scene that is not a call stays here.
   connected,
 
-  /// The phone rings: a `ring=` scene that just started, or the caller calling back. The story waits for
-  /// [StoryController.answerCall].
+  /// The phone rings: a `ring=` scene that just started. The story waits for [StoryController.answerCall].
   ringing,
 
-  /// The player hung up or declined. The caller calls back after [StoryController.callbackDelay].
+  /// The player hung up or declined a call with a `hangup` target. The story goes there after
+  /// [StoryController.hangUpDelay].
   ended,
 }
 
@@ -123,11 +123,23 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// Clues as the story finds them, for the clue notification.
   Stream<Clue> get cluesFound => _cluesFound.stream;
 
-  /// How long a declined or hung-up call stays ended before the caller calls back.
-  static const callbackDelay = Duration(milliseconds: 2600);
+  /// How long a call the player ends shows as ended before the story goes on to the scene's `hangup` target.
+  static const hangUpDelay = Duration(milliseconds: 1200);
 
-  /// The call of a `CALL` scene. A story can't go on without its call, so a call the player ends rings again.
+  /// How long [refusal] stays up.
+  static const refusalDuration = Duration(milliseconds: 3200);
+
+  /// The call of a `CALL` scene.
   CallState callState = CallState.connected;
+
+  /// What the player's character thinks when they try to end a call that can't be ended (the scene's `stay`).
+  /// Null when nothing is shown.
+  String? refusal;
+  Timer? _refusalTimer;
+
+  /// The scene has played out by itself and waits for a tap before the story goes on to the next one, so a
+  /// thread or a stage direction that ends a scene doesn't cut straight to the next. See [_holdsAtSceneEnd].
+  bool sceneEndHeld = false;
 
   /// The player put the call on hold: the line stops and the story waits.
   bool onHold = false;
@@ -137,7 +149,7 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   /// The first item of a ringing scene, delivered once the player answers.
   ItemType? _ringingItem;
-  Timer? _callback;
+  Timer? _hangUp;
 
   bool _busy = false;
   bool _disposed = false;
@@ -208,8 +220,10 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Profile? profileById(String id) => engine.getProfileById(id);
 
-  bool get canAdvance =>
-      !_busy && !_callPaused && (phase == StoryPhase.idle || phase == StoryPhase.showing);
+  /// The cast, as the story files name it (see [profileById] for the active language).
+  List<Profile> get profiles => engine.profileData.profiles;
+
+  bool get canAdvance => !_busy && !_callPaused && (phase == StoryPhase.idle || phase == StoryPhase.showing);
 
   /// The call is ringing, ended or on hold, so the story waits.
   bool get _callPaused => callState != CallState.connected || onHold;
@@ -328,6 +342,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     _typingEntry = null;
     phase = StoryPhase.idle;
     _resetCall();
+    sceneEndHeld = false;
     await audio.stopVoice();
     await engine.start(save: save, checkpoint: checkpoint, replay: replay);
     _playMusic();
@@ -352,6 +367,7 @@ class StoryController extends ChangeNotifier with EngineListener {
       currentProfile = engine.getProfile(item);
       _lineTyped = !_typesOut(item);
       phase = item is EndingItemType ? StoryPhase.ending : StoryPhase.showing;
+      if (scene.mode == SceneMode.chat && phase == StoryPhase.showing) await _holdsAtSceneEnd(_epoch);
       _notify();
       _scheduleAutoAdvance();
     }
@@ -359,6 +375,7 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   /// Shows [item] again, as restored by a rollback.
   void _show(ItemType item) {
+    sceneEndHeld = false;
     _ringPending = false;
     current = item;
     currentProfile = engine.getProfile(item);
@@ -459,6 +476,7 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Future<void> _next([ItemResult? result]) async {
     _busy = true;
+    sceneEndHeld = false;
     _autoTimer?.cancel();
     final epoch = _epoch;
     ItemType? item;
@@ -516,10 +534,31 @@ class StoryController extends ChangeNotifier with EngineListener {
       if (_disposed || epoch != _epoch) return;
       notification = null;
       phase = StoryPhase.showing;
+      if (await _holdsAtSceneEnd(epoch)) return _notify();
       await advance();
       return;
     }
+    // A thread moves on by itself.
+    if (scene.mode == SceneMode.chat && phase == StoryPhase.showing && await _holdsAtSceneEnd(epoch)) _notify();
     _scheduleAutoAdvance();
+  }
+
+  /// Sets [sceneEndHeld] when the story would leave the scene on its own next: the player taps to go on, unless
+  /// Auto or Skip moves the story for them. As [StoryScreen] shows scenes, a new VN conversation is a new scene,
+  /// and a chat or call thread goes on across conversations unless a new chapter starts.
+  Future<bool> _holdsAtSceneEnd(int epoch) async {
+    if (skipMode || autoMode) return false;
+    final exit = await engine.peekExit();
+    if (_disposed || epoch != _epoch || exit == null) return false;
+    final next = exit.next;
+    final nextScene = exit.scene ?? scene;
+    sceneEndHeld =
+        next == null ||
+        nextScene.mode != scene.mode ||
+        nextScene.channelId != scene.channelId ||
+        scene.mode == SceneMode.vn ||
+        (next.chapterText != null && next.chapterText != conversation?.chapterText);
+    return sceneEndHeld;
   }
 
   Future<void> _present(ItemType item) async {
@@ -653,37 +692,52 @@ class StoryController extends ChangeNotifier with EngineListener {
     _notify();
   }
 
-  /// Picks up the ringing phone. A scene that just started delivers its first line, a call back picks up the
-  /// line where the call was cut.
+  /// Picks up the ringing phone and delivers the scene's first line.
   Future<void> answerCall() async {
     if (callState != CallState.ringing) return;
     audio.stopRing();
+    _clearRefusal();
     callState = CallState.connected;
     final item = _ringingItem;
     _ringingItem = null;
-    if (item != null) return _deliver(item);
-    // Only a line on screen can be hung up on.
-    phase = StoryPhase.showing;
-    _notify();
-    _speakAgain();
-    _scheduleAutoAdvance();
+    if (item != null) await _deliver(item);
   }
 
-  /// Declines the ringing phone or hangs up. The story still needs the call, so the caller calls back after
-  /// [callbackDelay].
+  /// Declines the ringing phone or hangs up. A scene with a `hangup` target ends the call and goes there after
+  /// [hangUpDelay]. Any other call can't be ended: [refusal] shows what the player's character thinks of it,
+  /// and the call goes on.
   void endCall() {
     if (scene.mode != SceneMode.call || callState == CallState.ended) return;
-    if (callState == CallState.connected && phase != StoryPhase.showing) return;
+    final target = scene.hangUp;
+    if (target == null) {
+      refusal = switch (scene.stay) {
+        final stay? => localizer.resolve(stay),
+        null => strings.cantHangUp,
+      };
+      _refusalTimer?.cancel();
+      _refusalTimer = Timer(refusalDuration, _clearRefusal);
+      _notify();
+      return;
+    }
+    if (_busy) return;
     audio.stopRing();
     audio.stopVoice();
     _autoTimer?.cancel();
+    _clearRefusal();
     callState = CallState.ended;
     onHold = false;
-    _callback?.cancel();
+    _hangUp?.cancel();
     final epoch = _epoch;
-    _callback = Timer(callbackDelay, () {
-      if (!_disposed && epoch == _epoch && callState == CallState.ended) _ring();
+    _hangUp = Timer(hangUpDelay, () {
+      if (!_disposed && epoch == _epoch && callState == CallState.ended) jumpTo(target);
     });
+    _notify();
+  }
+
+  void _clearRefusal() {
+    _refusalTimer?.cancel();
+    if (refusal == null) return;
+    refusal = null;
     _notify();
   }
 
@@ -701,13 +755,15 @@ class StoryController extends ChangeNotifier with EngineListener {
     _notify();
   }
 
-  /// Says the current line again after the call was cut or held.
+  /// Says the current line again after the call was held.
   void _speakAgain() {
     if (current case final TextItemType item when phase == StoryPhase.showing && !skipMode) replayVoice(item);
   }
 
   void _resetCall() {
-    _callback?.cancel();
+    _hangUp?.cancel();
+    _refusalTimer?.cancel();
+    refusal = null;
     _ringPending = false;
     _ringingItem = null;
     if (callState == CallState.ringing) audio.stopRing();
@@ -727,7 +783,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (phase != StoryPhase.showing) return;
     if (_callPaused) return;
     if (_storyHeld) return;
-    if (scene.mode == SceneMode.chat && !skipMode) {
+    if (scene.mode == SceneMode.chat && !skipMode && !sceneEndHeld) {
       if (_pacingHeld) return;
       final pause = current is MediaItemType ? _chatMediaPauseMs : _chatPauseMs;
       _autoTimer = Timer(Duration(milliseconds: pause), advance);
@@ -784,7 +840,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   void dispose() {
     _disposed = true;
     _autoTimer?.cancel();
-    _callback?.cancel();
+    _hangUp?.cancel();
+    _refusalTimer?.cancel();
     settings.removeListener(_applySettings);
     _toasts.close();
     _cluesFound.close();

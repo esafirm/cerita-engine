@@ -28,7 +28,8 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
   - **Voice Note (`AUDIO`)**: Inline audio player bubble with play/pause button, waveform/progress bar, duration, and optional transcript toggle.
   - **Video (`VIDEO`)**: Inline preview with play overlay.
 - **Bottom Composer / Interaction Tray**:
-  - **Normal Progression**: Tap anywhere or tap the bottom "Continue" prompt to advance incoming messages.
+  - **Normal Progression**: the thread moves on by itself, at the chat pacing.
+  - **End of a scene**: when the thread has played out and the story would leave it next (another mode or thread, a new chapter, or the end), the tray shows **Tap to continue** and the story waits for a tap there or on the thread (§7).
   - **Choice Selection (`CHOICE`)**: Expands a tray of selectable reply cards at the bottom of the chat (with an optional countdown bar if `timeout_ms` is set). An evidence question shows the Case Board picker there instead (§6.3), and the presented clue is sent as a clue message (§6.4).
   - **Text Input (`INPUT`)**: Activates the message text field and Send button. With `"keyboard": "digits"` the number pad opens and only digits can be typed. Typing stops at `max_length`, and Send stays disabled until the answer has `min_length` characters (data schema §4.5). The VN dialog and the call view use the same field.
 
@@ -39,7 +40,7 @@ Activated when `scene.mode == "CHAT"`. Emulates a modern mobile messaging applic
   - **Mute** and **Speaker** toggle. Mute shows a muted microphone next to the status.
   - **Keypad** swaps the buttons for a dial pad that plays key clicks and shows the keys pressed. **Hide** brings the buttons back.
   - **Hold** stops the line and the story, and the status reads "On hold". Taking the call off hold says the line again.
-  - **End call** and **Decline**: the story can't go on without its call, so the call ends ("Call ended"), and after a moment the caller calls back. Answering picks the call up where it was cut, and says the cut line again.
+  - **End call** and **Decline**: with the scene's `hangup` target (data schema §3) the call ends ("Call ended") and the story goes on there after a moment. Without it the call can't be ended: the player's character says why in a narration card over the buttons (the scene's `stay` line, or "Not now. I need to hear this."), and the call goes on ringing or talking. The card goes after about 3 seconds.
 - **Choices, inputs and evidence** take the place of the call buttons while they are open.
 
 ---
@@ -56,12 +57,11 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - Supports up to 5 simultaneous character slots (`far_left`, `left`, `center`, `right`, `far_right`). The 3 inner slots keep their wide spacing until a `far_*` slot is used.
   - Characters are tracked by profile id, so moving one to another slot slides it across instead of fading it out and in.
   - Active speaker is rendered at full opacity and slight scale-up; inactive sprites on stage are dimmed.
-  - On a narrow (portrait) stage a sprite is capped to a share of the stage width (all of it alone, 62% with two characters, 46% with three or more), so characters stand side by side instead of all landing in the middle. When a character enters or leaves, the others ease to their new size over the sprite transition. Wide stages are unaffected. Characters keep a fixed paint order: the speaker is not moved to the front.
-  - On a narrow stage two or more characters are spread evenly from edge to edge, left to right in slot order, so none is pushed off screen and three are each mostly visible. A lone character stands at its slot, kept on screen. Wide stages keep the slot spacing.
+  - **One scale for the cast**: a profile's `height` and `framing` (data schema §2) size its sprites against the others, like one camera on everyone: a taller character stands taller, and a sprite cut higher up the body (`framing` 0.6, cut at the thigh) stands lower than one cut at the knee (0.72), so every cut stays below the stage's bottom edge. The tallest head of the whole cast reaches 82% of the stage height, and a character keeps their size whoever else is on stage. Without heights every sprite is as tall and stands on the bottom edge.
+  - **Crowds**: on a narrow (portrait) stage the camera barely pulls back for a crowd (80% with two, 72% with three or more) and the characters overlap a little instead of shrinking into dolls against the background. Two or more stand evenly around the middle, left to right in slot order, half the stage width apart with two and 40% with three. A lone character stands at its slot, kept on screen. On a wide stage the slots are fixed shares of the width, the far ones half on screen, and the size drops to 66% with three or more. When a character enters or leaves, the others ease to their new size over the sprite transition. Characters keep a fixed paint order: the speaker is not moved to the front.
   - A line spoken by someone off stage (`offstage`, data schema §4.1) leaves the stage as it is and dims everyone on it.
   - An expression change fades the new sprite in over the old one, then fades the old one out under it, so the character is never see-through midway.
   - Smooth sprite swapping when a character changes expression (`123aaa:0` -> `123aaa:2`).
-  - Sprites stand on the bottom edge of the stage. On a portrait stage a sprite's slot is taller than the sprite, and the sprite sits at the bottom of it, so a cut-off waist or thigh is hidden by the screen edge.
 - **Stage Direction (`STAGE` items)**:
   - Character and background `transition`s: `fade`, `dissolve`, `fade_black`, `slide_*`, `zoom`, `wipe_*`, `none`. Without one, the skin's default transition is used.
   - Camera: `shake` and `flash` play once; `zoom` scales the background and characters towards a slot.
@@ -85,8 +85,9 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **Back**: Rolls back to the previous line (engine §7). A mouse wheel scroll up does the same. Rolled-back lines and stage changes show instantly.
   - **Auto / Skip**: Auto-advance dialogue after a reading delay, or fast-forward previously read text (all text with the `skip_unread` setting).
   - **Quick Save / Quick Load**: Saves to and loads from the quick slot without leaving the stage.
-  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Holding the stage anywhere does the same until the finger lifts. Auto and skip wait while the UI is hidden and carry on when it comes back.
+  - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Holding the stage anywhere but a control does the same until the finger lifts (`HoldToPeek`: a hold that starts on a button, a choice or a menu entry does nothing). Anything with a `MouseRegion`, which every `InkWell` and Material button has, counts as a control, so a skin's own buttons made of a plain `GestureDetector` wrap it in one. Auto and skip wait while the UI is hidden and carry on when it comes back.
   - **Case Board**: Opens the board (§6) in stories with clues, with a badge counting new clues.
+  - **End of a scene**: a stage direction or wait that ends a scene leaves a pulsing **Tap to continue** over the stage, and the next scene waits for the tap (§7).
 
 ---
 
@@ -211,7 +212,7 @@ no board entry, button, badge or notification anywhere.
   title, its image as a thumbnail, a marker when it is a `key` clue, and a "New" highlight until viewed. With
   `show_counts`, each chapter heading says "3 of 5 found". Chapters with no clue found yet aren't shown.
   Before the first clue, the board says so.
-- **Detail**: tapping a clue opens a sheet with its title, image and full description. Tapping the image opens
+- **Detail**: tapping a clue opens a sheet (§7.1) with its title in the header, a key-clue marker, its image and full description. Tapping the image opens
   it full screen with pinch to zoom.
 - **Viewed**: closing the board marks every clue it showed as viewed (engine §10.2), which clears the
   highlights and the count.
@@ -262,3 +263,35 @@ or a case file:
 Hooks get the clue's text already resolved in the active language, the image's asset path and the callbacks.
 Every label (board title, "New", "Clue found", "Present", "Presented", the counts) comes from `CeritaStrings`
 (§5.2), in English and Indonesian.
+
+---
+
+## 7. Between scenes and sheets
+
+### 7.1 The end of a scene
+A scene that plays out by itself doesn't cut straight to the next one. When the story would leave the scene
+before it shows anything else (`RealFsseEngine.peekExit`: the conversation runs out, or jumps into a conversation
+with its own scene, or the story ends), and nothing but the clock would move it on (chat pacing, a `wait`, a
+stage direction), it waits for a tap: `StoryController.sceneEndHeld`. The chat tray shows a **Tap to continue**
+button, the VN stage and the call screen a pulsing **Tap to continue** pill.
+
+What counts as leaving follows what the player sees switch: another mode or thread, any new VN conversation, a
+new chapter (its card) or the end of the story. A chat that goes on in the same thread, with no new chapter,
+moves on by itself. Auto and Skip don't wait: the player asked the story to move for them. A scene whose last line
+already waits for a tap (a VN line, a call line) needs no extra one.
+
+### 7.2 Sheets (`StorySheet`)
+Every bottom sheet of the engine opens through `StorySheet.show`: the in-game menu, the backlog, a clue's detail,
+a chapter's actions on the route chart and the developer tools. They share one frame, drawn by
+`StorySkin.sheet(context, StorySheetFrame)`: a handle, a header with an icon, the title and a close button, and
+the body under a rule. A sheet is as tall as its body up to 88% of the screen, and its body scrolls from there.
+The developer tools take the full height (`expand`).
+
+- **In-game menu**: the main actions as a row of big buttons (`StorySheetAction`): Save, Load, Case Board (with
+  its new-clue count) and Backlog. Settings, Gallery, Endings, Story variables and Developer follow as a list,
+  and Back to title is set apart at the end.
+- **Backlog**: the transcript, newest line at the bottom. A short backlog makes a short sheet.
+- **Clue detail**: the clue's title in the header, then the key-clue marker, its image and its description.
+
+The default frame is a raised panel with rounded top corners. Last Seen draws it as one of its framed windows,
+with an uppercase title, a dotted rule and a CLOSE tag.

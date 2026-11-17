@@ -15,7 +15,11 @@
     "time": "02:17",
     "background": "bg_raka_room_night.webp",
     "music": "amb_room_night.mp3",
-    "ring": "sfx_phone_ring.mp3"
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Jangan. Dinda nggak bakal nelpon jam segini kalau nggak penting.",
+      "en": "Don't. Dinda wouldn't call at this hour unless it mattered."
+    }
   },
   "conversations": [
     {

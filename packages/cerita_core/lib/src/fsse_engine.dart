@@ -101,7 +101,8 @@ class RealFsseEngine extends FsseEngine {
   /// [evaluator] drawing its random numbers from [_rolls].
   late final ConditionEvaluator _evaluator = ConditionEvaluator(_rolls);
 
-  late ProfileData profileData;
+  /// The cast. Empty until [start] reads the story.
+  ProfileData profileData = const ProfileData([]);
   List<Channel> channels = const [];
   ClueCatalog clues = ClueCatalog.empty;
 
@@ -331,6 +332,80 @@ class RealFsseEngine extends FsseEngine {
   /// Whether [rollback] has a line to go back to. With [historyIndex], whether the line at that
   /// transcript index can be rolled back to.
   bool canRollback({int? historyIndex}) => _rollbackTarget(historyIndex) != null;
+
+  /// Where the story goes before it shows its next item, without going there: null while the next item is in the
+  /// current conversation, else the conversation it is in and the scene it plays in. The record's `next` is null
+  /// when the story ends first. Follows conditions, `BRANCH`, `JUMP`, `CALL` and `RETURN` as [next] does, but
+  /// applies no effects, so a condition that reads a variable set on the way is read as it is now.
+  Future<({Conversation? next, Scene? scene})?> peekExit() async {
+    var conversation = currentConversation;
+    if (conversation == null) return null;
+    var index = dialogIndex;
+    var scene = _scene;
+    final callStack = _callStack.toList();
+
+    Future<bool> enter(String key, int at) async {
+      final entered = _conversations[key] ?? await loader.loadConversation(key);
+      final chapter = _replayChapter;
+      if (chapter != null && entered.chapter != null && entered.chapter != chapter) return false;
+      conversation = entered;
+      index = at;
+      if (entered.hasScene) scene = entered.scene;
+      return true;
+    }
+
+    for (var steps = 0; steps < _maxJumps; steps++) {
+      final current = conversation!;
+      if (index >= current.conversations.length) {
+        if (callStack.isEmpty) return (next: null, scene: null);
+        final frame = callStack.removeLast();
+        if (!await enter(frame.conversationKey, frame.dialogIndex)) return (next: null, scene: null);
+        continue;
+      }
+      final item = current.conversations[index];
+      if (!evaluate(item.condition)) {
+        index++;
+        continue;
+      }
+      final String target;
+      switch (item) {
+        case BranchItemType():
+          final branch =
+              item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
+          if (branch == null) {
+            index++;
+            continue;
+          }
+          target = branch;
+        case JumpItemType():
+          target = item.target;
+        case CallItemType():
+          callStack.add(CallFrame(current.key, index + 1));
+          target = item.target;
+        case ReturnItemType():
+          if (callStack.isEmpty) return (next: null, scene: null);
+          final frame = callStack.removeLast();
+          if (!await enter(frame.conversationKey, frame.dialogIndex)) return (next: null, scene: null);
+          continue;
+        case FlowItemType():
+          index++;
+          continue;
+        default:
+          return identical(current, currentConversation) ? null : (next: current, scene: scene);
+      }
+      final hash = target.indexOf("#");
+      final key = hash < 0 ? target : target.substring(0, hash);
+      final label = hash < 0 ? null : target.substring(hash + 1);
+      if (key.isNotEmpty && !await enter(key, 0)) return (next: null, scene: null);
+      if (label != null) {
+        index = conversation!.conversations.indexWhere((item) => item.id == label);
+        if (index < 0) return null;
+      } else if (key.isEmpty) {
+        index = 0;
+      }
+    }
+    return null;
+  }
 
   /// Restores the state right after the previous line was delivered, or after the line at transcript
   /// [historyIndex], and returns that line. Null if there is none. The meta-state is not rolled back.
@@ -690,10 +765,11 @@ class RealFsseEngine extends FsseEngine {
     _applyEffects(itemResult.effects);
 
     final scene = _scene;
-    final playerText = itemResult.localizedText ?? switch (itemResult.text) {
-      final text? => LocalizedText(text),
-      null => null,
-    };
+    final playerText = itemResult.localizedText ??
+        switch (itemResult.text) {
+          final text? => LocalizedText(text),
+          null => null,
+        };
     if (playerText != null && scene != null) {
       _history.add(TranscriptEntry(
         conversationKey: currentConversation!.key,

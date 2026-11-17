@@ -146,9 +146,17 @@ class SaveThumbnail extends StatelessWidget {
           background: stage.background == null ? null : config.bg(stage.background!),
           actors: [
             for (final MapEntry(key: position, value: info) in stage.sprites.entries)
-              if (profiles?.byId(info.id)?.getSprite(info) case final sprite?)
-                PoiActor(id: info.id, sprite: config.sprite(sprite), position: position),
+              if (profiles?.byId(info.id) case final profile?)
+                if (profile.getSprite(info) case final sprite?)
+                  PoiActor(
+                    id: info.id,
+                    sprite: config.sprite(sprite),
+                    position: position,
+                    height: profile.height,
+                    framing: profile.framing,
+                  ),
           ],
+          cast: profiles == null ? null : PoiCast.ofProfiles(profiles!.profiles),
           speakerId: stage.speakerId,
           zoom: stage.zoom,
           zoomFocus: stage.zoomFocus,

@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../common/story_sheet.dart';
 import '../common/tagged_text.dart';
 import '../l10n/story_language.dart';
 import '../meta/credits_screen.dart';
@@ -134,6 +135,75 @@ class StorySkin {
     final color = dark ? Colors.amberAccent : Theme.of(context).colorScheme.tertiary;
     final label = StoryLanguage.of(context).strings.memoryMarker;
     return Icon(Icons.auto_awesome, size: 16, color: color.withAlpha(200), semanticLabel: label);
+  }
+
+  /// A bottom sheet of the story (see [StorySheet]): the menu, the backlog, a clue's detail. The default is a
+  /// raised panel with a handle, the title with its icon, a close button and a rule under the header.
+  Widget sheet(BuildContext context, StorySheetFrame frame) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final maxHeight = MediaQuery.sizeOf(context).height * StorySheet.maxHeightFactor;
+    final title = frame.title;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight, minHeight: frame.expand ? maxHeight : 0),
+      child: Material(
+        color: scheme.surfaceContainerLow,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          side: BorderSide(color: scheme.outlineVariant.withAlpha(120)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10, bottom: 4),
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(color: scheme.outline, borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              if (title != null) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 8, 8),
+                  child: Row(
+                    children: [
+                      if (frame.icon case final icon?) ...[
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: scheme.secondaryContainer,
+                          child: Icon(icon, size: 20, color: scheme.onSecondaryContainer),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                        icon: const Icon(Icons.close),
+                        onPressed: frame.onClose,
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, indent: 20, endIndent: 20, color: scheme.outlineVariant),
+              ],
+              if (frame.expand) Expanded(child: frame.body) else Flexible(child: frame.body),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   /// Backdrop of the Case Board and the evidence picker, behind the clue list. Override for a cork board, a

@@ -8,6 +8,7 @@ import 'chat/chat_view.dart';
 import 'clues/case_board.dart';
 import 'common/backlog_sheet.dart';
 import 'common/ending_view.dart';
+import 'common/story_sheet.dart';
 import 'l10n/story_language.dart';
 import 'meta/developer_sheet.dart';
 import 'meta/endings_screen.dart';
@@ -100,92 +101,100 @@ class _StoryScreenState extends State<StoryScreen> {
   void _openGallery() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GalleryScreen(setup: widget.setup)));
 
   void _openMenu() {
-    final language = StoryLanguage.of(context);
-    final strings = language.strings;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
+    final strings = StoryLanguage.of(context).strings;
+    StorySheet.show<void>(
+      context,
+      title: strings.menu,
+      icon: Icons.menu,
       builder: (sheetContext) {
         void close(VoidCallback action) {
           Navigator.of(sheetContext).pop();
           action();
         }
 
-        // Scrolls on short or landscape screens.
-        return SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!_controller.replay)
-                  ListTile(
-                    leading: const Icon(Icons.save_outlined),
-                    title: Text(strings.saveGame),
-                    onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo),
-                        ))),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.folder_open),
-                  title: Text(strings.loadGame),
-                  onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (route) => SaveSlotsScreen(
-                          setup: widget.setup,
-                          onLoad: (save) {
-                            Navigator.of(route).pop();
-                            _controller.load(save);
-                          },
-                        ),
-                      ))),
-                ),
-                if (_controller.hasClues && _controller.current is! EvidenceItemType)
-                  ListTile(
-                    leading: const Icon(Icons.push_pin_outlined),
-                    title: Text(strings.caseBoardEntry(_controller.newClues.length)),
-                    onTap: () => close(() => CaseBoardScreen.open(context, _controller)),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: Text(strings.backlog),
-                  onTap: () => close(() => BacklogSheet.show(context, _controller)),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.tune),
-                  title: Text(strings.settings),
-                  onTap: () => close(() => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader),
-                      ))),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.data_object),
-                  title: Text(strings.storyVariables),
-                  onTap: () => close(_showVariables),
-                ),
-                if (widget.setup.developer)
-                  ListTile(
-                    leading: const Icon(Icons.build_outlined),
-                    title: Text(strings.developer),
-                    onTap: () => close(() => DeveloperSheet.show(context, _controller, widget.setup)),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: Text(strings.gallery),
-                  onTap: () => close(_openGallery),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.emoji_events_outlined),
-                  title: Text(strings.endings),
-                  onTap: () => close(() => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => EndingsScreen(setup: widget.setup)),
-                      )),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.home_outlined),
-                  title: Text(strings.backToTitle),
-                  onTap: () => close(() => Navigator.of(context).pop()),
-                ),
-              ],
+        void push(WidgetBuilder builder) =>
+            close(() => Navigator.of(context).push(MaterialPageRoute(builder: builder)));
+
+        // The main actions as big buttons, the rest as a list, and leaving the story set apart at the end.
+        final actions = [
+          if (!_controller.replay)
+            StorySheetAction(
+              icon: Icons.save_outlined,
+              label: strings.saveGame,
+              onTap: () => push((_) => SaveSlotsScreen(setup: widget.setup, onSave: _controller.saveTo)),
             ),
+          StorySheetAction(
+            icon: Icons.folder_open,
+            label: strings.loadGame,
+            onTap: () => push(
+              (route) => SaveSlotsScreen(
+                setup: widget.setup,
+                onLoad: (save) {
+                  Navigator.of(route).pop();
+                  _controller.load(save);
+                },
+              ),
+            ),
+          ),
+          if (_controller.hasClues && _controller.current is! EvidenceItemType)
+            StorySheetAction(
+              icon: Icons.push_pin_outlined,
+              label: strings.caseBoard,
+              badge: _controller.newClues.length,
+              onTap: () => close(() => CaseBoardScreen.open(context, _controller)),
+            ),
+          StorySheetAction(
+            icon: Icons.history,
+            label: strings.backlog,
+            onTap: () => close(() => BacklogSheet.show(context, _controller)),
+          ),
+        ];
+        // Scrolls on short or landscape screens.
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [for (final action in actions) Expanded(child: action)],
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                leading: const Icon(Icons.tune),
+                title: Text(strings.settings),
+                onTap: () => push((_) => SettingsScreen(settings: widget.setup.settings, loader: widget.setup.loader)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: Text(strings.gallery),
+                onTap: () => close(_openGallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.emoji_events_outlined),
+                title: Text(strings.endings),
+                onTap: () => push((_) => EndingsScreen(setup: widget.setup)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.data_object),
+                title: Text(strings.storyVariables),
+                onTap: () => close(_showVariables),
+              ),
+              if (widget.setup.developer)
+                ListTile(
+                  leading: const Icon(Icons.build_outlined),
+                  title: Text(strings.developer),
+                  onTap: () => close(() => DeveloperSheet.show(context, _controller, widget.setup)),
+                ),
+              const Divider(height: 16),
+              ListTile(
+                leading: const Icon(Icons.home_outlined),
+                title: Text(strings.backToTitle),
+                onTap: () => close(() => Navigator.of(context).pop()),
+              ),
+            ],
           ),
         );
       },

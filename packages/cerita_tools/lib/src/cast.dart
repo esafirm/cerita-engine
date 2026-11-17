@@ -23,6 +23,12 @@ class CastProfile {
   final List<String> sprites;
   final List<SourceSpan> spriteSpans;
 
+  /// `height`: how tall the character is, in any unit the whole cast shares. Sizes the sprites against each other.
+  final num? height;
+
+  /// `framing`: the share of the body the sprites show, from the top of the head: 1 is head to toe.
+  final num? framing;
+
   const CastProfile({
     required this.key,
     required this.id,
@@ -35,6 +41,8 @@ class CastProfile {
     this.bio,
     this.avatar,
     this.avatarSpan,
+    this.height,
+    this.framing,
   });
 
   /// The sprite index of [expression], or 0 when it's `null`. `null` when the expression doesn't exist.
@@ -84,7 +92,7 @@ class Cast {
         diagnostics.error(span, "Profile '$key' must be a map");
         return;
       }
-      const known = {"id", "name", "handle", "bio", "avatar", "expressions"};
+      const known = {"id", "name", "handle", "bio", "avatar", "expressions", "height", "framing"};
       for (final field in node.nodes.keys.cast<YamlNode>()) {
         if (!known.contains(field.value)) {
           diagnostics.error(yamlSpan(file, field), "Unknown profile field '${field.value}'");
@@ -118,6 +126,18 @@ class Cast {
         diagnostics.error(yamlSpan(file, expressionsNode), "'expressions' must map names to sprite files");
       }
 
+      num? measure(String field, {num? max}) {
+        final measured = node.nodes[field];
+        if (measured == null || measured.value == null) return null;
+        final value = measured.value;
+        if (value is num && value > 0 && (max == null || value <= max)) return value;
+        diagnostics.error(
+          yamlSpan(file, measured),
+          max == null ? "'$field' must be a number above 0" : "'$field' must be a number above 0, up to $max",
+        );
+        return null;
+      }
+
       final avatarNode = node.nodes["avatar"];
       profiles[key] = CastProfile(
         key: key,
@@ -131,6 +151,8 @@ class Cast {
         expressions: expressions,
         sprites: sprites,
         spriteSpans: spriteSpans,
+        height: measure("height"),
+        framing: measure("framing", max: 1),
       );
     });
     return Cast(profiles);

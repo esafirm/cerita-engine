@@ -11,7 +11,7 @@ void main() {
 
   late SilentAudio audio;
 
-  Future<StoryController> call(WidgetTester tester, {String? ring = "ring.mp3"}) async {
+  Future<StoryController> call(WidgetTester tester, {String? ring = "ring.mp3", String? stay, String? hangUp}) async {
     await tester.binding.setSurfaceSize(const Size(400, 860));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     audio = SilentAudio();
@@ -20,11 +20,18 @@ void main() {
       loader: FakeEngineLoader({
         "index": {
           "conversation_id": "cvn",
-          "scene": {"mode": "CALL", "channel_id": "dinda", "ring": ?ring},
+          "scene": {"mode": "CALL", "channel_id": "dinda", "ring": ?ring, "stay": ?stay, "hangup": ?hangUp},
           "conversations": [
             {..._line("Ka? Sorry."), "voice": "vo_1.mp3"},
             _line("Are you there?"),
             {"type": "INPUT", "text": "Reply", "variable": "R"},
+          ],
+        },
+        "after": {
+          "conversation_id": "after",
+          "scene": {"mode": "VN"},
+          "conversations": [
+            {"type": "NARRATION", "text": "You hung up."},
           ],
         },
       }),
@@ -66,35 +73,55 @@ void main() {
     expect(audio.calls.last, startsWith("voice assets/story/music/vo_1.mp3"));
   });
 
-  testWidgets('declining or hanging up makes the caller call back, and the call goes on where it was cut',
-      (tester) async {
-    final controller = await call(tester);
+  testWidgets('a call that can\'t be hung up shows what the player thinks, and goes on ringing or talking', (
+    tester,
+  ) async {
+    final controller = await call(tester, stay: "Not her. Not now.");
     await tester.tap(find.text("Decline"));
     await tester.pump();
-    expect(find.text("Call ended"), findsOneWidget);
+    expect(find.text("Not her. Not now."), findsOneWidget);
+    expect(controller.callState, CallState.ringing, reason: "the phone keeps ringing");
+    await tester.pump(StoryController.refusalDuration);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text("Not her. Not now."), findsNothing);
 
-    await tester.pump(StoryController.callbackDelay);
-    expect(find.text("Incoming call"), findsOneWidget);
     await tester.tap(find.text("Answer"));
     await tester.pump(const Duration(milliseconds: 500));
     expect(caption("Ka? Sorry."), findsOneWidget);
-
-    audio.calls.clear();
     await tester.tap(find.byIcon(Icons.call_end));
     await tester.pump();
-    expect(find.text("Call ended"), findsOneWidget);
-    expect(caption("Ka? Sorry."), findsNothing);
-    await tapScreen(tester);
-    expect(controller.callState, CallState.ended, reason: "a tap doesn't move a cut call on");
-
-    await tester.pump(StoryController.callbackDelay);
-    await tester.tap(find.text("Answer"));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(caption("Ka? Sorry."), findsOneWidget);
-    expect(audio.calls.last, startsWith("voice assets/story/music/vo_1.mp3"), reason: "the cut line is said again");
+    expect(controller.callState, CallState.connected);
+    expect(find.text("Not her. Not now."), findsOneWidget);
+    expect(caption("Ka? Sorry."), findsOneWidget, reason: "the line stays");
 
     await tapScreen(tester);
     expect(caption("Are you there?"), findsOneWidget);
+    await tester.pump(StoryController.refusalDuration);
+  });
+
+  testWidgets('without a stay line, the engine\'s own thought is shown', (tester) async {
+    await call(tester);
+    await tester.tap(find.text("Decline"));
+    await tester.pump();
+    expect(find.text("Not now. I need to hear this."), findsOneWidget);
+    await tester.pump(StoryController.refusalDuration);
+  });
+
+  testWidgets('a call with a hangup target ends there when the player hangs up or declines', (tester) async {
+    final controller = await call(tester, hangUp: "after");
+    await tester.tap(find.text("Answer"));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.byIcon(Icons.call_end));
+    await tester.pump();
+    expect(controller.callState, CallState.ended);
+    expect(find.text("Call ended"), findsOneWidget);
+
+    await tester.pump(StoryController.hangUpDelay);
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 200));
+    }
+    expect(controller.conversation?.key, "after");
+    expect(find.text("You hung up.", findRichText: true), findsOneWidget);
   });
 
   testWidgets('hold stops the call until it is taken off hold, mute and speaker toggle, the keypad dials',

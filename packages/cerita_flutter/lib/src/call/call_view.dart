@@ -10,13 +10,16 @@ import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
 import '../common/tagged_text.dart';
+import '../common/tap_to_continue.dart';
 import '../l10n/story_language.dart';
+import '../skin/story_skin.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
 /// Phone call mode, laid out like a phone's call screen: caller card, call timer, live captions and reply
-/// options. A `ring=` scene rings until the player answers. Mute, speaker, keypad and hold work like on a phone,
-/// and ending the call makes the caller call back (see [StoryController.endCall]).
+/// options. A `ring=` scene rings until the player answers. Mute, speaker, keypad and hold work like on a phone.
+/// Ending the call goes where the scene's `hangup` leads, or shows what the player's character thinks of hanging
+/// up when the call can't be ended (see [StoryController.endCall]).
 class CallView extends StatefulWidget {
   final StoryController controller;
   final StorySetup setup;
@@ -185,6 +188,18 @@ class _CallViewState extends State<CallView> {
                     ),
                   ),
                 const Spacer(),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: switch (controller.refusal) {
+                    final thought? => Padding(
+                      key: ValueKey(thought),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: _Thought(thought),
+                    ),
+                    null when controller.sceneEndHeld => const TapToContinue(),
+                    null => const SizedBox.shrink(),
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: switch (controller.phase) {
@@ -193,7 +208,7 @@ class _CallViewState extends State<CallView> {
                       onAnswer: _answer,
                       onDecline: _end,
                     ),
-                    // Hung up: the screen waits for the call back.
+                    // Hung up: the story goes on where the call leads.
                     _ when state == CallState.ended => const SizedBox(height: 172),
                     StoryPhase.choice when item is EvidenceItemType => SizedBox(
                       height: MediaQuery.sizeOf(context).height * 0.55,
@@ -483,6 +498,35 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
         child: child,
       ),
       child: widget.child,
+    );
+  }
+}
+
+/// What the player's character thinks, in their own voice: why they won't hang up. Narration, so no name.
+class _Thought extends StatelessWidget {
+  final String text;
+
+  const _Thought(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: TaggedText(
+        text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          height: 1.4,
+        ).merge(StorySkin.of(context).narrationStyle),
+      ),
     );
   }
 }

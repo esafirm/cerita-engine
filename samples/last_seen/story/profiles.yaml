@@ -1,9 +1,14 @@
 # The cast (spec §2). Expressions are in sprite order: the first one is used when a script names none.
 # Keep the order: appending is safe, reordering changes every compiled sprite index.
+# height is in cm. framing is the share of the body the sprites show from the top of the head: Raka's go down
+# to the knee (0.72), Dinda's stop at the upper thigh (0.62). The stage uses both to stand everyone at their real
+# heights side by side.
 
 raka:
   handle: "@rakapradipta"
   name: Raka
+  height: 178
+  framing: 0.72
   avatar: assets/story/sprites/raka_avatar.webp
   expressions:
     neutral: raka_neutral.webp
@@ -18,6 +23,8 @@ sekar:
   handle: "@sekar.ayu"
   bio: { id: "Suara dari pesisir utara. Ep. 12 segera.", en: "Voices from the north coast. Ep. 12 soon." }
   name: Sekar
+  height: 162
+  framing: 0.68
   avatar: assets/story/sprites/sekar_avatar.webp
   expressions:
     neutral: sekar_neutral.webp
@@ -30,6 +37,8 @@ sekar:
 dinda:
   handle: "@dindaaa"
   name: Dinda
+  height: 156
+  framing: 0.62
   avatar: assets/story/sprites/dinda_avatar.webp
   expressions:
     neutral: dinda_neutral.webp
@@ -40,6 +49,8 @@ dinda:
 
 tasya:
   name: Tasya
+  height: 165
+  framing: 0.64
   avatar: assets/story/sprites/tasya_avatar.webp
   expressions:
     neutral: tasya_neutral.webp
@@ -51,6 +62,8 @@ tasya:
 
 bima:
   name: Bima
+  height: 180
+  framing: 0.63
   avatar: assets/story/sprites/bima_avatar.webp
   expressions:
     neutral: bima_neutral.webp
@@ -61,6 +74,8 @@ bima:
 
 hendra:
   name: "Pak Hendra"
+  height: 168
+  framing: 0.62
   avatar: assets/story/sprites/hendra_avatar.webp
   expressions:
     neutral: hendra_neutral.webp
@@ -71,6 +86,8 @@ hendra:
 
 yusuf:
   name: "Ipda Yusuf"
+  height: 175
+  framing: 0.62
   avatar: assets/story/sprites/yusuf_avatar.webp
   expressions:
     neutral: yusuf_neutral.webp

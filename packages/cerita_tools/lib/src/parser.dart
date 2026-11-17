@@ -188,6 +188,9 @@ class ScriptParser {
       ..textbox = st.choose("textbox", _textboxStyles)
       ..channel = st.take("channel")
       ..time = st.take("time");
+    final hangUp = st.take("hangup");
+    if (hangUp != null) scene.hangUp = _target(hangUp, st.span, "hangup");
+    scene.stay = st.localized("stay");
     // `status=none` hides the channel status for this scene, any other text replaces it.
     final status = st.localized("status");
     if (status != null && status.values.length == 1 && status.values.values.single == "none") {
@@ -200,7 +203,12 @@ class ScriptParser {
       scene.day = int.tryParse(day);
       if (scene.day == null) _error(st.span, "day must be a whole number, not '$day'");
     }
-    if (scene.ring != null && mode != "CALL") _error(st.span, "ring is only for CALL scenes");
+    for (final (set, name) in [(scene.ring != null, "ring"), (hangUp != null, "hangup"), (scene.stay != null, "stay")]) {
+      if (set && mode != "CALL") _error(st.span, "$name is only for CALL scenes");
+    }
+    if (hangUp != null && scene.stay != null) {
+      _error(st.span, "stay is for a call that can't be hung up, so not with hangup");
+    }
     st.finish(allowCondition: false);
     conversation.scene = scene;
     _body = null;

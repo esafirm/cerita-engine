@@ -119,28 +119,33 @@ class ChatView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            // The thread moves on by itself (see StoryController's chat pacing), so no tap to continue.
+            // The thread moves on by itself (see StoryController's chat pacing). Only the end of a scene waits for a
+            // tap, here or on the tray's button.
             child: _PacingGate(
               controller: controller,
-              child: ListView.builder(
-                reverse: true,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                itemCount: entries.length + (typing != null ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (typing != null) {
-                    if (index == 0) return TypingBubble(profile: typing, setup: setup);
-                    index -= 1;
-                  }
-                  final entryIndex = entries.length - 1 - index;
-                  final entry = entries[entryIndex];
-                  return MessageBubble(
-                    key: ValueKey(entryIndex),
-                    entry: entry,
-                    controller: controller,
-                    setup: setup,
-                    showSender: entryIndex == 0 || !MessageBubble.sameSender(entries[entryIndex - 1], entry),
-                  );
-                },
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: controller.sceneEndHeld ? controller.advance : null,
+                child: ListView.builder(
+                  reverse: true,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  itemCount: entries.length + (typing != null ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (typing != null) {
+                      if (index == 0) return TypingBubble(profile: typing, setup: setup);
+                      index -= 1;
+                    }
+                    final entryIndex = entries.length - 1 - index;
+                    final entry = entries[entryIndex];
+                    return MessageBubble(
+                      key: ValueKey(entryIndex),
+                      entry: entry,
+                      controller: controller,
+                      setup: setup,
+                      showSender: entryIndex == 0 || !MessageBubble.sameSender(entries[entryIndex - 1], entry),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -202,10 +207,20 @@ class _InteractionTray extends StatelessWidget {
           ],
         ),
       StoryPhase.input when item is InputItemType => InputPrompt(
-          key: ValueKey(item),
-          item: item,
-          onSubmit: controller.submitInput,
+        key: ValueKey(item),
+        item: item,
+        onSubmit: controller.submitInput,
+      ),
+      // The thread has played out: the next scene waits for the player.
+      _ when controller.sceneEndHeld => SizedBox(
+        width: double.infinity,
+        child: FilledButton.tonalIcon(
+          onPressed: controller.advance,
+          iconAlignment: IconAlignment.end,
+          icon: const Icon(Icons.chevron_right),
+          label: Text(StoryLanguage.of(context).strings.tapToContinue),
         ),
+      ),
       // Nothing to answer yet: an inactive composer, like a real messenger.
       _ => Row(
           children: [

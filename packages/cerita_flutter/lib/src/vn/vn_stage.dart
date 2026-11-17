@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import '../clues/case_board.dart';
 import '../common/backlog_sheet.dart';
 import '../common/choice_list.dart';
+import '../common/hold_to_peek.dart';
 import '../common/input_prompt.dart';
 import '../common/media_widgets.dart';
 import '../common/tagged_text.dart';
+import '../common/tap_to_continue.dart';
 import '../l10n/story_language.dart';
 import '../skin/story_skin.dart';
 import '../story_controller.dart';
@@ -154,104 +156,113 @@ class _VnStageState extends State<VnStage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _onTap,
-        // Holding anywhere hides the UI to look at the stage, until the finger lifts.
-        onLongPressStart: (_) => _peek(true),
-        onLongPressEnd: (_) => _peek(false),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Poi(
-              background: stage.background == null ? null : config.bg(stage.background!),
-              actors: _actors(),
-              speakerId: item is NarrationItemType ? null : stage.speakerId,
-              direction: controller.direction,
-              zoom: stage.zoom,
-              zoomFocus: stage.zoomFocus,
-              weather: stage.weather,
-              instant: instant,
-            ),
-            if (item is MediaItemType) _MediaOverlay(item: item, setup: widget.setup, controller: controller),
-            // Offstage rather than removed, so the line doesn't type out again when it comes back.
-            Offstage(
-              offstage: _hidden,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (nvl && item is! MediaItemType)
-                    NvlPage(
-                      controller: controller,
-                      typewriterKey: _nvlKey,
-                      instant: instant,
-                      msPerChar: msPerChar,
-                      autoResume: autoResume,
-                      onTyped: () => _lineTyped(item, item?.getText() ?? ""),
-                    ),
-                  if (!nvl && text != null && item is! MediaItemType)
-                    Positioned(
-                      left: 12,
-                      right: 12,
-                      bottom: 16,
-                      child: DialogueBox(
-                        text,
-                        key: _dialogueKey,
-                        speaker: item is NarrationItemType ? null : controller.currentProfile?.name,
-                        italic: italic,
+        // Holding anywhere but a button hides the UI to look at the stage, until the finger lifts.
+        child: HoldToPeek(
+          onPeek: _peek,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Poi(
+                background: stage.background == null ? null : config.bg(stage.background!),
+                actors: _actors(),
+                speakerId: item is NarrationItemType ? null : stage.speakerId,
+                direction: controller.direction,
+                zoom: stage.zoom,
+                zoomFocus: stage.zoomFocus,
+                weather: stage.weather,
+                instant: instant,
+                cast: PoiCast.ofProfiles(controller.profiles),
+              ),
+              if (item is MediaItemType) _MediaOverlay(item: item, setup: widget.setup, controller: controller),
+              // Offstage rather than removed, so the line doesn't type out again when it comes back.
+              Offstage(
+                offstage: _hidden,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (nvl && item is! MediaItemType)
+                      NvlPage(
+                        controller: controller,
+                        typewriterKey: _nvlKey,
                         instant: instant,
                         msPerChar: msPerChar,
                         autoResume: autoResume,
-                        onTyped: () => _lineTyped(item, text),
+                        onTyped: () => _lineTyped(item, item?.getText() ?? ""),
                       ),
-                    ),
-                  // The picker fills the screen, so it goes below the HUD rather than under it: the prompt and
-                  // countdown stay readable, and the backlog stays at hand to look up what was said.
-                  if (picking)
-                    ColoredBox(
-                      color: Colors.black54,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          hud,
-                          Expanded(
-                            child: MediaQuery.removePadding(
-                              context: context,
-                              removeTop: true,
-                              child: SafeArea(
-                                minimum: const EdgeInsets.all(16),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                    if (!nvl && text != null && item is! MediaItemType)
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        bottom: 16,
+                        child: DialogueBox(
+                          text,
+                          key: _dialogueKey,
+                          speaker: item is NarrationItemType ? null : controller.currentProfile?.name,
+                          italic: italic,
+                          instant: instant,
+                          msPerChar: msPerChar,
+                          autoResume: autoResume,
+                          onTyped: () => _lineTyped(item, text),
+                        ),
+                      ),
+                    // The picker fills the screen, so it goes below the HUD rather than under it: the prompt and
+                    // countdown stay readable, and the backlog stays at hand to look up what was said.
+                    if (picking)
+                      ColoredBox(
+                        color: Colors.black54,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            hud,
+                            Expanded(
+                              child: MediaQuery.removePadding(
+                                context: context,
+                                removeTop: true,
+                                child: SafeArea(
+                                  minimum: const EdgeInsets.all(16),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
-                    _Dimmed(
-                      child: ChoiceList(
-                        key: ValueKey(item),
-                        item: item,
-                        dark: true,
-                        paused: controller.storyHeld,
-                        onSelected: controller.choose,
-                      ),
-                    ),
-                  if (controller.phase == StoryPhase.input && item is InputItemType && asked)
-                    _Dimmed(
-                      liftAboveKeyboard: true,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: InputPrompt(item: item, onSubmit: controller.submitInput),
+                          ],
+                        ),
+                      )
+                    else if (controller.phase == StoryPhase.choice && item is ChoiceItemType && asked)
+                      _Dimmed(
+                        child: ChoiceList(
+                          key: ValueKey(item),
+                          item: item,
+                          dark: true,
+                          paused: controller.storyHeld,
+                          onSelected: controller.choose,
                         ),
                       ),
-                    ),
-                  if (!picking) Positioned(top: 0, left: 0, right: 0, child: hud),
-                ],
+                    if (controller.phase == StoryPhase.input && item is InputItemType && asked)
+                      _Dimmed(
+                        liftAboveKeyboard: true,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: InputPrompt(item: item, onSubmit: controller.submitInput),
+                          ),
+                        ),
+                      ),
+                    if (controller.sceneEndHeld && (text == null || item is MediaItemType))
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 24,
+                        child: SafeArea(top: false, child: Center(child: TapToContinue())),
+                      ),
+                    if (!picking) Positioned(top: 0, left: 0, right: 0, child: hud),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -16,7 +16,45 @@ class PoiActor {
   final String sprite;
   final SpritePosition position;
 
-  const PoiActor({required this.id, required this.sprite, required this.position});
+  /// How tall the character is ([Profile.height]). Null takes them as tall as the tallest one in the [PoiCast].
+  final double? height;
+
+  /// The share of the body the sprite shows, from the top of the head ([Profile.framing]).
+  final double framing;
+
+  const PoiActor({required this.id, required this.sprite, required this.position, this.height, this.framing = 1});
+}
+
+/// The measures that size every sprite on the stage alike, like one camera on the whole cast: a taller character
+/// stands taller, and a sprite cut higher up the body stands lower, so every cut stays under the stage's bottom edge.
+class PoiCast {
+  /// The tallest character's height.
+  final double tallest;
+
+  /// The highest cut: how far above the floor the sprite cut highest up the body ends.
+  final double highestCut;
+
+  const PoiCast({this.tallest = 1, this.highestCut = 0});
+
+  /// The measures of [cast]. A null height is as tall as the tallest.
+  factory PoiCast.of(Iterable<({double? height, double framing})> cast) {
+    final heights = [for (final member in cast) ?member.height];
+    final tallest = heights.isEmpty ? 1.0 : heights.reduce(max);
+    var highestCut = 0.0;
+    for (final member in cast) {
+      highestCut = max(highestCut, (member.height ?? tallest) * (1 - member.framing.clamp(0.05, 1)));
+    }
+    return PoiCast(tallest: tallest, highestCut: highestCut);
+  }
+
+  /// The measures of the characters in [profiles] that have sprites.
+  factory PoiCast.ofProfiles(Iterable<Profile> profiles) => PoiCast.of([
+    for (final profile in profiles)
+      if (profile.sprites.isNotEmpty) (height: profile.height, framing: profile.framing),
+  ]);
+
+  /// The top of the tallest head, measured from the floor's level at the stage's bottom edge.
+  double get _top => tallest - highestCut;
 }
 
 /// [Poi] draws the VN stage: background, up to five characters, weather and the camera
@@ -38,6 +76,10 @@ class Poi extends StatefulWidget {
   /// Applies every change without animating, e.g. while skipping.
   final bool instant;
 
+  /// The measures of the whole cast, so a character keeps their size whoever is on stage. Null measures the
+  /// [actors] on stage.
+  final PoiCast? cast;
+
   const Poi({
     super.key,
     this.background,
@@ -48,19 +90,26 @@ class Poi extends StatefulWidget {
     this.zoomFocus = SpritePosition.center,
     this.weather,
     this.instant = false,
+    this.cast,
   });
 
-  /// Slot x positions while only the three inner slots are used: wide apart, partly off-screen.
+  /// Slot x positions while only the three inner slots are used: wide apart. See [_PoiState._slotCenter].
   static const _wideX = {SpritePosition.left: -1.3, SpritePosition.center: 0.0, SpritePosition.right: 1.3};
 
-  /// The widest a sprite may be, as a share of the stage width, with [present] characters on stage. Only
-  /// narrow stages hit it: there a lone character keeps the full width and two or more stand side by side,
-  /// overlapping a little in the middle. A fractional [present] is between two counts, while the share eases
-  /// from one to the other.
-  static double widthShare(num present) => _between(present, 1.0, 0.62, 0.46);
+  /// How high the tallest head of the cast reaches, as a share of the stage height, with [present] characters on
+  /// stage. A fractional [present] is between two counts, while the share eases from one to the other. On a
+  /// [narrow] (portrait) stage the camera barely pulls back for a crowd: the characters overlap instead of
+  /// shrinking into dolls against the background.
+  static double heightShare(num present, {bool narrow = false}) =>
+      narrow ? _between(present, 0.82, 0.8, 0.72) : _between(present, 0.82, 0.82, 0.66);
 
-  /// The height of a sprite, as a share of the stage height, with [present] characters on stage.
-  static double heightShare(num present) => _between(present, 0.82, 0.82, 0.66);
+  /// How far apart, as a share of the stage width, [count] characters stand on a narrow stage.
+  static double spacing(int count) => switch (count) {
+    <= 2 => 0.5,
+    3 => 0.4,
+    4 => 0.27,
+    _ => 0.22,
+  };
 
   static double _between(num present, double one, double two, double more) {
     final count = present.clamp(1, 3).toDouble();
@@ -85,7 +134,7 @@ class _ActorEntry {
   StageTransition? transition;
   bool leaving = false;
 
-  /// Alignment x on a narrow stage, kept while the character leaves.
+  /// The center x on a narrow stage, kept while the character leaves.
   double? narrowX;
 
   _ActorEntry(this.actor, this.controller);
@@ -274,56 +323,99 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     final present = entries.where((e) => !e.leaving).toList();
     // While the last characters leave, they keep their size.
     if (present.isNotEmpty) _crowd = min(present.length, 3);
-    final narrow = box.maxWidth < box.maxHeight;
-    if (narrow) _spread(present);
+    final width = box.maxWidth;
+    final narrow = width < box.maxHeight;
     final xs = entries.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
     final speaker = widget.speakerId;
+    final cast =
+        widget.cast ?? PoiCast.of([for (final e in entries) (height: e.actor.height, framing: e.actor.framing)]);
 
     // Eases the size over the sprite transition, so the others don't jump when a character enters or leaves.
     return TweenAnimationBuilder<double>(
       tween: Tween(end: _crowd.toDouble()),
       duration: widget.instant ? Duration.zero : skin.spriteTransitionDuration,
       curve: Curves.easeInOut,
-      builder: (context, crowd, _) => Stack(
-        fit: StackFit.expand,
-        children: [
-          // A fixed paint order: moving the speaker to the front made the sprites swap places in one frame.
-          for (final entry in entries)
-            AnimatedAlign(
-              key: ValueKey(entry.actor.id),
-              duration: _duration(
-                _action<MoveAction>((action) => action.profileId == entry.actor.id),
-                _moveDuration,
-              ),
-              curve: Curves.easeInOut,
-              alignment: Alignment((narrow ? entry.narrowX : null) ?? xs[entry.actor.position] ?? 0, 1),
-              // On a narrow (portrait) stage a sprite would be as wide as the stage, so every slot would put it in
-              // the middle. Capping its width lets the characters on stage stand side by side.
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: box.maxWidth * Poi.widthShare(crowd)),
-                child: FractionallySizedBox(
-                  heightFactor: Poi.heightShare(crowd),
-                  child: entry.transition == null
-                      ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
-                      : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
-                ),
-              ),
-            ),
-        ],
+      builder: (context, crowd, _) {
+        // One scale for everyone: the tallest head of the cast reaches the crowd's share of the stage height.
+        final scale = box.maxHeight * Poi.heightShare(crowd, narrow: narrow) / cast._top;
+        double spriteHeight(_ActorEntry entry) =>
+            (entry.actor.height ?? cast.tallest) * entry.actor.framing.clamp(0.05, 1.0) * scale;
+        if (narrow) _spread(present, width, spriteHeight);
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            // A fixed paint order: moving the speaker to the front made the sprites swap places in one frame.
+            for (final entry in entries)
+              _character(skin, entry, cast, scale, spriteHeight(entry), width, narrow, xs, speaker),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _character(
+    StorySkin skin,
+    _ActorEntry entry,
+    PoiCast cast,
+    double scale,
+    double spriteHeight,
+    double stageWidth,
+    bool narrow,
+    Map<SpritePosition, double> xs,
+    String? speaker,
+  ) {
+    final actor = entry.actor;
+    final height = actor.height ?? cast.tallest;
+    final framing = actor.framing.clamp(0.05, 1.0);
+    // How far the sprite's bottom edge sits below the stage's: the cut highest up the body sits right on it.
+    final drop = (cast.highestCut - height * (1 - framing)) * scale;
+    final center = (narrow ? entry.narrowX : null) ?? _slotCenter(xs[actor.position] ?? 0, stageWidth);
+    return Positioned(
+      key: ValueKey(actor.id),
+      left: 0,
+      right: 0,
+      bottom: -drop,
+      height: spriteHeight,
+      child: AnimatedAlign(
+        duration: _duration(_action<MoveAction>((action) => action.profileId == actor.id), _moveDuration),
+        curve: Curves.easeInOut,
+        alignment: Alignment(stageWidth == 0 ? 0 : 2 * center / stageWidth - 1, 1),
+        // A zero-wide anchor at the character's center, the sprite as wide as it is drawn around it.
+        child: SizedBox(
+          width: 0,
+          height: spriteHeight,
+          child: OverflowBox(
+            maxWidth: double.infinity,
+            alignment: Alignment.bottomCenter,
+            child: entry.transition == null
+                ? skin.spriteTransition(entry.controller, _sprite(entry, speaker))
+                : stageTransition(entry.transition!, entry.controller, _sprite(entry, speaker)),
+          ),
+        ),
       ),
     );
   }
 
-  /// Places the [present] characters on a narrow stage. There the slots can't keep their spacing: a `far_*`
-  /// slot would push its character off the edge and the inner ones would cover each other. So they are spread
-  /// evenly from edge to edge, left to right in slot order. A lone character stands at its slot, kept on screen.
-  void _spread(List<_ActorEntry> present) {
+  /// The center of slot [x] on a stage [stageWidth] wide: the far slots (±1.5) a twelfth of the width in from the
+  /// edges, so a character there is half on screen, the middle one in the middle.
+  static double _slotCenter(double x, double stageWidth) => stageWidth * (0.5 + x / 3.6);
+
+  /// Places the [present] characters on a narrow stage, as centers in [stageWidth]. There the slots can't keep
+  /// their spacing: a `far_*` slot would push its character off the edge and the inner ones would cover each other.
+  /// So they stand evenly around the middle, left to right in slot order, as close as [Poi.spacing] says and
+  /// overlapping a little like people in one shot. A lone character stands at its slot, kept on screen.
+  void _spread(List<_ActorEntry> present, double stageWidth, double Function(_ActorEntry) spriteHeight) {
     final ordered = present.toList()..sort((a, b) => a.actor.position.index.compareTo(b.actor.position.index));
     final xs = ordered.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
+    final gap = stageWidth * Poi.spacing(ordered.length);
     for (final (rank, entry) in ordered.indexed) {
-      entry.narrowX = ordered.length == 1
-          ? xs[entry.actor.position]!.clamp(-1.0, 1.0)
-          : -1 + 2 * rank / (ordered.length - 1);
+      if (ordered.length == 1) {
+        // Kept on screen: a sprite of the usual 1:2 shape stays inside the edges.
+        final half = min(spriteHeight(entry) / 4, stageWidth / 2);
+        entry.narrowX = _slotCenter(xs[entry.actor.position]!, stageWidth).clamp(half, stageWidth - half);
+        continue;
+      }
+      entry.narrowX = stageWidth / 2 + (rank - (ordered.length - 1) / 2) * gap;
     }
   }
 
@@ -370,6 +462,8 @@ class _SpriteSlot extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             gaplessPlayback: true,
             // A missing sprite should not break the scene.
+            // As tall as the slot, however small the image file is.
+            height: double.infinity,
             errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
           ),
         ),

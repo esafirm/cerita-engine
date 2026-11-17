@@ -4,6 +4,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/media_widgets.dart';
+import '../common/story_sheet.dart';
 import '../common/tagged_text.dart';
 import '../skin/story_skin.dart';
 import '../story_controller.dart';
@@ -74,7 +75,16 @@ class ClueDetail extends StatelessWidget {
   final StoryController controller;
   final List<Widget> actions;
 
-  const ClueDetail({super.key, required this.clue, required this.controller, this.actions = const []});
+  /// Shows the clue's title. Off in a sheet whose header already names the clue.
+  final bool showTitle;
+
+  const ClueDetail({
+    super.key,
+    required this.clue,
+    required this.controller,
+    this.actions = const [],
+    this.showTitle = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -87,13 +97,21 @@ class ClueDetail extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(child: Text(title, style: theme.textTheme.titleLarge)),
-            if (clue.isKey)
-              Icon(Icons.star, color: theme.colorScheme.tertiary, semanticLabel: strings.keyClue),
-          ],
-        ),
+        if (showTitle)
+          Row(
+            children: [
+              Expanded(child: Text(title, style: theme.textTheme.titleLarge)),
+              if (clue.isKey) Icon(Icons.star, color: theme.colorScheme.tertiary, semanticLabel: strings.keyClue),
+            ],
+          )
+        else if (clue.isKey)
+          Row(
+            children: [
+              Icon(Icons.star, size: 18, color: theme.colorScheme.tertiary),
+              const SizedBox(width: 6),
+              Text(strings.keyClue, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.tertiary)),
+            ],
+          ),
         if (image != null)
           Padding(
             padding: const EdgeInsets.only(top: 12),
@@ -155,15 +173,13 @@ class _CaseBoardScreenState extends State<CaseBoardScreen> {
 
   void _openClue(Clue clue) {
     if (!mounted) return;
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: ClueDetail(clue: clue, controller: widget.controller),
-        ),
+    StorySheet.show<void>(
+      context,
+      title: widget.controller.clueText(clue.title),
+      icon: Icons.search,
+      builder: (_) => SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+        child: ClueDetail(clue: clue, controller: widget.controller, showTitle: false),
       ),
     );
   }

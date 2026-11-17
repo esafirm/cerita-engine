@@ -1,4 +1,3 @@
-| `ring` | `String` | No | `"CALL"` only. The call is incoming: the phone rings with this sound (in `musicDir`, on loop) until the player answers, and the first item waits for the answer (presentation modes §1.2). Left out, the call is already connected. |
 # Data & JSON Schemas
 
 This document defines the asset layout and JSON schemas consumed by `EngineLoader`.
@@ -57,6 +56,14 @@ Defines all characters in the story, their display metadata, and their ordered e
   ]
 }
 ```
+
+A profile with sprites can say how tall the character is, so the VN stage sizes the cast against each other
+(presentation modes §2.1):
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `height` | `num` | No | How tall the character is, in any unit the whole cast shares (cm, say). Left out, the stage takes them as tall as the tallest character. |
+| `framing` | `num`, above 0 up to 1 | No (defaults to `1`) | The share of the body the sprites show, from the top of the head: `1` is head to toe, `0.72` down to the knee, `0.5` cut at the hips. |
 
 ### Profile Reference Format (`<id>:<sprite_index>`)
 Dialogue items reference a character and expression using the shorthand `<id>:<sprite_index>` (parsed by `ProfileInfo`):
@@ -122,6 +129,9 @@ Each conversation file represents a scene, chat session, or story chapter.
 | `background` | `String` | No | Background image filename in `bgDir`. |
 | `music` | `String` | No | Looping BGM filename in `musicDir`. |
 | `ambience` | `String` | No | Looping background sound (rain, crowd, café) in `musicDir`, played under the music. |
+| `ring` | `String` | No | `"CALL"` only. The call is incoming: the phone rings with this sound (in `musicDir`, on loop) until the player answers, and the first item waits for the answer (presentation modes §1.2). Left out, the call is already connected. |
+| `hangup` | `String` | No | `"CALL"` only. A target (`conv`, `#label` or `conv#label`) the story goes to when the player declines or hangs up (presentation modes §1.2). Left out, the call can't be ended. |
+| `stay` | `String` or locale object | No | `"CALL"` only, without `hangup`. What the player's character thinks when they try to end the call, shown as narration over the call buttons. Left out, the engine's own line ("Not now. I need to hear this.") is shown. |
 | `textbox` | `"adv"` \| `"nvl"` | No (defaults to `"adv"`) | VN text display: one line in the dialogue box (`adv`), or a full-screen page of lines (`nvl`). |
 | `channel_id` | `String` | For `"CHAT"` | Identifier of the messaging thread or contact. |
 | `day` | `int` | No | In-game day number (e.g., `1` to `7`). |

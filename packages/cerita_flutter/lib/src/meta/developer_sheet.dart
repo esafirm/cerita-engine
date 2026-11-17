@@ -1,6 +1,8 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../common/story_sheet.dart';
+import '../l10n/story_language.dart';
 import '../story_controller.dart';
 import '../story_setup.dart';
 
@@ -12,16 +14,13 @@ class DeveloperSheet extends StatelessWidget {
 
   const DeveloperSheet({super.key, required this.controller, required this.setup});
 
-  static Future<void> show(BuildContext context, StoryController controller, StorySetup setup) =>
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        showDragHandle: true,
-        builder: (_) => FractionallySizedBox(
-          heightFactor: 0.85,
-          child: DeveloperSheet(controller: controller, setup: setup),
-        ),
-      );
+  static Future<void> show(BuildContext context, StoryController controller, StorySetup setup) => StorySheet.show(
+    context,
+    title: StoryLanguage.of(context).strings.developer,
+    icon: Icons.build_outlined,
+    expand: true,
+    builder: (_) => DeveloperSheet(controller: controller, setup: setup),
+  );
 
   /// `true` / `false`, a number, or text (quotes around it are dropped).
   static dynamic parseValue(String raw) {

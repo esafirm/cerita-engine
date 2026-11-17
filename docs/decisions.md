@@ -575,6 +575,8 @@ chat option that isn't silent is followed by a player line.
 
 *2026-11-17. Presentation modes §2. Found in the Last Seen M1 playtest.*
 
+*Its width cap was replaced on 2026-11-18, see "A portrait crowd overlaps instead of shrinking".*
+
 On a phone held upright, a sprite drawn at 82% of the stage height is as wide as the stage, so the `left` and
 `right` slots couldn't move it and two characters both landed in the middle, one hidden behind the other. Every
 speaker change then swapped which one was in front in a single frame, and an expression change cross-faded both
@@ -592,6 +594,8 @@ sprite in before the old one fades out.
 ## Characters spread edge to edge on a portrait stage
 
 *2026-11-17. Presentation modes §2. Found in the Last Seen M1 bug sweep.*
+
+*Replaced on 2026-11-18, see "A portrait crowd overlaps instead of shrinking".*
 
 With two or more characters on a stage narrower than it is tall, they are placed evenly from edge to edge in
 slot order instead of at the fixed slot positions, and the width cap eases to its new value over the sprite
@@ -713,22 +717,25 @@ Commons page as the source.
   (an OpenGameArt gull pack ripped from a video was skipped).
 - **Revisit if** a store review or the M5 license pass wants CC0 by name. The three files would then be replaced.
 
-## An ended call rings back
+## A call ends where `hangup=` leads, or can't be ended
 
-*2026-11-17. Presentation modes §1.2, data schema §3.*
+*2026-11-17, changed 2026-11-18. Presentation modes §1.2, data schema §3.*
 
 A `CALL` scene with `ring=` rings until the player answers, and its first line waits for the answer. Every call
 button works: mute, speaker and the keypad are the player's own, and hold stops the line and the story. Ending or
-declining the call ends it, and after 2.6 seconds the caller calls back. Answering picks the call up where it
-was cut and says the cut line again.
+declining the call goes where the scene's `hangup=` target leads, after "Call ended" shows for 1.2 seconds.
+Without `hangup=` the call can't be ended: a narration card says what the player's character thinks of hanging up
+(the scene's `stay=` line, or the engine's "Not now. I need to hear this."), and the call goes on.
 
-- **Why:** the playtest asked for a call screen where every button can be pressed. The story can't go on without
-  its call, so a hang-up can't skip it. A worried caller ringing back is what a real phone does, and it needs
-  nothing from the writer.
-- **Not done:** a script branch for hanging up (`hangup=` to another conversation). No scene needs one yet.
+- **Why:** the first version made the caller call back after a hang-up. The playtest found that odd: the story
+  should say why the character stays on the line, in their own voice, and a call that can be skipped should be
+  the engine's job, not a callback trick.
+- **Dinda's call** can't be ended. Raka thinks "Don't. Dinda wouldn't call at this hour unless it mattered."
 - **Mute and speaker change nothing in the story.** They are there for the feel of the phone.
-- **Cost:** the keypad plays the platform's key click, not real phone tones, because the engine ships no sounds.
-- **Revisit if** a scene wants the hang-up to matter, or a puzzle wants tones typed during a call.
+- **Cost:** a declined ringing call that has a `hangup=` target drops its first line, which the engine has
+  already put in the backlog.
+- **Revisit if** a puzzle wants tones typed during a call. The keypad plays the platform's key click, not real
+  phone tones, because the engine ships no sounds.
 
 ## The outgoing scene is frozen while it fades out
 
@@ -763,6 +770,84 @@ screen showed it most.
 
 Holding the stage (or the title screen) hides the UI until the finger lifts, so the art can be seen whole.
 
+## The cast shares one scale, from each character's height and framing
+
+*2026-11-18. Presentation modes §2.1, data schema §2. Found in the Last Seen M1 playtest.*
+
+A profile can give its `height` and its sprites' `framing` (the share of the body they show from the top of the
+head). The stage sizes every sprite with one scale for the whole cast, so the tallest head reaches 82% of the
+stage, a shorter character stands shorter, and each sprite's cut sits below the bottom edge at its height above
+the floor. Without heights every sprite is as tall, as before.
+
+- **Why:** every Last Seen sprite fills the same 887 × 1774 canvas, but they are cut at different points: Raka's
+  at the knee, Dinda's and Yusuf's at the thigh. Drawn at one height, Raka's head came out smaller than theirs
+  although he is the tallest. Only the writer knows how tall a character is, and the cut can't be read from the
+  image, so both are data.
+- **Why the whole cast and not who is on stage:** sizes measured on the people present would change when
+  someone walks in. With the cast measured once, a character keeps their size all story.
+- **Last Seen's numbers** are estimates from the sprites' landmarks: Raka 178 cm, framing 0.72; Bima 180, 0.63;
+  Yusuf 175, 0.62; Hendra 168, 0.62; Tasya 165, 0.64; Sekar 162, 0.68; Dinda 156, 0.62. Tune them in
+  `profiles.yaml` if a pair looks off.
+- **Cost:** a short character alone has more background above them. The writer has two numbers to fill in per
+  character.
+
+## A portrait crowd overlaps instead of shrinking
+
+*2026-11-18. Presentation modes §2.1. Replaces "Characters stand side by side" and "Characters spread edge to edge" for portrait stages.*
+
+On a portrait stage the camera barely pulls back for a crowd (80% with two, 72% with three) and the characters
+overlap, half the stage width apart with two and 40% with three. On a landscape stage the slots are fixed
+shares of the width and the far ones are half on screen.
+
+- **Why:** the width cap shrank two characters to 60% of the stage width, small against the background. The
+  playtest found the proportions off. Overlap reads as people in one shot, and the dimming shows who speaks.
+- **Also fixed:** on a landscape phone the `far_*` slots put their character fully off screen.
+- **Cost:** with three on a phone the middle one covers part of the other two. The paint order stays fixed, so
+  the speaker can be behind someone.
+- **Revisit if** a scene with three needs everyone fully visible: a per-scene option to show only the speaker
+  would fit there.
+
+## A scene that ends by itself waits for a tap
+
+*2026-11-18. Presentation modes §7.1, engine `peekExit`.*
+
+When a scene would end with nothing but the clock moving it on (chat pacing, a `wait`, a stage direction), the
+story stops with a "Tap to continue" prompt before the next scene. The engine looks ahead without moving
+(`RealFsseEngine.peekExit`) to see whether the next item is in another scene.
+
+- **Why:** chats ended and cut to the next scene a second after their last message, which the playtest found
+  too fast. A VN line already waits for a tap, so only these ends needed one.
+- **What counts as another scene** follows what the player sees switch: another mode or thread, any new VN
+  conversation, a new chapter, or the end. A chat continuing in the same thread doesn't wait.
+- **Auto and Skip don't wait.** The player asked the story to move for them.
+- **Cost:** the look-ahead reads conditions as they are now, without the effects of `SET` items on the way. A
+  route that a `SET` just before the end decides may be judged wrong, and then the scene doesn't wait.
+
+## Holding a control doesn't hide the UI
+
+*2026-11-18. Presentation modes §2.1.*
+
+Holding the stage hides the UI, but a hold that starts on a button, a choice or a menu entry does nothing. A
+control is anything with a `MouseRegion` under the finger, which every `InkWell` and Material button has. Last
+Seen's own buttons (the MENU tag, choices, menu rows, title menu) are `GestureDetector`s, so they now sit in a
+`MouseRegion` with the click cursor.
+
+- **Why not the click cursor alone:** on Android an `InkWell`'s cursor resolves to the basic arrow, so the cursor
+  says nothing on a phone. The region itself is there on every platform.
+- **Cost:** a skin's button made of a bare `GestureDetector` still peeks until it gets a `MouseRegion`.
+
+## Every bottom sheet shares one frame
+
+*2026-11-18. Presentation modes §7.2.*
+
+The in-game menu, the backlog, a clue's detail, the route chart's chapter actions and the developer tools open
+through `StorySheet.show`, which the skin draws with `StorySkin.sheet`: a handle, an icon and title, a close
+button and a rule. A sheet is as tall as its body. Last Seen draws it as its framed retro window.
+
+- **Why:** the playtest asked for nicer sheets, the Case Board's most of all. They were stock Material panels
+  in a pixel-art game, the backlog opened at 80% height with one line in it, and the menu ran past the screen.
+- **The menu** puts Save, Load, Case Board and Backlog in a row of big buttons and the rest in a short list.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
@@ -781,6 +866,6 @@ showing as written, a tagged choice option rendering in italics and its backlog 
 mode waiting while HIDE is on and resuming after.
 
 Not yet checked: the desktop mouse wheel rollback, story hot reload on a device, and fades and volumes by ear.
-Also not yet checked: the ringtone loop of a `ring=` call, the vibration while it rings, the keypad click, and
-holding the stage to hide the UI.
+Also not yet checked: the ringtone loop of a `ring=` call, the vibration while it rings, the keypad click,
+holding the stage to hide the UI (and holding a button not hiding it), and the cast's heights on a real phone.
 See the backlog.

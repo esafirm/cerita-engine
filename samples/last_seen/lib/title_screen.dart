@@ -24,6 +24,9 @@ class _TitleScreenState extends State<TitleScreen> {
 
   bool _started = false;
 
+  /// The cast, so the key art stands at the heights the story uses. Null until loaded.
+  ProfileData? _cast;
+
   /// Held down: the logo and menu step aside to show the key art.
   bool _peek = false;
   bool _extras = false;
@@ -38,6 +41,9 @@ class _TitleScreenState extends State<TitleScreen> {
     _playMusic();
     setup.loader.loadCredits().then((credits) {
       if (mounted) setState(() => _credits = credits);
+    }, onError: (Object _) {});
+    setup.loader.initialLoad().then((package) {
+      if (mounted) setState(() => _cast = package.profiles);
     }, onError: (Object _) {});
   }
 
@@ -146,20 +152,30 @@ class _TitleScreenState extends State<TitleScreen> {
         _extras ? _showExtras(false) : setState(() => _started = false);
       },
       child: Scaffold(
-        // Holding anywhere shows the art without the logo and menu, until the finger lifts.
-        body: GestureDetector(
-          onLongPressStart: (_) => _setPeek(true),
-          onLongPressEnd: (_) => _setPeek(false),
-          onLongPressCancel: () => _setPeek(false),
+        // Holding anywhere but the menu shows the art without the logo and menu, until the finger lifts.
+        body: HoldToPeek(
+          onPeek: _setPeek,
           child: Stack(
             fit: StackFit.expand,
             children: [
               Poi(
                 background: config.bg("bg_seawall_night.webp"),
+                // They step in once the cast is read, already at their heights.
                 actors: [
-                  PoiActor(id: "raka", sprite: config.sprite("raka_neutral.webp"), position: SpritePosition.left),
-                  PoiActor(id: "sekar", sprite: config.sprite("sekar_smile.webp"), position: SpritePosition.right),
+                  if (_cast case final cast?)
+                    for (final (id, sprite, position) in const [
+                      ("raka", "raka_neutral.webp", SpritePosition.left),
+                      ("sekar", "sekar_smile.webp", SpritePosition.right),
+                    ])
+                      PoiActor(
+                        id: id,
+                        sprite: config.sprite(sprite),
+                        position: position,
+                        height: cast.byId(id)?.height,
+                        framing: cast.byId(id)?.framing ?? 1,
+                      ),
                 ],
+                cast: _cast == null ? null : PoiCast.ofProfiles(_cast!.profiles),
               ),
               IgnorePointer(
                 ignoring: _peek,
@@ -282,35 +298,39 @@ class _Menu extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (final (index, (label, action)) in entries.indexed)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onSelect(index, action),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 26,
-                          child: index == cursor
-                              ? Blink(
-                                  period: const Duration(milliseconds: 800),
-                                  child: const Align(alignment: Alignment.centerLeft, child: RetroCursor(size: 14)),
-                                )
-                              : null,
-                        ),
-                        Flexible(
-                          child: Text(
-                            label.toUpperCase(),
-                            overflow: TextOverflow.ellipsis,
-                            style: Retro.text.copyWith(
-                              fontSize: 17,
-                              height: 1.2,
-                              letterSpacing: 2.4,
-                              color: index == cursor ? Retro.frame : Retro.frame.withAlpha(200),
+                // The mouse region marks it as a button, so holding it doesn't hide the menu (see HoldToPeek).
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onSelect(index, action),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 26,
+                            child: index == cursor
+                                ? Blink(
+                                    period: const Duration(milliseconds: 800),
+                                    child: const Align(alignment: Alignment.centerLeft, child: RetroCursor(size: 14)),
+                                  )
+                                : null,
+                          ),
+                          Flexible(
+                            child: Text(
+                              label.toUpperCase(),
+                              overflow: TextOverflow.ellipsis,
+                              style: Retro.text.copyWith(
+                                fontSize: 17,
+                                height: 1.2,
+                                letterSpacing: 2.4,
+                                color: index == cursor ? Retro.frame : Retro.frame.withAlpha(200),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

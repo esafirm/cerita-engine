@@ -77,6 +77,12 @@ abstract class CeritaStrings {
   String get hold;
   String get hideKeypad;
 
+  /// Shown when the player tries to end a call the story can't do without, and the scene sets no `stay` line.
+  String get cantHangUp;
+
+  /// The prompt at the end of a scene that waits for a tap before the next one.
+  String get tapToContinue;
+
   /// The player's name until the story sets `NAME`.
   String get you;
 
@@ -283,6 +289,10 @@ class EnglishCeritaStrings extends CeritaStrings {
   String get hold => "Hold";
   @override
   String get hideKeypad => "Hide";
+  @override
+  String get cantHangUp => "Not now. I need to hear this.";
+  @override
+  String get tapToContinue => "Tap to continue";
   @override
   String get you => "You";
   @override
@@ -528,6 +538,10 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get hold => "Tahan";
   @override
   String get hideKeypad => "Tutup";
+  @override
+  String get cantHangUp => "Jangan sekarang. Aku harus dengar ini.";
+  @override
+  String get tapToContinue => "Ketuk untuk lanjut";
   @override
   String get you => "Kamu";
   @override

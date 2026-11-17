@@ -53,6 +53,63 @@ class RetroSkin extends StorySkin {
   Widget? chapterCard(BuildContext context, Conversation conversation) =>
       _ChapterCard(chapter: conversation.chapter!, title: conversation.title);
 
+  /// Sheets are windows too: framed, square, a dotted rule under an uppercase title and a CLOSE tag. They float a
+  /// little above the bottom edge, like the dialogue window.
+  @override
+  Widget sheet(BuildContext context, StorySheetFrame frame) {
+    final maxHeight = MediaQuery.sizeOf(context).height * StorySheet.maxHeightFactor;
+    final title = frame.title;
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(8, 0, 12, 12),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight, minHeight: frame.expand ? maxHeight : 0),
+        child: RetroWindow(
+          padding: EdgeInsets.zero,
+          child: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (title != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 10, 10, 8),
+                    child: Row(
+                      children: [
+                        if (frame.icon case final icon?) ...[
+                          Icon(icon, size: 18, color: Retro.accent),
+                          const SizedBox(width: 10),
+                        ],
+                        Expanded(
+                          child: Text(
+                            title.toUpperCase(),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Retro.text.copyWith(fontSize: 15, height: 1.3, letterSpacing: 2.4),
+                          ),
+                        ),
+                        _HudTag(
+                          StoryLanguage.of(context).locale == "en" ? "CLOSE" : "TUTUP",
+                          onTap: () {
+                            UiSounds.instance?.cancel();
+                            frame.onClose();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const _DottedRule(),
+                ],
+                if (frame.expand) Expanded(child: frame.body) else Flexible(child: frame.body),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget dialogueFrame(BuildContext context, DialogueFrame frame) {
     return Stack(
@@ -192,40 +249,47 @@ class _ChoiceButtonState extends State<_ChoiceButton> {
     final choice = widget.choice;
     final locked = choice.locked;
     final foreground = locked ? Retro.dim : (_pressed ? Retro.night : Retro.frame);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: (_) => _press(true),
-      onTapCancel: () => _press(false),
-      onTapUp: (_) => _press(false),
-      onTap: widget.onTap == null
-          ? null
-          : () {
-              UiSounds.instance?.confirm();
-              widget.onTap!();
-            },
-      child: RetroWindow(
-        fill: _pressed ? Retro.frame : Retro.ink,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 22,
-              child: locked
-                  ? Text("×", style: Retro.text.copyWith(color: Retro.dim, height: 1.3))
-                  : (_pressed
-                        ? const Align(
-                            alignment: Alignment.centerLeft,
-                            child: RetroCursor(color: Retro.night),
-                          )
-                        : null),
-            ),
-            if (widget.marker case final marker?) ...[marker, const SizedBox(width: 8)],
-            Expanded(
-              child: TaggedText(choice.text, style: Retro.text.copyWith(color: foreground, fontSize: 15, height: 1.4)),
-            ),
-            // Picked in an earlier playthrough.
-            if (choice.chosen && !locked) Text("✓", style: Retro.text.copyWith(color: foreground, height: 1.3)),
-          ],
+    // A mouse region marks it as a control, so holding it doesn't hide the UI (see HoldToPeek).
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => _press(true),
+        onTapCancel: () => _press(false),
+        onTapUp: (_) => _press(false),
+        onTap: widget.onTap == null
+            ? null
+            : () {
+                UiSounds.instance?.confirm();
+                widget.onTap!();
+              },
+        child: RetroWindow(
+          fill: _pressed ? Retro.frame : Retro.ink,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 22,
+                child: locked
+                    ? Text("×", style: Retro.text.copyWith(color: Retro.dim, height: 1.3))
+                    : (_pressed
+                          ? const Align(
+                              alignment: Alignment.centerLeft,
+                              child: RetroCursor(color: Retro.night),
+                            )
+                          : null),
+              ),
+              if (widget.marker case final marker?) ...[marker, const SizedBox(width: 8)],
+              Expanded(
+                child: TaggedText(
+                  choice.text,
+                  style: Retro.text.copyWith(color: foreground, fontSize: 15, height: 1.4),
+                ),
+              ),
+              // Picked in an earlier playthrough.
+              if (choice.chosen && !locked) Text("✓", style: Retro.text.copyWith(color: foreground, height: 1.3)),
+            ],
+          ),
         ),
       ),
     );
@@ -241,18 +305,22 @@ class _HudTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: RetroWindow(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        fill: alert ? Retro.accent : Retro.ink,
-        child: Text(
-          label,
-          style: Retro.text.copyWith(
-            color: alert ? Retro.night : Retro.frame,
-            fontSize: 13,
-            height: 1.3,
-            letterSpacing: 2,
+    // A mouse region marks it as a control, so holding it doesn't hide the UI (see HoldToPeek).
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: RetroWindow(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          fill: alert ? Retro.accent : Retro.ink,
+          child: Text(
+            label,
+            style: Retro.text.copyWith(
+              color: alert ? Retro.night : Retro.frame,
+              fontSize: 13,
+              height: 1.3,
+              letterSpacing: 2,
+            ),
           ),
         ),
       ),
@@ -345,24 +413,28 @@ class _MenuRowState extends State<_MenuRow> {
   @override
   Widget build(BuildContext context) {
     final enabled = widget.onTap != null;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 20,
-              child: _pressed ? const Align(alignment: Alignment.centerLeft, child: RetroCursor()) : null,
-            ),
-            Text(
-              widget.label,
-              style: Retro.text.copyWith(color: enabled ? Retro.frame : Retro.dim, height: 1.2, letterSpacing: 2),
-            ),
-          ],
+    // A mouse region marks it as a control, so holding it doesn't hide the UI (see HoldToPeek).
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
+        onTapCancel: () => setState(() => _pressed = false),
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                child: _pressed ? const Align(alignment: Alignment.centerLeft, child: RetroCursor()) : null,
+              ),
+              Text(
+                widget.label,
+                style: Retro.text.copyWith(color: enabled ? Retro.frame : Retro.dim, height: 1.2, letterSpacing: 2),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -408,4 +480,29 @@ class _ChapterCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A row of dots across a window, under a sheet's title.
+class _DottedRule extends StatelessWidget {
+  const _DottedRule();
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 2,
+    width: double.infinity,
+    child: CustomPaint(painter: _Dots()),
+  );
+}
+
+class _Dots extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Retro.line;
+    for (var x = 2.0; x < size.width - 2; x += 6) {
+      canvas.drawRect(Rect.fromLTWH(x, 0, 2, size.height), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_Dots oldDelegate) => false;
 }

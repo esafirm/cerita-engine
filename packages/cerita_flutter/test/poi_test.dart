@@ -11,149 +11,172 @@ PoiActor _actor(String id, SpritePosition position, [String sprite = "x.png"]) =
 StageItemType _direction(List<Map<String, dynamic>> actions) =>
     StageItemType.fromJson({"type": "STAGE", "actions": actions});
 
-Alignment _alignmentOf(WidgetTester tester, String id) =>
-    tester.widget<AnimatedAlign>(find.byKey(ValueKey(id))).alignment as Alignment;
+/// Where the sprite of [id] is drawn: its height, its bottom edge and its center x.
+Rect _slot(WidgetTester tester, String id) =>
+    tester.getRect(find.descendant(of: find.byKey(ValueKey(id)), matching: find.byType(OverflowBox)));
 
-/// The widest the sprite of [id] may be.
-double _cap(WidgetTester tester, String id) => tester
-    .widget<ConstrainedBox>(find.descendant(of: find.byKey(ValueKey(id)), matching: find.byType(ConstrainedBox)).first)
-    .constraints
-    .maxWidth;
+Alignment _alignmentOf(WidgetTester tester, String id) =>
+    tester
+            .widget<AnimatedAlign>(find.descendant(of: find.byKey(ValueKey(id)), matching: find.byType(AnimatedAlign)))
+            .alignment
+        as Alignment;
 
 List<String> _paintOrder(WidgetTester tester) => [
-      for (final align in tester.widgetList<AnimatedAlign>(find.byType(AnimatedAlign)))
-        if (align.key case ValueKey<String>(:final value)) value,
-    ];
+  for (final slot in tester.widgetList<Positioned>(find.byType(Positioned)))
+    if (slot.key case ValueKey<String>(:final value)) value,
+];
+
+Future<void> _portrait(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(const Size(400, 800));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+}
 
 void main() {
   testWidgets('a moved character keeps its widget and slides to the new slot', (tester) async {
     await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.left)])));
     final element = tester.element(find.byKey(const ValueKey("nora")));
-    expect(_alignmentOf(tester, "nora").x, -1.3);
+    final left = _slot(tester, "nora").center.dx;
 
-    await tester.pumpWidget(_wrap(Poi(
-      actors: [_actor("nora", SpritePosition.right)],
-      direction: _direction([{"action": "move", "profile": "nora", "position": "right", "duration_ms": 600}]),
-    )));
+    await tester.pumpWidget(
+      _wrap(
+        Poi(
+          actors: [_actor("nora", SpritePosition.right)],
+          direction: _direction([
+            {"action": "move", "profile": "nora", "position": "right", "duration_ms": 600},
+          ]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
     expect(tester.element(find.byKey(const ValueKey("nora"))), same(element));
-    expect(_alignmentOf(tester, "nora").x, 1.3);
-    expect(tester.widget<AnimatedAlign>(find.byKey(const ValueKey("nora"))).duration, const Duration(milliseconds: 600));
+    expect(_slot(tester, "nora").center.dx, closeTo(800 - left, 0.01), reason: "the mirrored slot");
+    final align = find.descendant(of: find.byKey(const ValueKey("nora")), matching: find.byType(AnimatedAlign));
+    expect(tester.widget<AnimatedAlign>(align).duration, const Duration(milliseconds: 600));
   });
 
-  testWidgets('a sprite stands on the bottom edge of its slot, not in its middle', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(400, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    // On a portrait stage the slot is taller than the sprite. Centered in it, the cut-off legs floated.
-    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.left), _actor("miki", SpritePosition.right)])));
+  testWidgets('without heights every sprite stands on the bottom edge at one size', (tester) async {
+    await _portrait(tester);
+    await tester.pumpWidget(
+      _wrap(Poi(actors: [_actor("nora", SpritePosition.left), _actor("miki", SpritePosition.right)])),
+    );
     await tester.pumpAndSettle();
-    for (final image in find.byType(Image).evaluate()) {
-      expect(tester.getBottomLeft(find.byWidget(image.widget)).dy, 800);
+    for (final id in ["nora", "miki"]) {
+      expect(_slot(tester, id).bottom, 800);
+      expect(_slot(tester, id).height, closeTo(800 * Poi.heightShare(2, narrow: true), 0.01));
     }
   });
 
-  testWidgets('far slots switch to the five slot layout', (tester) async {
-    await tester.pumpWidget(_wrap(Poi(actors: [
-      _actor("nora", SpritePosition.left),
-      _actor("miki", SpritePosition.farRight),
-    ])));
-    expect(_alignmentOf(tester, "nora").x, -0.75);
-    expect(_alignmentOf(tester, "miki").x, 1.5);
-  });
-
-  testWidgets('on a portrait stage two characters are capped to stand side by side, in a fixed paint order',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(400, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    double cap(String id) => _cap(tester, id);
-    List<String> paintOrder() => _paintOrder(tester);
-
-    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
-    expect(cap("nora"), 400, reason: "a lone character keeps the full width");
-
-    final actors = [_actor("nora", SpritePosition.left), _actor("miki", SpritePosition.right)];
-    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "nora")));
+  testWidgets('heights and framing size the sprites against each other and keep every cut below the edge', (
+    tester,
+  ) async {
+    await _portrait(tester);
+    // Nora is 180 and shown head to toe. Miki is 150 and shown down to the hips: her cut is the highest, at 75.
+    await tester.pumpWidget(
+      _wrap(
+        Poi(
+          actors: [
+            const PoiActor(id: "nora", sprite: "x.png", position: SpritePosition.left, height: 180),
+            const PoiActor(id: "miki", sprite: "x.png", position: SpritePosition.right, height: 150, framing: 0.5),
+          ],
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(cap("nora"), closeTo(400 * Poi.widthShare(2), 0.01));
-    expect(cap("miki"), closeTo(400 * Poi.widthShare(2), 0.01));
-    expect(paintOrder(), ["nora", "miki"]);
-
-    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "miki")));
-    expect(paintOrder(), ["nora", "miki"], reason: "the speaker doesn't jump to the front");
+    final nora = _slot(tester, "nora");
+    final miki = _slot(tester, "miki");
+    final scale = 800 * Poi.heightShare(2, narrow: true) / (180 - 75);
+    expect(miki.bottom, closeTo(800, 0.01), reason: "the highest cut sits on the edge");
+    expect(miki.height, closeTo(75 * scale, 0.01));
+    expect(nora.height, closeTo(180 * scale, 0.01));
+    expect(nora.bottom, closeTo(800 + 75 * scale, 0.01), reason: "Nora's feet are below the edge, off the stage");
+    expect(800 - nora.top, closeTo(800 * Poi.heightShare(2, narrow: true), 0.01), reason: "the tallest head");
+    expect(nora.top, lessThan(miki.top), reason: "the taller one stands taller");
   });
 
-  testWidgets('on a portrait stage the width cap eases to its new share when a character enters or leaves',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(400, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    final two = 400 * Poi.widthShare(2);
+  testWidgets('with the whole cast measured, a character keeps their size whoever is on stage', (tester) async {
+    await _portrait(tester);
+    const cast = PoiCast(tallest: 180);
+    const miki = PoiActor(id: "miki", sprite: "x.png", position: SpritePosition.center, height: 150);
+    await tester.pumpWidget(_wrap(const Poi(actors: [miki], cast: cast)));
+    await tester.pumpAndSettle();
+    expect(_slot(tester, "miki").height, closeTo(800 * Poi.heightShare(1, narrow: true) * 150 / 180, 0.01));
+  });
 
+  testWidgets('on a portrait stage a crowd barely shrinks, spreads evenly and keeps a fixed paint order', (
+    tester,
+  ) async {
+    await _portrait(tester);
     await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
-    expect(_cap(tester, "nora"), 400);
+    await tester.pumpAndSettle();
+    expect(_slot(tester, "nora").center.dx, 200, reason: "a lone character stands in the middle");
+    final alone = _slot(tester, "nora").height;
 
-    final actors = [_actor("nora", SpritePosition.center), _actor("miki", SpritePosition.right)];
+    // The Last Seen scene: Raka left, Dinda far right, Yusuf center.
+    final actors = [
+      _actor("raka", SpritePosition.left),
+      _actor("dinda", SpritePosition.farRight),
+      _actor("yusuf", SpritePosition.center),
+    ];
+    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "raka")));
+    await tester.pumpAndSettle();
+    expect(_slot(tester, "raka").height, greaterThan(alone * 0.85), reason: "not shrunk into dolls");
+    final gap = 400 * Poi.spacing(3);
+    expect(_slot(tester, "raka").center.dx, closeTo(200 - gap, 0.01));
+    expect(_slot(tester, "yusuf").center.dx, closeTo(200, 0.01));
+    expect(_slot(tester, "dinda").center.dx, closeTo(200 + gap, 0.01));
+    expect(_paintOrder(tester), ["raka", "dinda", "yusuf"]);
+
+    await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "yusuf")));
+    expect(_paintOrder(tester), ["raka", "dinda", "yusuf"], reason: "the speaker doesn't jump to the front");
+  });
+
+  testWidgets('on a portrait stage the size eases when a character enters or leaves', (tester) async {
+    await _portrait(tester);
+    final one = 800 * Poi.heightShare(1, narrow: true);
+    final three = 800 * Poi.heightShare(3, narrow: true);
+    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
+    await tester.pumpAndSettle();
+    expect(_slot(tester, "nora").height, closeTo(one, 0.01));
+
+    final actors = [
+      _actor("nora", SpritePosition.center),
+      _actor("miki", SpritePosition.right),
+      _actor("rin", SpritePosition.left),
+    ];
     await tester.pumpWidget(_wrap(Poi(actors: actors)));
     await tester.pump(const Duration(milliseconds: 100));
-    expect(_cap(tester, "nora"), inExclusiveRange(two, 400), reason: "shrinks over the sprite transition");
+    expect(_slot(tester, "nora").height, inExclusiveRange(three, one), reason: "shrinks over the sprite transition");
     await tester.pumpAndSettle();
-    expect(_cap(tester, "nora"), closeTo(two, 0.01));
-
-    await tester.pumpWidget(_wrap(Poi(actors: [_actor("nora", SpritePosition.center)])));
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(_cap(tester, "nora"), inExclusiveRange(two, 400), reason: "grows back over the sprite transition");
-    expect(_cap(tester, "miki"), inExclusiveRange(two, 400), reason: "the leaving one keeps pace");
-    await tester.pumpAndSettle();
-    expect(_cap(tester, "nora"), 400);
-    expect(find.byKey(const ValueKey("miki")), findsNothing);
+    expect(_slot(tester, "nora").height, closeTo(three, 0.01));
 
     await tester.pumpWidget(_wrap(const Poi()));
     await tester.pump(const Duration(milliseconds: 100));
-    expect(_cap(tester, "nora"), 400, reason: "the last one leaving doesn't change size");
+    expect(_slot(tester, "nora").height, closeTo(three, 0.01), reason: "the last ones leaving don't change size");
   });
 
-  testWidgets('on a portrait stage three characters spread out and stay on screen', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(400, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    // Left and right edge of a sprite as wide as its cap.
-    (double, double) span(String id) {
-      final width = _cap(tester, id);
-      final left = (400 - width) * (1 + _alignmentOf(tester, id).x) / 2;
-      return (left, left + width);
-    }
-
-    // The Last Seen scene: Raka left, Dinda far right, Yusuf center.
-    await tester.pumpWidget(_wrap(Poi(actors: [
-      _actor("raka", SpritePosition.left),
-      _actor("dinda", SpritePosition.farRight),
-      _actor("yusuf", SpritePosition.center),
-    ])));
+  testWidgets('a landscape stage keeps the slots apart and every slot at least half on screen', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        Poi(
+          actors: [
+            _actor("raka", SpritePosition.farLeft),
+            _actor("bima", SpritePosition.left),
+            _actor("yusuf", SpritePosition.center),
+            _actor("hendra", SpritePosition.right),
+            _actor("dinda", SpritePosition.farRight),
+          ],
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    final [raka, yusuf, dinda] = [for (final id in ["raka", "yusuf", "dinda"]) span(id)];
-    for (final (left, right) in [raka, yusuf, dinda]) {
-      expect(left, greaterThanOrEqualTo(-0.01));
-      expect(right, lessThanOrEqualTo(400.01));
-    }
-    final width = _cap(tester, "raka");
-    expect(raka.$2 - yusuf.$1, lessThan(width / 2), reason: "Yusuf covers less than half of Raka");
-    expect(yusuf.$2 - dinda.$1, lessThan(width / 2));
-    expect(_paintOrder(tester), ["raka", "dinda", "yusuf"]);
-
-    await tester.pumpWidget(_wrap(Poi(actors: [
-      _actor("raka", SpritePosition.left),
-      _actor("dinda", SpritePosition.farRight),
-      _actor("yusuf", SpritePosition.center),
-    ], speakerId: "yusuf")));
-    expect(_paintOrder(tester), ["raka", "dinda", "yusuf"]);
-  });
-
-  testWidgets('a landscape stage keeps the slot spacing with three characters', (tester) async {
-    await tester.pumpWidget(_wrap(Poi(actors: [
-      _actor("raka", SpritePosition.left),
-      _actor("dinda", SpritePosition.farRight),
-      _actor("yusuf", SpritePosition.center),
-    ])));
-    expect(_alignmentOf(tester, "raka").x, -0.75);
+    final xs = [
+      for (final id in ["raka", "bima", "yusuf", "hendra", "dinda"]) _slot(tester, id).center.dx,
+    ];
+    expect(xs, orderedEquals([...xs]..sort()));
+    expect(xs.first, greaterThan(0));
+    expect(xs.last, lessThan(800));
+    expect(xs[2], 400);
     expect(_alignmentOf(tester, "yusuf").x, 0);
-    expect(_alignmentOf(tester, "dinda").x, 1.5);
   });
 
   testWidgets('an expression change disposes what its cross-fade creates', (tester) async {

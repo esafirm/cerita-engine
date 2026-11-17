@@ -67,6 +67,8 @@ nora:
   handle: "@nora_w"         # Always a plain string
   bio: Busy chasing deadlines ☕
   avatar: assets/story/sprites/nora_avatar.png
+  height: 165               # How tall, in a unit the whole cast shares. Sizes the sprites against each other
+  framing: 0.7              # Share of the body the sprites show from the top of the head (1 = head to toe)
   expressions:
     open: nora_open.png       # Index 0, used when a script names no expression
     frown: nora_frown.png
@@ -75,6 +77,7 @@ nora:
 
 A plain string value stays a plain string in every locale. A `{locale: text}` map gives one text per locale.
 `player` is built in (the player character) and can't be declared. Keys can't be statement keywords (§2.2).
+`height` must be a number above 0 and `framing` one above 0 up to 1 (data schema §2).
 The engine schema doesn't change: expression names exist only in the toolkit.
 
 ### 1.3 `channels.yaml`
@@ -159,7 +162,7 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
 | Statement | Compiles to | Attributes and modifiers |
 | :--- | :--- | :--- |
 | `@conversation <key>` | A conversation file: `index.json` for `index`, else `cvn_<key>.json` | `id=` (`conversation_id`, default `cvn_<key>`), `chapter=`, `title=`, `checkpoint` |
-| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `ring=` (`CALL` only: the call rings in with this sound until answered), `textbox=adv\|nvl`, `channel=`, `day=`, `time=`, `status=` (`status=none` hides the chat status) |
+| `@scene <VN\|CHAT\|CALL>` | Its `scene`. Leave it out for a conversation that keeps the current scene, like a shared `CALL` target | `bg=`, `music=`, `ambience=`, `ring=` (`CALL` only: the call rings in with this sound until answered), `hangup=` (`CALL` only: where the story goes when the player hangs up or declines, a target like `->`), `stay=` and `stay.en=` (`CALL` only, without `hangup=`: what the player's character thinks when they try to end it), `textbox=adv\|nvl`, `channel=`, `day=`, `time=`, `status=` (`status=none` hides the chat status) |
 | `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `[offstage]`, `typing=`, `sfx=`, `voice=` |
 | `narration` / `system` / `timestamp` | `NARRATION` (no style / `system` / `timestamp`) | `sfx=` |
 | `media <IMAGE\|AUDIO\|VIDEO\|CG> <file>` | `MEDIA` | `by=`, `unlock=`, `typing=`, `sfx=` |

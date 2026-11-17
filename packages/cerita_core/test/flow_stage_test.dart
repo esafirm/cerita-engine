@@ -42,6 +42,7 @@ Future<String?> _nextText(RealFsseEngine engine, {ItemResult? result}) async =>
     (await engine.next(prevResult: result)).getText();
 
 void main() {
+  _peekExitTests();
   group('ConditionEvaluator expressions', () {
     test('arithmetic, precedence, unary minus and string concat', () {
       const evaluator = ConditionEvaluator();
@@ -355,6 +356,79 @@ void main() {
     test('unknown actions and transitions throw', () {
       expect(() => StageAction.fromJson({"action": "dance"}), throwsException);
       expect(() => StageAction.fromJson({"action": "background", "transition": "spin"}), throwsException);
+    });
+  });
+}
+
+void _peekExitTests() {
+  group('peekExit', () {
+    Map<String, dynamic> chat(List<Map<String, dynamic>> items, {String channel = "miki"}) => {
+      "conversation_id": "cvn",
+      "scene": {"mode": "CHAT", "channel_id": channel},
+      "conversations": items,
+    };
+
+    test('is null while the next item is in the current conversation', () async {
+      final engine = RealFsseEngine(
+        _FakeEngineLoader({
+          "index": _conversation([
+            _text("one"),
+            {"type": "JUMP", "target": "#three"},
+            _text("two"),
+            _text("three", id: "three"),
+          ]),
+        }),
+      );
+      expect(await _nextText(engine), "one");
+      expect(await engine.peekExit(), isNull, reason: "a jump to a label in the same conversation stays");
+    });
+
+    test('names the conversation and scene the next item is in, following jumps, branches and calls', () async {
+      final engine = RealFsseEngine(
+        _FakeEngineLoader({
+          "index": _conversation([
+            _text("one"),
+            {
+              "type": "SET",
+              "effects": [
+                {"variable": "n", "op": "set", "value": 1},
+              ],
+            },
+            {
+              "type": "BRANCH",
+              "branches": [
+                {"condition": "flag == true", "target": "never"},
+              ],
+              "fallback_target": "hop",
+            },
+          ]),
+          "hop": {
+            "conversation_id": "hop",
+            "conversations": [
+              {"type": "CALL", "target": "thread"},
+            ],
+          },
+          "thread": chat([_text("hey", profile: "miki:0")]),
+        }),
+      );
+      expect(await _nextText(engine), "one");
+      final exit = await engine.peekExit();
+      expect(exit?.next?.key, "thread");
+      expect(exit?.scene?.mode, SceneMode.chat);
+      expect(engine.currentConversation!.key, "index", reason: "peeking goes nowhere");
+      expect(await _nextText(engine), "hey");
+    });
+
+    test('has no next conversation when the story ends first', () async {
+      final engine = RealFsseEngine(
+        _FakeEngineLoader({
+          "index": _conversation([_text("last")]),
+        }),
+      );
+      expect(await _nextText(engine), "last");
+      final exit = await engine.peekExit();
+      expect(exit, isNotNull);
+      expect(exit!.next, isNull);
     });
   });
 }

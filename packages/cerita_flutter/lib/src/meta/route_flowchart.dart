@@ -4,6 +4,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/ending_view.dart';
+import '../common/story_sheet.dart';
 import '../l10n/story_language.dart';
 
 /// The Chapters flowchart (CE-07): the [map]'s checkpoints and endings top to bottom, revealed as far as
@@ -269,9 +270,10 @@ class RouteFlowchart extends StatelessWidget {
 
   void _offer(BuildContext context, Checkpoint checkpoint, String chapter, String? title) {
     final strings = StoryLanguage.of(context).strings;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
+    StorySheet.show<void>(
+      context,
+      title: chapter,
+      icon: Icons.flag_outlined,
       builder: (sheetContext) {
         void close(VoidCallback action) {
           Navigator.of(sheetContext).pop();
@@ -279,14 +281,12 @@ class RouteFlowchart extends StatelessWidget {
         }
 
         final onReplay = this.onReplay;
-        return SafeArea(
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: Text(chapter, style: Theme.of(sheetContext).textTheme.titleMedium),
-                subtitle: title == null ? null : Text(title),
-              ),
+              if (title != null) ListTile(title: Text(title)),
               ListTile(
                 leading: const Icon(Icons.play_arrow),
                 title: Text(strings.playFromHere),

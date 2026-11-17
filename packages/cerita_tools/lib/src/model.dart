@@ -342,6 +342,12 @@ class SceneNode {
 
   /// `ring=`: a `CALL` scene rings with this sound until the player answers.
   String? ring;
+
+  /// `hangup=`: where a `CALL` scene goes when the player ends it. Without it the call can't be ended.
+  TargetRef? hangUp;
+
+  /// `stay=`: what the player's character thinks when they try to end a call that can't be ended.
+  Localized? stay;
   String? textbox;
   String? channel;
   int? day;

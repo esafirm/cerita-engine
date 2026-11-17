@@ -459,7 +459,7 @@ class StoryLinter {
         into.putIfAbsent(link.targetKey, () => {}).add(conversation.key);
         if (link.kind != LinkKind.call) continue;
         calls.putIfAbsent(conversation.key, () => {}).add(link.targetKey);
-        callsAt.putIfAbsent(conversation.key, () => []).add((link.itemIndex, link.targetKey));
+        callsAt.putIfAbsent(conversation.key, () => []).add((link.itemIndex!, link.targetKey));
       }
     }
 

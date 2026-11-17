@@ -27,6 +27,14 @@ class Profile {
   final String? avatar;
   final List<String> sprites;
 
+  /// How tall the character is, in any unit the whole cast shares (`"height"`). Null when not given: the stage then
+  /// takes them as tall as the tallest character.
+  final double? height;
+
+  /// The share of the body the sprites show, from the top of the head (`"framing"`): 1 is head to toe, 0.5 is cut
+  /// at the hips. Sprites cut at different points stand at their real heights side by side.
+  final double framing;
+
   /// The JSON it was read from, to show it in another language. Null when built in code.
   final Map<String, dynamic>? _json;
 
@@ -37,6 +45,8 @@ class Profile {
     this.bio,
     this.avatar,
     this.sprites = const [],
+    this.height,
+    this.framing = 1,
   }) : _json = null;
 
   Profile._fromJson(Map<String, dynamic> json, Localizer localizer)
@@ -46,6 +56,8 @@ class Profile {
         bio = localizer.json(json["bio"]),
         avatar = json["avatar"] as String?,
         sprites = [for (final sprite in json["sprites"] as List<dynamic>? ?? const []) sprite.toString()],
+        height = (json["height"] as num?)?.toDouble(),
+        framing = (json["framing"] as num?)?.toDouble() ?? 1,
         _json = json;
 
   factory Profile.fromJson(Map<String, dynamic> json, {Localizer localizer = const Localizer()}) =>

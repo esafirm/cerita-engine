@@ -122,6 +122,8 @@ class _Compiler {
       _put(sceneJson, "music", scene.music);
       _put(sceneJson, "ambience", scene.ambience);
       _put(sceneJson, "ring", scene.ring);
+      _put(sceneJson, "hangup", scene.hangUp?.key);
+      _put(sceneJson, "stay", _text(scene.stay));
       _put(sceneJson, "textbox", scene.textbox);
       json["scene"] = sceneJson;
     }
@@ -261,6 +263,8 @@ class _Compiler {
               if (profile.bio != null) "bio": _text(profile.bio),
               if (profile.avatar != null) "avatar": profile.avatar,
               if (profile.sprites.isNotEmpty) "sprites": profile.sprites,
+              if (profile.height != null) "height": profile.height,
+              if (profile.framing != null) "framing": profile.framing,
             },
         ],
       };

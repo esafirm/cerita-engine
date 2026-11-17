@@ -117,7 +117,9 @@ SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
     final item = conversation.items[index];
     return _locatePart(item, issue.path) ?? item.span;
   }
-  final aboutScene = issue.message.contains(" file '") || issue.message.contains("CHAT") || issue.message.contains("thread");
+  if (issue.path.firstOrNull == "scene") return conversation.scene?.span ?? conversation.span;
+  final aboutScene =
+      issue.message.contains(" file '") || issue.message.contains("CHAT") || issue.message.contains("thread");
   return aboutScene ? conversation.scene?.span ?? conversation.span : conversation.span;
 }
 

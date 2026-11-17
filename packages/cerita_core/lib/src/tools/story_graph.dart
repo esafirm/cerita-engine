@@ -5,12 +5,14 @@ import '../data/items/ending.dart';
 import '../data/items/evidence.dart';
 import '../data/items/flow.dart';
 
-enum LinkKind { choice, branch, fallback, jump, call }
+enum LinkKind { choice, branch, fallback, jump, call, hangUp }
 
-/// A `target` of an item: where a choice, branch, jump or call goes.
+/// A `target` of an item or scene: where a choice, branch, jump or call goes, or where a call goes once hung up.
 class StoryLink {
   final String from;
-  final int itemIndex;
+
+  /// The item the target is in. Null for the scene's own target, a call's `hangup`.
+  final int? itemIndex;
   final String target;
   final LinkKind kind;
 
@@ -18,7 +20,7 @@ class StoryLink {
   final String? label;
 
   /// Where in the item the target is, as JSON keys and indexes: `["choices", 1, "target"]`, `["branches", 0]`,
-  /// `["fallback_target"]` or `["responses", 0, "target"]`. Empty for a `JUMP` or `CALL`.
+  /// `["fallback_target"]`, `["responses", 0, "target"]` or `["scene", "hangup"]`. Empty for a `JUMP` or `CALL`.
   final List<Object> path;
 
   const StoryLink({
@@ -43,8 +45,19 @@ class StoryLink {
     return hash < 0 ? null : target.substring(hash + 1);
   }
 
-  /// Every target in [conversation], in item order.
+  /// Every target in [conversation]: the scene's, then the items' in order.
   static Iterable<StoryLink> of(Conversation conversation) sync* {
+    if (conversation.hasScene) {
+      if (conversation.scene.hangUp case final target?) {
+        yield StoryLink(
+          from: conversation.key,
+          itemIndex: null,
+          target: target,
+          kind: LinkKind.hangUp,
+          path: const ["scene", "hangup"],
+        );
+      }
+    }
     for (final (index, item) in conversation.conversations.indexed) {
       StoryLink link(String target, LinkKind kind, [String? label, List<Object> path = const []]) =>
           StoryLink(from: conversation.key, itemIndex: index, target: target, kind: kind, label: label, path: path);
@@ -122,6 +135,7 @@ class StoryGraph {
         LinkKind.choice || LinkKind.branch => link.label,
         LinkKind.fallback => "otherwise",
         LinkKind.call => "CALL",
+        LinkKind.hangUp => "hang up",
         LinkKind.jump => null,
       };
       final line = "    ${id(link.from)} $arrow${text == null ? "" : "|${quote(_short(text))}|"} ${id(link.targetKey)}";
