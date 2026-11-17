@@ -311,6 +311,19 @@ ending caught GOOD label=caught
     expect(choice["choices"].map((c) => c["value"]), [1, "b"]);
   });
 
+  test('[silent] marks one option and a silent choice marks them all', () {
+    final json = _compileOne(story({
+      "a.cerita": "@conversation index\nchoice PICK\n  en: Pick\n? Say hi\n? Say nothing [silent]\n"
+          "choice silent\n  en: Reply?\n? Type \"sorry\"\n? Close the app\n",
+    }));
+    final [one, all] = json["conversations"] as List;
+    expect(one["variable"], "PICK");
+    expect(one.containsKey("silent"), isFalse);
+    expect(one["choices"].map((c) => c["silent"]), [null, true]);
+    expect(all["silent"], isTrue);
+    expect(all.containsKey("variable"), isFalse, reason: "`silent` isn't taken as the variable");
+  });
+
   test('fails without output on syntax errors and unknown speakers or expressions', () {
     final result = compileStory(story({
       "a.cerita": "@conversation index\nnora:sad\n  en: Hi\nbob\n  en: Hi\nwait soon\n",

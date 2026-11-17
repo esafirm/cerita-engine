@@ -158,8 +158,8 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
 | `<speaker>[:<expression>]` | `TEXT` | `[far_left]` `[left]` `[center]` `[right]` `[far_right]`, `typing=`, `sfx=`, `voice=` |
 | `narration` / `system` / `timestamp` | `NARRATION` (no style / `system` / `timestamp`) | `sfx=` |
 | `media <IMAGE\|AUDIO\|VIDEO\|CG> <file>` | `MEDIA` | `by=`, `unlock=`, `typing=`, `sfx=` |
-| `choice [<VARIABLE>]` | `CHOICE`, followed by `?` options | `by=`, `timeout=` |
-| `? <text>` | One choice option | `[if <condition>]`, `[default]`, `[once]`, `[memory_marker]` |
+| `choice [<VARIABLE>]` | `CHOICE`, followed by `?` options | `by=`, `timeout=`, `silent` |
+| `? <text>` | One choice option | `[if <condition>]`, `[default]`, `[once]`, `[memory_marker]`, `[silent]` |
 | `input <VARIABLE>` | `INPUT` | `default=`, `by=` |
 | `wait <duration>` | `WAIT` | |
 | `branch` | `BRANCH`, with routes in its body (§2.4) | |
@@ -176,7 +176,8 @@ Every engine item ([data schema §4](data-schema.md#4-conversation-item-types-co
   `@scene` comes right after it.
 - An effect line at column 0 (§2.4) is a `SET` of its own. Effect lines that follow each other share one `SET`.
 - `[default]` marks the option picked when `timeout=` runs out. `[once]` hides an option for the rest of the
-  playthrough once picked. `[memory_marker]` marks an option unlocked by past runs.
+  playthrough once picked. `[memory_marker]` marks an option unlocked by past runs. `[silent]` sends no reply
+  when the option is picked (data schema §4.4), and `silent` on the `choice` line does that for every option.
 - `voice=` and a voice note's file name one clip, as written. The player looks for `name.<locale>.mp3` first and
   falls back to `name.mp3` (CE-01, data schema §5.4), so a story can ship either.
 - `clue <id>` at column 0 is an effect line (§2.4), so it's a `SET` that awards the clue where the scene finds it.

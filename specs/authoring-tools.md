@@ -53,6 +53,7 @@ Probably a mistake, but the story still runs.
 | Unknown chat thread | A `channel_id` that `channels.json` doesn't list (when the file exists). |
 | Clue never awarded | A clue in `clues.json` that no effect sets. Clue variables are not reported as "set but never read": the board reads them. |
 | Story stops | A conversation entered by a target (or `index`) can run out of items with no `ENDING`, `JUMP`, `RETURN` or `BRANCH` fallback after its last entry point (its start, or a label a target uses). The engine then ends the story without an ending. Reported at the last item. Conversations only reached through `CALL` return to their caller instead and aren't checked. A `CHOICE` leads on when every option has a target and one of them has no condition and isn't `once`. An evidence question (`"source": "clues"`) leads on when every response and its `fallback` (and `timeout`, if given) have a target. Conditions aren't evaluated. |
+| Reply sent twice | In a `CHAT` scene, an option that isn't `silent` is followed by a player `TEXT` line: the next item, or the `#label` it jumps to. The option is sent as the player's message and then the scripted line repeats it. Warning, reported at the option. |
 
 ### 1.3 Clues awardable before an evidence question
 

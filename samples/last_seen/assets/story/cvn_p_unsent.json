@@ -62,6 +62,7 @@
       },
       "variable": "UNSENT",
       "profile": "sekar:0",
+      "silent": true,
       "choices": [
         {
           "text": {

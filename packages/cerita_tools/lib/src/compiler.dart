@@ -164,6 +164,7 @@ class _Compiler {
         _put(json, "variable", item.variable);
         _put(json, "profile", _profile(item.by));
         _put(json, "timeout_ms", item.timeoutMs);
+        if (item.silent) json["silent"] = true;
         final defaultIndex = item.options.indexWhere((option) => option.isDefault);
         if (defaultIndex >= 0) json["default_choice"] = defaultIndex;
         json["choices"] = [for (final option in item.options) _option(option)];
@@ -234,6 +235,7 @@ class _Compiler {
     _put(json, "condition", option.condition);
     if (option.once) json["once"] = true;
     if (option.memoryMarker) json["memory_marker"] = true;
+    if (option.silent) json["silent"] = true;
     _put(json, "effects", _effects(option.effects));
     _put(json, "target", option.target?.key);
     return json;

@@ -165,6 +165,9 @@ class ChoiceItem extends ItemNode {
   final String? variable;
   ProfileRef? by;
   int? timeoutMs;
+
+  /// Every option sends no reply (`silent`).
+  bool silent = false;
   final List<OptionNode> options = [];
 
   ChoiceItem(super.span, this.variable);
@@ -184,6 +187,9 @@ class OptionNode implements TextHolder {
   bool isDefault = false;
   bool once = false;
   bool memoryMarker = false;
+
+  /// Picking it sends no reply (`[silent]`).
+  bool silent = false;
   Object? value;
   bool hasValue = false;
   TargetRef? target;

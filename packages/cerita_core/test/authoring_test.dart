@@ -338,6 +338,50 @@ flowchart TD
     expect((await engine.next()).getText(), "7");
   });
 
+  test('a silent option sends no reply, and a chat option followed by a player line is reported', () async {
+    final chat = {"mode": "CHAT", "channel_id": "thread_nora"};
+    Map<String, dynamic> choice(List<Map<String, dynamic>> options, {bool silent = false}) =>
+        {"type": "CHOICE", "text": "Reply?", "variable": "R", "silent": silent ? true : null, "choices": options};
+    final ending = {"type": "ENDING", "ending_id": "e", "title": "E", "category": "GOOD"};
+    final files = <String, Object>{
+      "index": _conversation([
+        choice([
+          {"text": "hi", "value": "hi"},
+          {"text": "Say nothing", "value": "quiet", "silent": true, "target": "#after"},
+          {"text": "bye", "value": "bye", "target": "#after"},
+        ]),
+        _text("hi", profile: "player", condition: "R == 'hi'"),
+        {"type": "TEXT", "id": "after", "text": "ok", "profile": "nora:0"},
+        choice([{"text": "Type \"sorry\""}, {"text": "Close the app"}], silent: true),
+        _text("sorry_", profile: "player"),
+        ending,
+      ], scene: chat),
+    };
+
+    final issues = await _lint(files);
+    expect(issues, [
+      "warning index.json #0 choices[0]  Option 1 is sent as the player's message and a player line follows it, "
+          "so the message shows twice. Mark the option silent",
+    ], reason: "the silent option and the silent choice aren't reported, nor an option jumping to Nora's line");
+
+    final engine = RealFsseEngine(_FakeEngineLoader(files));
+    var item = await engine.next() as ChoiceItemType;
+    expect([for (final option in item.choices) option.silent], [false, true, false]);
+    await engine.next(prevResult: ItemResult.choice("R", item.choices[1]));
+    expect(engine.history.where((entry) => entry.isPlayer), isEmpty, reason: "a silent option sends nothing");
+    expect(engine.dataMap["R"], "quiet", reason: "it still stores its value");
+
+    item = await engine.next() as ChoiceItemType;
+    expect(item.choices.every((option) => option.silent), isTrue, reason: "a silent choice makes every option silent");
+    await engine.next(prevResult: ItemResult.choice(null, item.choices.first));
+    expect([for (final entry in engine.history) if (entry.isPlayer) entry.playerText.toString()], isEmpty);
+
+    final loud = RealFsseEngine(_FakeEngineLoader(files));
+    final first = await loud.next() as ChoiceItemType;
+    await loud.next(prevResult: ItemResult.choice("R", first.choices.first));
+    expect(loud.history.where((entry) => entry.isPlayer).length, 1, reason: "other options still send their text");
+  });
+
   group('cerita command', () {
     late Directory story;
 

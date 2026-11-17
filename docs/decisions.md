@@ -552,6 +552,25 @@ screen itself and the subtitle stay in English.
 - **Revisit if** the demo gets more app strings or more languages. Then a demo strings class like
   `CeritaStrings` would be cleaner than a map.
 
+## Choice options can be silent
+
+*2026-11-17. Data schema §4.4, authoring tools §1. Found in the Last Seen M1 playtest.*
+
+In a chat, the picked option is always sent as the player's message. Last Seen's prologue has a choice whose
+options are actions ("Type \"sorry\"", "Close the app"), so the action itself showed up as a sent bubble. Three
+other chats write the reply as an option and then as a scripted player line with chat casing and a send sound,
+so it showed up twice. Options and choices now take `silent`, which sends nothing, and the linter warns when a
+chat option that isn't silent is followed by a player line.
+
+- **Why a flag and not a rule:** the engine can't tell an action from a message, and a scripted line right after
+  a choice is sometimes a different line on purpose. A flag keeps the author in charge, and the lint warning
+  catches the common mistake.
+- **Why not drop the scripted lines instead:** they carry the chat voice (lower case, slang) and the send sound,
+  which the option text shown on a button shouldn't have.
+- **Cost:** one more flag to remember. The warning covers the case that matters.
+- **Revisit if** authors want a reply that differs from the button text without a scripted line, e.g. a
+  `reply` field per option.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

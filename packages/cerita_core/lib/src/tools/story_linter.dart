@@ -328,6 +328,17 @@ class StoryLinter {
 
       StoryLink.of(conversation).forEach(target);
       _deadItems(conversation, (index) => warn(key, index, "Never reached: it follows a JUMP or RETURN"));
+      if (conversation.hasScene && conversation.scene.mode == SceneMode.chat) {
+        _doubleReplies(
+          conversation,
+          (index, option) => warn(
+              key,
+              index,
+              "Option ${option + 1} is sent as the player's message and a player line follows it, so the message "
+              "shows twice. Mark the option silent",
+              ["choices", option]),
+        );
+      }
     }
 
     final graph = StoryGraph(conversations);
@@ -511,6 +522,26 @@ class StoryLinter {
 
   /// Reports the first item of each run that can't be reached: right after an unconditional JUMP,
   /// RETURN or BRANCH with a fallback, without an `id` a target could use.
+  /// In a chat, a picked option is sent as the player's message. Reports options that are followed by a player
+  /// line anyway (the next item, or the `#label` they jump to), which would send the message twice.
+  static void _doubleReplies(Conversation conversation, void Function(int index, int option) report) {
+    final items = conversation.conversations;
+    for (final (index, item) in items.indexed) {
+      if (item is! ChoiceItemType || item is EvidenceItemType) continue;
+      for (final option in item.choices) {
+        if (option.silent) continue;
+        final target = option.target;
+        final next = switch (target) {
+          null => index + 1,
+          final target when target.startsWith("#") => items.indexWhere((other) => other.id == target.substring(1)),
+          _ => -1,
+        };
+        final follower = next >= 0 && next < items.length ? items[next] : null;
+        if (follower is TextItemType && (follower.getProfileInfo()?.isPlayer ?? false)) report(index, option.index);
+      }
+    }
+  }
+
   static void _deadItems(Conversation conversation, void Function(int index) report) {
     var dead = false;
     var reported = false;

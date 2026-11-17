@@ -26,7 +26,8 @@ class ChoiceItemType extends ItemType {
         choices = choices ??
             [
               for (final (index, raw) in (json["choices"] as List<dynamic>? ?? const []).indexed)
-                Choice.fromJson(Map<String, dynamic>.from(raw as Map), index: index, localizer: localizer),
+                Choice.fromJson(Map<String, dynamic>.from(raw as Map),
+                    index: index, localizer: localizer, silent: json["silent"] as bool? ?? false),
             ];
 
   ChoiceItemType._copy(ChoiceItemType source, this.choices)
@@ -93,6 +94,10 @@ class Choice {
   /// Marks the option as unlocked by past runs (`memory_marker`). The UI shows a marker while it is available.
   final bool memoryMarker;
 
+  /// Picking it sends no reply: the transcript, chat thread and backlog get no player line (`silent`). For
+  /// options that are actions, not words, or that a scripted player line repeats right after.
+  final bool silent;
+
   /// The option text in every language, kept for the transcript. Null for a choice built in code.
   final LocalizedText? localizedText;
 
@@ -111,12 +116,14 @@ class Choice {
     this.index = 0,
     this.once = false,
     this.memoryMarker = false,
+    this.silent = false,
     this.localizedText,
     this.locked = false,
     this.chosen = false,
   });
 
-  factory Choice.fromJson(Map<String, dynamic> json, {int index = 0, Localizer localizer = const Localizer()}) {
+  factory Choice.fromJson(Map<String, dynamic> json,
+      {int index = 0, Localizer localizer = const Localizer(), bool silent = false}) {
     final text = LocalizedText.fromJson(json["text"]) ?? (throw FormatException("Missing 'text'", json));
     return Choice(
       localizer.resolve(text),
@@ -128,6 +135,7 @@ class Choice {
       index: index,
       once: json["once"] as bool? ?? false,
       memoryMarker: json["memory_marker"] as bool? ?? false,
+      silent: json["silent"] as bool? ?? silent,
       localizedText: text,
     );
   }
@@ -145,6 +153,7 @@ class Choice {
         index: index,
         once: once,
         memoryMarker: memoryMarker,
+        silent: silent,
         localizedText: localizedText,
         locked: locked ?? this.locked,
         chosen: chosen ?? this.chosen,

@@ -89,7 +89,7 @@ dinda typing=3.4s sfx=sfx_msg_receive.mp3
   id: maaf jam segini. lo masih pake nomor ini kan?
   en: sorry it's so late. you still use this number right?
 
-choice FIRST_REPLY by=dinda
+choice FIRST_REPLY by=dinda silent
   id: Dinda masih mengetik...
   en: Dinda is still typing...
 ? Din? Ada apa? | Din? What's going on?

@@ -239,13 +239,16 @@ class ScriptParser {
   }
 
   ItemNode? _choiceItem(_Statement st) {
+    // Read before the variable, so `choice silent` isn't taken as a variable named "silent".
+    final silent = st.flag("silent");
     final variable = st.next();
     if (variable != null && !variablePattern.hasMatch(variable)) {
       _error(st.span, "Invalid variable name '$variable'");
     }
     return ChoiceItem(st.span, variable)
       ..by = st.profile("by")
-      ..timeoutMs = st.duration("timeout");
+      ..timeoutMs = st.duration("timeout")
+      ..silent = silent;
   }
 
   ItemNode? _evidenceItem(_Statement st) {
@@ -343,6 +346,8 @@ class ScriptParser {
         option.once = true;
       } else if (inner == "memory_marker") {
         option.memoryMarker = true;
+      } else if (inner == "silent") {
+        option.silent = true;
       } else if (inner.startsWith("if ")) {
         if (option.condition != null) _error(span, "An option has only one [if]");
         option.condition = inner.substring(3).trim();

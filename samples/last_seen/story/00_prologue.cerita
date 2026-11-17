@@ -201,7 +201,7 @@ sekar typing=3.8s sfx=sfx_msg_receive.mp3
   id: kalau lo berubah pikiran, sabtu jam 5 pagi. dermaga muara angke. gue tunggu sampai jam 6
   en: if you change your mind, saturday 5am. muara angke pier. i'll wait until 6
 
-choice UNSENT by=sekar
+choice UNSENT by=sekar silent
   id: Balas Sekar?
   en: Reply to Sekar?
 ? Ketik "maaf" | Type "sorry"

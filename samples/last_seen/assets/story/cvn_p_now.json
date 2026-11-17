@@ -70,6 +70,7 @@
       },
       "variable": "FIRST_REPLY",
       "profile": "dinda:0",
+      "silent": true,
       "choices": [
         {
           "text": {

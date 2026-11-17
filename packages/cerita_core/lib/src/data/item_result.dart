@@ -49,13 +49,14 @@ class ItemResult {
         presentedClue = null,
         evidenceTimedOut = false;
 
+  /// A [Choice.silent] option has no [text], so nothing is sent as the player's reply.
   ItemResult.choice(this.variable, Choice choice)
       : value = choice.value ?? TextMarkup.plain(choice.text),
         effects = choice.effects,
         target = choice.target,
-        text = TextMarkup.plain(choice.text),
+        text = choice.silent ? null : TextMarkup.plain(choice.text),
         choiceIndex = choice.index,
-        localizedText = choice.localizedText?.map(TextMarkup.plain),
+        localizedText = choice.silent ? null : choice.localizedText?.map(TextMarkup.plain),
         presentedClue = null,
         evidenceTimedOut = false;
 

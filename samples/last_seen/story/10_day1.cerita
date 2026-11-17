@@ -882,7 +882,7 @@ wulan typing=6s sfx=sfx_msg_receive.mp3
   id: Sekar dulu sering cerita soal kamu. Setahun ini juga. Dia bilang, "Raka itu kalau takut suka lari, Bu. Tapi dia selalu balik."
   en: Sekar used to talk about you a lot. This past year too. She said, "Raka runs when he's scared, Mom. But he always comes back."
 
-choice WULAN_REPLY by=wulan
+choice WULAN_REPLY by=wulan silent
   id: Balas Bu Wulan.
   en: Reply to Mrs. Wulan.
 ? Saya bakal cari Sekar sampai ketemu, Tante. | I'll keep looking for Sekar until I find her, Auntie.
@@ -933,7 +933,7 @@ unknown typing=3.6s sfx=sfx_msg_receive.mp3
   en: stop looking. for her sister's sake
   clue threat_message
 
-choice THREAT_REPLY by=unknown timeout=15s
+choice THREAT_REPLY by=unknown timeout=15s silent
   id: Tangan gue dingin.
   en: My hands go cold.
 ? siapa ini? | who is this?

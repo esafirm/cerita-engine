@@ -234,6 +234,7 @@ Presents interactive options to the player. Choices can mutate state variables, 
 }
 ```
 - `once` (`bool`, default `false`): The choice disappears for the rest of the playthrough after it is picked, for "ask everything" hub menus that loop back on themselves. A `CHOICE` left with no visible options is skipped.
+- `silent` (`bool`, default `false`): Picking the option sends no reply. Normally the chosen option becomes the player's line: a sent bubble in a chat, and a line in the backlog. Use it for options that are actions, not words (`Close the app`, `Screenshot it, say nothing`), and for options a scripted player line repeats right after. `"silent": true` on the `CHOICE` itself makes every option silent. The option's `value`, `effects` and `target` apply as usual.
 - Choices picked in any earlier playthrough are flagged `chosen` so the UI can mark them.
 - A choice whose `condition` fails is shown locked, unless the condition reads cross-playthrough memory
   (`meta.ending.*` or `meta.flag.*`). Then it is left out, so past-run rewards don't show up as locks on a first

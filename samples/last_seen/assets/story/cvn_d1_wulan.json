@@ -62,6 +62,7 @@
       },
       "variable": "WULAN_REPLY",
       "profile": "wulan",
+      "silent": true,
       "choices": [
         {
           "text": {
