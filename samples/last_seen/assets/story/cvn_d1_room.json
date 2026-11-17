@@ -77,11 +77,26 @@
     },
     {
       "type": "NARRATION",
-      "id": "room_look",
       "text": {
         "id": "Gue berdiri di tengah kamar. Dari mana mulainya?",
         "en": "I stand in the middle of the room. Where do I start?"
       }
+    },
+    {
+      "type": "NARRATION",
+      "id": "room_look",
+      "condition": "room_looked >= 3 && clue_missing_recorder != true && nudged_shelf != true",
+      "text": {
+        "id": "Rak alat rekamannya belum gue sentuh. Dulu itu pojok kamar ini yang paling gue hafal.",
+        "en": "I haven't touched her gear shelf yet. That used to be the corner of this room I knew best."
+      },
+      "effects": [
+        {
+          "variable": "nudged_shelf",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "CHOICE",
@@ -91,12 +106,14 @@
       },
       "variable": "ROOM",
       "profile": "raka:0",
+      "silent": true,
       "choices": [
         {
           "text": {
             "id": "Meja kerjanya",
             "en": "Her desk"
           },
+          "value": "desk",
           "once": true,
           "effects": [
             {
@@ -112,6 +129,7 @@
             "id": "Papan gabus di dinding",
             "en": "The corkboard on the wall"
           },
+          "value": "corkboard",
           "once": true,
           "effects": [
             {
@@ -127,6 +145,7 @@
             "id": "Rak alat rekaman",
             "en": "The recording gear shelf"
           },
+          "value": "shelf",
           "once": true,
           "effects": [
             {
@@ -142,6 +161,7 @@
             "id": "Bingkai foto di samping kasur",
             "en": "The photo frame by the bed"
           },
+          "value": "photo",
           "once": true,
           "effects": [
             {
@@ -157,6 +177,7 @@
             "id": "Jendela",
             "en": "The window"
           },
+          "value": "window",
           "once": true,
           "target": "#window"
         },
@@ -165,7 +186,8 @@
             "id": "Cukup. Turun ke Dinda.",
             "en": "That's enough. Go down to Dinda."
           },
-          "condition": "room_looked >= 3",
+          "value": "leave",
+          "condition": "room_looked >= 3 && clue_missing_recorder == true",
           "target": "#room_done"
         }
       ]
@@ -215,6 +237,7 @@
       },
       "variable": "NOTEBOOK",
       "profile": "raka:2",
+      "silent": true,
       "choices": [
         {
           "text": {
@@ -313,9 +336,17 @@
     {
       "type": "NARRATION",
       "text": {
-        "id": "Di sebelahnya ada foto Sekar dan cewek berambut cokelat panjang, dua-duanya pake headset, ketawa di depan mic. Di bawahnya ditulis, \"Suara Pesisir, Ep. 1. Kita & Tasya!!\"",
-        "en": "Next to it is a photo of Sekar and a girl with long brown hair, both in headsets, laughing in front of a mic. Underneath, it says, \"Suara Pesisir, Ep. 1. Us & Tasya!!\""
+        "id": "Di sebelahnya ada foto Sekar dan cewek berambut cokelat panjang, dua-duanya pake headset, ketawa di depan mic. Di bawahnya ditulis, \"Suara Pesisir resmi berdua!! Welcome, Tasya\"",
+        "en": "Next to it is a photo of Sekar and a girl with long brown hair, both in headsets, laughing in front of a mic. Underneath, it says, \"Suara Pesisir is officially a duo!! Welcome, Tasya\""
       }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tasya. Co-host yang gabung abis gue pergi. Gue nggak pernah ketemu dia. Gue cuma kenal suaranya, dari episode-episode yang gue dengerin diem-diem.",
+        "en": "Tasya. The co-host who joined after I left. I've never met her. I only know her voice, from the episodes I listen to when no one's looking."
+      },
+      "profile": "raka:0"
     },
     {
       "type": "JUMP",

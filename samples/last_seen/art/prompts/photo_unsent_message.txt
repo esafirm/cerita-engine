@@ -1,6 +1,9 @@
-A phone photo of another phone's screen, taken at night in a bedroom, slightly blurry with a little glare. The screen
-shows a dark-mode chat app with a single outgoing message bubble on the right that reads exactly:
+A phone photo of another phone's lock screen, taken in the afternoon in a dim bedroom, slightly blurry with a little
+glare. The phone is locked: no chat app is open. Big white clock "14.06" near the top. The lock screen wallpaper is a
+photo of a wooden fishing boat at a pier at dawn, orange sky, grey sea. In the status bar, a nearly empty red battery
+icon with "9%". Below the clock, one notification card from a plain messaging app (generic speech bubble icon, no brand)
+with the bold title "Pesan gagal terkirim", a small line "Ke: Raka", and the preview text that reads exactly:
 "Ka. Inget jam lima pagi itu? Gue masih di sana."
-Under the bubble, a small red exclamation mark icon and the tiny text "Tidak terkirim". The chat header at the top
-says "Raka". The phone lies on a messy desk next to a tangled earphone cable. Realistic phone-photo look, not anime.
-Portrait 4:5.
+Under it, a small red exclamation mark icon and the tiny text "Kuota habis". At the bottom of the screen, a small
+padlock icon. The phone lies in an old cracked clear case on a messy desk next to a tangled charging cable. Realistic
+phone-photo look, not anime. Portrait 4:5.

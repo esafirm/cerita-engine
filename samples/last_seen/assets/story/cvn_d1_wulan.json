@@ -37,8 +37,8 @@
     {
       "type": "TEXT",
       "text": {
-        "id": "Maaf Tante belum bisa keluar kamar. Tante dengar suaramu dari tadi siang. Terima kasih sudah datang jauh-jauh.",
-        "en": "I'm sorry I haven't been able to leave my room. I've heard your voice since this afternoon. Thank you for coming all this way."
+        "id": "Maaf Tante belum bisa keluar kamar. Tante dengar suaramu dari tadi pagi. Terima kasih sudah datang jauh-jauh.",
+        "en": "I'm sorry I haven't been able to leave my room. I've heard your voice since this morning. Thank you for coming all this way."
       },
       "profile": "wulan",
       "typing_delay_ms": 5200,

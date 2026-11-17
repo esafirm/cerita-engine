@@ -100,7 +100,7 @@
       "type": "TEXT",
       "text": {
         "id": "Saya tahu, Dik. Tapi saya butuh sesuatu yang bisa saya tulis di laporan. Bukan perasaan.",
-        "en": "I know. But I need something I can put in a report. Not a feeling."
+        "en": "I know, Dinda. But I need something I can put in a report. Not a feeling."
       },
       "profile": "yusuf:3"
     },
@@ -375,7 +375,8 @@
             "id": "(Diam.)",
             "en": "(Say nothing.)"
           },
-          "value": "silent"
+          "value": "silent",
+          "silent": true
         }
       ]
     },

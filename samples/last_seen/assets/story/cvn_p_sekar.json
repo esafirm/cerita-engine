@@ -1,0 +1,39 @@
+{
+  "conversation_id": "cvn_p_sekar",
+  "chapter": {
+    "id": "Prolog",
+    "en": "Prologue"
+  },
+  "title": {
+    "id": "Terakhir Dilihat",
+    "en": "Last Seen"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_sekar",
+    "day": 0,
+    "time": "02:23",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue buka chat Sekar. Setahun nggak gue sentuh.",
+        "en": "I open Sekar's chat. I haven't touched it in a year."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sekar terakhir dilihat 3 hari yang lalu",
+        "en": "Sekar was last seen 3 days ago"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d1_house"
+    }
+  ]
+}

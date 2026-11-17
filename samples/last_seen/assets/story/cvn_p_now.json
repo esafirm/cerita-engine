@@ -25,14 +25,6 @@
       }
     },
     {
-      "type": "NARRATION",
-      "style": "system",
-      "text": {
-        "id": "Nomor ini menyimpan kontak kamu sebagai \"Raka (temen Kak Sekar)\"",
-        "en": "This number saved you as \"Raka (Sekar's friend)\""
-      }
-    },
-    {
       "type": "TEXT",
       "text": {
         "id": "ka",

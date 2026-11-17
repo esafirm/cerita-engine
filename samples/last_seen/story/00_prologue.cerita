@@ -53,12 +53,12 @@ choice BANTER by=sekar:smile
   en: Sekar bumps your shoulder.
 ? "Oke. Gue dengerin." | "Okay. I'm listening."
   value listen
-? "Dua ratus pendengar, Kar. Sembilan puluhnya bokap lo." | "Two hundred listeners, Kar. Ninety of them are your dad."
+? "Dua ratus pendengar, Kar. Sembilan puluhnya nyokap lo." | "Two hundred listeners, Kar. Ninety of them are your mom."
   value tease
 
 sekar:laugh [if BANTER == 'tease']
-  id: Bokap gue cuma satu orang, ya. Walaupun dia punya tiga akun.
-  en: My dad is one person, thank you. Even if he has three accounts.
+  id: Nyokap gue cuma satu orang, ya. Walaupun dia punya tiga akun, dan tiga-tiganya ngasih bintang lima.
+  en: My mom is one person, thank you. Even if she has three accounts, and all three leave five stars.
 sekar:smile [if BANTER == 'listen']
   id: Tumben. Catet tanggalnya.
   en: That's a first. Write down the date.
@@ -152,7 +152,7 @@ choice FALLOUT by=sekar:serious timeout=12s
   value cruel
 ? "Nggak semua orang bisa hidup dari mimpi." | "Not everyone gets to live on dreams."
   value cold
-? (Nggak usah jawab.) | (Don't answer.) [default]
+? (Nggak usah jawab.) | (Don't answer.) [default] [silent]
   value silent
 
 sekar:scared [if FALLOUT == 'cruel']

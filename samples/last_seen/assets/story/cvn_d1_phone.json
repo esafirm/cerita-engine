@@ -85,13 +85,16 @@
         "en": "Enter the four-digit code."
       },
       "variable": "PASSCODE",
-      "profile": "dinda:0"
+      "profile": "dinda:0",
+      "keyboard": "digits",
+      "min_length": 4,
+      "max_length": 4
     },
     {
       "type": "BRANCH",
       "branches": [
         {
-          "condition": "PASSCODE == '0530' || PASSCODE == '05:30' || PASSCODE == '05.30'",
+          "condition": "PASSCODE == '0530'",
           "target": "#unlocked"
         },
         {
@@ -359,8 +362,8 @@
       "type": "NARRATION",
       "condition": "PHONE_PLAN == 'rush'",
       "text": {
-        "id": "Gue buka chat Bima. Layar langsung meredup. \"Baterai lemah.\" Lalu mati.",
-        "en": "I open Bima's chat. The screen dims at once. \"Battery low.\" Then it dies."
+        "id": "Gue pencet chat Bima. Belum sempet kebuka, layarnya meredup. \"Baterai lemah.\" Lalu mati.",
+        "en": "I tap Bima's chat. Before it even opens, the screen dims. \"Battery low.\" Then it dies."
       }
     },
     {

@@ -1,9 +1,9 @@
 # Raka's chat threads.
 
+# No fixed status: the thread spans a year, so a "last seen" here would be wrong in one scene or another.
 thread_sekar:
   name: Sekar
   avatar: assets/story/sprites/sekar_avatar.webp
-  status: { id: terakhir dilihat Sabtu 06.12, en: last seen Saturday 6:12 AM }
   members: [sekar]
 
 thread_dinda:

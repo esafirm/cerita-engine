@@ -5,8 +5,8 @@
     "en": "Prologue"
   },
   "title": {
-    "id": "Terakhir Dilihat",
-    "en": "Last Seen"
+    "id": "Pesan Terakhir",
+    "en": "The Last Message"
   },
   "scene": {
     "mode": "CHAT",
@@ -17,22 +17,12 @@
   },
   "conversations": [
     {
-      "type": "TEXT",
-      "text": {
-        "id": "Jl. Pluit Karang Indah 7 no. 12",
-        "en": "Jl. Pluit Karang Indah 7 no. 12"
-      },
-      "profile": "dinda:0",
-      "typing_delay_ms": 2000,
-      "sfx": "sfx_msg_receive.mp3"
-    },
-    {
       "type": "MEDIA",
       "media_type": "IMAGE",
       "uri": "photo_unsent_message.webp",
       "caption": {
-        "id": "ini screenshot dari HP cadangannya",
-        "en": "screenshot from her spare phone"
+        "id": "gue fotoin layar HP cadangannya",
+        "en": "took a pic of her spare phone's screen"
       },
       "profile": "dinda:0",
       "unlock_id": "photo_unsent_message",
@@ -78,23 +68,8 @@
       "sfx": "sfx_msg_receive.mp3"
     },
     {
-      "type": "NARRATION",
-      "text": {
-        "id": "Gue buka chat Sekar. Setahun nggak gue sentuh.",
-        "en": "I open Sekar's chat. I haven't touched it in a year."
-      }
-    },
-    {
-      "type": "NARRATION",
-      "style": "system",
-      "text": {
-        "id": "Sekar terakhir dilihat 3 hari yang lalu",
-        "en": "Sekar was last seen 3 days ago"
-      }
-    },
-    {
       "type": "JUMP",
-      "target": "d1_house"
+      "target": "p_sekar"
     }
   ]
 }

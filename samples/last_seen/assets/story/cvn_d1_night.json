@@ -26,10 +26,9 @@
     },
     {
       "type": "NARRATION",
-      "style": "system",
       "text": {
-        "id": "Gue tidur di sofa ruang tamu. HP cadangan Sekar udah delapan puluh persen. Gue belum berani buka chat apa pun.",
-        "en": "I'm sleeping on the living room sofa. Sekar's spare phone is at eighty percent. I haven't dared open any chat yet."
+        "id": "Gue rebahan di sofa ruang tamu, nggak bisa tidur. HP cadangan Sekar udah delapan puluh persen. Gue belum berani buka chat lain selain chat gue sendiri.",
+        "en": "I'm lying on the living room sofa, unable to sleep. Sekar's spare phone is at eighty percent. I haven't dared open any chat but my own."
       }
     },
     {
@@ -78,7 +77,7 @@
       "profile": "unknown",
       "timeout_ms": 15000,
       "silent": true,
-      "default_choice": 2,
+      "default_choice": 3,
       "choices": [
         {
           "text": {
@@ -107,6 +106,13 @@
             "en": "touch dinda and i'll find you first"
           },
           "value": "threaten"
+        },
+        {
+          "text": {
+            "id": "(Nggak bales.)",
+            "en": "(Don't reply.)"
+          },
+          "value": "ignore"
         }
       ]
     },
@@ -132,11 +138,28 @@
     },
     {
       "type": "NARRATION",
-      "condition": "THREAT_REPLY != 'quiet'",
+      "condition": "THREAT_REPLY == 'ask' || THREAT_REPLY == 'threaten'",
       "style": "system",
       "text": {
         "id": "Dibaca 23.59",
         "en": "Read 11:59 PM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THREAT_REPLY == 'quiet'",
+      "style": "system",
+      "text": {
+        "id": "Tangkapan layar disimpan",
+        "en": "Screenshot saved"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THREAT_REPLY == 'ignore'",
+      "text": {
+        "id": "Gue nggak bales. HP-nya gue taruh telungkup di dada. Layarnya masih nyala, nembus ke kaos gue.",
+        "en": "I don't reply. I lay the phone face down on my chest. The screen is still lit, glowing through my shirt."
       }
     },
     {

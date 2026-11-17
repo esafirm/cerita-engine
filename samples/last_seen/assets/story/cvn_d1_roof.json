@@ -80,9 +80,19 @@
     },
     {
       "type": "TEXT",
+      "condition": "FALLOUT != 'silent'",
       "text": {
         "id": "Kak Sekar nggak pernah cerita. Dia cuma bilang, \"Raka ngomong sesuatu yang bener, dan itu yang bikin sakit.\"",
         "en": "Sekar never told me. She just said, \"Raka said something true, and that's what hurt.\""
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "FALLOUT == 'silent'",
+      "text": {
+        "id": "Kak Sekar nggak pernah cerita. Dia cuma bilang, \"Raka nggak ngomong apa-apa, dan itu yang bikin sakit.\"",
+        "en": "Sekar never told me. She just said, \"Raka didn't say anything, and that's what hurt.\""
       },
       "profile": "dinda:3"
     },
@@ -94,11 +104,12 @@
       },
       "variable": "ROOF_TRUTH",
       "profile": "dinda:0",
+      "silent": true,
       "choices": [
         {
           "text": {
-            "id": "Ceritain semuanya. Termasuk yang lo omongin.",
-            "en": "Tell her everything. Including what you said."
+            "id": "Ceritain semuanya. Termasuk bagian gue.",
+            "en": "Tell her everything. Including my part."
           },
           "value": "truth",
           "target": "#truth"

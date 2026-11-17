@@ -84,6 +84,7 @@
       },
       "variable": "PLAY_EP",
       "profile": "raka:5",
+      "silent": true,
       "choices": [
         {
           "text": {
@@ -116,6 +117,7 @@
         "en": "Hi, Suara Pesisir listeners. I'm Sekar, and this is episode eleven. Tonight we're talking with the women who shell mussels in Muara Angke."
       },
       "profile": "sekar:0",
+      "offstage": true,
       "voice": "vo_p_sekar_01.mp3"
     },
     {
@@ -125,6 +127,7 @@
         "en": "They work from before dawn, their hands covered in tiny cuts, and every year there are fewer mussels. Why? Well. That's what we're going to find out."
       },
       "profile": "sekar:0",
+      "offstage": true,
       "voice": "vo_p_sekar_02.mp3"
     },
     {
@@ -141,6 +144,7 @@
         "en": "Oh, and. I'm working on episode twelve. This one is... different. Wish me luck."
       },
       "profile": "sekar:0",
+      "offstage": true,
       "voice": "vo_p_sekar_03.mp3"
     },
     {

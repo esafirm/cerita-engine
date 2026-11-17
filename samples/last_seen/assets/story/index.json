@@ -156,8 +156,8 @@
         },
         {
           "text": {
-            "id": "\"Dua ratus pendengar, Kar. Sembilan puluhnya bokap lo.\"",
-            "en": "\"Two hundred listeners, Kar. Ninety of them are your dad.\""
+            "id": "\"Dua ratus pendengar, Kar. Sembilan puluhnya nyokap lo.\"",
+            "en": "\"Two hundred listeners, Kar. Ninety of them are your mom.\""
           },
           "value": "tease"
         }
@@ -167,8 +167,8 @@
       "type": "TEXT",
       "condition": "BANTER == 'tease'",
       "text": {
-        "id": "Bokap gue cuma satu orang, ya. Walaupun dia punya tiga akun.",
-        "en": "My dad is one person, thank you. Even if he has three accounts."
+        "id": "Nyokap gue cuma satu orang, ya. Walaupun dia punya tiga akun, dan tiga-tiganya ngasih bintang lima.",
+        "en": "My mom is one person, thank you. Even if she has three accounts, and all three leave five stars."
       },
       "profile": "sekar:2"
     },
@@ -402,7 +402,8 @@
             "id": "(Nggak usah jawab.)",
             "en": "(Don't answer.)"
           },
-          "value": "silent"
+          "value": "silent",
+          "silent": true
         }
       ]
     },

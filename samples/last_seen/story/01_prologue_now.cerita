@@ -29,7 +29,7 @@ narration
   id: Pendengarnya udah dua kali lipat. Gue nggak tahu harus ngerasa apa soal itu.
   en: Her listeners have doubled. I don't know how to feel about that.
 
-choice PLAY_EP by=raka:sad
+choice PLAY_EP by=raka:sad silent
   id: Putar episodenya?
   en: Play the episode?
 ? Putar. | Play it.
@@ -41,11 +41,11 @@ narration [if PLAY_EP == 'close']
   id: Kursor gue udah di tanda silang. Udah setahun kursor gue di situ.{w} Jari gue malah ngeklik tombol putar.
   en: My cursor is already on the X. It's been there for a year.{w} My finger clicks play instead.
 
-sekar voice=vo_p_sekar_01.mp3
+sekar voice=vo_p_sekar_01.mp3 [offstage]
   id: Halo, pendengar Suara Pesisir. Gue Sekar, dan ini episode sebelas. Malam ini kita ngobrol sama ibu-ibu pengupas kerang di Muara Angke.
   en: Hi, Suara Pesisir listeners. I'm Sekar, and this is episode eleven. Tonight we're talking with the women who shell mussels in Muara Angke.
   delivery: bright podcast intro, a little playful, recorded close to the mic
-sekar voice=vo_p_sekar_02.mp3
+sekar voice=vo_p_sekar_02.mp3 [offstage]
   id: Mereka kerja dari subuh, tangannya penuh luka kecil, dan tiap tahun kerangnya makin sedikit. Kenapa? Nah. Itu yang mau kita cari tahu.
   en: They work from before dawn, their hands covered in tiny cuts, and every year there are fewer mussels. Why? Well. That's what we're going to find out.
   delivery: warm, then curious, leaning in on the question
@@ -54,7 +54,7 @@ narration
   id: Audionya bersih. Anginnya nggak bunyi kayak pesawat jatuh.{w} Siapa pun yang ngedit sekarang, dia lebih rajin dari gue.
   en: The audio is clean. The wind doesn't sound like a plane crash.{w} Whoever edits it now is more careful than I ever was.
 
-sekar voice=vo_p_sekar_03.mp3
+sekar voice=vo_p_sekar_03.mp3 [offstage]
   id: Oh iya. Episode dua belas lagi gue garap. Yang ini... beda. Doain ya.
   en: Oh, and. I'm working on episode twelve. This one is... different. Wish me luck.
   delivery: the playfulness drops, quieter, almost nervous
@@ -75,9 +75,6 @@ narration
 timestamp
   id: Bandung, 02.14
   en: Bandung, 2:14 AM
-system
-  id: Nomor ini menyimpan kontak kamu sebagai "Raka (temen Kak Sekar)"
-  en: This number saved you as "Raka (Sekar's friend)"
 
 dinda typing=1.8s sfx=sfx_msg_receive.mp3
   id: ka
@@ -191,17 +188,17 @@ choice ANSWER by=dinda timeout=10s
   +trust_dinda 5
 ? Nggak tahu. Tapi gue ke sana besok. | No idea. But I'll come tomorrow.
   value tomorrow
-? ... | ... [default]
+? ... | ... [default] [silent]
   value silent
   -trust_dinda 2
 
 dinda voice=vo_p_dinda_10.mp3 [if ANSWER == 'now']
-  id: Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue kirim alamatnya.
-  en: Now? It's two in the morning, Ka.{w} ...Okay. I'll send the address.
+  id: Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue tunggu di rumah.
+  en: Now? It's two in the morning, Ka.{w} ...Okay. I'll be waiting at home.
   delivery: stunned, then relieved
 dinda voice=vo_p_dinda_11.mp3 [if ANSWER == 'tomorrow']
-  id: Oke. Gue kirim alamatnya. Jangan nggak dateng.
-  en: Okay. I'll send the address. Don't not show up.
+  id: Oke. Gue tunggu di rumah. Jangan nggak dateng.
+  en: Okay. I'll be at home, waiting. Don't not show up.
   delivery: wary, half joking
 dinda voice=vo_p_dinda_12.mp3 [if ANSWER == 'silent']
   id: Ka? Halo? ...Dia selalu bilang lo kabur kalau ada yang berat. Jangan kali ini.
@@ -209,21 +206,18 @@ dinda voice=vo_p_dinda_12.mp3 [if ANSWER == 'silent']
   delivery: frustrated, almost crying
 
 system
-  id: Panggilan berakhir · 04:51
-  en: Call ended · 04:51
+  id: Panggilan berakhir
+  en: Call ended
 
 -> p_after
 
 
-@conversation p_after chapter=Prolog chapter.en=Prologue title="Terakhir Dilihat" title.en="Last Seen"
+@conversation p_after chapter=Prolog chapter.en=Prologue title="Pesan Terakhir" title.en="The Last Message"
 @scene CHAT channel=thread_dinda day=0 time=02:22 music=bgm_low_tide.mp3
 
-dinda typing=2s sfx=sfx_msg_receive.mp3
-  id: Jl. Pluit Karang Indah 7 no. 12
-  en: Jl. Pluit Karang Indah 7 no. 12
 media IMAGE photo_unsent_message.webp by=dinda unlock=photo_unsent_message typing=2.4s sfx=sfx_msg_receive.mp3
-  id: ini screenshot dari HP cadangannya
-  en: screenshot from her spare phone
+  id: gue fotoin layar HP cadangannya
+  en: took a pic of her spare phone's screen
   clue unsent_message
 media IMAGE photo_ep12_teaser.webp by=dinda unlock=photo_ep12_teaser typing=2.8s sfx=sfx_msg_receive.mp3
   id: postingan terakhir dia. 3 hari sebelum ilang
@@ -232,6 +226,12 @@ media IMAGE photo_ep12_teaser.webp by=dinda unlock=photo_ep12_teaser typing=2.8s
 dinda:hopeful typing=1.6s sfx=sfx_msg_receive.mp3 [if trust_dinda >= 5]
   id: makasih ka
   en: thanks ka
+
+-> p_sekar
+
+
+@conversation p_sekar chapter=Prolog chapter.en=Prologue title="Terakhir Dilihat" title.en="Last Seen"
+@scene CHAT channel=thread_sekar day=0 time=02:23 music=bgm_low_tide.mp3
 
 narration
   id: Gue buka chat Sekar. Setahun nggak gue sentuh.

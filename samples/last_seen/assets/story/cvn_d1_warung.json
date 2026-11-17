@@ -217,7 +217,7 @@
       "type": "TEXT",
       "text": {
         "id": "Nggak tahu. \"Orang PT\", katanya. Nawarin duit gede buat \"konten positif soal pembangunan pesisir\". Kak Sekar nolak. Tasya pengen terima.",
-        "en": "No idea. \"Some company guy,\" she said. Offered big money for \"positive content about coastal development\". Sekar said no. Tasya wanted to take it."
+        "en": "No idea. \"Some PT company guy,\" she said. Offered big money for \"positive content about coastal development\". Sekar said no. Tasya wanted to take it."
       },
       "profile": "dinda:0"
     },
@@ -246,10 +246,18 @@
     {
       "type": "NARRATION",
       "id": "lunch_more",
+      "condition": "lunch_served != true",
       "text": {
         "id": "Bu Sari naruh dua piring di meja tanpa ditanya. Pesenan yang sama kayak setahun lalu. Gue nggak tahu dia inget atau cuma nebak.",
         "en": "Bu Sari sets two plates down without asking. The same order as a year ago. I don't know if she remembered or just guessed."
-      }
+      },
+      "effects": [
+        {
+          "variable": "lunch_served",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "CHOICE",
@@ -349,6 +357,7 @@
             "en": "(Slide the chili sauce over to her, like you used to for Sekar.)"
           },
           "value": "sambal",
+          "silent": true,
           "effects": [
             {
               "variable": "trust_dinda",

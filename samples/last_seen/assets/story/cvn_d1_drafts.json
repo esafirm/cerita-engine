@@ -103,8 +103,8 @@
     {
       "type": "NARRATION",
       "text": {
-        "id": "Paling bawah, sebelum pesan yang gagal itu, ada satu voice note yang juga belum kekirim. Durasinya empat puluh dua detik.",
-        "en": "At the very bottom, before the failed message, there's a voice note that was never sent either. Forty-two seconds long."
+        "id": "Paling bawah, sebelum pesan yang gagal itu, ada satu voice note yang juga belum kekirim. Durasinya dua puluhan detik.",
+        "en": "At the very bottom, before the failed message, there's a voice note that was never sent either. About twenty seconds long."
       }
     },
     {
@@ -115,6 +115,7 @@
       },
       "variable": "PLAY_VN",
       "profile": "raka:5",
+      "silent": true,
       "choices": [
         {
           "text": {
@@ -140,6 +141,7 @@
         "en": "Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima."
       },
       "profile": "sekar:0",
+      "offstage": true,
       "voice": "vo_unsent_01.mp3"
     },
     {
@@ -150,6 +152,7 @@
         "en": "I found something. Something big. And I think someone leaked that I have it.{w} If I disappear, you'll know where to start."
       },
       "profile": "sekar:0",
+      "offstage": true,
       "voice": "vo_unsent_02.mp3"
     },
     {
@@ -171,8 +174,8 @@
       "type": "NARRATION",
       "condition": "PLAY_VN == 'later'",
       "text": {
-        "id": "Gue kunci layarnya. Empat puluh dua detik. Gue udah setahun nggak denger suaranya langsung ke gue. Empat puluh dua detik lagi bisa nunggu sampai gue siap.",
-        "en": "I lock the screen. Forty-two seconds. I haven't heard her voice talking to me in a year. Forty-two more seconds can wait until I'm ready."
+        "id": "Gue kunci layarnya. Dua puluh detik. Gue udah setahun nggak denger suaranya langsung ke gue. Dua puluh detik lagi bisa nunggu sampai gue siap.",
+        "en": "I lock the screen. Twenty seconds. I haven't heard her voice talking to me in a year. Twenty more seconds can wait until I'm ready."
       }
     },
     {

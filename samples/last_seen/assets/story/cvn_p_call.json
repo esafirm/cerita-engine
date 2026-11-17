@@ -221,6 +221,7 @@
             "en": "..."
           },
           "value": "silent",
+          "silent": true,
           "effects": [
             {
               "variable": "trust_dinda",
@@ -235,8 +236,8 @@
       "type": "TEXT",
       "condition": "ANSWER == 'now'",
       "text": {
-        "id": "Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue kirim alamatnya.",
-        "en": "Now? It's two in the morning, Ka.{w} ...Okay. I'll send the address."
+        "id": "Sekarang? Ini jam dua pagi, Ka.{w} ...Oke. Gue tunggu di rumah.",
+        "en": "Now? It's two in the morning, Ka.{w} ...Okay. I'll be waiting at home."
       },
       "profile": "dinda:0",
       "voice": "vo_p_dinda_10.mp3"
@@ -245,8 +246,8 @@
       "type": "TEXT",
       "condition": "ANSWER == 'tomorrow'",
       "text": {
-        "id": "Oke. Gue kirim alamatnya. Jangan nggak dateng.",
-        "en": "Okay. I'll send the address. Don't not show up."
+        "id": "Oke. Gue tunggu di rumah. Jangan nggak dateng.",
+        "en": "Okay. I'll be at home, waiting. Don't not show up."
       },
       "profile": "dinda:0",
       "voice": "vo_p_dinda_11.mp3"
@@ -265,8 +266,8 @@
       "type": "NARRATION",
       "style": "system",
       "text": {
-        "id": "Panggilan berakhir · 04:51",
-        "en": "Call ended · 04:51"
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
       }
     },
     {

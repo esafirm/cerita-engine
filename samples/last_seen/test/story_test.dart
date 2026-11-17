@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// text typed into each INPUT, in order.
 typedef _Run = ({Map<String, String> picks, List<String> inputs});
 
+/// The answer that lets a timed choice run out, so it takes its `[default]` option.
+const _timeout = "<timeout>";
+
 /// Plays Last Seen headlessly in [locale], so every route and JSON file is exercised. A choice without an
 /// answer in [run] takes its first available option.
 Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
@@ -23,7 +26,15 @@ Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
         result = ItemResult.present(item, clue!);
       case ChoiceItemType():
         final wanted = run.picks[item.variable];
-        final choice = item.availableChoices.firstWhere((c) => c.value == wanted, orElse: () => item.availableChoices.first);
+        if (wanted == _timeout) expect(item.timeoutMs, isNotNull, reason: "${item.variable} has no timer");
+        // "a|b|c" is an order of preference, for hubs that come back to the same choice.
+        final preferred = wanted?.split("|") ?? const <String>[];
+        final choice = wanted == _timeout
+            ? item.timeoutChoice!
+            : [
+                for (final value in preferred) ...item.availableChoices.where((c) => c.value == value),
+                item.availableChoices.first,
+              ].first;
         expect(choice.locked, isFalse, reason: "'${choice.text}' is locked");
         result = ItemResult.choice(item.variable, choice);
       case InputItemType():
@@ -85,6 +96,19 @@ const _Run _cold = (
   inputs: ["1234", "0500", "9999"],
 );
 
+/// Every timed choice left to run out, and a room search that walks past the gear shelf.
+const _Run _timeouts = (
+  picks: {
+    "FALLOUT": _timeout,
+    "ANSWER": _timeout,
+    "ROOM": "photo|desk|corkboard|window|leave",
+    "YUSUF_PROOF": "missing_recorder",
+    "TELL_YUSUF": _timeout,
+    "THREAT_REPLY": _timeout,
+  },
+  inputs: ["0530"],
+);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -109,6 +133,7 @@ void main() {
       expect(engine.dataMap["pass_tries"], isNull, reason: "first try");
       expect(engine.dataMap["yusuf_cctv"], isTrue);
       expect(engine.dataMap["told_dinda_truth"], isTrue);
+      expect(engine.dataMap["threat_screenshot"], isTrue);
       // worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3
       expect(engine.dataMap["trust_dinda"], 30);
       expect(engine.dataMap["trust_yusuf"], 8);
@@ -127,6 +152,22 @@ void main() {
       // alone -3, silent -2, hedge -4, unlocked 3, ferry -3, lie 3, police -3, half -2
       expect(engine.dataMap["trust_dinda"], -11);
       expect(engine.dataMap["clue_sekar_notebook"], isNull);
+    });
+
+    test('timeout run ($locale): timed choices fall back to silence, the room waits for the shelf', () async {
+      final (ending, engine) = await _play(locale, _timeouts);
+      expect(ending.endingId, "end_00_preview");
+      expect(engine.dataMap["FALLOUT"], "silent");
+      expect(engine.dataMap["ANSWER"], "silent");
+      expect(engine.dataMap["TELL_YUSUF"], "silent");
+      expect(engine.dataMap["THREAT_REPLY"], "ignore");
+      expect(engine.dataMap["threat_screenshot"], isNull);
+      // Photo, desk and corkboard make three spots, but leaving stays locked until the shelf is checked.
+      expect(engine.dataMap["nudged_shelf"], isTrue);
+      expect(engine.dataMap["room_looked"], 4);
+      expect(engine.dataMap["clue_missing_recorder"], isTrue);
+      expect(engine.dataMap["yusuf_cctv"], isTrue);
+      expect(engine.dataMap["lunch_served"], isTrue);
     });
   }
 }
