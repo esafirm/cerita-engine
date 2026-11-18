@@ -68,7 +68,7 @@ nora:
   bio: Busy chasing deadlines ☕
   avatar: assets/story/sprites/nora_avatar.png
   height: 165               # How tall, in a unit the whole cast shares. Sizes the sprites against each other
-  face: { eyes: 0.13, chin: 0.21 }  # Eye line and chin on the sprites, as shares of their height from the top
+  head: { top: 0.01, chin: 0.21 }  # Top of the hair and chin on the sprites, as shares of their height
   expressions:
     open: nora_open.png       # Index 0, used when a script names no expression
     frown: nora_frown.png
@@ -77,7 +77,7 @@ nora:
 
 A plain string value stays a plain string in every locale. A `{locale: text}` map gives one text per locale.
 `player` is built in (the player character) and can't be declared. Keys can't be statement keywords (§2.2).
-`height` must be a number above 0. `face` gives `eyes` and `chin` between 0 and 1, the eyes above the chin: measure
+`height` must be a number above 0. `head` gives `top` and `chin` between 0 and 1, the top above the chin: measure
 them on one sprite, in pixels divided by its height (data schema §2).
 The engine schema doesn't change: expression names exist only in the toolkit.
 

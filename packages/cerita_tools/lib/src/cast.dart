@@ -26,8 +26,8 @@ class CastProfile {
   /// `height`: how tall the character is, in any unit the whole cast shares. Sizes the sprites against each other.
   final num? height;
 
-  /// `face`: where the eye line and the chin are on the sprites, as shares of the sprite height from the top.
-  final ({num eyes, num chin})? face;
+  /// `head`: where the top of the hair and the chin are on the sprites, as shares of the sprite height from the top.
+  final ({num top, num chin})? head;
 
   const CastProfile({
     required this.key,
@@ -42,7 +42,7 @@ class CastProfile {
     this.avatar,
     this.avatarSpan,
     this.height,
-    this.face,
+    this.head,
   });
 
   /// The sprite index of [expression], or 0 when it's `null`. `null` when the expression doesn't exist.
@@ -92,7 +92,7 @@ class Cast {
         diagnostics.error(span, "Profile '$key' must be a map");
         return;
       }
-      const known = {"id", "name", "handle", "bio", "avatar", "expressions", "height", "face"};
+      const known = {"id", "name", "handle", "bio", "avatar", "expressions", "height", "head"};
       for (final field in node.nodes.keys.cast<YamlNode>()) {
         if (!known.contains(field.value)) {
           diagnostics.error(yamlSpan(file, field), "Unknown profile field '${field.value}'");
@@ -135,17 +135,17 @@ class Cast {
         return null;
       }
 
-      ({num eyes, num chin})? face() {
-        final faceNode = node.nodes["face"];
-        if (faceNode == null || faceNode.value == null) return null;
-        if (faceNode case YamlMap(
-          value: {"eyes": final num eyes, "chin": final num chin},
-        ) when faceNode.length == 2 && 0 <= eyes && eyes < chin && chin <= 1) {
-          return (eyes: eyes, chin: chin);
+      ({num top, num chin})? head() {
+        final headNode = node.nodes["head"];
+        if (headNode == null || headNode.value == null) return null;
+        if (headNode case YamlMap(
+          value: {"top": final num top, "chin": final num chin},
+        ) when headNode.length == 2 && 0 <= top && top < chin && chin <= 1) {
+          return (top: top, chin: chin);
         }
         diagnostics.error(
-          yamlSpan(file, faceNode),
-          "'face' must give 'eyes' and 'chin' as shares of the sprite height, eyes above chin: { eyes: 0.13, chin: 0.21 }",
+          yamlSpan(file, headNode),
+          "'head' must give 'top' and 'chin' as shares of the sprite height, top above chin: { top: 0.01, chin: 0.21 }",
         );
         return null;
       }
@@ -164,7 +164,7 @@ class Cast {
         sprites: sprites,
         spriteSpans: spriteSpans,
         height: measure("height"),
-        face: face(),
+        head: head(),
       );
     });
     return Cast(profiles);

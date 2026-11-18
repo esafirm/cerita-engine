@@ -774,7 +774,7 @@ Holding the stage (or the title screen) hides the UI until the finger lifts, so 
 
 *2026-11-18. Presentation modes §2.1, data schema §2. Found in the Last Seen M1 playtest.*
 
-*Its `framing` was replaced the same day, see "Sprites are sized by their faces".*
+*Its `framing` was replaced the same day, see "Sprites are sized by their heads".*
 
 A profile can give its `height` and its sprites' `framing` (the share of the body they show from the top of the
 head). The stage sizes every sprite with one scale for the whole cast, so the tallest head reaches 82% of the
@@ -862,31 +862,32 @@ its framed retro window.
   fades the skin's frame in, and the picture flies above the fade from the thumbnail's box to its fitted box in
   the viewer, cropped like the thumbnail at the start. The viewer's own copy shows once it lands.
 
-## Sprites are sized by their faces
+## Sprites are sized by their heads
 
 *2026-11-18. Presentation modes §2.1, data schema §2. Found in the second Last Seen playtest. Replaces `framing`.*
 
-A profile gives `face: {eyes, chin}`, where the eye line and the bottom of the chin are on its sprites, as shares
-of the sprite height. The stage takes a person's eyes to chin as 1/15 of their height and their eyes at 14/15 of
-it. From that it knows how long the whole sprite is in the cast's unit and where it stands, so faces come out in
-proportion to height and eye lines at eye height.
+A profile gives `head: {top, chin}`, where the top of the hair and the bottom of the chin are on its sprites, as
+shares of the sprite height. The stage takes the head as 1/6 of the character's height with the top of the hair at
+that height. From that it knows how long the whole sprite is in the cast's unit and where it stands, so every head
+comes out in proportion to its character.
 
 - **Why:** `framing` (the share of the body a sprite shows) was a guess from where the art cuts, and it was off
-  where it mattered. Measured on the art, Raka's face is 140 px from eyes to chin, Bima's 180 and Dinda's 130,
-  although Raka is 178 cm, Bima 180 and Dinda 156. The art draws Raka with a small face on a long frame. Players
-  compare faces, not knees, so the face is what has to come out right. Eyes and chin are also easy to measure,
-  where a body cut isn't.
-- **Why the eye line and not the top of the head:** the top of the sprite is hair, and anime hair adds very
-  different amounts (Raka's spikes, Hendra's cap). Eyes sit in the same place on every person.
+  where it mattered. The art draws Raka with a small head on a long frame, so he looked shorter than Dinda. Players
+  compare heads, not knees, so the head is what has to come out right. A head is also easy to measure, where a body
+  cut isn't.
+- **Why the whole head and not the face:** the first try measured eyes to chin, as 1/15 of the height. It made
+  Dinda look big-headed: the art draws the girls with big eyes set low and a short chin, and Bima with a long jaw,
+  so Dinda's whole head is 3.1 times her eyes to chin and Bima's 1.8 times. Sized by the face, her head came out
+  half again as big as his. Side by side with the whole head and a mix of both, the whole head looked right.
 - **Also found:** the story stage never passed the heights to the stage at all, only the probe that rendered it
   for screenshots did. On the phone every character was drawn as tall as the tallest and head to toe, which
   zoomed everyone into a chest-up close-up. A test now checks the story stage hands each actor its profile's
-  height and face.
-- **Last Seen's numbers** were measured on the neutral poses (the others match within about 10 px): Raka 0.132 /
-  0.211, Sekar 0.163 / 0.237, Dinda 0.161 / 0.234, Tasya 0.158 / 0.234, Bima 0.110 / 0.211, Hendra 0.127 /
-  0.220, Yusuf 0.130 / 0.223.
+  height and head.
+- **Last Seen's numbers** were measured on the neutral poses: the top as the first opaque row, the chin by eye.
+  The other poses match within a few pixels, except where a hand is raised above the head.
 - **Cost:** one measurement per character, and a character whose poses are drawn at different scales needs them
-  redrawn to match.
+  redrawn to match. Hair counts, so a character with big hair or a hat (Hendra's cap) comes out a little smaller
+  than their height says.
 
 ## A new expression waits for its image
 

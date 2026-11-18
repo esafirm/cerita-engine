@@ -72,12 +72,10 @@ void main() {
     }
   });
 
-  testWidgets('faces come out in proportion to height, eyes at eye height, and every cut stays below the edge', (
-    tester,
-  ) async {
+  testWidgets('heads come out in proportion to height, and every cut stays below the edge', (tester) async {
     await _portrait(tester);
-    // Nora is 180: eyes to chin is 12, so her sprite, with the face over a tenth of it, is 120 long, from 180 down
-    // to 60. Miki is 150: 10, drawn with a bigger face, so 100 long, from 160 down to 60.
+    // Nora is 180: her head is 30, a quarter of her sprite, so the sprite is 120 long, from 180 down to 60. Miki is
+    // 150: 25, also a quarter of hers with some space above the hair, so 100 long, from 160 down to 60.
     await tester.pumpWidget(
       _wrap(
         const Poi(
@@ -87,14 +85,14 @@ void main() {
               sprite: "x.png",
               position: SpritePosition.left,
               height: 180,
-              face: SpriteFace(eyes: 0.1, chin: 0.2),
+              head: SpriteHead(top: 0, chin: 0.25),
             ),
             PoiActor(
               id: "miki",
               sprite: "x.png",
               position: SpritePosition.right,
               height: 150,
-              face: SpriteFace(eyes: 0.2, chin: 0.3),
+              head: SpriteHead(top: 0.1, chin: 0.35),
             ),
           ],
         ),
@@ -109,12 +107,10 @@ void main() {
     expect(nora.bottom, closeTo(800, 0.01), reason: "the highest cut sits on the edge");
     expect(miki.bottom, closeTo(800, 0.01));
     expect(800 - nora.top, closeTo(800 * Poi.heightShare(2, narrow: true), 0.01), reason: "the highest head");
-    // Eyes to chin on screen: 12 and 10, as tall as they are.
-    expect(nora.height * 0.1 / (miki.height * 0.1), closeTo(180 / 150, 0.001));
-    // The eye lines are 168 and 140 above the floor.
-    final noraEyes = nora.top + nora.height * 0.1;
-    final mikiEyes = miki.top + miki.height * 0.2;
-    expect(mikiEyes - noraEyes, closeTo((168 - 140) * scale, 0.01));
+    // Heads on screen, 30 and 25: as tall as they are.
+    expect(nora.height * 0.25 / (miki.height * 0.25), closeTo(180 / 150, 0.001));
+    // The tops of their hair, at 180 and 150.
+    expect(miki.top + miki.height * 0.1 - nora.top, closeTo(30 * scale, 0.01));
   });
 
   testWidgets('a head-to-toe sprite stands next to a cut one with its feet off the stage', (tester) async {
@@ -129,7 +125,7 @@ void main() {
               sprite: "x.png",
               position: SpritePosition.right,
               height: 150,
-              face: SpriteFace(eyes: 0.2, chin: 0.3),
+              head: SpriteHead(top: 0.1, chin: 0.35),
             ),
           ],
         ),
@@ -141,7 +137,7 @@ void main() {
     expect(_slot(tester, "nora").bottom, closeTo(800 + 60 * scale, 0.01));
   });
 
-  testWidgets('the story stage gives each character its height and face', (tester) async {
+  testWidgets('the story stage gives each character its height and head', (tester) async {
     mockAudioChannels();
     final setup = StorySetup(
       config: const LoaderConfig(),
@@ -167,7 +163,7 @@ void main() {
             "name": "Nora",
             "sprites": ["nora.png"],
             "height": 170,
-            "face": {"eyes": 0.1, "chin": 0.2},
+            "head": {"top": 0.1, "chin": 0.2},
           },
         ],
       ),
@@ -178,8 +174,8 @@ void main() {
     await tester.pumpAndSettle();
     final actor = tester.widget<Poi>(find.byType(Poi)).actors.single;
     expect(actor.height, 170);
-    expect(actor.face?.eyes, 0.1);
-    expect(actor.face?.chin, 0.2);
+    expect(actor.head?.top, 0.1);
+    expect(actor.head?.chin, 0.2);
   });
 
   testWidgets('with the whole cast measured, a character keeps their size whoever is on stage', (tester) async {

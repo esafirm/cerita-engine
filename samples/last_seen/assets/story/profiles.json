@@ -15,8 +15,8 @@
         "raka_determined.webp"
       ],
       "height": 178,
-      "face": {
-        "eyes": 0.132,
+      "head": {
+        "top": 0.008,
         "chin": 0.211
       }
     },
@@ -38,8 +38,8 @@
         "sekar_tired.webp"
       ],
       "height": 162,
-      "face": {
-        "eyes": 0.163,
+      "head": {
+        "top": 0.026,
         "chin": 0.237
       }
     },
@@ -56,8 +56,8 @@
         "dinda_hopeful.webp"
       ],
       "height": 156,
-      "face": {
-        "eyes": 0.161,
+      "head": {
+        "top": 0.007,
         "chin": 0.234
       }
     },
@@ -74,8 +74,8 @@
         "tasya_crying.webp"
       ],
       "height": 165,
-      "face": {
-        "eyes": 0.158,
+      "head": {
+        "top": 0.007,
         "chin": 0.234
       }
     },
@@ -91,8 +91,8 @@
         "bima_ashamed.webp"
       ],
       "height": 180,
-      "face": {
-        "eyes": 0.11,
+      "head": {
+        "top": 0.009,
         "chin": 0.211
       }
     },
@@ -108,8 +108,8 @@
         "hendra_worried.webp"
       ],
       "height": 168,
-      "face": {
-        "eyes": 0.127,
+      "head": {
+        "top": 0.007,
         "chin": 0.22
       }
     },
@@ -124,8 +124,8 @@
         "yusuf_conflicted.webp"
       ],
       "height": 175,
-      "face": {
-        "eyes": 0.13,
+      "head": {
+        "top": 0.023,
         "chin": 0.223
       }
     },

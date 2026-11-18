@@ -19,20 +19,20 @@ class PoiActor {
   /// How tall the character is ([Profile.height]). Null takes them as tall as the tallest one in the [PoiCast].
   final double? height;
 
-  /// Where the face is on the sprite ([Profile.face]). Null takes the sprite as head to toe.
-  final SpriteFace? face;
+  /// Where the head is on the sprite ([Profile.head]). Null takes the sprite as head to toe.
+  final SpriteHead? head;
 
-  const PoiActor({required this.id, required this.sprite, required this.position, this.height, this.face});
+  const PoiActor({required this.id, required this.sprite, required this.position, this.height, this.head});
 
-  /// [height] and [face] from [profile].
+  /// [height] and [head] from [profile].
   PoiActor.of(Profile profile, {required this.sprite, required this.position})
       : id = profile.id,
         height = profile.height,
-        face = profile.face;
+        head = profile.head;
 }
 
 /// The measures that size every sprite on the stage alike, like one camera on the whole cast: a taller character
-/// stands taller with a bigger face, and a sprite cut higher up the body stands lower, so every cut stays under the
+/// stands taller with a bigger head, and a sprite cut higher up the body stands lower, so every cut stays under the
 /// stage's bottom edge.
 class PoiCast {
   /// The tallest character's height.
@@ -47,13 +47,13 @@ class PoiCast {
   const PoiCast({this.tallest = 1, double? top, this.highestCut = 0}) : top = top ?? tallest;
 
   /// The measures of [cast]. A null height is as tall as the tallest.
-  factory PoiCast.of(Iterable<({double? height, SpriteFace? face})> cast) {
+  factory PoiCast.of(Iterable<({double? height, SpriteHead? head})> cast) {
     final heights = [for (final member in cast) ?member.height];
     final tallest = heights.isEmpty ? 1.0 : heights.reduce(max);
     var top = 0.0;
     var highestCut = 0.0;
     for (final member in cast) {
-      final reach = span(member.height ?? tallest, member.face);
+      final reach = span(member.height ?? tallest, member.head);
       top = max(top, reach.top);
       highestCut = max(highestCut, reach.bottom);
     }
@@ -63,22 +63,21 @@ class PoiCast {
   /// The measures of the characters in [profiles] that have sprites.
   factory PoiCast.ofProfiles(Iterable<Profile> profiles) => PoiCast.of([
     for (final profile in profiles)
-      if (profile.sprites.isNotEmpty) (height: profile.height, face: profile.face),
+      if (profile.sprites.isNotEmpty) (height: profile.height, head: profile.head),
   ]);
 
-  /// How high above the floor the top and bottom edges of a sprite reach, for a character [height] tall whose face
-  /// is at [face] on it. Its eyes sit at the height of a person's eyes, and its eyes to chin is a person's
-  /// ([SpriteFace.eyeToChin]): that sets how long the whole sprite is. Without [face], the sprite is head to toe.
-  static ({double top, double bottom}) span(double height, SpriteFace? face) {
-    if (face == null) return (top: height, bottom: 0);
-    final eyeToChin = SpriteFace.eyeToChin * height;
-    final length = eyeToChin / max(face.chin - face.eyes, 0.01);
-    final top = height - eyeToChin + face.eyes * length;
+  /// How high above the floor the top and bottom edges of a sprite reach, for a character [height] tall whose head
+  /// is at [head] on it. The top of the hair is at [height], and the head is [SpriteHead.ofHeight] of it: that sets
+  /// how long the whole sprite is. Without [head], the sprite is head to toe.
+  static ({double top, double bottom}) span(double height, SpriteHead? head) {
+    if (head == null) return (top: height, bottom: 0);
+    final length = SpriteHead.ofHeight * height / max(head.chin - head.top, 0.01);
+    final top = height + head.top * length;
     return (top: top, bottom: top - length);
   }
 
   /// [actor]'s span, a null height as tall as the tallest.
-  ({double top, double bottom}) _spanOf(PoiActor actor) => span(actor.height ?? tallest, actor.face);
+  ({double top, double bottom}) _spanOf(PoiActor actor) => span(actor.height ?? tallest, actor.head);
 }
 
 /// [Poi] draws the VN stage: background, up to five characters, weather and the camera
@@ -352,7 +351,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     final xs = entries.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
     final speaker = widget.speakerId;
     final cast =
-        widget.cast ?? PoiCast.of([for (final e in entries) (height: e.actor.height, face: e.actor.face)]);
+        widget.cast ?? PoiCast.of([for (final e in entries) (height: e.actor.height, head: e.actor.head)]);
 
     // Eases the size over the sprite transition, so the others don't jump when a character enters or leaves.
     return TweenAnimationBuilder<double>(
