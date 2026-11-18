@@ -1,0 +1,163 @@
+{
+  "conversation_id": "cvn_d3_silent_call",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Tanpa Suara",
+    "en": "No Voice"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "call_private",
+    "day": 3,
+    "time": "23:41",
+    "background": "bg_sekar_room_night.webp",
+    "music": "amb_sea_night.mp3",
+    "ambience": "amb_generator_night.mp3",
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Nggak. Ada orang di sana.",
+      "en": "No. Someone's there."
+    }
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam dua belas kurang dua puluh. HP Sekar bunyi. Nomor pribadi.",
+        "en": "Twenty to midnight. Sekar's phone rings. A private number."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Nggak ada suara. Cuma ombak. Ombak yang pecah pelan di sesuatu yang deket. Dan di belakangnya, mesin. Bukan mesin kapal. Genset.",
+        "en": "No voice. Just waves. Waves breaking softly against something close. And behind them, an engine. Not a boat engine. A generator."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Halo?",
+        "en": "Hello?"
+      },
+      "profile": "player"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ombak. Genset. Nggak ada yang ngomong.",
+        "en": "Waves. The generator. Nobody speaks."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kar?",
+        "en": "Kar?"
+      },
+      "profile": "player"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Klik.",
+        "en": "Click."
+      }
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 900
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Klik.",
+        "en": "Click."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue kenal bunyi itu. Gue yang beliin alatnya. Tombol rekam Zoom H5. Dipencet, dilepas. Dua kali.",
+        "en": "I know that sound. I bought the thing. The record button on a Zoom H5. Pressed, released. Twice."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sekar. Ini gue. Gue di sini.",
+        "en": "Sekar. It's me. I'm here."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 1500
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "heard_silent_call",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "music",
+          "file": null,
+          "fade_ms": 2000
+        },
+        {
+          "action": "ambience",
+          "file": null,
+          "fade_ms": 2000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue duduk di lantai kamar Sekar sampai subuh, megangin HP-nya kayak megangin sesuatu yang bisa kabur.",
+        "en": "I sit on the floor of Sekar's room until dawn, holding her phone like something that might run away."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_stub"
+    }
+  ]
+}

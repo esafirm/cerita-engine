@@ -89,6 +89,31 @@ Budget share: 4.5k words, about 28 min.
 The handover is a trap the story warns about: Hendra's warning, the threat naming "her sister" and Didit knowing
 Dinda's name. Low `trust_dinda` removes Dinda's "jangan" before the timer runs.
 
+**As written** (`story/30_day3.cerita`, 2.0k words, about 13 minutes by the estimator):
+
+- `d3_angke`: three `[once]` people to ask, and leaving needs two. Without `yusuf_cctv` leaving also waits for the
+  coffee stall, as Day 1's room waits for the shelf: the owner's son works nights in the auction office and
+  photographed its CCTV monitor, which is the same `photo_cctv_still`. With `yusuf_cctv` he says the police already
+  took the footage. The mussel women name "Pak Didit" (`heard_of_didit`), so his "Aditya" card can land later.
+- `d3_hull`: the board lists "Sri Rejeki" (1427) and "Sri Rejeki 2" (0914), plus two other boats numbered 14xx, so
+  both halves of the photo are needed. 0914 and the other 14xx numbers get their own hints, and three misses make
+  Raka work it out.
+- `d3_hendra`: Karta's name stops his needle, and he knows Raka as "the kid who didn't show". `listener_photo` (+5)
+  and `ferry_schedule` (+4) both get the warning (`hendra_warned`). He knows about the phone and about Dinda without
+  being told.
+- `d3_yusuf_call`: rings in, and can't be declined. A new choice, `TELL_BOAT`: telling Yusuf about the Sri Rejeki
+  is `+trust_yusuf 2`, `-trust_hendra 2` and sets `yusuf_knows_boat`, a lever for the Harbor route. With
+  `yusuf_cctv` the still arrives in his chat thread after the call (`d3_yusuf_photo`). With `lied_to_yusuf` he
+  knows about the phone because Bima went to the station. `d3_home` then has Dinda name the silver car as Bima's.
+- `d3_didit`: Dinda's "jangan" needs `trust_dinda >= 10`. The timer's default is not replying, which stalls him
+  like "let me think". Presenting anything but the threat stalls him too. Presenting the threat sets
+  `didit_slipped`.
+- `d3_silent_call`: from a "Private Number" profile of its own (`private`), so it isn't read as the threat's
+  sender calling.
+
+Read by later days: `heard_of_didit`, `hendra_warned`, `yusuf_knows_boat`, `didit_slipped`, `heard_silent_call`,
+`trust_hendra`.
+
 ## 5. Day 4: Malam Itu
 
 CALL and CHAT. Theme: rebuilding Monday night minute by minute. Budget share: 4.5k words, about 28 min.

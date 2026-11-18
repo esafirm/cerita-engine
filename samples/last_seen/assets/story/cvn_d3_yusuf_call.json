@@ -1,0 +1,194 @@
+{
+  "conversation_id": "cvn_d3_yusuf_call",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Ipda Yusuf",
+    "en": "Officer Yusuf"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_yusuf",
+    "day": 3,
+    "time": "12:40",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Itu polisi. Kalau gue nggak angkat, dia punya satu alasan lagi buat nggak percaya gue.",
+      "en": "That's the police. If I don't answer, he has one more reason not to believe me."
+    }
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Ipda Yusuf. Ada waktu sebentar?",
+        "en": "Mr. Raka. Inspector Yusuf. Do you have a moment?"
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "Rekaman CCTV di TPI sudah saya dapat. Senin, pukul dua puluh satu lima puluh dua. Mbak Sekar turun dari mobil, dekat pintu timur.",
+        "en": "I've got the CCTV footage from the fish auction. Monday, nine fifty-two in the evening. Ms. Sekar gets out of a car, near the east entrance."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "Mobil hatchback, warna perak. Pelatnya tidak terbaca. Pengemudinya tidak turun, dan mobilnya pergi dua menit kemudian.",
+        "en": "A hatchback, silver. The plate can't be read. The driver didn't get out, and the car left two minutes later."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "Ini belum mengubah status kasusnya. Tapi untuk pertama kalinya saya punya sesuatu untuk ditulis selain \"keluarga cemas\".",
+        "en": "This doesn't change the status of the case yet. But for the first time I have something to write down other than \"family is anxious\"."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "Saya kirim fotonya ke Anda. Jangan disebar.",
+        "en": "I'll send you the still. Don't share it."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "lied_to_yusuf == true",
+      "text": {
+        "id": "Satu lagi. Kemarin ada yang datang ke kantor. Pacarnya Mbak Sekar. Katanya ada HP cadangan, dan Anda yang pegang.",
+        "en": "One more thing. Someone came to the station yesterday. Ms. Sekar's boyfriend. He said there's a spare phone, and that you have it."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_06.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "lied_to_yusuf == true",
+      "text": {
+        "id": "Anda bilang ke saya tidak ada apa-apa, Mas. Saya ingat itu.",
+        "en": "You told me there was nothing. I remember that."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_07.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv != true && lied_to_yusuf == true",
+      "text": {
+        "id": "Saya tidak punya dasar untuk minta rekaman apa pun. Statusnya tetap. Pergi atas kemauan sendiri.",
+        "en": "I have no grounds to request any footage. The status stays. Left of her own accord."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_08.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_cctv != true && lied_to_yusuf != true",
+      "text": {
+        "id": "Saya cuma mau mengabari. Tanpa bukti baru, kasus Mbak Sekar tetap orang dewasa yang pergi atas kemauan sendiri. Maaf, Mas.",
+        "en": "I just wanted to let you know. Without new evidence, Ms. Sekar's case stays an adult who left of her own accord. I'm sorry."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_09.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Kapal Pak Hendra. Polisi bisa nanya ke dia dengan cara yang gue nggak bisa.",
+        "en": "Pak Hendra's boat. The police could question him in ways I can't."
+      },
+      "variable": "TELL_BOAT",
+      "profile": "yusuf:0",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Pak, ada kapal namanya Sri Rejeki. Nomor 1427.\"",
+            "en": "\"Sir, there's a boat called the Sri Rejeki. Number 1427.\""
+          },
+          "value": "tell",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 2
+            },
+            {
+              "variable": "trust_hendra",
+              "op": "subtract",
+              "value": 2
+            },
+            {
+              "variable": "yusuf_knows_boat",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Simpan dulu soal kapalnya.)",
+            "en": "(Keep the boat to yourself for now.)"
+          },
+          "value": "keep",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_BOAT == 'tell'",
+      "text": {
+        "id": "Sri Rejeki. Satu, empat, dua, tujuh. Saya catat. Jangan ke sana lagi sendirian, Mas.",
+        "en": "Sri Rejeki. One, four, two, seven. Noted. Don't go back there alone."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_10.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dan kalau ada yang menghubungi Anda soal HP itu, siapa pun, kabari saya dulu. Sebelum Anda melakukan apa-apa.",
+        "en": "And if anyone contacts you about that phone, anyone at all, tell me first. Before you do anything."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d3_yusuf_11.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "JUMP",
+      "condition": "yusuf_cctv == true",
+      "target": "d3_yusuf_photo"
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_home"
+    }
+  ]
+}

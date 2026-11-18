@@ -166,6 +166,14 @@
       "id": "pesisir77",
       "name": "pesisir_77",
       "avatar": "assets/story/sprites/listener_pesisir77_avatar.webp"
+    },
+    {
+      "id": "private",
+      "name": {
+        "id": "Nomor Pribadi",
+        "en": "Private Number"
+      },
+      "avatar": "assets/story/sprites/unknown_avatar.webp"
     }
   ]
 }

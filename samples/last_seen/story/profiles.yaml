@@ -127,3 +127,8 @@ mpus:
 pesisir77:
   name: pesisir_77
   avatar: assets/story/sprites/listener_pesisir77_avatar.webp
+
+# The silent call on Day 3. Not the threat's number, so it isn't 'unknown'.
+private:
+  name: { id: Nomor Pribadi, en: Private Number }
+  avatar: assets/story/sprites/unknown_avatar.webp

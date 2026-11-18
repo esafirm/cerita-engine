@@ -1,0 +1,317 @@
+{
+  "conversation_id": "cvn_d3_angke",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Dermaga",
+    "en": "The Pier"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "05:10",
+    "background": "bg_muara_angke_dawn.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_harbor_day.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 3. Sabtu, jam lima lewat sepuluh pagi. Muara Angke.",
+        "en": "Day 3. Saturday, ten past five in the morning. Muara Angke."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda tinggal di rumah. Ibunya mulai mau makan, dan Dinda nggak mau ninggalin momen itu. \"Fotoin semuanya,\" katanya sambil nyodorin helm. \"Dan jangan ngilang.\"",
+        "en": "Dinda stayed home. Her mom has started eating again, and Dinda doesn't want to miss it. \"Take pictures of everything,\" she said, handing me a helmet. \"And don't vanish.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "TPI jam segini udah rame. Lantainya basah, lampunya putih dan pucat, dan suara orang nawar ikan kedengeran kayak orang berantem yang udah saling kenal puluhan tahun.",
+        "en": "The fish auction is already busy at this hour. Wet floor, pale white lights, and the bidding sounds like an argument between people who've known each other for decades."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bau amisnya nempel di baju dalam lima menit. Sekar dulu bilang, kalau udah nggak kecium, berarti lo udah jadi orang sini.",
+        "en": "The fishy smell gets into my clothes in five minutes. Sekar used to say that once you stop smelling it, you belong here."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oke. Senin malem, jam sepuluh kurang tiga belas. Dia berdiri di sini, jalan ke arah air.",
+        "en": "Okay. Monday night, thirteen minutes to ten. She stood here, walking toward the water."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "NARRATION",
+      "id": "angke_look",
+      "condition": "angke_asked >= 2 && yusuf_cctv != true && clue_cctv_still != true && nudged_stall != true",
+      "text": {
+        "id": "Di pojok, warung kopi yang nempel ke tembok TPI. Ada kamera CCTV di atasnya, ngadep ke jalan. Senin malem kamera itu ngelihat sesuatu.",
+        "en": "In the corner, a coffee stall built against the auction hall wall. There's a CCTV camera above it, facing the road. On Monday night that camera saw something."
+      },
+      "effects": [
+        {
+          "variable": "nudged_stall",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Tanya siapa dulu?",
+        "en": "Who do you ask first?"
+      },
+      "variable": "ANGKE",
+      "profile": "raka:0",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Ibu-ibu pengupas kerang",
+            "en": "The women shelling mussels"
+          },
+          "value": "mussels",
+          "once": true,
+          "effects": [
+            {
+              "variable": "angke_asked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#mussels"
+        },
+        {
+          "text": {
+            "id": "Warung kopi di pojok",
+            "en": "The coffee stall in the corner"
+          },
+          "value": "stall",
+          "once": true,
+          "effects": [
+            {
+              "variable": "angke_asked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#stall"
+        },
+        {
+          "text": {
+            "id": "Nelayan yang lagi ngerokok di tumpukan krat",
+            "en": "The fisherman smoking on the crates"
+          },
+          "value": "fisherman",
+          "once": true,
+          "effects": [
+            {
+              "variable": "angke_asked",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#fisherman"
+        },
+        {
+          "text": {
+            "id": "Ke dermaga, ke kapal-kapal.",
+            "en": "Go to the pier, to the boats."
+          },
+          "value": "boats",
+          "condition": "angke_asked >= 2 && (yusuf_cctv == true || clue_cctv_still == true)",
+          "target": "#angke_done"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "id": "mussels",
+      "text": {
+        "id": "Lima ibu-ibu duduk melingkar di bangku plastik rendah, tangannya gerak cepet banget sampai kelihatan kayak mesin. Kulit kerang numpuk di ember kayak gunung kecil.",
+        "en": "Five women sit in a circle on low plastic stools, their hands moving so fast they look like machines. Shells pile up in buckets like small mountains."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nyodorin foto Sekar dari HP gue. Yang paling tua, Bu Rohmah, langsung berhenti ngupas.",
+        "en": "I show them Sekar's photo on my phone. The oldest, Bu Rohmah, stops shelling at once."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Mbak Sekar! Yang rekam kita itu. Episode sebelas,\" katanya, ngeja angkanya pelan-pelan, bangga. \"Cucu saya dengerin di HP. Suara saya kedengeran kayak penyiar radio.\"",
+        "en": "\"Mbak Sekar! The one who recorded us. Episode eleven,\" she says, pronouncing the number slowly, proudly. \"My grandson played it on his phone. I sounded like a radio announcer.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nanya soal Senin malem. Ibu-ibu saling lirik. Malem mereka nggak di sini. Mereka kerja dari subuh sampai siang.",
+        "en": "I ask about Monday night. The women glance at each other. They're never here at night. They work from dawn until noon."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Kalau malem, yang di sini cuma orang kapal sama penjaga,\" kata Bu Rohmah. \"Mbak Sekar tuh suka ngobrol sama orang kapal. Yang tua-tua. Yang udah nggak dianggap.\"",
+        "en": "\"At night it's just the boat people and the guards,\" Bu Rohmah says. \"Mbak Sekar liked talking to the boat people. The old ones. The ones nobody listens to anymore.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ibu di sebelahnya nambahin sambil tetep ngupas. Orang PT dateng tiap bulan, bagi-bagi sembako, minta tanda tangan. Namanya Pak Didit. Ramah, katanya. Senyumnya kebanyakan.",
+        "en": "The woman next to her adds something without stopping. Men from the company come every month, handing out groceries, asking for signatures. The one in charge is called Pak Didit. Friendly, she says. Smiles too much."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "heard_of_didit",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#angke_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "stall",
+      "text": {
+        "id": "Warung kopinya cuma meja panjang dan termos-termos besar. Bapak pemiliknya lagi nyeduh kopi sachet buat tiga orang sekaligus.",
+        "en": "The coffee stall is just a long table and a row of big thermoses. The owner is making instant coffee for three people at once."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "\"Senin malem? Polisi udah dateng kemarin, minta rekaman kamera itu,\" katanya, nunjuk ke atas. \"Anak saya yang jaga malem di kantor TPI. Udah dikasih semua.\"",
+        "en": "\"Monday night? The police came yesterday and asked for that camera's footage,\" he says, pointing up. \"My son works nights in the auction office. He gave them everything.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_cctv == true",
+      "text": {
+        "id": "Polisi udah minta rekamannya. Ipda Yusuf beneran nyari.",
+        "en": "The police already asked for the footage. Inspector Yusuf is actually looking."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_cctv != true",
+      "text": {
+        "id": "\"Senin malem? Nggak ada yang nanya,\" katanya. \"Polisi juga nggak.\" Dia manggil ke belakang. Anak cowok umur dua puluhan keluar, matanya masih merah abis jaga malem di kantor TPI.",
+        "en": "\"Monday night? Nobody's asked,\" he says. \"Not even the police.\" He calls into the back. A guy in his twenties comes out, his eyes still red from the night shift in the auction office."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_cctv != true",
+      "text": {
+        "id": "Anaknya inget. Cewek pake jaket hijau, turun dari mobil, Senin malem. Dia inget karena mobil bagus jarang berhenti di situ jam segitu. Dia motret layar CCTV-nya pake HP, iseng, buat diledekin ke temennya.",
+        "en": "The son remembers. A girl in a green jacket, getting out of a car, Monday night. He remembers because nice cars rarely stop there at that hour. He took a picture of the CCTV screen with his phone, just for fun, to tease a friend."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_cctv != true",
+      "text": {
+        "id": "Dia kirim fotonya ke HP gue. Nggak minta apa-apa. Cuma bilang, \"Semoga ketemu, Bang.\"",
+        "en": "He sends the photo to my phone. He doesn't ask for anything. Just says, \"Hope you find her, man.\""
+      }
+    },
+    {
+      "type": "SET",
+      "condition": "yusuf_cctv != true",
+      "effects": [
+        {
+          "variable": "clue_cctv_still",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#angke_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "fisherman",
+      "text": {
+        "id": "Nelayannya ngerokok kretek di atas tumpukan krat biru, ngelihatin laut kayak lagi nunggu laut minta maaf.",
+        "en": "The fisherman is smoking a clove cigarette on a stack of blue crates, watching the sea like he's waiting for it to apologize."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nanya soal patok bambu. Dia ketawa tanpa suara. Tiga bulan lalu patoknya muncul dalam semalem. Sekarang dia harus muter satu jam lebih buat ke tempat yang dulu sepuluh menit.",
+        "en": "I ask about the bamboo stakes. He laughs without a sound. Three months ago the stakes went up overnight. Now he has to go the long way round, an extra hour, to get somewhere that used to be ten minutes out."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Solarnya siapa yang bayar? Patoknya?\" katanya. \"Anak perempuan yang pake headphone itu nanya hal yang sama. Dia satu-satunya yang nanya.\"",
+        "en": "\"Who pays for the extra diesel? The stakes?\" he says. \"That girl with the headphones asked the same thing. She's the only one who ever asked.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#angke_look"
+    },
+    {
+      "type": "NARRATION",
+      "id": "angke_done",
+      "text": {
+        "id": "Gue jalan ke dermaga. Matahari mulai naik di belakang crane-crane reklamasi, dan kapal-kapal kayu di depannya kelihatan kecil banget.",
+        "en": "I walk to the pier. The sun is starting to come up behind the reclamation cranes, and the wooden boats in front of them look very small."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_hull"
+    }
+  ]
+}

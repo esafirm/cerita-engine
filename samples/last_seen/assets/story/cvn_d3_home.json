@@ -1,0 +1,123 @@
+{
+  "conversation_id": "cvn_d3_home",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Mobil Perak",
+    "en": "The Silver Car"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "17:30",
+    "background": "bg_sekar_living_dusk.webp",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sore. Gue pulang naik ojek, bau ikan, kulit leher kebakar matahari. Dinda nungguin di ruang tamu dengan dua gelas teh, satu tawar.",
+        "en": "Late afternoon. I come home on a bike taxi, smelling of fish, the back of my neck sunburnt. Dinda is waiting in the living room with two glasses of tea, one without sugar."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue ceritain semuanya. Ibu-ibu kerang. Papan syahbandar. Kapalnya Pak Karta. Pak Hendra, yang nggak tahu Sekar di mana dengan cara yang bikin gue yakin dia tahu.",
+        "en": "I tell her everything. The mussel women. The harbor board. Pak Karta's boat. Pak Hendra, who doesn't know where Sekar is in a way that makes me sure he does."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Terus gue tunjukin foto CCTV-nya. Mobil hatchback, pintunya kebuka. Sekar turun.",
+        "en": "Then I show her the CCTV still. A hatchback, its door open. Sekar getting out."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Perak.",
+        "en": "Silver."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Iya.",
+        "en": "Yeah."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mobil Bima perak, Ka. Hatchback.",
+        "en": "Bima's car is silver, Ka. A hatchback."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Banyak mobil perak di Jakarta.",
+        "en": "There are lots of silver cars in Jakarta."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo ngomong gitu karena lo percaya, atau karena lo pengen percaya?",
+        "en": "Are you saying that because you believe it, or because you want to?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak jawab. Kalau gue nggak jawab, Dinda tahu itu artinya apa. Semua orang di rumah ini tahu.",
+        "en": "I don't answer. If I don't answer, Dinda knows what that means. Everyone in this house does."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_notification.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP Sekar geter di meja. Notifikasi dari nomor yang nggak disimpen. Pesannya panjang, rapi, pake huruf kapital di tempat yang bener.",
+        "en": "Sekar's phone buzzes on the table. A notification from an unsaved number. The message is long and neat, with capital letters in all the right places."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_didit"
+    }
+  ]
+}

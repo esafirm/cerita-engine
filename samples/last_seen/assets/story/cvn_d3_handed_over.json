@@ -1,0 +1,102 @@
+{
+  "conversation_id": "cvn_d3_handed_over",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Diserahkan",
+    "en": "Handed Over"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "20:02",
+    "background": "bg_sekar_house_gate_night.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_courier_motorbike.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam delapan lewat dua. Kurirnya pake jaket tanpa logo dan helm yang kacanya nggak dibuka. Dia nyodorin tanda terima. Tanda tangan gue jelek, kayak biasanya.",
+        "en": "Two minutes past eight. The courier wears a jacket with no logo and a helmet with the visor down. He holds out a receipt. My signature is as ugly as ever."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP Sekar masuk ke amplop cokelat. Amplopnya masuk ke tas. Motornya pergi.",
+        "en": "Sekar's phone goes into a brown envelope. The envelope goes into a bag. The motorbike leaves."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_handed_over.webp",
+      "caption": {
+        "id": "Lampu belakangnya merah kecil di ujung gang, terus belok, terus nggak ada.",
+        "en": "Its tail light is a small red dot at the end of the alley, then it turns, then it's gone."
+      },
+      "unlock_id": "cg_handed_over"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda nggak ngomong apa-apa malem itu.",
+        "en": "Dinda doesn't say anything that night."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Paginya, akun cloud Sekar kosong. Foto, catatan, draf, semuanya. Halaman dasbor podcast-nya bilang \"akun tidak ditemukan\".",
+        "en": "In the morning, Sekar's cloud account is empty. Photos, notes, drafts, all of it. Her podcast dashboard says \"account not found\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Grup pendengarnya sepi. Nadia nulis \"kak?\" sekali lagi, tiga hari kemudian. Nggak ada yang bales.",
+        "en": "The listener group goes quiet. Nadia writes \"kak?\" one more time, three days later. Nobody answers."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Seminggu kemudian, Ipda Yusuf nelpon. Laporannya ditutup. Orang dewasa, pergi atas kemauan sendiri. Dia minta maaf, dan kedengerannya dia beneran minta maaf.",
+        "en": "A week later, Inspector Yusuf calls. The report is closed. An adult, left of her own accord. He apologizes, and he sounds like he means it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue balik ke Bandung. Gue ngedit iklan asuransi. Kadang, jam lima pagi, gue kebangun dan nggak tahu kenapa.",
+        "en": "I go back to Bandung. I edit insurance ads. Sometimes, at five in the morning, I wake up and don't know why."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_07_handed_over",
+      "title": {
+        "id": "Diserahkan",
+        "en": "Handed Over"
+      },
+      "category": "BAD",
+      "summary": {
+        "id": "Raka menyerahkan HP Sekar ke kurir Didit. Semua yang Sekar simpan hilang dalam semalam, dan kasusnya ditutup.",
+        "en": "Raka gave Sekar's phone to Didit's courier. Everything Sekar had kept was gone overnight, and the case was closed."
+      }
+    }
+  ]
+}

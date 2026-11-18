@@ -1,0 +1,54 @@
+{
+  "conversation_id": "cvn_d3_yusuf_photo",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Ipda Yusuf",
+    "en": "Officer Yusuf"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_yusuf",
+    "day": 3,
+    "time": "12:46",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_cctv_still.webp",
+      "caption": {
+        "id": "Untuk pegangan Anda. Mohon tidak disebarkan.",
+        "en": "For your reference. Please do not share it."
+      },
+      "profile": "yusuf:0",
+      "unlock_id": "photo_cctv_still",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_cctv_still",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Hati-hati, Mas.",
+        "en": "Be careful."
+      },
+      "profile": "yusuf:0",
+      "typing_delay_ms": 1600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_home"
+    }
+  ]
+}

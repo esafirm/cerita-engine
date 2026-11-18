@@ -75,3 +75,23 @@ clues:
       id: 'Intro 41 detik yang disunting Sekar sendiri, "Siapa yang punya laut?". Segmen narsum "dari dalam" dan dokumennya gagal terunggah.'
       en: 'A 41-second intro Sekar edited herself, "Who owns the sea?". The segment with her "inside source" and the documents failed to upload.'
     chapter: { id: Hari 2, en: Day 2 }
+  boat_registration:
+    title: { id: KM Sri Rejeki, en: The Sri Rejeki }
+    description:
+      id: Kapal di foto pesisir_77, nomor registrasi 1427. Dulu punya Pak Karta, sekarang dipegang adiknya, Pak Hendra.
+      en: The boat in pesisir_77's photo, registration 1427. It was Pak Karta's, and his younger brother, Pak Hendra, runs it now.
+    chapter: { id: Hari 3, en: Day 3 }
+  cctv_still:
+    title: { id: Foto CCTV TPI, en: The fish auction CCTV still }
+    description:
+      id: Senin, 21.52. Sekar turun dari mobil hatchback perak di depan TPI Muara Angke. Pengemudinya nggak turun, dan mobilnya pergi dua menit kemudian.
+      en: Monday, 9:52 PM. Sekar gets out of a silver hatchback outside the Muara Angke fish auction. The driver stays inside, and the car leaves two minutes later.
+    image: photo_cctv_still.webp
+    chapter: { id: Hari 3, en: Day 3 }
+  didit_card:
+    title: { id: Kartu nama Aditya, en: Aditya's business card }
+    description:
+      id: Aditya Nugraha, Community Relations Manager, PT Bentang Pesisir Makmur. "PT. B" di peta Sekar. Dapat nomor HP Sekar dari Bima, dan tahu nama Dinda.
+      en: Aditya Nugraha, Community Relations Manager, PT Bentang Pesisir Makmur. The "PT. B" on Sekar's map. He got Sekar's number from Bima, and he knows Dinda's name.
+    image: photo_didit_card.webp
+    chapter: { id: Hari 3, en: Day 3 }

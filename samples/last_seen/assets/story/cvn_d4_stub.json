@@ -1,0 +1,41 @@
+{
+  "conversation_id": "cvn_d4_stub",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Malam Itu",
+    "en": "That Night"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "07:00",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_quiet_house.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 4 belum ditulis. Ceritanya berlanjut di versi berikutnya.",
+        "en": "Day 4 isn't written yet. The story continues in the next build."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_00_preview",
+      "title": {
+        "id": "Bersambung",
+        "en": "To Be Continued"
+      },
+      "category": "NORMAL",
+      "summary": {
+        "id": "Sekar naik ke kapal Pak Karta Senin malem. Seseorang menelepon tanpa suara, dan tombol perekamnya berbunyi dua kali.",
+        "en": "Sekar went to Pak Karta's boat on Monday night. Someone called without a word, and a recorder button clicked twice."
+      }
+    }
+  ]
+}

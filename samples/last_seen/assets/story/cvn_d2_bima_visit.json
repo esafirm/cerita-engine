@@ -455,7 +455,7 @@
     },
     {
       "type": "JUMP",
-      "target": "d3_stub"
+      "target": "d3_angke"
     }
   ]
 }

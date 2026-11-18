@@ -1074,20 +1074,4 @@ narration
   id: Besok gue ke dermaga. Nyari kapal yang namanya ketutup ban.
   en: Tomorrow I go to the pier. To find a boat whose name is hidden behind a tire.
 
--> d3_stub
-
-
-# Day 3: Dermaga. M2 placeholder until Day 3 is written, which replaces this stub and its ending.
-
-@conversation d3_stub chapter="Hari 3" chapter.en="Day 3" title="Dermaga" title.en="The Pier" checkpoint
-@scene VN bg=bg_muara_angke_dawn.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=3 time=05:10
-
-narration
-  id: Hari 3 belum ditulis. Ceritanya berlanjut di versi berikutnya.
-  en: Day 3 isn't written yet. The story continues in the next build.
-
-ending end_00_preview NORMAL
-  id: Bersambung
-  en: To Be Continued
-  summary id: Sekar pergi ke dermaga Senin malem, dan orang-orang terdekatnya menyimpan sisanya. Raka baru mulai menyusun potongannya.
-  summary en: Sekar went to the pier on Monday night, and the people closest to her are keeping the rest. Raka has only begun to put the pieces together.
+-> d3_angke

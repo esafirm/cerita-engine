@@ -1,0 +1,289 @@
+{
+  "conversation_id": "cvn_d3_hull",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Nomor Lambung",
+    "en": "The Hull Number"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "07:15",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dermaganya panjang, dan setengah kapal di sini dicat biru-putih. Setengahnya lagi digantungin ban bekas di haluannya. Foto pesisir_77 tiba-tiba kerasa nggak ada gunanya.",
+        "en": "The pier is long, and half the boats here are painted blue and white. The other half have old tires hanging off their bows. pesisir_77's photo suddenly feels useless."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di ujung dermaga ada pos syahbandar kecil dengan papan pengumuman yang udah pudar. \"DAFTAR KAPAL TERDAFTAR, DERMAGA III.\" Tulisannya kecil-kecil, diketik, ditempel pake selotip.",
+        "en": "At the end of the pier there's a small harbor office with a faded notice board. \"REGISTERED VESSELS, PIER III.\" Small typed print, held up with tape."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "nvl"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "KM Sinar Pagi .............. 2210\nKM Sri Rejeki 2 ............ 0914\nKM Bintang Laut ............ 1452\nKM Sri Rejeki .............. 1427\nKM Mutiara Hati ............ 1403\nKM Barokah Jaya ............ 0388",
+        "en": "KM Sinar Pagi .............. 2210\nKM Sri Rejeki 2 ............ 0914\nKM Bintang Laut ............ 1452\nKM Sri Rejeki .............. 1427\nKM Mutiara Hati ............ 1403\nKM Barokah Jaya ............ 0388"
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Petugas di pos itu bapak-bapak gendut yang lagi nonton sinetron di HP. Dia nggak ngangkat kepala.",
+        "en": "The man in the office is a heavyset guy watching a soap opera on his phone. He doesn't look up."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Nyari kapal? Nomor registrasinya berapa, Mas? Saya cek pemiliknya.\"",
+        "en": "\"Looking for a boat? What's the registration number? I'll look up the owner.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di foto, haluannya bilang \"SRI REJ\", terus ketutup ban. Di bawahnya \"No. 14\", terus ketutup lagi.",
+        "en": "In the photo, the bow says \"SRI REJ\", then the tire covers it. Under that, \"No. 14\", then covered again."
+      }
+    },
+    {
+      "type": "INPUT",
+      "id": "hull",
+      "text": {
+        "id": "Nomor registrasi kapal di foto?",
+        "en": "The registration number of the boat in the photo?"
+      },
+      "variable": "HULL",
+      "profile": "raka:0",
+      "keyboard": "digits",
+      "min_length": 4,
+      "max_length": 4
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "HULL == '1427'",
+          "target": "#hull_found"
+        },
+        {
+          "condition": "HULL == '0914'",
+          "target": "#hull_twin"
+        },
+        {
+          "condition": "HULL == '1452' || HULL == '1403'",
+          "target": "#hull_fourteen"
+        }
+      ]
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hull_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Nggak ada di dermaga ini, Mas,\" kata petugasnya, masih ngelihatin sinetronnya.",
+        "en": "\"That one's not at this pier,\" the man says, still watching his show."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "hull_tries == 1",
+      "text": {
+        "id": "Dua hal di foto. Namanya. Nomornya. Dua-duanya setengah. Tapi dua setengah bisa jadi satu.",
+        "en": "Two things in the photo. The name. The number. Both half hidden. But two halves can make one."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "JUMP",
+      "target": "#hull_check"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hull_twin",
+      "text": {
+        "id": "\"Sri Rejeki 2? Itu punya Haji Darmo. Kapalnya lagi naik dok dari bulan lalu, Mas. Nggak ke mana-mana.\"",
+        "en": "\"Sri Rejeki 2? That's Haji Darmo's. It's been in dry dock since last month. Hasn't gone anywhere.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Namanya cocok. Tapi nomor di foto mulai dari empat belas.",
+        "en": "The name fits. But the number in the photo starts with fourteen."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hull_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#hull_check"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hull_fourteen",
+      "text": {
+        "id": "\"Itu bukan kapal biru-putih, Mas. Itu kapal merah.\"",
+        "en": "\"That's not a blue and white boat. That one's red.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nomornya mulai dari empat belas, iya. Tapi namanya harus \"Sri Rej\".",
+        "en": "It starts with fourteen, sure. But the name has to start \"Sri Rej\"."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hull_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#hull_check"
+    },
+    {
+      "type": "BRANCH",
+      "id": "hull_check",
+      "branches": [
+        {
+          "condition": "hull_tries >= 3",
+          "target": "#hull_remember"
+        }
+      ],
+      "fallback_target": "#hull"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hull_remember",
+      "text": {
+        "id": "Gue jejerin dua-duanya di kepala. Yang namanya mulai \"Sri Rej\" ada dua. Yang nomornya mulai \"14\" cuma satu di antara dua itu.",
+        "en": "I line both up in my head. Two names start with \"Sri Rej\". Only one of those two has a number starting \"14\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Satu, empat, dua, tujuh.",
+        "en": "One, four, two, seven."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#hull_found"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hull_found",
+      "text": {
+        "id": "Petugasnya akhirnya ngangkat kepala.",
+        "en": "The man finally looks up."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Sri Rejeki? Punya Pak Hendra. Dulu punya abangnya, Pak Karta. Pak Karta udah nggak melaut dari stroke tahun lalu, jadi kapalnya dipegang adiknya.\"",
+        "en": "\"Sri Rejeki? That's Pak Hendra's. It used to be his older brother's, Pak Karta. Pak Karta hasn't been out since his stroke last year, so his brother took the boat.\""
+      },
+      "effects": [
+        {
+          "variable": "clue_boat_registration",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Karta.",
+        "en": "Pak Karta."
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kapalnya Pak Karta. Kapal yang berangkat jam setengah enam pagi, setahun lalu, tanpa gue.",
+        "en": "Pak Karta's boat. The boat that left at five thirty in the morning, a year ago, without me."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Pak Hendra biasanya di ujung, deket tiang lampu, siang-siang benerin jaring,\" kata petugasnya. \"Orangnya nggak suka ngobrol, Mas. Jangan kaget.\"",
+        "en": "\"Pak Hendra's usually at the far end, by the lamp post, fixing nets around noon,\" the man says. \"He doesn't like to talk. Don't take it personally.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_hendra"
+    }
+  ]
+}

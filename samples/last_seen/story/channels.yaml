@@ -52,3 +52,22 @@ thread_tasya:
   name: Tasya
   avatar: assets/story/sprites/tasya_avatar.webp
   members: [tasya]
+
+thread_yusuf:
+  name: Ipda Yusuf
+  avatar: assets/story/sprites/yusuf_avatar.webp
+  status: { id: terakhir dilihat baru saja, en: last seen just now }
+  members: [yusuf]
+
+# Didit writes to Sekar's spare phone, from the number Bima gave him.
+thread_didit:
+  name: "+62 811-8820-xxxx"
+  avatar: assets/story/sprites/didit_avatar.webp
+  status: online
+  members: [didit]
+
+# The silent call on Sekar's phone (Day 3).
+call_private:
+  name: { id: Nomor Pribadi, en: Private Number }
+  avatar: assets/story/sprites/unknown_avatar.webp
+  members: [private]

@@ -80,6 +80,38 @@
       "members": [
         "tasya"
       ]
+    },
+    {
+      "id": "thread_yusuf",
+      "name": "Ipda Yusuf",
+      "avatar": "assets/story/sprites/yusuf_avatar.webp",
+      "status": {
+        "id": "terakhir dilihat baru saja",
+        "en": "last seen just now"
+      },
+      "members": [
+        "yusuf"
+      ]
+    },
+    {
+      "id": "thread_didit",
+      "name": "+62 811-8820-xxxx",
+      "avatar": "assets/story/sprites/didit_avatar.webp",
+      "status": "online",
+      "members": [
+        "didit"
+      ]
+    },
+    {
+      "id": "call_private",
+      "name": {
+        "id": "Nomor Pribadi",
+        "en": "Private Number"
+      },
+      "avatar": "assets/story/sprites/unknown_avatar.webp",
+      "members": [
+        "private"
+      ]
     }
   ]
 }

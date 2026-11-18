@@ -1,0 +1,420 @@
+{
+  "conversation_id": "cvn_d3_hendra",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Pak Hendra",
+    "en": "Pak Hendra"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "12:05",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Siang. Gue nunggu empat jam di warung kopi, minum tiga gelas kopi sachet yang rasanya kayak gula dibakar.",
+        "en": "Noon. I waited four hours at the coffee stall, drinking three cups of instant coffee that tasted like burnt sugar."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kapal biru-putih itu ada di ujung dermaga. Ban bekas masih nutupin setengah namanya. Di sebelahnya, seorang bapak duduk di atas ember terbalik, benerin jaring pake jarum kayu.",
+        "en": "The blue and white boat is at the end of the pier. The old tire still hides half its name. Next to it, a man sits on an upturned bucket, mending a net with a wooden needle."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "hendra:1",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 800
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Hendra?",
+        "en": "Pak Hendra?"
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Siapa yang nanya.",
+        "en": "Who's asking."
+      },
+      "profile": "hendra:1",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Raka. Saya nyari temen saya. Sekar. Dia podcaster, sering ke sini.",
+        "en": "Raka. I'm looking for a friend. Sekar. She does a podcast, she comes here a lot."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Banyak yang ke sini. Saya nggak hafal muka orang.",
+        "en": "Lots of people come here. I don't remember faces."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jarumnya nggak berhenti. Matanya juga nggak naik dari jaring.",
+        "en": "His needle doesn't stop. Neither do his eyes leave the net."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapal ini dulu punya Pak Karta, kan?",
+        "en": "This boat used to be Pak Karta's, right?"
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jarumnya berhenti.",
+        "en": "The needle stops."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kamu kenal abang saya dari mana?",
+        "en": "How do you know my brother?"
+      },
+      "profile": "hendra:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Setahun lalu, saya harusnya ikut kapal ini. Sabtu, jam setengah enam pagi. Sama Sekar. Saya nggak dateng.",
+        "en": "A year ago, I was supposed to go out on this boat. Saturday, five thirty in the morning. With Sekar. I didn't show up."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pak Hendra ngelihat gue lama. Lama banget, sampai gue mulai ngitung ombak yang nabrak tiang dermaga.",
+        "en": "Pak Hendra looks at me for a long time. Long enough that I start counting the waves hitting the pier posts."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Anak yang nggak dateng.",
+        "en": "The kid who didn't show."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Abang saya cerita. Anak perempuan itu nunggu di sini sampai mataharinya tinggi. Terus dia tetep ikut, sendirian, rekam semuanya. Pulangnya dia nggak ngomong sepatah kata pun.",
+        "en": "My brother told me. That girl waited here until the sun was high. Then she came out anyway, alone, recorded everything. She didn't say a word the whole way back."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "CHOICE",
+      "id": "ask_hendra",
+      "source": "clues",
+      "text": {
+        "id": "\"Terus kamu mau apa dari saya?\" Tunjukkan kenapa lo yakin Sekar ke sini.",
+        "en": "\"So what do you want from me?\" Show him why you're sure Sekar came here."
+      },
+      "variable": "HENDRA_PROOF",
+      "profile": "hendra:2",
+      "responses": [
+        {
+          "clue": "listener_photo",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 5
+            }
+          ],
+          "target": "#proof_photo"
+        },
+        {
+          "clue": "ferry_schedule",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 4
+            }
+          ],
+          "target": "#proof_ferry"
+        },
+        {
+          "clue": "unsent_message",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "subtract",
+              "value": 3
+            }
+          ],
+          "target": "#proof_message"
+        }
+      ],
+      "fallback": {
+        "effects": [
+          {
+            "variable": "trust_hendra",
+            "op": "subtract",
+            "value": 1
+          }
+        ],
+        "target": "#proof_none"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "id": "proof_photo",
+      "text": {
+        "id": "Gue tunjukin foto dari grup. Sekar, jaket hijau, haluan biru-putih di belakangnya. Senin, jam sepuluh kurang tiga belas.",
+        "en": "I show him the photo from the group. Sekar, green jacket, the blue and white bow behind her. Monday, thirteen minutes to ten."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Banyak kapal biru-putih di sini.",
+        "en": "There are lots of blue and white boats here."
+      },
+      "profile": "hendra:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Yang namanya \"Sri Rej\" dan nomornya \"14\" cuma satu, Pak.",
+        "en": "Only one has a name starting \"Sri Rej\" and a number starting \"14\", sir."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "#hendra_warns"
+    },
+    {
+      "type": "NARRATION",
+      "id": "proof_ferry",
+      "text": {
+        "id": "Gue tunjukin foto jadwal kapal dari papan gabus Sekar. Jam setengah enam, dilingkarin dua kali.",
+        "en": "I show him the ferry schedule from Sekar's corkboard. Five thirty, circled twice."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu kapal penumpang ke Pari. Bukan kapal saya.",
+        "en": "That's the passenger boat to Pari. Not my boat."
+      },
+      "profile": "hendra:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapal Bapak juga berangkat setengah enam. Dari dulu.",
+        "en": "Your boat leaves at five thirty too. It always has."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "#hendra_warns"
+    },
+    {
+      "type": "NARRATION",
+      "id": "proof_message",
+      "text": {
+        "id": "Gue tunjukin pesan yang nggak pernah sampai itu. \"Ka. Inget jam lima pagi itu? Gue masih di sana.\"",
+        "en": "I show him the message that never arrived. \"Ka. Remember five in the morning? I'm still there.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...",
+        "en": "..."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu bukan buat saya baca. Simpen.",
+        "en": "That's not for me to read. Put it away."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia balik ke jaringnya. Jarumnya gerak lagi, lebih cepet dari tadi.",
+        "en": "He goes back to his net. The needle moves again, faster than before."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#hendra_closed"
+    },
+    {
+      "type": "TEXT",
+      "id": "proof_none",
+      "text": {
+        "id": "Saya nggak ngerti maksud kamu. Saya nelayan, bukan polisi.",
+        "en": "I don't know what you mean. I'm a fisherman, not a policeman."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "JUMP",
+      "target": "#hendra_closed"
+    },
+    {
+      "type": "TEXT",
+      "id": "hendra_warns",
+      "text": {
+        "id": "Saya nggak tahu dia di mana.",
+        "en": "I don't know where she is."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngomong pelan, satu-satu, kayak orang yang lagi milih kata di atas papan rapuh. Bukan kayak orang yang nggak tahu.",
+        "en": "He says it slowly, one word at a time, like a man choosing where to step on rotten boards. Not like a man who doesn't know."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tapi saya kasih tahu satu hal. HP itu.",
+        "en": "But I'll tell you one thing. That phone."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngelirik saku gue. Gue nggak pernah bilang soal HP Sekar.",
+        "en": "He glances at my pocket. I never said anything about Sekar's phone."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan dibawa ke mana-mana. HP bisa dicari. Dan jangan kasih ke siapa pun yang tiba-tiba baik sama kamu.",
+        "en": "Don't carry it everywhere. Phones can be tracked. And don't hand it to anyone who's suddenly nice to you."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hendra_warned",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak. Kalau Bapak tahu sesuatu...",
+        "en": "Sir. If you know something..."
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pulang. Jaga adiknya.",
+        "en": "Go home. Look after her sister."
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#hendra_end"
+    },
+    {
+      "type": "TEXT",
+      "id": "hendra_closed",
+      "text": {
+        "id": "Pulang, Mas. Di sini panas.",
+        "en": "Go home. It's hot out here."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hendra_end",
+      "text": {
+        "id": "Dia berdiri, ngangkat jaringnya, dan naik ke kapal. Ban bekas di haluannya bergoyang sedikit.",
+        "en": "He stands, lifts his net and climbs onto the boat. The old tire on its bow sways a little."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di belakang ban itu, sekarang gue bisa baca semuanya. \"SRI REJEKI. No. 1427.\"",
+        "en": "Behind the tire, now I can read the whole thing. \"SRI REJEKI. No. 1427.\""
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_phone_ring.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP gue bunyi. Bukan HP Sekar. HP gue sendiri.",
+        "en": "My phone rings. Not Sekar's. My own."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_yusuf_call"
+    }
+  ]
+}

@@ -1,0 +1,746 @@
+# Day 3: Dermaga (spec §2, beat plan last-seen-m2.md §4). Muara Angke, the boat in the photo, Pak Hendra, and
+# Didit's first contact, where the early bad end lives. Budget: 4.5k Indonesian words, about 28 minutes, to be
+# retuned after the M1 playtest.
+
+@conversation d3_angke chapter="Hari 3" chapter.en="Day 3" title="Dermaga" title.en="The Pier" checkpoint
+@scene VN bg=bg_muara_angke_dawn.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=3 time=05:10 textbox=nvl
+
+narration
+  id: Hari 3. Sabtu, jam lima lewat sepuluh pagi. Muara Angke.
+  en: Day 3. Saturday, ten past five in the morning. Muara Angke.
+narration
+  id: Dinda tinggal di rumah. Ibunya mulai mau makan, dan Dinda nggak mau ninggalin momen itu. "Fotoin semuanya," katanya sambil nyodorin helm. "Dan jangan ngilang."
+  en: Dinda stayed home. Her mom has started eating again, and Dinda doesn't want to miss it. "Take pictures of everything," she said, handing me a helmet. "And don't vanish."
+narration
+  id: TPI jam segini udah rame. Lantainya basah, lampunya putih dan pucat, dan suara orang nawar ikan kedengeran kayak orang berantem yang udah saling kenal puluhan tahun.
+  en: The fish auction is already busy at this hour. Wet floor, pale white lights, and the bidding sounds like an argument between people who've known each other for decades.
+narration
+  id: Bau amisnya nempel di baju dalam lima menit. Sekar dulu bilang, kalau udah nggak kecium, berarti lo udah jadi orang sini.
+  en: The fishy smell gets into my clothes in five minutes. Sekar used to say that once you stop smelling it, you belong here.
+
+stage
+  textbox adv
+  show raka:neutral left
+
+raka:neutral [left]
+  id: Oke. Senin malem, jam sepuluh kurang tiga belas. Dia berdiri di sini, jalan ke arah air.
+  en: Okay. Monday night, thirteen minutes to ten. She stood here, walking toward the water.
+
+narration label=angke_look [if angke_asked >= 2 && yusuf_cctv != true && clue_cctv_still != true && nudged_stall != true]
+  id: Di pojok, warung kopi yang nempel ke tembok TPI. Ada kamera CCTV di atasnya, ngadep ke jalan. Senin malem kamera itu ngelihat sesuatu.
+  en: In the corner, a coffee stall built against the auction hall wall. There's a CCTV camera above it, facing the road. On Monday night that camera saw something.
+  set nudged_stall true
+
+choice ANGKE by=raka:neutral silent
+  id: Tanya siapa dulu?
+  en: Who do you ask first?
+? Ibu-ibu pengupas kerang | The women shelling mussels [once]
+  +angke_asked
+  value mussels
+  -> #mussels
+? Warung kopi di pojok | The coffee stall in the corner [once]
+  +angke_asked
+  value stall
+  -> #stall
+? Nelayan yang lagi ngerokok di tumpukan krat | The fisherman smoking on the crates [once]
+  +angke_asked
+  value fisherman
+  -> #fisherman
+? Ke dermaga, ke kapal-kapal. | Go to the pier, to the boats. [if angke_asked >= 2 && (yusuf_cctv == true || clue_cctv_still == true)]
+  value boats
+  -> #angke_done
+
+narration label=mussels
+  id: Lima ibu-ibu duduk melingkar di bangku plastik rendah, tangannya gerak cepet banget sampai kelihatan kayak mesin. Kulit kerang numpuk di ember kayak gunung kecil.
+  en: Five women sit in a circle on low plastic stools, their hands moving so fast they look like machines. Shells pile up in buckets like small mountains.
+narration
+  id: Gue nyodorin foto Sekar dari HP gue. Yang paling tua, Bu Rohmah, langsung berhenti ngupas.
+  en: I show them Sekar's photo on my phone. The oldest, Bu Rohmah, stops shelling at once.
+narration
+  id: "Mbak Sekar! Yang rekam kita itu. Episode sebelas," katanya, ngeja angkanya pelan-pelan, bangga. "Cucu saya dengerin di HP. Suara saya kedengeran kayak penyiar radio."
+  en: "Mbak Sekar! The one who recorded us. Episode eleven," she says, pronouncing the number slowly, proudly. "My grandson played it on his phone. I sounded like a radio announcer."
+narration
+  id: Gue nanya soal Senin malem. Ibu-ibu saling lirik. Malem mereka nggak di sini. Mereka kerja dari subuh sampai siang.
+  en: I ask about Monday night. The women glance at each other. They're never here at night. They work from dawn until noon.
+narration
+  id: "Kalau malem, yang di sini cuma orang kapal sama penjaga," kata Bu Rohmah. "Mbak Sekar tuh suka ngobrol sama orang kapal. Yang tua-tua. Yang udah nggak dianggap."
+  en: "At night it's just the boat people and the guards," Bu Rohmah says. "Mbak Sekar liked talking to the boat people. The old ones. The ones nobody listens to anymore."
+narration
+  id: Ibu di sebelahnya nambahin sambil tetep ngupas. Orang PT dateng tiap bulan, bagi-bagi sembako, minta tanda tangan. Namanya Pak Didit. Ramah, katanya. Senyumnya kebanyakan.
+  en: The woman next to her adds something without stopping. Men from the company come every month, handing out groceries, asking for signatures. The one in charge is called Pak Didit. Friendly, she says. Smiles too much.
+set
+  set heard_of_didit true
+-> #angke_look
+
+narration label=stall
+  id: Warung kopinya cuma meja panjang dan termos-termos besar. Bapak pemiliknya lagi nyeduh kopi sachet buat tiga orang sekaligus.
+  en: The coffee stall is just a long table and a row of big thermoses. The owner is making instant coffee for three people at once.
+narration [if yusuf_cctv == true]
+  id: "Senin malem? Polisi udah dateng kemarin, minta rekaman kamera itu," katanya, nunjuk ke atas. "Anak saya yang jaga malem di kantor TPI. Udah dikasih semua."
+  en: "Monday night? The police came yesterday and asked for that camera's footage," he says, pointing up. "My son works nights in the auction office. He gave them everything."
+narration [if yusuf_cctv == true]
+  id: Polisi udah minta rekamannya. Ipda Yusuf beneran nyari.
+  en: The police already asked for the footage. Inspector Yusuf is actually looking.
+narration [if yusuf_cctv != true]
+  id: "Senin malem? Nggak ada yang nanya," katanya. "Polisi juga nggak." Dia manggil ke belakang. Anak cowok umur dua puluhan keluar, matanya masih merah abis jaga malem di kantor TPI.
+  en: "Monday night? Nobody's asked," he says. "Not even the police." He calls into the back. A guy in his twenties comes out, his eyes still red from the night shift in the auction office.
+narration [if yusuf_cctv != true]
+  id: Anaknya inget. Cewek pake jaket hijau, turun dari mobil, Senin malem. Dia inget karena mobil bagus jarang berhenti di situ jam segitu. Dia motret layar CCTV-nya pake HP, iseng, buat diledekin ke temennya.
+  en: The son remembers. A girl in a green jacket, getting out of a car, Monday night. He remembers because nice cars rarely stop there at that hour. He took a picture of the CCTV screen with his phone, just for fun, to tease a friend.
+narration [if yusuf_cctv != true]
+  id: Dia kirim fotonya ke HP gue. Nggak minta apa-apa. Cuma bilang, "Semoga ketemu, Bang."
+  en: He sends the photo to my phone. He doesn't ask for anything. Just says, "Hope you find her, man."
+set [if yusuf_cctv != true]
+  clue cctv_still
+-> #angke_look
+
+narration label=fisherman
+  id: Nelayannya ngerokok kretek di atas tumpukan krat biru, ngelihatin laut kayak lagi nunggu laut minta maaf.
+  en: The fisherman is smoking a clove cigarette on a stack of blue crates, watching the sea like he's waiting for it to apologize.
+narration
+  id: Gue nanya soal patok bambu. Dia ketawa tanpa suara. Tiga bulan lalu patoknya muncul dalam semalem. Sekarang dia harus muter satu jam lebih buat ke tempat yang dulu sepuluh menit.
+  en: I ask about the bamboo stakes. He laughs without a sound. Three months ago the stakes went up overnight. Now he has to go the long way round, an extra hour, to get somewhere that used to be ten minutes out.
+narration
+  id: "Solarnya siapa yang bayar? Patoknya?" katanya. "Anak perempuan yang pake headphone itu nanya hal yang sama. Dia satu-satunya yang nanya."
+  en: "Who pays for the extra diesel? The stakes?" he says. "That girl with the headphones asked the same thing. She's the only one who ever asked."
+-> #angke_look
+
+narration label=angke_done
+  id: Gue jalan ke dermaga. Matahari mulai naik di belakang crane-crane reklamasi, dan kapal-kapal kayu di depannya kelihatan kecil banget.
+  en: I walk to the pier. The sun is starting to come up behind the reclamation cranes, and the wooden boats in front of them look very small.
+
+-> d3_hull
+
+
+@conversation d3_hull chapter="Hari 3" chapter.en="Day 3" title="Nomor Lambung" title.en="The Hull Number"
+@scene VN bg=bg_pier_day.webp music=bgm_unease.mp3 ambience=amb_harbor_day.mp3 day=3 time=07:15
+
+stage
+  show raka:neutral left
+
+narration
+  id: Dermaganya panjang, dan setengah kapal di sini dicat biru-putih. Setengahnya lagi digantungin ban bekas di haluannya. Foto pesisir_77 tiba-tiba kerasa nggak ada gunanya.
+  en: The pier is long, and half the boats here are painted blue and white. The other half have old tires hanging off their bows. pesisir_77's photo suddenly feels useless.
+narration
+  id: Di ujung dermaga ada pos syahbandar kecil dengan papan pengumuman yang udah pudar. "DAFTAR KAPAL TERDAFTAR, DERMAGA III." Tulisannya kecil-kecil, diketik, ditempel pake selotip.
+  en: At the end of the pier there's a small harbor office with a faded notice board. "REGISTERED VESSELS, PIER III." Small typed print, held up with tape.
+
+stage
+  textbox nvl
+
+narration
+  id: KM Sinar Pagi .............. 2210\nKM Sri Rejeki 2 ............ 0914\nKM Bintang Laut ............ 1452\nKM Sri Rejeki .............. 1427\nKM Mutiara Hati ............ 1403\nKM Barokah Jaya ............ 0388
+  en: KM Sinar Pagi .............. 2210\nKM Sri Rejeki 2 ............ 0914\nKM Bintang Laut ............ 1452\nKM Sri Rejeki .............. 1427\nKM Mutiara Hati ............ 1403\nKM Barokah Jaya ............ 0388
+
+stage
+  textbox adv
+
+narration
+  id: Petugas di pos itu bapak-bapak gendut yang lagi nonton sinetron di HP. Dia nggak ngangkat kepala.
+  en: The man in the office is a heavyset guy watching a soap opera on his phone. He doesn't look up.
+narration
+  id: "Nyari kapal? Nomor registrasinya berapa, Mas? Saya cek pemiliknya."
+  en: "Looking for a boat? What's the registration number? I'll look up the owner."
+narration
+  id: Di foto, haluannya bilang "SRI REJ", terus ketutup ban. Di bawahnya "No. 14", terus ketutup lagi.
+  en: In the photo, the bow says "SRI REJ", then the tire covers it. Under that, "No. 14", then covered again.
+
+input HULL by=raka label=hull keyboard=digits length=4
+  id: Nomor registrasi kapal di foto?
+  en: The registration number of the boat in the photo?
+
+branch
+  if HULL == '1427' -> #hull_found
+  if HULL == '0914' -> #hull_twin
+  if HULL == '1452' || HULL == '1403' -> #hull_fourteen
+
++hull_tries
+narration
+  id: "Nggak ada di dermaga ini, Mas," kata petugasnya, masih ngelihatin sinetronnya.
+  en: "That one's not at this pier," the man says, still watching his show.
+raka:worried [if hull_tries == 1]
+  id: Dua hal di foto. Namanya. Nomornya. Dua-duanya setengah. Tapi dua setengah bisa jadi satu.
+  en: Two things in the photo. The name. The number. Both half hidden. But two halves can make one.
+-> #hull_check
+
+narration label=hull_twin
+  id: "Sri Rejeki 2? Itu punya Haji Darmo. Kapalnya lagi naik dok dari bulan lalu, Mas. Nggak ke mana-mana."
+  en: "Sri Rejeki 2? That's Haji Darmo's. It's been in dry dock since last month. Hasn't gone anywhere."
+raka:worried
+  id: Namanya cocok. Tapi nomor di foto mulai dari empat belas.
+  en: The name fits. But the number in the photo starts with fourteen.
++hull_tries
+-> #hull_check
+
+narration label=hull_fourteen
+  id: "Itu bukan kapal biru-putih, Mas. Itu kapal merah."
+  en: "That's not a blue and white boat. That one's red."
+raka:worried
+  id: Nomornya mulai dari empat belas, iya. Tapi namanya harus "Sri Rej".
+  en: It starts with fourteen, sure. But the name has to start "Sri Rej".
++hull_tries
+-> #hull_check
+
+branch label=hull_check
+  if hull_tries >= 3 -> #hull_remember
+  -> #hull
+
+narration label=hull_remember
+  id: Gue jejerin dua-duanya di kepala. Yang namanya mulai "Sri Rej" ada dua. Yang nomornya mulai "14" cuma satu di antara dua itu.
+  en: I line both up in my head. Two names start with "Sri Rej". Only one of those two has a number starting "14".
+narration
+  id: Satu, empat, dua, tujuh.
+  en: One, four, two, seven.
+-> #hull_found
+
+narration label=hull_found
+  id: Petugasnya akhirnya ngangkat kepala.
+  en: The man finally looks up.
+narration
+  id: "Sri Rejeki? Punya Pak Hendra. Dulu punya abangnya, Pak Karta. Pak Karta udah nggak melaut dari stroke tahun lalu, jadi kapalnya dipegang adiknya."
+  en: "Sri Rejeki? That's Pak Hendra's. It used to be his older brother's, Pak Karta. Pak Karta hasn't been out since his stroke last year, so his brother took the boat."
+  clue boat_registration
+raka:shocked
+  id: Pak Karta.
+  en: Pak Karta.
+narration
+  id: Kapalnya Pak Karta. Kapal yang berangkat jam setengah enam pagi, setahun lalu, tanpa gue.
+  en: Pak Karta's boat. The boat that left at five thirty in the morning, a year ago, without me.
+narration
+  id: "Pak Hendra biasanya di ujung, deket tiang lampu, siang-siang benerin jaring," kata petugasnya. "Orangnya nggak suka ngobrol, Mas. Jangan kaget."
+  en: "Pak Hendra's usually at the far end, by the lamp post, fixing nets around noon," the man says. "He doesn't like to talk. Don't take it personally."
+
+-> d3_hendra
+
+
+@conversation d3_hendra chapter="Hari 3" chapter.en="Day 3" title="Pak Hendra" title.en="Pak Hendra"
+@scene VN bg=bg_pier_day.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=3 time=12:05
+
+narration
+  id: Siang. Gue nunggu empat jam di warung kopi, minum tiga gelas kopi sachet yang rasanya kayak gula dibakar.
+  en: Noon. I waited four hours at the coffee stall, drinking three cups of instant coffee that tasted like burnt sugar.
+narration
+  id: Kapal biru-putih itu ada di ujung dermaga. Ban bekas masih nutupin setengah namanya. Di sebelahnya, seorang bapak duduk di atas ember terbalik, benerin jaring pake jarum kayu.
+  en: The blue and white boat is at the end of the pier. The old tire still hides half its name. Next to it, a man sits on an upturned bucket, mending a net with a wooden needle.
+
+stage
+  show raka:neutral left
+  show hendra:gruff right transition=fade duration=800
+
+raka:neutral [left]
+  id: Pak Hendra?
+  en: Pak Hendra?
+hendra:gruff [right]
+  id: Siapa yang nanya.
+  en: Who's asking.
+raka:neutral
+  id: Raka. Saya nyari temen saya. Sekar. Dia podcaster, sering ke sini.
+  en: Raka. I'm looking for a friend. Sekar. She does a podcast, she comes here a lot.
+hendra:gruff
+  id: Banyak yang ke sini. Saya nggak hafal muka orang.
+  en: Lots of people come here. I don't remember faces.
+
+narration
+  id: Jarumnya nggak berhenti. Matanya juga nggak naik dari jaring.
+  en: His needle doesn't stop. Neither do his eyes leave the net.
+
+raka:neutral
+  id: Kapal ini dulu punya Pak Karta, kan?
+  en: This boat used to be Pak Karta's, right?
+
+narration
+  id: Jarumnya berhenti.
+  en: The needle stops.
+
+hendra:wary
+  id: Kamu kenal abang saya dari mana?
+  en: How do you know my brother?
+raka:sad
+  id: Setahun lalu, saya harusnya ikut kapal ini. Sabtu, jam setengah enam pagi. Sama Sekar. Saya nggak dateng.
+  en: A year ago, I was supposed to go out on this boat. Saturday, five thirty in the morning. With Sekar. I didn't show up.
+
+narration
+  id: Pak Hendra ngelihat gue lama. Lama banget, sampai gue mulai ngitung ombak yang nabrak tiang dermaga.
+  en: Pak Hendra looks at me for a long time. Long enough that I start counting the waves hitting the pier posts.
+
+hendra:neutral
+  id: Anak yang nggak dateng.
+  en: The kid who didn't show.
+hendra:neutral
+  id: Abang saya cerita. Anak perempuan itu nunggu di sini sampai mataharinya tinggi. Terus dia tetep ikut, sendirian, rekam semuanya. Pulangnya dia nggak ngomong sepatah kata pun.
+  en: My brother told me. That girl waited here until the sun was high. Then she came out anyway, alone, recorded everything. She didn't say a word the whole way back.
+
+evidence HENDRA_PROOF by=hendra:wary label=ask_hendra
+  id: "Terus kamu mau apa dari saya?" Tunjukkan kenapa lo yakin Sekar ke sini.
+  en: "So what do you want from me?" Show him why you're sure Sekar came here.
+? listener_photo
+  +trust_hendra 5
+  -> #proof_photo
+? ferry_schedule
+  +trust_hendra 4
+  -> #proof_ferry
+? unsent_message
+  -trust_hendra 3
+  -> #proof_message
+? [fallback]
+  -trust_hendra 1
+  -> #proof_none
+
+narration label=proof_photo
+  id: Gue tunjukin foto dari grup. Sekar, jaket hijau, haluan biru-putih di belakangnya. Senin, jam sepuluh kurang tiga belas.
+  en: I show him the photo from the group. Sekar, green jacket, the blue and white bow behind her. Monday, thirteen minutes to ten.
+hendra:wary
+  id: Banyak kapal biru-putih di sini.
+  en: There are lots of blue and white boats here.
+raka:determined
+  id: Yang namanya "Sri Rej" dan nomornya "14" cuma satu, Pak.
+  en: Only one has a name starting "Sri Rej" and a number starting "14", sir.
+-> #hendra_warns
+
+narration label=proof_ferry
+  id: Gue tunjukin foto jadwal kapal dari papan gabus Sekar. Jam setengah enam, dilingkarin dua kali.
+  en: I show him the ferry schedule from Sekar's corkboard. Five thirty, circled twice.
+hendra:wary
+  id: Itu kapal penumpang ke Pari. Bukan kapal saya.
+  en: That's the passenger boat to Pari. Not my boat.
+raka:determined
+  id: Kapal Bapak juga berangkat setengah enam. Dari dulu.
+  en: Your boat leaves at five thirty too. It always has.
+-> #hendra_warns
+
+narration label=proof_message
+  id: Gue tunjukin pesan yang nggak pernah sampai itu. "Ka. Inget jam lima pagi itu? Gue masih di sana."
+  en: I show him the message that never arrived. "Ka. Remember five in the morning? I'm still there."
+hendra:worried
+  id: ...
+  en: ...
+hendra:gruff
+  id: Itu bukan buat saya baca. Simpen.
+  en: That's not for me to read. Put it away.
+narration
+  id: Dia balik ke jaringnya. Jarumnya gerak lagi, lebih cepet dari tadi.
+  en: He goes back to his net. The needle moves again, faster than before.
+-> #hendra_closed
+
+hendra:gruff label=proof_none
+  id: Saya nggak ngerti maksud kamu. Saya nelayan, bukan polisi.
+  en: I don't know what you mean. I'm a fisherman, not a policeman.
+-> #hendra_closed
+
+hendra:neutral label=hendra_warns
+  id: Saya nggak tahu dia di mana.
+  en: I don't know where she is.
+narration
+  id: Dia ngomong pelan, satu-satu, kayak orang yang lagi milih kata di atas papan rapuh. Bukan kayak orang yang nggak tahu.
+  en: He says it slowly, one word at a time, like a man choosing where to step on rotten boards. Not like a man who doesn't know.
+hendra:worried
+  id: Tapi saya kasih tahu satu hal. HP itu.
+  en: But I'll tell you one thing. That phone.
+narration
+  id: Dia ngelirik saku gue. Gue nggak pernah bilang soal HP Sekar.
+  en: He glances at my pocket. I never said anything about Sekar's phone.
+hendra:worried
+  id: Jangan dibawa ke mana-mana. HP bisa dicari. Dan jangan kasih ke siapa pun yang tiba-tiba baik sama kamu.
+  en: Don't carry it everywhere. Phones can be tracked. And don't hand it to anyone who's suddenly nice to you.
+set
+  set hendra_warned true
+raka:shocked
+  id: Pak. Kalau Bapak tahu sesuatu...
+  en: Sir. If you know something...
+hendra:kind
+  id: Pulang. Jaga adiknya.
+  en: Go home. Look after her sister.
+-> #hendra_end
+
+hendra:gruff label=hendra_closed
+  id: Pulang, Mas. Di sini panas.
+  en: Go home. It's hot out here.
+
+narration label=hendra_end
+  id: Dia berdiri, ngangkat jaringnya, dan naik ke kapal. Ban bekas di haluannya bergoyang sedikit.
+  en: He stands, lifts his net and climbs onto the boat. The old tire on its bow sways a little.
+narration
+  id: Di belakang ban itu, sekarang gue bisa baca semuanya. "SRI REJEKI. No. 1427."
+  en: Behind the tire, now I can read the whole thing. "SRI REJEKI. No. 1427."
+
+stage
+  sound sfx_phone_ring.mp3
+
+narration
+  id: HP gue bunyi. Bukan HP Sekar. HP gue sendiri.
+  en: My phone rings. Not Sekar's. My own.
+
+-> d3_yusuf_call
+
+
+@conversation d3_yusuf_call chapter="Hari 3" chapter.en="Day 3" title="Ipda Yusuf" title.en="Officer Yusuf"
+@scene CALL channel=thread_yusuf day=3 time=12:40 bg=bg_pier_day.webp music=bgm_tense_call.mp3 ring=sfx_phone_ring.mp3 stay="Itu polisi. Kalau gue nggak angkat, dia punya satu alasan lagi buat nggak percaya gue." stay.en="That's the police. If I don't answer, he has one more reason not to believe me."
+
+yusuf voice=vo_d3_yusuf_01.mp3
+  id: Mas Raka. Ipda Yusuf. Ada waktu sebentar?
+  en: Mr. Raka. Inspector Yusuf. Do you have a moment?
+  delivery: formal, a little tired, calling from a noisy station
+yusuf voice=vo_d3_yusuf_02.mp3 [if yusuf_cctv == true]
+  id: Rekaman CCTV di TPI sudah saya dapat. Senin, pukul dua puluh satu lima puluh dua. Mbak Sekar turun dari mobil, dekat pintu timur.
+  en: I've got the CCTV footage from the fish auction. Monday, nine fifty-two in the evening. Ms. Sekar gets out of a car, near the east entrance.
+  delivery: reading from notes, precise
+yusuf voice=vo_d3_yusuf_03.mp3 [if yusuf_cctv == true]
+  id: Mobil hatchback, warna perak. Pelatnya tidak terbaca. Pengemudinya tidak turun, dan mobilnya pergi dua menit kemudian.
+  en: A hatchback, silver. The plate can't be read. The driver didn't get out, and the car left two minutes later.
+  delivery: matter of fact
+yusuf voice=vo_d3_yusuf_04.mp3 [if yusuf_cctv == true]
+  id: Ini belum mengubah status kasusnya. Tapi untuk pertama kalinya saya punya sesuatu untuk ditulis selain "keluarga cemas".
+  en: This doesn't change the status of the case yet. But for the first time I have something to write down other than "family is anxious".
+  delivery: a small, dry warmth, almost an apology
+yusuf voice=vo_d3_yusuf_05.mp3 [if yusuf_cctv == true]
+  id: Saya kirim fotonya ke Anda. Jangan disebar.
+  en: I'll send you the still. Don't share it.
+  delivery: firm
+yusuf voice=vo_d3_yusuf_06.mp3 [if lied_to_yusuf == true]
+  id: Satu lagi. Kemarin ada yang datang ke kantor. Pacarnya Mbak Sekar. Katanya ada HP cadangan, dan Anda yang pegang.
+  en: One more thing. Someone came to the station yesterday. Ms. Sekar's boyfriend. He said there's a spare phone, and that you have it.
+  delivery: cooler, measured
+yusuf voice=vo_d3_yusuf_07.mp3 [if lied_to_yusuf == true]
+  id: Anda bilang ke saya tidak ada apa-apa, Mas. Saya ingat itu.
+  en: You told me there was nothing. I remember that.
+  delivery: cold, letting it sit
+yusuf voice=vo_d3_yusuf_08.mp3 [if yusuf_cctv != true && lied_to_yusuf == true]
+  id: Saya tidak punya dasar untuk minta rekaman apa pun. Statusnya tetap. Pergi atas kemauan sendiri.
+  en: I have no grounds to request any footage. The status stays. Left of her own accord.
+  delivery: closing a file
+yusuf voice=vo_d3_yusuf_09.mp3 [if yusuf_cctv != true && lied_to_yusuf != true]
+  id: Saya cuma mau mengabari. Tanpa bukti baru, kasus Mbak Sekar tetap orang dewasa yang pergi atas kemauan sendiri. Maaf, Mas.
+  en: I just wanted to let you know. Without new evidence, Ms. Sekar's case stays an adult who left of her own accord. I'm sorry.
+  delivery: sincere but tired, the decision isn't his
+
+choice TELL_BOAT by=yusuf
+  id: Kapal Pak Hendra. Polisi bisa nanya ke dia dengan cara yang gue nggak bisa.
+  en: Pak Hendra's boat. The police could question him in ways I can't.
+? "Pak, ada kapal namanya Sri Rejeki. Nomor 1427." | "Sir, there's a boat called the Sri Rejeki. Number 1427."
+  value tell
+  +trust_yusuf 2
+  -trust_hendra 2
+  set yusuf_knows_boat true
+? (Simpan dulu soal kapalnya.) | (Keep the boat to yourself for now.) [silent]
+  value keep
+
+yusuf voice=vo_d3_yusuf_10.mp3 [if TELL_BOAT == 'tell']
+  id: Sri Rejeki. Satu, empat, dua, tujuh. Saya catat. Jangan ke sana lagi sendirian, Mas.
+  en: Sri Rejeki. One, four, two, seven. Noted. Don't go back there alone.
+  delivery: writing it down, then a warning
+yusuf voice=vo_d3_yusuf_11.mp3
+  id: Dan kalau ada yang menghubungi Anda soal HP itu, siapa pun, kabari saya dulu. Sebelum Anda melakukan apa-apa.
+  en: And if anyone contacts you about that phone, anyone at all, tell me first. Before you do anything.
+  delivery: serious, slower, meaning it
+
+system
+  id: Panggilan berakhir
+  en: Call ended
+
+-> d3_yusuf_photo [if yusuf_cctv == true]
+-> d3_home
+
+
+@conversation d3_yusuf_photo chapter="Hari 3" chapter.en="Day 3" title="Ipda Yusuf" title.en="Officer Yusuf"
+@scene CHAT channel=thread_yusuf day=3 time=12:46 music=bgm_unease.mp3
+
+media IMAGE photo_cctv_still.webp by=yusuf unlock=photo_cctv_still typing=3s sfx=sfx_msg_receive.mp3
+  id: Untuk pegangan Anda. Mohon tidak disebarkan.
+  en: For your reference. Please do not share it.
+  clue cctv_still
+yusuf typing=1.6s sfx=sfx_msg_receive.mp3
+  id: Hati-hati, Mas.
+  en: Be careful.
+
+-> d3_home
+
+
+@conversation d3_home chapter="Hari 3" chapter.en="Day 3" title="Mobil Perak" title.en="The Silver Car"
+@scene VN bg=bg_sekar_living_dusk.webp music=bgm_unease.mp3 day=3 time=17:30
+
+stage
+  show raka:neutral left
+  show dinda:neutral right
+
+narration
+  id: Sore. Gue pulang naik ojek, bau ikan, kulit leher kebakar matahari. Dinda nungguin di ruang tamu dengan dua gelas teh, satu tawar.
+  en: Late afternoon. I come home on a bike taxi, smelling of fish, the back of my neck sunburnt. Dinda is waiting in the living room with two glasses of tea, one without sugar.
+narration
+  id: Gue ceritain semuanya. Ibu-ibu kerang. Papan syahbandar. Kapalnya Pak Karta. Pak Hendra, yang nggak tahu Sekar di mana dengan cara yang bikin gue yakin dia tahu.
+  en: I tell her everything. The mussel women. The harbor board. Pak Karta's boat. Pak Hendra, who doesn't know where Sekar is in a way that makes me sure he does.
+
+narration
+  id: Terus gue tunjukin foto CCTV-nya. Mobil hatchback, pintunya kebuka. Sekar turun.
+  en: Then I show her the CCTV still. A hatchback, its door open. Sekar getting out.
+
+dinda:angry
+  id: Perak.
+  en: Silver.
+raka:worried
+  id: Iya.
+  en: Yeah.
+dinda:angry
+  id: Mobil Bima perak, Ka. Hatchback.
+  en: Bima's car is silver, Ka. A hatchback.
+raka:neutral
+  id: Banyak mobil perak di Jakarta.
+  en: There are lots of silver cars in Jakarta.
+dinda:neutral
+  id: Lo ngomong gitu karena lo percaya, atau karena lo pengen percaya?
+  en: Are you saying that because you believe it, or because you want to?
+
+narration
+  id: Gue nggak jawab. Kalau gue nggak jawab, Dinda tahu itu artinya apa. Semua orang di rumah ini tahu.
+  en: I don't answer. If I don't answer, Dinda knows what that means. Everyone in this house does.
+
+stage
+  sound sfx_notification.mp3
+
+narration
+  id: HP Sekar geter di meja. Notifikasi dari nomor yang nggak disimpen. Pesannya panjang, rapi, pake huruf kapital di tempat yang bener.
+  en: Sekar's phone buzzes on the table. A notification from an unsaved number. The message is long and neat, with capital letters in all the right places.
+
+-> d3_didit
+
+
+@conversation d3_didit chapter="Hari 3" chapter.en="Day 3" title="Aditya" title.en="Aditya"
+@scene CHAT channel=thread_didit day=3 time=19:20 music=bgm_tense_call.mp3
+
+didit typing=4s sfx=sfx_msg_receive.mp3
+  id: Selamat malam. Mohon maaf mengganggu. Saya Aditya, dari bagian community relations PT Bentang Pesisir Makmur.
+  en: Good evening. I'm sorry to bother you. My name is Aditya, from community relations at PT Bentang Pesisir Makmur.
+media IMAGE photo_didit_card.webp by=didit unlock=photo_didit_card typing=2s sfx=sfx_msg_receive.mp3
+  id: Kartu nama saya.
+  en: My card.
+  clue didit_card
+didit typing=4.5s sfx=sfx_msg_receive.mp3
+  id: Nomor ini saya dapat dari Mas Bima. Beliau sangat khawatir. Kami semua turut prihatin atas hilangnya Mbak Sekar.
+  en: I got this number from Bima. He is very worried. All of us are deeply sorry about Ms. Sekar's disappearance.
+
+narration
+  id: "Bentang Pesisir," kata Dinda pelan. "PT. B."
+  en: "Bentang Pesisir," Dinda says quietly. "PT. B."
+narration [if heard_of_didit == true]
+  id: Aditya. Orang-orang panggil dia Pak Didit. Ibu-ibu kerang bilang senyumnya kebanyakan.
+  en: Aditya. People call him Pak Didit. The mussel women said he smiles too much.
+narration [if TASYA_PROOF == 'tasya_warning']
+  id: Orang PR dari perusahaan yang nawarin sponsor. Yang nelpon Tasya malem-malem. Ramah banget. Terlalu ramah.
+  en: The PR man from the company that offered the sponsorship. The one who called Tasya late at night. So friendly. Too friendly.
+
+didit typing=5s sfx=sfx_msg_receive.mp3 [if group_alerted == true]
+  id: Saya juga dengar grup pendengar Mbak Sekar sempat ramai kemarin pagi. Pasti berat sekali untuk Anda.
+  en: I also heard Ms. Sekar's listener group got rather busy yesterday morning. This must be very hard for you.
+didit typing=6s sfx=sfx_msg_receive.mp3
+  id: Perusahaan kami ingin membantu. Kami punya pengacara, dan kami bekerja sama dengan laboratorium forensik digital. Kalau HP Mbak Sekar bisa diperiksa dengan benar, mungkin ada petunjuk yang terlewat oleh polisi.
+  en: Our company would like to help. We have lawyers, and we work with a digital forensics lab. If Ms. Sekar's phone could be examined properly, there might be clues the police have missed.
+didit typing=4s sfx=sfx_msg_receive.mp3
+  id: Kurir kami bisa datang ke rumah malam ini, jam delapan. Aman, ada tanda terimanya. Besok pagi hasilnya sudah ada.
+  en: Our courier can come to the house tonight at eight. It's safe, with a signed receipt. You'd have the results by tomorrow morning.
+didit typing=3s sfx=sfx_msg_receive.mp3
+  id: Salam untuk Dik Dinda juga, ya. Pasti berat sekali untuk adiknya.
+  en: Please give my regards to Dinda too. This must be so hard for the younger sister.
+
+narration
+  id: Gue nggak pernah nyebut nama Dinda ke siapa pun di luar rumah ini.
+  en: I've never said Dinda's name to anyone outside this house.
+narration [if hendra_warned == true]
+  id: "Jangan kasih ke siapa pun yang tiba-tiba baik sama kamu."
+  en: "Don't hand it to anyone who's suddenly nice to you."
+narration [if trust_dinda >= 10]
+  id: Dinda megang lengan gue. Kenceng. "Jangan," katanya. Cuma itu.
+  en: Dinda grips my arm. Hard. "Don't," she says. That's all.
+narration [if trust_dinda < 10]
+  id: Dinda ngelihat layar, terus ngelihat gue. Dia nggak ngomong apa-apa. Sejak kemarin, dia mulai nunggu gue yang mutusin sendiri.
+  en: Dinda looks at the screen, then at me. She doesn't say anything. Since yesterday, she's started leaving the decisions to me.
+
+didit typing=2s sfx=sfx_msg_receive.mp3
+  id: Bagaimana, Mas Raka? Kurirnya saya jalankan?
+  en: So, Raka? Shall I send the courier?
+
+choice HANDOVER by=didit timeout=15s silent
+  id: Gimana?
+  en: Well?
+? Kirim HP-nya lewat kurir. | Send the phone with the courier.
+  value send
+? "Saya pikir-pikir dulu, Pak." | "Let me think about it first."
+  value stall
+? Tunjukin sesuatu ke dia. | Show him something.
+  value present
+? (Nggak bales.) | (Don't reply.) [default]
+  value ignore
+
+player sfx=sfx_msg_send.mp3 [if HANDOVER == 'send']
+  id: Iya, Pak. Silakan kirim kurirnya.
+  en: Yes. Please send the courier.
+-> d3_handed_over [if HANDOVER == 'send']
+
+player sfx=sfx_msg_send.mp3 [if HANDOVER == 'stall']
+  id: Saya pikir-pikir dulu, Pak.
+  en: Let me think about it first.
+-> #didit_stalled [if HANDOVER == 'stall' || HANDOVER == 'ignore']
+
+evidence DIDIT_PROOF by=didit label=ask_didit
+  id: Kirim apa ke dia?
+  en: What do you send him?
+? threat_message
+  -> #didit_slips
+? [fallback]
+  -> #didit_shrugs
+
+didit typing=5s sfx=sfx_msg_receive.mp3 label=didit_slips
+  id: Astaga. Saya turut prihatin ada yang mengirim pesan seperti itu, Mas.
+  en: Good heavens. I'm sorry someone sent you a message like that.
+didit typing=6s sfx=sfx_msg_receive.mp3
+  id: Saran saya sebagai teman, sebaiknya Anda berhenti dulu. Demi keluarganya.
+  en: My advice, as a friend, is that you stop for now. For the family's sake.
+set
+  set didit_slipped true
+narration
+  id: "Demi keluarganya." Gue taruh layarnya di samping screenshot pesan tengah malem itu. "Demi adiknya."
+  en: "For the family's sake." I put the screen next to the screenshot of the midnight message. "For her sister's sake."
+narration
+  id: Dinda baca dua-duanya, terus ngelihat gue. Nggak ada yang perlu ngomong.
+  en: Dinda reads them both, then looks at me. Neither of us needs to say it.
+system
+  id: Aditya sedang mengetik...
+  en: Aditya is typing...
+system
+  id: Aditya terakhir dilihat 19.26
+  en: Aditya last seen 7:26 PM
+narration
+  id: Dia berhenti ngetik. Dia nggak pernah ngirim apa-apa lagi.
+  en: He stops typing. He never sends anything else.
+-> d3_silent_call
+
+didit typing=3s sfx=sfx_msg_receive.mp3 label=didit_shrugs
+  id: Terima kasih sudah berbagi, Mas. Justru hal-hal seperti ini yang bisa diperiksa lab kami.
+  en: Thank you for sharing. That's exactly the kind of thing our lab can look into.
+-> #didit_stalled
+
+didit typing=4s sfx=sfx_msg_receive.mp3 label=didit_stalled
+  id: Tentu. Silakan dipikirkan baik-baik. Tapi tawaran seperti ini tidak selalu ada, Mas.
+  en: Of course. Please think it over carefully. But an offer like this won't always be there.
+didit typing=2s sfx=sfx_msg_receive.mp3
+  id: Selamat malam.
+  en: Good evening.
+narration
+  id: Jam delapan lewat. Nggak ada motor yang berhenti di depan pagar. Tapi gue tetep ngintip dari jendela atas, dua kali, kayak Sekar dulu.
+  en: Eight o'clock comes and goes. No motorbike stops at the gate. But I still look out of the upstairs window, twice, the way Sekar used to.
+
+-> d3_silent_call
+
+
+@conversation d3_handed_over chapter="Hari 3" chapter.en="Day 3" title="Diserahkan" title.en="Handed Over"
+@scene VN bg=bg_sekar_house_gate_night.webp music=bgm_low_tide.mp3 ambience=amb_room_night.mp3 day=3 time=20:02
+
+stage
+  sound sfx_courier_motorbike.mp3
+
+narration
+  id: Jam delapan lewat dua. Kurirnya pake jaket tanpa logo dan helm yang kacanya nggak dibuka. Dia nyodorin tanda terima. Tanda tangan gue jelek, kayak biasanya.
+  en: Two minutes past eight. The courier wears a jacket with no logo and a helmet with the visor down. He holds out a receipt. My signature is as ugly as ever.
+narration
+  id: HP Sekar masuk ke amplop cokelat. Amplopnya masuk ke tas. Motornya pergi.
+  en: Sekar's phone goes into a brown envelope. The envelope goes into a bag. The motorbike leaves.
+
+media CG cg_handed_over.webp unlock=cg_handed_over
+  id: Lampu belakangnya merah kecil di ujung gang, terus belok, terus nggak ada.
+  en: Its tail light is a small red dot at the end of the alley, then it turns, then it's gone.
+
+narration
+  id: Dinda nggak ngomong apa-apa malem itu.
+  en: Dinda doesn't say anything that night.
+narration
+  id: Paginya, akun cloud Sekar kosong. Foto, catatan, draf, semuanya. Halaman dasbor podcast-nya bilang "akun tidak ditemukan".
+  en: In the morning, Sekar's cloud account is empty. Photos, notes, drafts, all of it. Her podcast dashboard says "account not found".
+narration
+  id: Grup pendengarnya sepi. Nadia nulis "kak?" sekali lagi, tiga hari kemudian. Nggak ada yang bales.
+  en: The listener group goes quiet. Nadia writes "kak?" one more time, three days later. Nobody answers.
+narration
+  id: Seminggu kemudian, Ipda Yusuf nelpon. Laporannya ditutup. Orang dewasa, pergi atas kemauan sendiri. Dia minta maaf, dan kedengerannya dia beneran minta maaf.
+  en: A week later, Inspector Yusuf calls. The report is closed. An adult, left of her own accord. He apologizes, and he sounds like he means it.
+narration
+  id: Gue balik ke Bandung. Gue ngedit iklan asuransi. Kadang, jam lima pagi, gue kebangun dan nggak tahu kenapa.
+  en: I go back to Bandung. I edit insurance ads. Sometimes, at five in the morning, I wake up and don't know why.
+
+ending end_07_handed_over BAD
+  id: Diserahkan
+  en: Handed Over
+  summary id: Raka menyerahkan HP Sekar ke kurir Didit. Semua yang Sekar simpan hilang dalam semalam, dan kasusnya ditutup.
+  summary en: Raka gave Sekar's phone to Didit's courier. Everything Sekar had kept was gone overnight, and the case was closed.
+
+
+@conversation d3_silent_call chapter="Hari 3" chapter.en="Day 3" title="Tanpa Suara" title.en="No Voice"
+@scene CALL channel=call_private day=3 time=23:41 bg=bg_sekar_room_night.webp music=amb_sea_night.mp3 ambience=amb_generator_night.mp3 ring=sfx_phone_ring.mp3 stay="Nggak. Ada orang di sana." stay.en="No. Someone's there."
+
+narration
+  id: Jam dua belas kurang dua puluh. HP Sekar bunyi. Nomor pribadi.
+  en: Twenty to midnight. Sekar's phone rings. A private number.
+narration
+  id: Nggak ada suara. Cuma ombak. Ombak yang pecah pelan di sesuatu yang deket. Dan di belakangnya, mesin. Bukan mesin kapal. Genset.
+  en: No voice. Just waves. Waves breaking softly against something close. And behind them, an engine. Not a boat engine. A generator.
+player
+  id: Halo?
+  en: Hello?
+narration
+  id: Ombak. Genset. Nggak ada yang ngomong.
+  en: Waves. The generator. Nobody speaks.
+player
+  id: Kar?
+  en: Kar?
+
+stage
+  sound sfx_recorder_click.mp3
+
+narration
+  id: Klik.
+  en: Click.
+
+wait 900
+
+stage
+  sound sfx_recorder_click.mp3
+
+narration
+  id: Klik.
+  en: Click.
+narration
+  id: Gue kenal bunyi itu. Gue yang beliin alatnya. Tombol rekam Zoom H5. Dipencet, dilepas. Dua kali.
+  en: I know that sound. I bought the thing. The record button on a Zoom H5. Pressed, released. Twice.
+player
+  id: Sekar. Ini gue. Gue di sini.
+  en: Sekar. It's me. I'm here.
+
+wait 1500
+
+system
+  id: Panggilan berakhir
+  en: Call ended
+set
+  set heard_silent_call true
+
+stage
+  music none fade=2s
+  ambience none fade=2s
+
+narration
+  id: Gue duduk di lantai kamar Sekar sampai subuh, megangin HP-nya kayak megangin sesuatu yang bisa kabur.
+  en: I sit on the floor of Sekar's room until dawn, holding her phone like something that might run away.
+
+-> d4_stub
+
+
+# Day 4: Malam Itu. M2 placeholder until Day 4 is written, which replaces this stub and its ending.
+
+@conversation d4_stub chapter="Hari 4" chapter.en="Day 4" title="Malam Itu" title.en="That Night" checkpoint
+@scene VN bg=bg_sekar_room_day.webp music=bgm_quiet_house.mp3 day=4 time=07:00
+
+narration
+  id: Hari 4 belum ditulis. Ceritanya berlanjut di versi berikutnya.
+  en: Day 4 isn't written yet. The story continues in the next build.
+
+ending end_00_preview NORMAL
+  id: Bersambung
+  en: To Be Continued
+  summary id: Sekar naik ke kapal Pak Karta Senin malem. Seseorang menelepon tanpa suara, dan tombol perekamnya berbunyi dua kali.
+  summary en: Sekar went to Pak Karta's boat on Monday night. Someone called without a word, and a recorder button clicked twice.

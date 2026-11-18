@@ -1,0 +1,376 @@
+{
+  "conversation_id": "cvn_d3_didit",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Aditya",
+    "en": "Aditya"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_didit",
+    "day": 3,
+    "time": "19:20",
+    "music": "bgm_tense_call.mp3"
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Selamat malam. Mohon maaf mengganggu. Saya Aditya, dari bagian community relations PT Bentang Pesisir Makmur.",
+        "en": "Good evening. I'm sorry to bother you. My name is Aditya, from community relations at PT Bentang Pesisir Makmur."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 4000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_didit_card.webp",
+      "caption": {
+        "id": "Kartu nama saya.",
+        "en": "My card."
+      },
+      "profile": "didit",
+      "unlock_id": "photo_didit_card",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_didit_card",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nomor ini saya dapat dari Mas Bima. Beliau sangat khawatir. Kami semua turut prihatin atas hilangnya Mbak Sekar.",
+        "en": "I got this number from Bima. He is very worried. All of us are deeply sorry about Ms. Sekar's disappearance."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 4500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Bentang Pesisir,\" kata Dinda pelan. \"PT. B.\"",
+        "en": "\"Bentang Pesisir,\" Dinda says quietly. \"PT. B.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "heard_of_didit == true",
+      "text": {
+        "id": "Aditya. Orang-orang panggil dia Pak Didit. Ibu-ibu kerang bilang senyumnya kebanyakan.",
+        "en": "Aditya. People call him Pak Didit. The mussel women said he smiles too much."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TASYA_PROOF == 'tasya_warning'",
+      "text": {
+        "id": "Orang PR dari perusahaan yang nawarin sponsor. Yang nelpon Tasya malem-malem. Ramah banget. Terlalu ramah.",
+        "en": "The PR man from the company that offered the sponsorship. The one who called Tasya late at night. So friendly. Too friendly."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "Saya juga dengar grup pendengar Mbak Sekar sempat ramai kemarin pagi. Pasti berat sekali untuk Anda.",
+        "en": "I also heard Ms. Sekar's listener group got rather busy yesterday morning. This must be very hard for you."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 5000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Perusahaan kami ingin membantu. Kami punya pengacara, dan kami bekerja sama dengan laboratorium forensik digital. Kalau HP Mbak Sekar bisa diperiksa dengan benar, mungkin ada petunjuk yang terlewat oleh polisi.",
+        "en": "Our company would like to help. We have lawyers, and we work with a digital forensics lab. If Ms. Sekar's phone could be examined properly, there might be clues the police have missed."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 6000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kurir kami bisa datang ke rumah malam ini, jam delapan. Aman, ada tanda terimanya. Besok pagi hasilnya sudah ada.",
+        "en": "Our courier can come to the house tonight at eight. It's safe, with a signed receipt. You'd have the results by tomorrow morning."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 4000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Salam untuk Dik Dinda juga, ya. Pasti berat sekali untuk adiknya.",
+        "en": "Please give my regards to Dinda too. This must be so hard for the younger sister."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak pernah nyebut nama Dinda ke siapa pun di luar rumah ini.",
+        "en": "I've never said Dinda's name to anyone outside this house."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "hendra_warned == true",
+      "text": {
+        "id": "\"Jangan kasih ke siapa pun yang tiba-tiba baik sama kamu.\"",
+        "en": "\"Don't hand it to anyone who's suddenly nice to you.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "trust_dinda >= 10",
+      "text": {
+        "id": "Dinda megang lengan gue. Kenceng. \"Jangan,\" katanya. Cuma itu.",
+        "en": "Dinda grips my arm. Hard. \"Don't,\" she says. That's all."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "trust_dinda < 10",
+      "text": {
+        "id": "Dinda ngelihat layar, terus ngelihat gue. Dia nggak ngomong apa-apa. Sejak kemarin, dia mulai nunggu gue yang mutusin sendiri.",
+        "en": "Dinda looks at the screen, then at me. She doesn't say anything. Since yesterday, she's started leaving the decisions to me."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bagaimana, Mas Raka? Kurirnya saya jalankan?",
+        "en": "So, Raka? Shall I send the courier?"
+      },
+      "profile": "didit",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Gimana?",
+        "en": "Well?"
+      },
+      "variable": "HANDOVER",
+      "profile": "didit",
+      "timeout_ms": 15000,
+      "silent": true,
+      "default_choice": 3,
+      "choices": [
+        {
+          "text": {
+            "id": "Kirim HP-nya lewat kurir.",
+            "en": "Send the phone with the courier."
+          },
+          "value": "send"
+        },
+        {
+          "text": {
+            "id": "\"Saya pikir-pikir dulu, Pak.\"",
+            "en": "\"Let me think about it first.\""
+          },
+          "value": "stall"
+        },
+        {
+          "text": {
+            "id": "Tunjukin sesuatu ke dia.",
+            "en": "Show him something."
+          },
+          "value": "present"
+        },
+        {
+          "text": {
+            "id": "(Nggak bales.)",
+            "en": "(Don't reply.)"
+          },
+          "value": "ignore"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "HANDOVER == 'send'",
+      "text": {
+        "id": "Iya, Pak. Silakan kirim kurirnya.",
+        "en": "Yes. Please send the courier."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "JUMP",
+      "condition": "HANDOVER == 'send'",
+      "target": "d3_handed_over"
+    },
+    {
+      "type": "TEXT",
+      "condition": "HANDOVER == 'stall'",
+      "text": {
+        "id": "Saya pikir-pikir dulu, Pak.",
+        "en": "Let me think about it first."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "JUMP",
+      "condition": "HANDOVER == 'stall' || HANDOVER == 'ignore'",
+      "target": "#didit_stalled"
+    },
+    {
+      "type": "CHOICE",
+      "id": "ask_didit",
+      "source": "clues",
+      "text": {
+        "id": "Kirim apa ke dia?",
+        "en": "What do you send him?"
+      },
+      "variable": "DIDIT_PROOF",
+      "profile": "didit",
+      "responses": [
+        {
+          "clue": "threat_message",
+          "target": "#didit_slips"
+        }
+      ],
+      "fallback": {
+        "target": "#didit_shrugs"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "didit_slips",
+      "text": {
+        "id": "Astaga. Saya turut prihatin ada yang mengirim pesan seperti itu, Mas.",
+        "en": "Good heavens. I'm sorry someone sent you a message like that."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 5000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saran saya sebagai teman, sebaiknya Anda berhenti dulu. Demi keluarganya.",
+        "en": "My advice, as a friend, is that you stop for now. For the family's sake."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 6000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "didit_slipped",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Demi keluarganya.\" Gue taruh layarnya di samping screenshot pesan tengah malem itu. \"Demi adiknya.\"",
+        "en": "\"For the family's sake.\" I put the screen next to the screenshot of the midnight message. \"For her sister's sake.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda baca dua-duanya, terus ngelihat gue. Nggak ada yang perlu ngomong.",
+        "en": "Dinda reads them both, then looks at me. Neither of us needs to say it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Aditya sedang mengetik...",
+        "en": "Aditya is typing..."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Aditya terakhir dilihat 19.26",
+        "en": "Aditya last seen 7:26 PM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia berhenti ngetik. Dia nggak pernah ngirim apa-apa lagi.",
+        "en": "He stops typing. He never sends anything else."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_silent_call"
+    },
+    {
+      "type": "TEXT",
+      "id": "didit_shrugs",
+      "text": {
+        "id": "Terima kasih sudah berbagi, Mas. Justru hal-hal seperti ini yang bisa diperiksa lab kami.",
+        "en": "Thank you for sharing. That's exactly the kind of thing our lab can look into."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#didit_stalled"
+    },
+    {
+      "type": "TEXT",
+      "id": "didit_stalled",
+      "text": {
+        "id": "Tentu. Silakan dipikirkan baik-baik. Tapi tawaran seperti ini tidak selalu ada, Mas.",
+        "en": "Of course. Please think it over carefully. But an offer like this won't always be there."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 4000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Selamat malam.",
+        "en": "Good evening."
+      },
+      "profile": "didit",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam delapan lewat. Nggak ada motor yang berhenti di depan pagar. Tapi gue tetep ngintip dari jendela atas, dua kali, kayak Sekar dulu.",
+        "en": "Eight o'clock comes and goes. No motorbike stops at the gate. But I still look out of the upstairs window, twice, the way Sekar used to."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_silent_call"
+    }
+  ]
+}

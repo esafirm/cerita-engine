@@ -72,8 +72,13 @@ const _Run _kind = (
     "TASYA_OPEN": "warm",
     "TASYA_PROOF": "tasya_warning",
     "BIMA_PHONE": "ask",
+    "ANGKE": "mussels|stall|boats",
+    "HENDRA_PROOF": "listener_photo",
+    "TELL_BOAT": "keep",
+    "HANDOVER": "present",
+    "DIDIT_PROOF": "threat_message",
   },
-  inputs: ["0530", "karta0530"],
+  inputs: ["0530", "karta0530", "1427"],
 );
 
 /// Cold all the way, a short room search, three wrong passcodes before Raka remembers.
@@ -102,8 +107,12 @@ const _Run _cold = (
     "TASYA_OPEN": "blunt",
     "TASYA_PROOF": "threat_message",
     "BIMA_PHONE": "give",
+    "ANGKE": "fisherman|mussels|boats|stall",
+    "HENDRA_PROOF": "unsent_message",
+    "TELL_BOAT": "tell",
+    "HANDOVER": "send",
   },
-  inputs: ["1234", "0500", "9999", "0530", "karta", "sekar"],
+  inputs: ["1234", "0500", "9999", "0530", "karta", "sekar", "0914", "1452", "9999"],
 );
 
 /// Every timed choice left to run out, and a room search that walks past the gear shelf.
@@ -117,8 +126,10 @@ const _Run _timeouts = (
     "THREAT_REPLY": _timeout,
     "TASYA_PROOF": "sekar_notebook",
     "BIMA_PHONE": _timeout,
+    "HENDRA_PROOF": "ferry_schedule",
+    "HANDOVER": _timeout,
   },
-  inputs: ["0530", "Karta0530"],
+  inputs: ["0530", "Karta0530", "1427"],
 );
 
 void main() {
@@ -142,6 +153,14 @@ void main() {
     test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV, Tasya talks', () async {
       final (ending, engine) = await _play(locale, _kind);
       expect(ending.endingId, "end_00_preview");
+      // Day 3: the CCTV comes from Yusuf, Hendra warns Raka, and the threat makes Didit slip.
+      expect(engine.dataMap["heard_of_didit"], isTrue);
+      expect(engine.dataMap["hull_tries"], isNull);
+      expect(engine.dataMap["trust_hendra"], 5);
+      expect(engine.dataMap["hendra_warned"], isTrue);
+      expect(engine.dataMap["yusuf_knows_boat"], isNull);
+      expect(engine.dataMap["didit_slipped"], isTrue);
+      expect(engine.dataMap["heard_silent_call"], isTrue);
       expect(engine.dataMap["pass_tries"], isNull, reason: "first try");
       expect(engine.dataMap["yusuf_cctv"], isTrue);
       expect(engine.dataMap["told_dinda_truth"], isTrue);
@@ -157,14 +176,23 @@ void main() {
       expect(engine.dataMap["hid_threat"], isNull);
       expect(engine.dataMap["trust_yusuf"], 8);
       for (final clue in ["unsent_message", "ep12_teaser", "stake_map", "ferry_schedule", "missing_recorder",
-          "sekar_notebook", "threat_message", "listener_photo", "tasya_warning", "bima_deleted", "ep12_draft"]) {
+          "sekar_notebook", "threat_message", "listener_photo", "tasya_warning", "bima_deleted", "ep12_draft", "boat_registration", "cctv_still", "didit_card"]) {
         expect(engine.dataMap["clue_$clue"], isTrue, reason: clue);
       }
     });
 
-    test('cold run ($locale): wrong passwords, Yusuf unconvinced, the phone nearly handed over', () async {
+    test('cold run ($locale): wrong passwords, Yusuf unconvinced, the phone handed to Didit', () async {
       final (ending, engine) = await _play(locale, _cold);
-      expect(ending.endingId, "end_00_preview");
+      expect(ending.endingId, "end_07_handed_over", reason: "the phone goes to Didit's courier");
+      // Day 3: no CCTV request, so the stall owner's son has the still. Three wrong hull numbers.
+      expect(engine.dataMap["nudged_stall"], isTrue);
+      expect(engine.dataMap["clue_cctv_still"], isTrue);
+      expect(engine.dataMap["hull_tries"], 3);
+      expect(engine.dataMap["clue_boat_registration"], isTrue);
+      // unsent message -3, telling Yusuf about the boat -2
+      expect(engine.dataMap["trust_hendra"], -5);
+      expect(engine.dataMap["hendra_warned"], isNull);
+      expect(engine.dataMap["heard_silent_call"], isNull);
       expect(engine.dataMap["pass_tries"], 2, reason: "the third wrong code sends Raka to remember it");
       expect(engine.dataMap["yusuf_cctv"], isNull);
       expect(engine.dataMap["lied_to_yusuf"], isTrue);
@@ -199,6 +227,12 @@ void main() {
       expect(engine.dataMap["TASYA_PROOF"], "sekar_notebook");
       expect(engine.dataMap["trust_tasya"], -1);
       expect(engine.dataMap["BIMA_PHONE"], "silent");
+      // Day 3: the handover timer runs out, which only stalls Didit.
+      expect(engine.dataMap["HANDOVER"], "ignore");
+      // the ferry schedule 4, telling Yusuf about the boat -2
+      expect(engine.dataMap["trust_hendra"], 2);
+      expect(engine.dataMap["yusuf_knows_boat"], isTrue);
+      expect(engine.dataMap["heard_silent_call"], isTrue);
     });
   }
 }
