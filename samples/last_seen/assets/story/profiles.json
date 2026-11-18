@@ -15,7 +15,10 @@
         "raka_determined.webp"
       ],
       "height": 178,
-      "framing": 0.72
+      "face": {
+        "eyes": 0.132,
+        "chin": 0.211
+      }
     },
     {
       "id": "sekar",
@@ -35,7 +38,10 @@
         "sekar_tired.webp"
       ],
       "height": 162,
-      "framing": 0.68
+      "face": {
+        "eyes": 0.163,
+        "chin": 0.237
+      }
     },
     {
       "id": "dinda",
@@ -50,7 +56,10 @@
         "dinda_hopeful.webp"
       ],
       "height": 156,
-      "framing": 0.62
+      "face": {
+        "eyes": 0.161,
+        "chin": 0.234
+      }
     },
     {
       "id": "tasya",
@@ -65,7 +74,10 @@
         "tasya_crying.webp"
       ],
       "height": 165,
-      "framing": 0.64
+      "face": {
+        "eyes": 0.158,
+        "chin": 0.234
+      }
     },
     {
       "id": "bima",
@@ -79,7 +91,10 @@
         "bima_ashamed.webp"
       ],
       "height": 180,
-      "framing": 0.63
+      "face": {
+        "eyes": 0.11,
+        "chin": 0.211
+      }
     },
     {
       "id": "hendra",
@@ -93,7 +108,10 @@
         "hendra_worried.webp"
       ],
       "height": 168,
-      "framing": 0.62
+      "face": {
+        "eyes": 0.127,
+        "chin": 0.22
+      }
     },
     {
       "id": "yusuf",
@@ -106,7 +124,10 @@
         "yusuf_conflicted.webp"
       ],
       "height": 175,
-      "framing": 0.62
+      "face": {
+        "eyes": 0.13,
+        "chin": 0.223
+      }
     },
     {
       "id": "wulan",

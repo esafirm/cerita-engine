@@ -167,13 +167,8 @@ class _TitleScreenState extends State<TitleScreen> {
                       ("raka", "raka_neutral.webp", SpritePosition.left),
                       ("sekar", "sekar_smile.webp", SpritePosition.right),
                     ])
-                      PoiActor(
-                        id: id,
-                        sprite: config.sprite(sprite),
-                        position: position,
-                        height: cast.byId(id)?.height,
-                        framing: cast.byId(id)?.framing ?? 1,
-                      ),
+                      if (cast.byId(id) case final profile?)
+                        PoiActor.of(profile, sprite: config.sprite(sprite), position: position),
                 ],
                 cast: _cast == null ? null : PoiCast.ofProfiles(_cast!.profiles),
               ),

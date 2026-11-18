@@ -61,23 +61,26 @@ void hangUpTests() {
 }
 
 void castMeasureTests() {
-  test('height and framing in profiles.yaml reach profiles.json, and bad values are errors', () {
+  test('height and face in profiles.yaml reach profiles.json, and bad values are errors', () {
     const cast =
-        "nora:\n  name: Nora\n  height: 172\n  framing: 0.7\n  expressions:\n    open: nora_open.png\n"
-        "bob:\n  name: Bob\n  height: tall\n  framing: 1.4\n";
+        "nora:\n  name: Nora\n  height: 172\n  face: { eyes: 0.13, chin: 0.21 }\n  expressions:\n    open: nora_open.png\n"
+        "bob:\n  name: Bob\n  height: tall\n  face: { eyes: 0.3, chin: 0.2 }\n"
+        "ann:\n  name: Ann\n  face: 0.2\n";
     final result = compileStory(story({"a.cerita": "@conversation index\nnora\n  en: Hi\n"}, profiles: cast));
     expect(result.diagnostics.sorted().map((d) => d.format()), [
       "profiles.yaml:9: error: 'height' must be a number above 0",
-      "profiles.yaml:10: error: 'framing' must be a number above 0, up to 1",
+      "profiles.yaml:10: error: 'face' must give 'eyes' and 'chin' as shares of the sprite height, eyes above chin: { eyes: 0.13, chin: 0.21 }",
+      "profiles.yaml:13: error: 'face' must give 'eyes' and 'chin' as shares of the sprite height, eyes above chin: { eyes: 0.13, chin: 0.21 }",
     ]);
 
     final ok = compileStory(
       story({
         "a.cerita": "@conversation index\nnora\n  en: Hi\n",
-      }, profiles: "nora:\n  name: Nora\n  height: 172\n  framing: 0.7\n  expressions:\n    open: nora_open.png\n"),
+      }, profiles: "nora:\n  name: Nora\n  height: 172\n  face: { eyes: 0.13, chin: 0.21 }\n  expressions:\n    open: nora_open.png\n"),
     );
     final profiles = core.ProfileData.fromJson(jsonDecode(ok.files["profiles.json"]!) as Map<String, dynamic>);
     expect(profiles.byId("nora")?.height, 172);
-    expect(profiles.byId("nora")?.framing, 0.7);
+    expect(profiles.byId("nora")?.face?.eyes, 0.13);
+    expect(profiles.byId("nora")?.face?.chin, 0.21);
   });
 }

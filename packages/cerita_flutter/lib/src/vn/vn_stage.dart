@@ -92,8 +92,9 @@ class _VnStageState extends State<VnStage> {
 
   List<PoiActor> _actors() => [
         for (final MapEntry(key: position, value: info) in controller.stage.sprites.entries)
-          if (controller.profileById(info.id)?.getSprite(info) case final sprite?)
-            PoiActor(id: info.id, sprite: config.sprite(sprite), position: position),
+          if (controller.profileById(info.id) case final profile?)
+            if (profile.getSprite(info) case final sprite?)
+              PoiActor.of(profile, sprite: config.sprite(sprite), position: position),
       ];
 
   @override
@@ -120,33 +121,36 @@ class _VnStageState extends State<VnStage> {
     final picking = controller.phase == StoryPhase.choice && item is EvidenceItemType && asked;
 
     // Top-anchored, so the bottom inset is not its concern. Above the picker it would leave a gap.
-    final hud = MediaQuery.removePadding(
-      context: context,
-      removeBottom: true,
-      child: StorySkin.of(context).vnHud(
-        context,
-        VnHud(
-          label: scene.day != null || scene.time != null
-              ? [
-                  if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
-                  // The same clock as chat headers and story timestamps: "9:40 PM", "21.40".
-                  if (scene.time != null) StoryLanguage.of(context).strings.sceneTime(scene.time!),
-                ].join(" · ")
-              : null,
-          autoMode: controller.autoMode,
-          skipMode: controller.skipMode,
-          onBacklog: () => BacklogSheet.show(context, controller),
-          onAuto: controller.toggleAuto,
-          onSkip: controller.toggleSkip,
-          onMenu: widget.onMenu,
-          onBack: controller.canRollback ? controller.rollback : null,
-          onQuickSave: controller.replay ? null : controller.quickSave,
-          onQuickLoad: controller.replay ? null : controller.quickLoad,
-          onHide: () => _setHidden(true),
-          onCaseBoard: controller.hasClues && item is! EvidenceItemType
-              ? () => CaseBoardScreen.open(context, controller)
-              : null,
-          newClues: controller.newClues.length,
+    // Clue notifications show under it, not over its buttons.
+    final hud = ClueNotifications.below(
+      child: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        child: StorySkin.of(context).vnHud(
+          context,
+          VnHud(
+            label: scene.day != null || scene.time != null
+                ? [
+                    if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
+                    // The same clock as chat headers and story timestamps: "9:40 PM", "21.40".
+                    if (scene.time != null) StoryLanguage.of(context).strings.sceneTime(scene.time!),
+                  ].join(" · ")
+                : null,
+            autoMode: controller.autoMode,
+            skipMode: controller.skipMode,
+            onBacklog: () => BacklogSheet.show(context, controller),
+            onAuto: controller.toggleAuto,
+            onSkip: controller.toggleSkip,
+            onMenu: widget.onMenu,
+            onBack: controller.canRollback ? controller.rollback : null,
+            onQuickSave: controller.replay ? null : controller.quickSave,
+            onQuickLoad: controller.replay ? null : controller.quickLoad,
+            onHide: () => _setHidden(true),
+            onCaseBoard: controller.hasClues && item is! EvidenceItemType
+                ? () => CaseBoardScreen.open(context, controller)
+                : null,
+            newClues: controller.newClues.length,
+          ),
         ),
       ),
     );

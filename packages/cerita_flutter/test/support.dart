@@ -8,15 +8,19 @@ class FakeEngineLoader extends EngineLoader {
   /// The story's `clues.json`, if it has one.
   final Map<String, dynamic>? clues;
 
-  FakeEngineLoader(this.files, {this.clues});
+  /// The cast, in place of Nora and Miki.
+  final List<Map<String, dynamic>>? profiles;
+
+  FakeEngineLoader(this.files, {this.clues, this.profiles});
 
   @override
   Future<EnginePackage> initialLoad() async => EnginePackage(
         profiles: ProfileData.fromJson({
-          "profiles": [
-            {"id": "nora", "name": "Nora", "sprites": ["nora.png"]},
-            {"id": "miki", "name": "Miki", "sprites": ["miki.png"]},
-          ],
+          "profiles": profiles ??
+              [
+                {"id": "nora", "name": "Nora", "sprites": ["nora.png"]},
+                {"id": "miki", "name": "Miki", "sprites": ["miki.png"]},
+              ],
         }),
         conversation: await loadConversation(Conversation.indexKey),
         clues: clues == null ? ClueCatalog.empty : ClueCatalog.fromJson(clues!),

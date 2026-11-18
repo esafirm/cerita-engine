@@ -1,6 +1,6 @@
 Anime visual novel character sprite, knees-up: the bottom edge of the frame cuts across his knees, so no shins and
 no boots show. Same framing and scale as the other cast sprites: the top of his cap about 3% below the top edge, his
-eyes about 13% down from the top, his belt about half way down. Portrait 1:2, the character centered and fully
+eyes about 13% down from the top, his waist about half way down. The singlet hangs loose over the waistband, so no belt shows. Portrait 1:2, the character centered and fully
 inside the frame side to side, flat pure green #00FF00 background with nothing else on it, no shadow, no floor,
 clean hard edges, no green in the clothes, hair or props. Pak Hendra, a 56-year-old Indonesian boatman from the
 fishing port, wiry and strong, still upright, a man of few words, clearly mid-fifties and not elderly. Sun-darkened

@@ -31,9 +31,9 @@ class Profile {
   /// takes them as tall as the tallest character.
   final double? height;
 
-  /// The share of the body the sprites show, from the top of the head (`"framing"`): 1 is head to toe, 0.5 is cut
-  /// at the hips. Sprites cut at different points stand at their real heights side by side.
-  final double framing;
+  /// Where the face is on the sprites (`"face"`), so the stage can size every face to the character's [height]
+  /// whatever the art's framing. Null takes the sprites as head to toe.
+  final SpriteFace? face;
 
   /// The JSON it was read from, to show it in another language. Null when built in code.
   final Map<String, dynamic>? _json;
@@ -46,7 +46,7 @@ class Profile {
     this.avatar,
     this.sprites = const [],
     this.height,
-    this.framing = 1,
+    this.face,
   }) : _json = null;
 
   Profile._fromJson(Map<String, dynamic> json, Localizer localizer)
@@ -57,7 +57,7 @@ class Profile {
         avatar = json["avatar"] as String?,
         sprites = [for (final sprite in json["sprites"] as List<dynamic>? ?? const []) sprite.toString()],
         height = (json["height"] as num?)?.toDouble(),
-        framing = (json["framing"] as num?)?.toDouble() ?? 1,
+        face = SpriteFace.fromJson(json["face"]),
         _json = json;
 
   factory Profile.fromJson(Map<String, dynamic> json, {Localizer localizer = const Localizer()}) =>
@@ -76,4 +76,27 @@ class Profile {
     final index = info.spriteIndex;
     return sprites[index.clamp(0, sprites.length - 1)];
   }
+}
+
+/// Where a character's face is on their sprites, as shares of the sprite's height from its top edge: the eye line
+/// and the bottom of the chin. Measured once per character, as every pose of a character is drawn at one framing.
+///
+/// From it the stage knows how big the art draws the character and where their eyes are, so every face comes out
+/// in proportion to the character's height (eyes to chin is about [eyeToChin] of a person's height) whether the
+/// art cuts them at the knees or at the waist.
+class SpriteFace {
+  /// Eyes to chin, as a share of a person's height. The top of the head to the eyes is about as much again.
+  static const eyeToChin = 1 / 15;
+
+  final double eyes;
+  final double chin;
+
+  const SpriteFace({required this.eyes, required this.chin});
+
+  static SpriteFace? fromJson(Object? json) => switch (json) {
+        {"eyes": final num eyes, "chin": final num chin} => SpriteFace(eyes: eyes.toDouble(), chin: chin.toDouble()),
+        _ => null,
+      };
+
+  Map<String, dynamic> toJson() => {"eyes": eyes, "chin": chin};
 }

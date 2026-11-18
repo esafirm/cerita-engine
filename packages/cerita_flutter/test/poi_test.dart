@@ -1,7 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
@@ -66,17 +72,30 @@ void main() {
     }
   });
 
-  testWidgets('heights and framing size the sprites against each other and keep every cut below the edge', (
+  testWidgets('faces come out in proportion to height, eyes at eye height, and every cut stays below the edge', (
     tester,
   ) async {
     await _portrait(tester);
-    // Nora is 180 and shown head to toe. Miki is 150 and shown down to the hips: her cut is the highest, at 75.
+    // Nora is 180: eyes to chin is 12, so her sprite, with the face over a tenth of it, is 120 long, from 180 down
+    // to 60. Miki is 150: 10, drawn with a bigger face, so 100 long, from 160 down to 60.
     await tester.pumpWidget(
       _wrap(
-        Poi(
+        const Poi(
           actors: [
-            const PoiActor(id: "nora", sprite: "x.png", position: SpritePosition.left, height: 180),
-            const PoiActor(id: "miki", sprite: "x.png", position: SpritePosition.right, height: 150, framing: 0.5),
+            PoiActor(
+              id: "nora",
+              sprite: "x.png",
+              position: SpritePosition.left,
+              height: 180,
+              face: SpriteFace(eyes: 0.1, chin: 0.2),
+            ),
+            PoiActor(
+              id: "miki",
+              sprite: "x.png",
+              position: SpritePosition.right,
+              height: 150,
+              face: SpriteFace(eyes: 0.2, chin: 0.3),
+            ),
           ],
         ),
       ),
@@ -84,13 +103,83 @@ void main() {
     await tester.pumpAndSettle();
     final nora = _slot(tester, "nora");
     final miki = _slot(tester, "miki");
-    final scale = 800 * Poi.heightShare(2, narrow: true) / (180 - 75);
-    expect(miki.bottom, closeTo(800, 0.01), reason: "the highest cut sits on the edge");
-    expect(miki.height, closeTo(75 * scale, 0.01));
-    expect(nora.height, closeTo(180 * scale, 0.01));
-    expect(nora.bottom, closeTo(800 + 75 * scale, 0.01), reason: "Nora's feet are below the edge, off the stage");
-    expect(800 - nora.top, closeTo(800 * Poi.heightShare(2, narrow: true), 0.01), reason: "the tallest head");
-    expect(nora.top, lessThan(miki.top), reason: "the taller one stands taller");
+    final scale = 800 * Poi.heightShare(2, narrow: true) / (180 - 60);
+    expect(nora.height, closeTo(120 * scale, 0.01));
+    expect(miki.height, closeTo(100 * scale, 0.01));
+    expect(nora.bottom, closeTo(800, 0.01), reason: "the highest cut sits on the edge");
+    expect(miki.bottom, closeTo(800, 0.01));
+    expect(800 - nora.top, closeTo(800 * Poi.heightShare(2, narrow: true), 0.01), reason: "the highest head");
+    // Eyes to chin on screen: 12 and 10, as tall as they are.
+    expect(nora.height * 0.1 / (miki.height * 0.1), closeTo(180 / 150, 0.001));
+    // The eye lines are 168 and 140 above the floor.
+    final noraEyes = nora.top + nora.height * 0.1;
+    final mikiEyes = miki.top + miki.height * 0.2;
+    expect(mikiEyes - noraEyes, closeTo((168 - 140) * scale, 0.01));
+  });
+
+  testWidgets('a head-to-toe sprite stands next to a cut one with its feet off the stage', (tester) async {
+    await _portrait(tester);
+    await tester.pumpWidget(
+      _wrap(
+        const Poi(
+          actors: [
+            PoiActor(id: "nora", sprite: "x.png", position: SpritePosition.left, height: 180),
+            PoiActor(
+              id: "miki",
+              sprite: "x.png",
+              position: SpritePosition.right,
+              height: 150,
+              face: SpriteFace(eyes: 0.2, chin: 0.3),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final scale = 800 * Poi.heightShare(2, narrow: true) / (180 - 60);
+    expect(_slot(tester, "nora").height, closeTo(180 * scale, 0.01));
+    expect(_slot(tester, "nora").bottom, closeTo(800 + 60 * scale, 0.01));
+  });
+
+  testWidgets('the story stage gives each character its height and face', (tester) async {
+    mockAudioChannels();
+    final setup = StorySetup(
+      config: const LoaderConfig(),
+      loader: FakeEngineLoader(
+        {
+          "index": {
+            "conversation_id": "cvn",
+            "scene": {"mode": "VN"},
+            "conversations": [
+              {
+                "type": "STAGE",
+                "actions": [
+                  {"action": "show", "profile": "nora:0", "position": "left"},
+                ],
+              },
+              {"type": "TEXT", "text": "Hi", "profile": "nora:0"},
+            ],
+          },
+        },
+        profiles: [
+          {
+            "id": "nora",
+            "name": "Nora",
+            "sprites": ["nora.png"],
+            "height": 170,
+            "face": {"eyes": 0.1, "chin": 0.2},
+          },
+        ],
+      ),
+      storage: InMemoryStoryStorage(),
+      audio: SilentAudio.new,
+    );
+    await tester.pumpWidget(MaterialApp(home: StoryScreen(setup: setup)));
+    await tester.pumpAndSettle();
+    final actor = tester.widget<Poi>(find.byType(Poi)).actors.single;
+    expect(actor.height, 170);
+    expect(actor.face?.eyes, 0.1);
+    expect(actor.face?.chin, 0.2);
   });
 
   testWidgets('with the whole cast measured, a character keeps their size whoever is on stage', (tester) async {
@@ -119,7 +208,7 @@ void main() {
     ];
     await tester.pumpWidget(_wrap(Poi(actors: actors, speakerId: "raka")));
     await tester.pumpAndSettle();
-    expect(_slot(tester, "raka").height, greaterThan(alone * 0.85), reason: "not shrunk into dolls");
+    expect(_slot(tester, "raka").height, greaterThan(alone * 0.75), reason: "not shrunk into dolls");
     final gap = 400 * Poi.spacing(3);
     expect(_slot(tester, "raka").center.dx, closeTo(200 - gap, 0.01));
     expect(_slot(tester, "yusuf").center.dx, closeTo(200, 0.01));
@@ -179,6 +268,36 @@ void main() {
     expect(_alignmentOf(tester, "yusuf").x, 0);
   });
 
+  testWidgets('a new expression waits for its image, so the old one never fades out over an empty slot', (
+    tester,
+  ) async {
+    final bundle = _SlowBundle();
+    Widget stage(String sprite) => DefaultAssetBundle(
+      bundle: bundle,
+      child: _wrap(Poi(actors: [_actor("nora", SpritePosition.center, sprite)], speakerId: "nora")),
+    );
+    List<String> shown() => [
+      for (final image in tester.widgetList<Image>(find.byType(Image)))
+        if (image.image case AssetImage(:final assetName)) assetName,
+    ];
+
+    await tester.pumpWidget(stage("a.png"));
+    await tester.runAsync(() async => bundle.release("a.png"));
+    await tester.pumpAndSettle();
+    expect(shown(), ["a.png"]);
+
+    await tester.pumpWidget(stage("b.png"));
+    await tester.pump(const Duration(seconds: 1));
+    expect(shown(), ["a.png"], reason: "b.png isn't loaded yet");
+
+    await tester.runAsync(() async {
+      bundle.release("b.png");
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pumpAndSettle();
+    expect(shown(), ["b.png"]);
+  });
+
   testWidgets('an expression change disposes what its cross-fade creates', (tester) async {
     var live = 0;
     void track(ObjectEvent event) {
@@ -233,4 +352,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect(tester.takeException(), isNull);
   });
+}
+
+/// Serves a 1×1 PNG for any asset, each only once [release] lets it through.
+class _SlowBundle extends CachingAssetBundle {
+  static final _pixel = base64Decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+  );
+  final _waiting = <String, Completer<void>>{};
+
+  void release(String key) => (_waiting[key] ??= Completer()).complete();
+
+  @override
+  Future<ByteData> load(String key) async {
+    if (key == "AssetManifest.bin") return const StandardMessageCodec().encodeMessage(<String, Object?>{})!;
+    await (_waiting[key] ??= Completer()).future;
+    return ByteData.sublistView(_pixel);
+  }
 }

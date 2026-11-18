@@ -103,6 +103,20 @@ void main() {
   }
 
   for (final (name, skin) in [("default", const StorySkin()), ("tall", const _TallHudSkin())]) {
+    testWidgets('in VN, a clue notification shows under the $name HUD, not over its buttons', (tester) async {
+      tester.view.physicalSize = const Size(411, 820);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final story = _story();
+      story["index"]!["scene"] = {"mode": "VN", "day": 1, "time": "21:00"};
+      await pumpStory(tester, story, skin: skin);
+      final notice = tester.getRect(find.text(_strings.clueFound("Pier photo")));
+      final backlog = find.byTooltip("Backlog").evaluate().isNotEmpty ? find.byTooltip("Backlog") : find.text("LOG");
+      expect(notice.top, greaterThanOrEqualTo(tester.getRect(backlog.first).bottom));
+      await tester.pump(ClueNotifications.duration);
+      await tester.pumpAndSettle();
+    });
+
     testWidgets('in VN, the picker sits below the $name HUD and a clue found just before shows no notification',
         (tester) async {
       tester.view.physicalSize = const Size(411, 820);

@@ -264,7 +264,7 @@ class _Compiler {
               if (profile.avatar != null) "avatar": profile.avatar,
               if (profile.sprites.isNotEmpty) "sprites": profile.sprites,
               if (profile.height != null) "height": profile.height,
-              if (profile.framing != null) "framing": profile.framing,
+              if (profile.face case final face?) "face": {"eyes": face.eyes, "chin": face.chin},
             },
         ],
       };

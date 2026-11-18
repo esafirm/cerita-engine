@@ -63,7 +63,7 @@ A profile with sprites can say how tall the character is, so the VN stage sizes 
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `height` | `num` | No | How tall the character is, in any unit the whole cast shares (cm, say). Left out, the stage takes them as tall as the tallest character. |
-| `framing` | `num`, above 0 up to 1 | No (defaults to `1`) | The share of the body the sprites show, from the top of the head: `1` is head to toe, `0.72` down to the knee, `0.5` cut at the hips. |
+| `face` | `{"eyes": num, "chin": num}`, shares from 0 to 1, eyes above chin | No | Where the face is on the sprites, measured once on any pose: the eye line and the bottom of the chin, as shares of the sprite height from its top edge. The stage takes eyes to chin as 1/15 of `height` and the eyes at 14/15 of it, which sets how big the art draws the character and where it stands. Left out, the sprites are taken as head to toe. |
 
 ### Profile Reference Format (`<id>:<sprite_index>`)
 Dialogue items reference a character and expression using the shorthand `<id>:<sprite_index>` (parsed by `ProfileInfo`):

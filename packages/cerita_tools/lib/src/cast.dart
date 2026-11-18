@@ -26,8 +26,8 @@ class CastProfile {
   /// `height`: how tall the character is, in any unit the whole cast shares. Sizes the sprites against each other.
   final num? height;
 
-  /// `framing`: the share of the body the sprites show, from the top of the head: 1 is head to toe.
-  final num? framing;
+  /// `face`: where the eye line and the chin are on the sprites, as shares of the sprite height from the top.
+  final ({num eyes, num chin})? face;
 
   const CastProfile({
     required this.key,
@@ -42,7 +42,7 @@ class CastProfile {
     this.avatar,
     this.avatarSpan,
     this.height,
-    this.framing,
+    this.face,
   });
 
   /// The sprite index of [expression], or 0 when it's `null`. `null` when the expression doesn't exist.
@@ -92,7 +92,7 @@ class Cast {
         diagnostics.error(span, "Profile '$key' must be a map");
         return;
       }
-      const known = {"id", "name", "handle", "bio", "avatar", "expressions", "height", "framing"};
+      const known = {"id", "name", "handle", "bio", "avatar", "expressions", "height", "face"};
       for (final field in node.nodes.keys.cast<YamlNode>()) {
         if (!known.contains(field.value)) {
           diagnostics.error(yamlSpan(file, field), "Unknown profile field '${field.value}'");
@@ -126,14 +126,26 @@ class Cast {
         diagnostics.error(yamlSpan(file, expressionsNode), "'expressions' must map names to sprite files");
       }
 
-      num? measure(String field, {num? max}) {
+      num? measure(String field) {
         final measured = node.nodes[field];
         if (measured == null || measured.value == null) return null;
         final value = measured.value;
-        if (value is num && value > 0 && (max == null || value <= max)) return value;
+        if (value is num && value > 0) return value;
+        diagnostics.error(yamlSpan(file, measured), "'$field' must be a number above 0");
+        return null;
+      }
+
+      ({num eyes, num chin})? face() {
+        final faceNode = node.nodes["face"];
+        if (faceNode == null || faceNode.value == null) return null;
+        if (faceNode case YamlMap(
+          value: {"eyes": final num eyes, "chin": final num chin},
+        ) when faceNode.length == 2 && 0 <= eyes && eyes < chin && chin <= 1) {
+          return (eyes: eyes, chin: chin);
+        }
         diagnostics.error(
-          yamlSpan(file, measured),
-          max == null ? "'$field' must be a number above 0" : "'$field' must be a number above 0, up to $max",
+          yamlSpan(file, faceNode),
+          "'face' must give 'eyes' and 'chin' as shares of the sprite height, eyes above chin: { eyes: 0.13, chin: 0.21 }",
         );
         return null;
       }
@@ -152,7 +164,7 @@ class Cast {
         sprites: sprites,
         spriteSpans: spriteSpans,
         height: measure("height"),
-        framing: measure("framing", max: 1),
+        face: face(),
       );
     });
     return Cast(profiles);

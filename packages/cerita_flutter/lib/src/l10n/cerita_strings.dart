@@ -506,7 +506,7 @@ class IndonesianCeritaStrings extends CeritaStrings {
   @override
   String get newGalleryItem => "item baru";
   @override
-  String checkpoint(String chapter) => "Checkpoint: $chapter";
+  String checkpoint(String chapter) => "Titik simpan: $chapter";
   @override
   String get typing => "mengetik…";
   @override

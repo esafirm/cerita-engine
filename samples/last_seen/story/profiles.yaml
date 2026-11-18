@@ -1,14 +1,14 @@
 # The cast (spec §2). Expressions are in sprite order: the first one is used when a script names none.
 # Keep the order: appending is safe, reordering changes every compiled sprite index.
-# height is in cm. framing is the share of the body the sprites show from the top of the head: Raka's go down
-# to the knee (0.72), Dinda's stop at the upper thigh (0.62). The stage uses both to stand everyone at their real
-# heights side by side.
+# height is in cm. face is where the eye line and the bottom of the chin are on the sprites, as shares of the
+# sprite height from the top (pixels / 1774 here), measured on the neutral pose. The stage sizes every face to its
+# character's height from it: Raka's art draws him with a small face for his frame, Bima's with a big one.
 
 raka:
   handle: "@rakapradipta"
   name: Raka
   height: 178
-  framing: 0.72
+  face: { eyes: 0.132, chin: 0.211 }
   avatar: assets/story/sprites/raka_avatar.webp
   expressions:
     neutral: raka_neutral.webp
@@ -24,7 +24,7 @@ sekar:
   bio: { id: "Suara dari pesisir utara. Ep. 12 segera.", en: "Voices from the north coast. Ep. 12 soon." }
   name: Sekar
   height: 162
-  framing: 0.68
+  face: { eyes: 0.163, chin: 0.237 }
   avatar: assets/story/sprites/sekar_avatar.webp
   expressions:
     neutral: sekar_neutral.webp
@@ -38,7 +38,7 @@ dinda:
   handle: "@dindaaa"
   name: Dinda
   height: 156
-  framing: 0.62
+  face: { eyes: 0.161, chin: 0.234 }
   avatar: assets/story/sprites/dinda_avatar.webp
   expressions:
     neutral: dinda_neutral.webp
@@ -50,7 +50,7 @@ dinda:
 tasya:
   name: Tasya
   height: 165
-  framing: 0.64
+  face: { eyes: 0.158, chin: 0.234 }
   avatar: assets/story/sprites/tasya_avatar.webp
   expressions:
     neutral: tasya_neutral.webp
@@ -63,7 +63,7 @@ tasya:
 bima:
   name: Bima
   height: 180
-  framing: 0.63
+  face: { eyes: 0.110, chin: 0.211 }
   avatar: assets/story/sprites/bima_avatar.webp
   expressions:
     neutral: bima_neutral.webp
@@ -75,7 +75,7 @@ bima:
 hendra:
   name: "Pak Hendra"
   height: 168
-  framing: 0.62
+  face: { eyes: 0.127, chin: 0.220 }
   avatar: assets/story/sprites/hendra_avatar.webp
   expressions:
     neutral: hendra_neutral.webp
@@ -87,7 +87,7 @@ hendra:
 yusuf:
   name: "Ipda Yusuf"
   height: 175
-  framing: 0.62
+  face: { eyes: 0.130, chin: 0.223 }
   avatar: assets/story/sprites/yusuf_avatar.webp
   expressions:
     neutral: yusuf_neutral.webp

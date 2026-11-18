@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
@@ -328,6 +329,8 @@ class _EvidencePickerState extends State<EvidencePicker> with SingleTickerProvid
 /// None shows during an evidence question: it would cover the picker's prompt and countdown, and open the
 /// board the question hides. Notifications still queued when the question comes are dropped. Their clues stay
 /// new, so the picker lists them and the board's badge counts them afterwards.
+///
+/// They show below a bar wrapped in [ClueNotifications.below], such as the VN HUD, rather than over its buttons.
 class ClueNotifications extends StatefulWidget {
   final StoryController controller;
   final Widget child;
@@ -336,12 +339,25 @@ class ClueNotifications extends StatefulWidget {
 
   const ClueNotifications({super.key, required this.controller, required this.child});
 
+  /// Keeps the notifications clear of [child], a bar at the top of the screen: while it is on screen they show
+  /// under its bottom edge.
+  static Widget below({Key? key, required Widget child}) => _ClearOf(key: key, child: child);
+
   @override
   State<ClueNotifications> createState() => _ClueNotificationsState();
 }
 
 class _ClueNotificationsState extends State<ClueNotifications> {
   final List<Clue> _queue = [];
+  final _stack = GlobalKey();
+
+  /// The bottom edges of the bars to keep clear of, in this widget.
+  final Map<State, double> _bars = {};
+
+  void _keepClear(State bar, double? bottom) {
+    if (_bars[bar] == bottom) return;
+    setState(() => bottom == null ? _bars.remove(bar) : _bars[bar] = bottom);
+  }
   late final StreamSubscription<Clue> _subscription;
   Timer? _timer;
 
@@ -390,43 +406,112 @@ class _ClueNotificationsState extends State<ClueNotifications> {
   Widget build(BuildContext context) {
     final clue = _evidenceAsked ? null : _queue.firstOrNull;
     final controller = widget.controller;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        widget.child,
-        Positioned(
-          top: 0,
-          left: 12,
-          right: 12,
-          child: SafeArea(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              transitionBuilder: (child, animation) => SlideTransition(
-                position: Tween(begin: const Offset(0, -1.5), end: Offset.zero).animate(animation),
-                child: child,
-              ),
-              child: clue == null
-                  ? const SizedBox.shrink()
-                  : Padding(
-                      key: ValueKey(clue.id),
-                      padding: const EdgeInsets.only(top: 8),
-                      child: StorySkin.of(context).clueNotification(
-                        context,
-                        ClueNotice(
-                          clue: clue,
-                          title: controller.clueText(clue.title),
-                          image: controller.clueImage(clue),
-                          onTap: () {
-                            _dismiss();
-                            CaseBoardScreen.open(context, controller, clue: clue);
-                          },
+    final below = _bars.values.fold(0.0, max);
+    return _ClueNotificationsScope(
+      state: this,
+      child: Stack(
+        key: _stack,
+        fit: StackFit.expand,
+        children: [
+          widget.child,
+          Positioned(
+            top: below,
+            left: 12,
+            right: 12,
+            child: SafeArea(
+              // Under a bar, the status bar is already cleared.
+              top: below == 0,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                transitionBuilder: (child, animation) => SlideTransition(
+                  position: Tween(begin: const Offset(0, -1.5), end: Offset.zero).animate(animation),
+                  child: child,
+                ),
+                child: clue == null
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        key: ValueKey(clue.id),
+                        padding: const EdgeInsets.only(top: 8),
+                        child: StorySkin.of(context).clueNotification(
+                          context,
+                          ClueNotice(
+                            clue: clue,
+                            title: controller.clueText(clue.title),
+                            image: controller.clueImage(clue),
+                            onTap: () {
+                              _dismiss();
+                              CaseBoardScreen.open(context, controller, clue: clue);
+                            },
+                          ),
                         ),
                       ),
-                    ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ClueNotificationsScope extends InheritedWidget {
+  final _ClueNotificationsState state;
+
+  const _ClueNotificationsScope({required this.state, required super.child});
+
+  @override
+  bool updateShouldNotify(_ClueNotificationsScope oldWidget) => false;
+}
+
+/// See [ClueNotifications.below]. Measures its child after each layout.
+class _ClearOf extends StatefulWidget {
+  final Widget child;
+
+  const _ClearOf({super.key, required this.child});
+
+  @override
+  State<_ClearOf> createState() => _ClearOfState();
+}
+
+class _ClearOfState extends State<_ClearOf> {
+  _ClueNotificationsState? _notifications;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final notifications = context.getInheritedWidgetOfExactType<_ClueNotificationsScope>()?.state;
+    if (notifications != _notifications) _notifications?._keepClear(this, null);
+    _notifications = notifications;
+  }
+
+  void _measure() {
+    final notifications = _notifications;
+    if (!mounted || notifications == null || !notifications.mounted) return;
+    final bar = context.findRenderObject();
+    final stack = notifications._stack.currentContext?.findRenderObject();
+    if (bar is! RenderBox || !bar.hasSize || stack == null) return;
+    notifications._keepClear(this, bar.localToGlobal(Offset(0, bar.size.height), ancestor: stack).dy);
+  }
+
+  @override
+  void dispose() {
+    final notifications = _notifications;
+    // Not during the unmount of the tree: the notifications may be going too.
+    if (notifications != null && notifications.mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (notifications.mounted) notifications._keepClear(this, null);
+      });
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+        return widget.child;
+      },
     );
   }
 }

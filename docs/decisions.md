@@ -774,6 +774,8 @@ Holding the stage (or the title screen) hides the UI until the finger lifts, so 
 
 *2026-11-18. Presentation modes §2.1, data schema §2. Found in the Last Seen M1 playtest.*
 
+*Its `framing` was replaced the same day, see "Sprites are sized by their faces".*
+
 A profile can give its `height` and its sprites' `framing` (the share of the body they show from the top of the
 head). The stage sizes every sprite with one scale for the whole cast, so the tallest head reaches 82% of the
 stage, a shorter character stands shorter, and each sprite's cut sits below the bottom edge at its height above
@@ -795,13 +797,15 @@ the floor. Without heights every sprite is as tall, as before.
 
 *2026-11-18. Presentation modes §2.1. Replaces "Characters stand side by side" and "Characters spread edge to edge" for portrait stages.*
 
-On a portrait stage the camera barely pulls back for a crowd (80% with two, 72% with three) and the characters
-overlap, half the stage width apart with two and 40% with three. On a landscape stage the slots are fixed
+On a portrait stage the camera barely pulls back for a crowd (80% with two, 66% with three) and the characters
+overlap, half the stage width apart with two and 34% with three. On a landscape stage the slots are fixed
 shares of the width and the far ones are half on screen.
 
 - **Why:** the width cap shrank two characters to 60% of the stage width, small against the background. The
   playtest found the proportions off. Overlap reads as people in one shot, and the dimming shows who speaks.
 - **Also fixed:** on a landscape phone the `far_*` slots put their character fully off screen.
+- **Three, tuned after the second playtest:** at 72% and 40% the middle one hid most of the one at the side and
+  pushed the other half off the screen. At 66% and 34% all three faces are clear and nobody is a doll.
 - **Cost:** with three on a phone the middle one covers part of the other two. The paint order stays fixed, so
   the speaker can be behind someone.
 - **Revisit if** a scene with three needs everyone fully visible: a per-scene option to show only the speaker
@@ -857,6 +861,63 @@ its framed retro window.
   between page routes, and the clue's thumbnail sits in a modal sheet. So the viewer has its own route, which
   fades the skin's frame in, and the picture flies above the fade from the thumbnail's box to its fitted box in
   the viewer, cropped like the thumbnail at the start. The viewer's own copy shows once it lands.
+
+## Sprites are sized by their faces
+
+*2026-11-18. Presentation modes §2.1, data schema §2. Found in the second Last Seen playtest. Replaces `framing`.*
+
+A profile gives `face: {eyes, chin}`, where the eye line and the bottom of the chin are on its sprites, as shares
+of the sprite height. The stage takes a person's eyes to chin as 1/15 of their height and their eyes at 14/15 of
+it. From that it knows how long the whole sprite is in the cast's unit and where it stands, so faces come out in
+proportion to height and eye lines at eye height.
+
+- **Why:** `framing` (the share of the body a sprite shows) was a guess from where the art cuts, and it was off
+  where it mattered. Measured on the art, Raka's face is 140 px from eyes to chin, Bima's 180 and Dinda's 130,
+  although Raka is 178 cm, Bima 180 and Dinda 156. The art draws Raka with a small face on a long frame. Players
+  compare faces, not knees, so the face is what has to come out right. Eyes and chin are also easy to measure,
+  where a body cut isn't.
+- **Why the eye line and not the top of the head:** the top of the sprite is hair, and anime hair adds very
+  different amounts (Raka's spikes, Hendra's cap). Eyes sit in the same place on every person.
+- **Also found:** the story stage never passed the heights to the stage at all, only the probe that rendered it
+  for screenshots did. On the phone every character was drawn as tall as the tallest and head to toe, which
+  zoomed everyone into a chest-up close-up. A test now checks the story stage hands each actor its profile's
+  height and face.
+- **Last Seen's numbers** were measured on the neutral poses (the others match within about 10 px): Raka 0.132 /
+  0.211, Sekar 0.163 / 0.237, Dinda 0.161 / 0.234, Tasya 0.158 / 0.234, Bima 0.110 / 0.211, Hendra 0.127 /
+  0.220, Yusuf 0.130 / 0.223.
+- **Cost:** one measurement per character, and a character whose poses are drawn at different scales needs them
+  redrawn to match.
+
+## A new expression waits for its image
+
+*2026-11-18. Presentation modes §2.1. Found in the second Last Seen playtest.*
+
+When a character changes expression, the cross-fade starts once the new sprite is decoded. Until then the old one
+stays on screen.
+
+- **Why:** a pose not shown before takes a moment to decode on a phone, and the 240 ms cross-fade faded the old
+  one out on time over an empty slot. The character blinked out mid-change, but only the first time each pose
+  showed, which made it look random.
+- **Cost:** a first-time pose arrives a few frames after its line.
+
+## Clue notifications show under the VN HUD
+
+*2026-11-18. Presentation modes §6.*
+
+In VN the "Clue found" notification slides in under the HUD instead of over it. A bar wrapped in
+`ClueNotifications.below` reports where it ends, and the notifications show below the lowest one.
+
+- **Why:** for 3 seconds the notification covered MENU, the backlog and the other quick controls.
+- **Not in chat:** the chat header has nothing the player needs in those 3 seconds.
+
+## bgm_unease loops at a quiet join
+
+*2026-11-18. Last Seen assets.*
+
+The track's first and last samples held the three largest jumps of the whole file, a click baked in at both
+edges, heard as a tick every 48 seconds. The loop point now sits at a zero crossing in the middle of the track,
+the old ends are joined inside the file with a 10 ms crossfade, and the file is encoded at 96 kbps. Its edges
+now step no more than the music does next to them.
 
 ## Deferred
 

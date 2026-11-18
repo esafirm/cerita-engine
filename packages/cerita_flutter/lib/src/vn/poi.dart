@@ -19,42 +19,66 @@ class PoiActor {
   /// How tall the character is ([Profile.height]). Null takes them as tall as the tallest one in the [PoiCast].
   final double? height;
 
-  /// The share of the body the sprite shows, from the top of the head ([Profile.framing]).
-  final double framing;
+  /// Where the face is on the sprite ([Profile.face]). Null takes the sprite as head to toe.
+  final SpriteFace? face;
 
-  const PoiActor({required this.id, required this.sprite, required this.position, this.height, this.framing = 1});
+  const PoiActor({required this.id, required this.sprite, required this.position, this.height, this.face});
+
+  /// [height] and [face] from [profile].
+  PoiActor.of(Profile profile, {required this.sprite, required this.position})
+      : id = profile.id,
+        height = profile.height,
+        face = profile.face;
 }
 
 /// The measures that size every sprite on the stage alike, like one camera on the whole cast: a taller character
-/// stands taller, and a sprite cut higher up the body stands lower, so every cut stays under the stage's bottom edge.
+/// stands taller with a bigger face, and a sprite cut higher up the body stands lower, so every cut stays under the
+/// stage's bottom edge.
 class PoiCast {
   /// The tallest character's height.
   final double tallest;
 
+  /// How high above the floor the highest sprite reaches, its hair included.
+  final double top;
+
   /// The highest cut: how far above the floor the sprite cut highest up the body ends.
   final double highestCut;
 
-  const PoiCast({this.tallest = 1, this.highestCut = 0});
+  const PoiCast({this.tallest = 1, double? top, this.highestCut = 0}) : top = top ?? tallest;
 
   /// The measures of [cast]. A null height is as tall as the tallest.
-  factory PoiCast.of(Iterable<({double? height, double framing})> cast) {
+  factory PoiCast.of(Iterable<({double? height, SpriteFace? face})> cast) {
     final heights = [for (final member in cast) ?member.height];
     final tallest = heights.isEmpty ? 1.0 : heights.reduce(max);
+    var top = 0.0;
     var highestCut = 0.0;
     for (final member in cast) {
-      highestCut = max(highestCut, (member.height ?? tallest) * (1 - member.framing.clamp(0.05, 1)));
+      final reach = span(member.height ?? tallest, member.face);
+      top = max(top, reach.top);
+      highestCut = max(highestCut, reach.bottom);
     }
-    return PoiCast(tallest: tallest, highestCut: highestCut);
+    return PoiCast(tallest: tallest, top: cast.isEmpty ? tallest : top, highestCut: highestCut);
   }
 
   /// The measures of the characters in [profiles] that have sprites.
   factory PoiCast.ofProfiles(Iterable<Profile> profiles) => PoiCast.of([
     for (final profile in profiles)
-      if (profile.sprites.isNotEmpty) (height: profile.height, framing: profile.framing),
+      if (profile.sprites.isNotEmpty) (height: profile.height, face: profile.face),
   ]);
 
-  /// The top of the tallest head, measured from the floor's level at the stage's bottom edge.
-  double get _top => tallest - highestCut;
+  /// How high above the floor the top and bottom edges of a sprite reach, for a character [height] tall whose face
+  /// is at [face] on it. Its eyes sit at the height of a person's eyes, and its eyes to chin is a person's
+  /// ([SpriteFace.eyeToChin]): that sets how long the whole sprite is. Without [face], the sprite is head to toe.
+  static ({double top, double bottom}) span(double height, SpriteFace? face) {
+    if (face == null) return (top: height, bottom: 0);
+    final eyeToChin = SpriteFace.eyeToChin * height;
+    final length = eyeToChin / max(face.chin - face.eyes, 0.01);
+    final top = height - eyeToChin + face.eyes * length;
+    return (top: top, bottom: top - length);
+  }
+
+  /// [actor]'s span, a null height as tall as the tallest.
+  ({double top, double bottom}) _spanOf(PoiActor actor) => span(actor.height ?? tallest, actor.face);
 }
 
 /// [Poi] draws the VN stage: background, up to five characters, weather and the camera
@@ -101,12 +125,12 @@ class Poi extends StatefulWidget {
   /// [narrow] (portrait) stage the camera barely pulls back for a crowd: the characters overlap instead of
   /// shrinking into dolls against the background.
   static double heightShare(num present, {bool narrow = false}) =>
-      narrow ? _between(present, 0.82, 0.8, 0.72) : _between(present, 0.82, 0.82, 0.66);
+      narrow ? _between(present, 0.82, 0.8, 0.66) : _between(present, 0.82, 0.82, 0.66);
 
   /// How far apart, as a share of the stage width, [count] characters stand on a narrow stage.
   static double spacing(int count) => switch (count) {
     <= 2 => 0.5,
-    3 => 0.4,
+    3 => 0.34,
     4 => 0.27,
     _ => 0.22,
   };
@@ -149,7 +173,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
   double _shakeIntensity = 0;
   Color _flashColor = Colors.white;
 
-  /// Characters on stage that size the sprites, 1 to 3. See [Poi.widthShare].
+  /// Characters on stage that size the sprites, 1 to 3. See [Poi.heightShare].
   int _crowd = 1;
 
   @override
@@ -328,7 +352,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     final xs = entries.any((e) => !Poi._wideX.containsKey(e.actor.position)) ? Poi._fiveX : Poi._wideX;
     final speaker = widget.speakerId;
     final cast =
-        widget.cast ?? PoiCast.of([for (final e in entries) (height: e.actor.height, framing: e.actor.framing)]);
+        widget.cast ?? PoiCast.of([for (final e in entries) (height: e.actor.height, face: e.actor.face)]);
 
     // Eases the size over the sprite transition, so the others don't jump when a character enters or leaves.
     return TweenAnimationBuilder<double>(
@@ -336,10 +360,12 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
       duration: widget.instant ? Duration.zero : skin.spriteTransitionDuration,
       curve: Curves.easeInOut,
       builder: (context, crowd, _) {
-        // One scale for everyone: the tallest head of the cast reaches the crowd's share of the stage height.
-        final scale = box.maxHeight * Poi.heightShare(crowd, narrow: narrow) / cast._top;
-        double spriteHeight(_ActorEntry entry) =>
-            (entry.actor.height ?? cast.tallest) * entry.actor.framing.clamp(0.05, 1.0) * scale;
+        // One scale for everyone: the highest head of the cast reaches the crowd's share of the stage height.
+        final scale = box.maxHeight * Poi.heightShare(crowd, narrow: narrow) / max(cast.top - cast.highestCut, 1e-6);
+        double spriteHeight(_ActorEntry entry) {
+          final reach = cast._spanOf(entry.actor);
+          return (reach.top - reach.bottom) * scale;
+        }
         if (narrow) _spread(present, width, spriteHeight);
         return Stack(
           fit: StackFit.expand,
@@ -365,10 +391,8 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     String? speaker,
   ) {
     final actor = entry.actor;
-    final height = actor.height ?? cast.tallest;
-    final framing = actor.framing.clamp(0.05, 1.0);
     // How far the sprite's bottom edge sits below the stage's: the cut highest up the body sits right on it.
-    final drop = (cast.highestCut - height * (1 - framing)) * scale;
+    final drop = (cast.highestCut - cast._spanOf(actor).bottom) * scale;
     final center = (narrow ? entry.narrowX : null) ?? _slotCenter(xs[actor.position] ?? 0, stageWidth);
     return Positioned(
       key: ValueKey(actor.id),
@@ -424,15 +448,70 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
 }
 
 /// One character. Cross-fades expression changes and dims when someone else speaks.
-class _SpriteSlot extends StatelessWidget {
+///
+/// A new expression waits until its image is decoded before the cross-fade starts. A pose not shown before takes
+/// a moment to decode on a phone, and the old one used to fade out on time over an empty slot, so the character
+/// blinked out mid-change.
+class _SpriteSlot extends StatefulWidget {
   final String sprite;
   final bool active;
 
   const _SpriteSlot({required this.sprite, required this.active});
 
   @override
+  State<_SpriteSlot> createState() => _SpriteSlotState();
+}
+
+class _SpriteSlotState extends State<_SpriteSlot> {
+  /// The expression on screen, which [_SpriteSlot.sprite] replaces once it is decoded.
+  late String _shown = widget.sprite;
+  ImageStream? _loading;
+  ImageStreamListener? _listener;
+
+  @override
+  void didUpdateWidget(_SpriteSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.sprite != oldWidget.sprite) _load(widget.sprite);
+  }
+
+  void _load(String sprite) {
+    _stopLoading();
+    if (sprite == _shown) return;
+    void ready(bool synchronous) {
+      _stopLoading();
+      if (!mounted || widget.sprite != sprite) return;
+      // A cached image answers while this widget updates, before its build: no setState then.
+      synchronous ? _shown = sprite : setState(() => _shown = sprite);
+    }
+
+    final listener = ImageStreamListener(
+      (image, synchronous) {
+        image.dispose();
+        ready(synchronous);
+      },
+      // A missing sprite shows as nothing, at once.
+      onError: (error, stackTrace) => ready(false),
+    );
+    _listener = listener;
+    _loading = AssetImage(sprite).resolve(createLocalImageConfiguration(context))..addListener(listener);
+  }
+
+  void _stopLoading() {
+    if (_listener case final listener?) _loading?.removeListener(listener);
+    _loading = null;
+    _listener = null;
+  }
+
+  @override
+  void dispose() {
+    _stopLoading();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final skin = StorySkin.of(context);
+    final active = widget.active;
     return AnimatedScale(
       scale: active ? 1.04 : 0.97,
       alignment: Alignment.bottomCenter,
@@ -449,7 +528,7 @@ class _SpriteSlot extends StatelessWidget {
         transitionBuilder: (child, animation) =>
             skin.spriteTransition(animation.drive(CurveTween(curve: const Interval(0, 0.5))), child),
         child: TweenAnimationBuilder<double>(
-          key: ValueKey(sprite),
+          key: ValueKey(_shown),
           tween: Tween(end: active ? 0 : 0.45),
           duration: const Duration(milliseconds: 250),
           builder: (context, dim, child) => ColorFiltered(
@@ -457,7 +536,7 @@ class _SpriteSlot extends StatelessWidget {
             child: child,
           ),
           child: Image.asset(
-            sprite,
+            _shown,
             fit: BoxFit.contain,
             alignment: Alignment.bottomCenter,
             gaplessPlayback: true,
