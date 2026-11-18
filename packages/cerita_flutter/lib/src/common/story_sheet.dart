@@ -10,27 +10,47 @@ class StorySheetFrame {
   final Widget body;
 
   /// Takes the full height a sheet may have, for a body that scrolls by itself and would otherwise jump in size.
-  /// Else the sheet is as tall as its body, up to that height, and the body should scroll when it is taller.
+  /// Else the sheet is as tall as its body, between [minHeight] and [maxHeight], and the body should scroll when
+  /// it is taller.
   final bool expand;
+
+  /// The height range of the whole sheet, its header included. [StorySheet.show] sets them from the screen.
+  final double minHeight;
+  final double maxHeight;
 
   /// Closes the sheet, for the header's close button.
   final VoidCallback onClose;
 
-  const StorySheetFrame({required this.body, required this.onClose, this.title, this.icon, this.expand = false});
+  const StorySheetFrame({
+    required this.body,
+    required this.onClose,
+    this.title,
+    this.icon,
+    this.expand = false,
+    this.minHeight = 0,
+    this.maxHeight = double.infinity,
+  });
 }
 
-/// The engine's bottom sheet: the in-game menu, the backlog, a clue's detail and the developer tools all open in
-/// it, so they share one frame (handle, header, close button) that the [StorySkin] can restyle.
+/// The engine's bottom sheet: the in-game menu, the backlog, a clue's detail, a full-screen image and the
+/// developer tools all open in it, so they share one frame (handle, header, close button) that the [StorySkin]
+/// can restyle.
 abstract final class StorySheet {
   /// The share of the screen height a sheet may take.
   static const maxHeightFactor = 0.88;
 
+  /// The share of the screen height a sheet takes at least, so a sheet with one line in it still reads as a
+  /// panel rather than a strip.
+  static const minHeightFactor = 0.4;
+
+  /// Shows a sheet. [fullScreen] fills the screen below the status bar, for a picture. It implies [expand].
   static Future<T?> show<T>(
     BuildContext context, {
     required WidgetBuilder builder,
     String? title,
     IconData? icon,
     bool expand = false,
+    bool fullScreen = false,
   }) {
     final skin = StorySkin.of(context);
     return showModalBottomSheet<T>(
@@ -41,16 +61,24 @@ abstract final class StorySheet {
       backgroundColor: Colors.transparent,
       elevation: 0,
       barrierColor: Colors.black54,
-      builder: (sheetContext) => skin.sheet(
-        sheetContext,
-        StorySheetFrame(
-          title: title,
-          icon: icon,
-          expand: expand,
-          body: builder(sheetContext),
-          onClose: () => Navigator.of(sheetContext).pop(),
-        ),
-      ),
+      builder: (sheetContext) {
+        final screen = MediaQuery.sizeOf(sheetContext).height;
+        // Taller than the room left under the status bar is fine: the sheet's constraints cut it down.
+        final maxHeight = fullScreen ? screen : screen * maxHeightFactor;
+        final fill = expand || fullScreen;
+        return skin.sheet(
+          sheetContext,
+          StorySheetFrame(
+            title: title,
+            icon: icon,
+            expand: fill,
+            minHeight: fill ? maxHeight : screen * minHeightFactor,
+            maxHeight: maxHeight,
+            body: builder(sheetContext),
+            onClose: () => Navigator.of(sheetContext).pop(),
+          ),
+        );
+      },
     );
   }
 }

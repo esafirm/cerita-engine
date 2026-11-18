@@ -842,11 +842,17 @@ Seen's own buttons (the MENU tag, choices, menu rows, title menu) are `GestureDe
 
 The in-game menu, the backlog, a clue's detail, the route chart's chapter actions and the developer tools open
 through `StorySheet.show`, which the skin draws with `StorySkin.sheet`: a handle, an icon and title, a close
-button and a rule. A sheet is as tall as its body. Last Seen draws it as its framed retro window.
+button and a rule. A sheet is as tall as its body, between 40% and 88% of the screen. A picture opened full
+screen (a clue's image, a chat photo, a gallery CG) is a sheet too, the whole screen tall. Last Seen draws it as
+its framed retro window.
 
 - **Why:** the playtest asked for nicer sheets, the Case Board's most of all. They were stock Material panels
   in a pixel-art game, the backlog opened at 80% height with one line in it, and the menu ran past the screen.
 - **The menu** puts Save, Load, Case Board and Backlog in a row of big buttons and the rest in a short list.
+- **The 40% floor:** a sheet as tall as one line read as a strip at the bottom of the screen, not a panel (second
+  playtest note). The floor keeps every sheet the same kind of object, and the body starts at its top.
+- **The picture viewer** was a black page with an app bar, the one screen that looked like a stock app. As a sheet
+  it keeps the skin's frame and closes like the rest.
 
 ## Deferred
 

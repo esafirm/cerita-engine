@@ -119,9 +119,25 @@ class ClueDetail extends StatelessWidget {
               onTap: () => ImageViewerPage.open(context, image, caption: title),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 220),
-                  child: Image.asset(image, fit: BoxFit.cover),
+                child: Stack(
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 220),
+                      child: Image.asset(image, width: double.infinity, fit: BoxFit.cover),
+                    ),
+                    // A tap opens the whole picture.
+                    const Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                        child: Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(Icons.open_in_full, size: 18, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

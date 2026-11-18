@@ -212,8 +212,8 @@ no board entry, button, badge or notification anywhere.
   title, its image as a thumbnail, a marker when it is a `key` clue, and a "New" highlight until viewed. With
   `show_counts`, each chapter heading says "3 of 5 found". Chapters with no clue found yet aren't shown.
   Before the first clue, the board says so.
-- **Detail**: tapping a clue opens a sheet (§7.1) with its title in the header, a key-clue marker, its image and full description. Tapping the image opens
-  it full screen with pinch to zoom.
+- **Detail**: tapping a clue opens a sheet (§7.2) with its title in the header, a key-clue marker, its image and full
+  description. Tapping the image opens it in a full-screen sheet with pinch to zoom.
 - **Viewed**: closing the board marks every clue it showed as viewed (engine §10.2), which clears the
   highlights and the count.
 - **Pausing**: while the board is open the story holds: chat pacing, auto and skip wait, and a timed choice's
@@ -282,16 +282,20 @@ already waits for a tap (a VN line, a call line) needs no extra one.
 
 ### 7.2 Sheets (`StorySheet`)
 Every bottom sheet of the engine opens through `StorySheet.show`: the in-game menu, the backlog, a clue's detail,
-a chapter's actions on the route chart and the developer tools. They share one frame, drawn by
-`StorySkin.sheet(context, StorySheetFrame)`: a handle, a header with an icon, the title and a close button, and
-the body under a rule. A sheet is as tall as its body up to 88% of the screen, and its body scrolls from there.
-The developer tools take the full height (`expand`).
+a chapter's actions on the route chart, a picture shown full screen and the developer tools. They share one
+frame, drawn by `StorySkin.sheet(context, StorySheetFrame)`: a handle, a header with an icon, the title and a
+close button, and the body under a rule. A sheet is as tall as its body, but at least 40% of the screen and at
+most 88%, and its body scrolls from there. The developer tools take the full 88% (`expand`). A picture takes the
+whole screen below the status bar (`fullScreen`).
 
 - **In-game menu**: the main actions as a row of big buttons (`StorySheetAction`): Save, Load, Case Board (with
   its new-clue count) and Backlog. Settings, Gallery, Endings, Story variables and Developer follow as a list,
   and Back to title is set apart at the end.
-- **Backlog**: the transcript, newest line at the bottom. A short backlog makes a short sheet.
+- **Backlog**: the transcript, newest line at the bottom. A short backlog starts at the top of a 40% sheet.
 - **Clue detail**: the clue's title in the header, then the key-clue marker, its image and its description.
+  An expand mark on the image says a tap opens it full screen.
+- **Picture** (`ImageViewerPage.open`, from a clue, a chat photo or the gallery): "Photo" in the header, the
+  picture with pinch to zoom, and its caption under it.
 
 The default frame is a raised panel with rounded top corners. Last Seen draws it as one of its framed windows,
 with an uppercase title, a dotted rule and a CLOSE tag.

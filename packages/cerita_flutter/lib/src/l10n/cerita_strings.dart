@@ -176,6 +176,9 @@ abstract class CeritaStrings {
   String track(int number);
   String get notHeardYet;
 
+  /// Header of the full-screen picture sheet.
+  String get photo;
+
   // Gallery.
   String get photosAndCgs;
   String get voiceNotes;
@@ -343,6 +346,8 @@ class EnglishCeritaStrings extends CeritaStrings {
   String get playFromHere => "Play from here";
   @override
   String endingsFound(int found, int total) => "$found of $total endings found";
+  @override
+  String get photo => "Photo";
   @override
   String get photosAndCgs => "Photos & CGs";
   @override
@@ -598,6 +603,8 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get playFromHere => "Main dari sini";
   @override
   String endingsFound(int found, int total) => "$found dari $total ending ditemukan";
+  @override
+  String get photo => "Foto";
   @override
   String get photosAndCgs => "Foto & CG";
   @override

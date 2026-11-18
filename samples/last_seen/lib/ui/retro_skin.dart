@@ -57,13 +57,12 @@ class RetroSkin extends StorySkin {
   /// little above the bottom edge, like the dialogue window.
   @override
   Widget sheet(BuildContext context, StorySheetFrame frame) {
-    final maxHeight = MediaQuery.sizeOf(context).height * StorySheet.maxHeightFactor;
     final title = frame.title;
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(8, 0, 12, 12),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: maxHeight, minHeight: frame.expand ? maxHeight : 0),
+        constraints: BoxConstraints(minHeight: frame.minHeight, maxHeight: frame.maxHeight),
         child: RetroWindow(
           padding: EdgeInsets.zero,
           child: Material(

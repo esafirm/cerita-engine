@@ -7,8 +7,10 @@ import 'package:video_player/video_player.dart';
 import '../audio_helper.dart';
 import '../l10n/localized_assets.dart';
 import '../l10n/story_language.dart';
+import 'story_sheet.dart';
 
-/// Full-screen pinch-to-zoom image viewer.
+/// A picture at full size, pinch to zoom, with its caption under it. [open] shows it in a full-screen
+/// [StorySheet], so it closes like every other sheet and keeps the skin's frame.
 class ImageViewerPage extends StatelessWidget {
   final String asset;
   final String? caption;
@@ -16,29 +18,35 @@ class ImageViewerPage extends StatelessWidget {
   const ImageViewerPage({super.key, required this.asset, this.caption});
 
   static Future<void> open(BuildContext context, String asset, {String? caption}) {
-    return Navigator.of(context).push(MaterialPageRoute(
-      fullscreenDialog: true,
+    return StorySheet.show(
+      context,
+      title: StoryLanguage.of(context).strings.photo,
+      icon: Icons.image_outlined,
+      fullScreen: true,
       builder: (_) => ImageViewerPage(asset: asset, caption: caption),
-    ));
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.black, foregroundColor: Colors.white),
-      body: Column(
-        children: [
-          Expanded(
-            child: InteractiveViewer(maxScale: 5, child: Center(child: Image.asset(asset))),
-          ),
-          if (caption != null)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(caption!, style: const TextStyle(color: Colors.white70)),
+    final caption = this.caption;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+            child: ClipRect(
+              child: InteractiveViewer(maxScale: 5, child: Center(child: Image.asset(asset))),
             ),
-        ],
-      ),
+          ),
+        ),
+        if (caption != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            child: Text(caption, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
+          ),
+      ],
     );
   }
 }

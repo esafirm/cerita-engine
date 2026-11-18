@@ -142,10 +142,9 @@ class StorySkin {
   Widget sheet(BuildContext context, StorySheetFrame frame) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final maxHeight = MediaQuery.sizeOf(context).height * StorySheet.maxHeightFactor;
     final title = frame.title;
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight, minHeight: frame.expand ? maxHeight : 0),
+      constraints: BoxConstraints(minHeight: frame.minHeight, maxHeight: frame.maxHeight),
       child: Material(
         color: scheme.surfaceContainerLow,
         clipBehavior: Clip.antiAlias,
