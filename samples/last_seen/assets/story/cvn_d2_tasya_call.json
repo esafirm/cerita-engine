@@ -1,0 +1,315 @@
+{
+  "conversation_id": "cvn_d2_tasya_call",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Telepon Tasya",
+    "en": "Calling Tasya"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_tasya",
+    "day": 2,
+    "time": "15:05",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "stay": {
+      "id": "Belum. Dia tahu sesuatu, dan ini mungkin satu-satunya kesempatan sebelum dia blokir nomor gue.",
+      "en": "Not yet. She knows something, and this might be my only chance before she blocks my number."
+    }
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Halo? Siapa nih? Kalau dari media, sori ya, no comment.",
+        "en": "Hello? Who's this? If you're press, sorry, no comment."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue Raka. Temennya Sekar.",
+        "en": "It's Raka. Sekar's friend."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Raka... Raka yang editor? The Raka? Oh my god. Sekar ngomongin lo terus, literally tiap abis rekaman.",
+        "en": "Raka... Raka the editor? The Raka? Oh my god. Sekar talked about you all the time, literally after every recording."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sori. Gimana Dinda? Gue pengen ke rumah, tapi gue nggak tahu gue masih diterima atau nggak.",
+        "en": "Sorry. How's Dinda? I want to come by, but I don't know if I'm still welcome."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_03.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Apa yang lo bilang?",
+        "en": "What do you say?"
+      },
+      "variable": "TASYA_OPEN",
+      "profile": "tasya:0",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Dinda butuh temen-temen Sekar sekarang.\"",
+            "en": "\"Dinda needs Sekar's friends right now.\""
+          },
+          "value": "warm",
+          "effects": [
+            {
+              "variable": "trust_tasya",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Gue udah baca chat lo sama Sekar.\"",
+            "en": "\"I've read your chat with Sekar.\""
+          },
+          "value": "blunt"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TASYA_OPEN == 'warm'",
+      "text": {
+        "id": "Iya. Iya, nanti gue ke sana. Promise.",
+        "en": "Yeah. Yeah, I'll come by. Promise."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TASYA_OPEN == 'blunt'",
+      "text": {
+        "id": "Lo... apa? Itu privat, Ka. Lo nggak berhak.",
+        "en": "You... what? That's private, Ka. You had no right."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "Bentar. Tadi pagi yang bales di grup pake akun Sekar... itu lo? Lo gila ya? Semua orang panik.",
+        "en": "Wait. This morning, whoever replied in the group from Sekar's account... that was you? Are you crazy? Everyone's freaking out."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_06.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue udah bilang ke polisi, gue nggak tahu apa-apa. Terakhir gue ngobrol sama Sekar itu soal jadwal rekaman. That's it.",
+        "en": "I already told the police, I don't know anything. The last time I talked to Sekar it was about the recording schedule. That's it."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_07.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "id": "ask_tasya",
+      "source": "clues",
+      "text": {
+        "id": "Tasya bohong. Tunjukkan buktinya.",
+        "en": "Tasya is lying. Show the proof."
+      },
+      "variable": "TASYA_PROOF",
+      "profile": "tasya:0",
+      "responses": [
+        {
+          "clue": "tasya_warning",
+          "effects": [
+            {
+              "variable": "trust_tasya",
+              "op": "add",
+              "value": 5
+            }
+          ],
+          "target": "#warning"
+        },
+        {
+          "clue": "sekar_notebook",
+          "effects": [
+            {
+              "variable": "trust_tasya",
+              "op": "subtract",
+              "value": 3
+            }
+          ],
+          "target": "#notebook"
+        }
+      ],
+      "fallback": {
+        "effects": [
+          {
+            "variable": "trust_tasya",
+            "op": "subtract",
+            "value": 1
+          }
+        ],
+        "target": "#nothing"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "warning",
+      "text": {
+        "id": "\"Mereka nelpon gue. Lo beneran mau publish?\" Senin lalu, seminggu sebelum dia hilang. Siapa \"mereka\", Tas?",
+        "en": "\"They called me. Are you really going to publish?\" Last Monday, a week before she vanished. Who's \"they\", Tas?"
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Lo nggak ngerti.",
+        "en": "...You don't understand."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_08.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ada orang PR. Dari perusahaan yang nawarin sponsor itu. Dia nelpon gue malem-malem. Ramah banget. Terlalu ramah.",
+        "en": "There was a PR guy. From the company that offered the sponsorship. He called me late at night. So friendly. Too friendly."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_09.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Katanya Sekar \"salah paham soal proyeknya\". Kalau gue bisa bikin dia nggak publish, sponsornya tetep jalan. Buat gue aja.",
+        "en": "He said Sekar had \"misunderstood the project\". If I could get her not to publish, the sponsorship would still go ahead. Just for me."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_10.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak setuju! Gue cuma... nanya ke Sekar. Terus dia marah, terus gue nggak bales, karena gue malu.",
+        "en": "I didn't say yes! I just... asked Sekar. Then she got angry, and I didn't reply, because I was ashamed."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_11.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin malem. Dia bilang mau ke mana?",
+        "en": "Monday night. Did she say where she was going?"
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Siangnya dia DM gue di akun podcast. \"Malem ini ketemu narsum di dermaga. Doain.\" Itu juga nggak gue bales.",
+        "en": "That afternoon she DMed me on the podcast account. \"Meeting a source at the pier tonight. Wish me luck.\" I didn't answer that either."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_12.mp3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "tasya_admitted",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#call_end"
+    },
+    {
+      "type": "TEXT",
+      "id": "notebook",
+      "text": {
+        "id": "Sekar nulis \"jangan percaya T\" di buku catatannya.",
+        "en": "Sekar wrote \"don't trust T\" in her notebook."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Wow. Oke. Jadi sekarang gue tersangkanya? \"T\" bisa siapa aja, Ka. Tetangga. Tukang parkir. Tante gue.",
+        "en": "Wow. Okay. So now I'm the suspect? \"T\" could be anyone, Ka. A neighbor. The parking guy. My aunt."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_13.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue co-host-nya dua tahun. Lo ngilang setahun, terus dateng-dateng nuduh gue?",
+        "en": "I've been her co-host for two years. You vanish for a year, then show up out of nowhere and accuse me?"
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_14.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Satu lagi, abis itu gue tutup. Senin siang dia bilang mau ketemu narsum di dermaga. Udah. Cari narsumnya. Jangan cari gue.",
+        "en": "One more thing, then I'm hanging up. Monday afternoon she said she was meeting a source at the pier. That's it. Go find the source. Not me."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_15.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#call_end"
+    },
+    {
+      "type": "TEXT",
+      "id": "nothing",
+      "text": {
+        "id": "Itu apa hubungannya sama gue? Sori, Ka. Gue lagi ada janji. Nanti aja ya. Bye.",
+        "en": "What does that have to do with me? Sorry, Ka. I'm meeting someone. Some other time. Bye."
+      },
+      "profile": "tasya:0",
+      "voice": "vo_d2_tasya_16.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "id": "call_end",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_bima_visit"
+    }
+  ]
+}

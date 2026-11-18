@@ -1,0 +1,412 @@
+{
+  "conversation_id": "cvn_d2_morning",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Sarapan",
+    "en": "Breakfast"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 2,
+    "time": "06:50",
+    "background": "bg_sekar_living_day.webp",
+    "music": "bgm_quiet_house.mp3",
+    "ambience": "amb_kampung_day.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 2. Jumat, jam tujuh kurang sepuluh.",
+        "en": "Day 2. Friday, ten to seven."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue kebangun di sofa dengan leher pegel dan HP Sekar masih di dada. Layarnya gelap. Pesan tengah malem tadi masih ada di dalemnya, nunggu dibuka lagi. Gue nggak buka.",
+        "en": "I wake up on the sofa with a stiff neck and Sekar's phone still on my chest. The screen is dark. The midnight message is still in there, waiting to be opened again. I don't open it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dari dapur kedengeran minyak panas dan sendok yang beradu sama wajan. Bau bawang putih. Ada yang masak nasi goreng, kayak hari ini hari biasa.",
+        "en": "From the kitchen comes the hiss of hot oil and a spoon scraping a wok. Garlic. Someone is making fried rice, like today is a normal day."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right",
+          "transition": "slide_left",
+          "duration_ms": 600
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bangun. Nasi goreng dari nasi kemarin. Jangan protes.",
+        "en": "Get up. Fried rice from yesterday's rice. No complaints."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak protes.",
+        "en": "I'm not complaining."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Muka lo protes.",
+        "en": "Your face is."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia naruh dua piring di meja. Telur ceploknya gosong di pinggir, persis bikinan Sekar. Mungkin itu cara masak telur yang diajarin di rumah ini.",
+        "en": "She sets two plates on the table. The fried eggs are burnt at the edges, exactly like Sekar used to make them. Maybe that's just how eggs are cooked in this house."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pintu kamar di ujung lorong kebuka. Pelan, kayak takut ngebangunin seseorang.",
+        "en": "The bedroom door at the end of the hall opens. Slowly, like it's afraid of waking someone."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bu Wulan keluar dengan mukena yang udah dilepas setengah dan rambut yang disanggul asal. Badannya lebih kecil dari yang gue inget. Tiga hari ternyata bisa ngecilin orang.",
+        "en": "Mrs. Wulan comes out with her prayer robe half off and her hair pinned up any old way. She's smaller than I remember. It turns out three days can shrink a person."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bu...",
+        "en": "Mom..."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Duduk aja, Nak. Nggak usah berdiri.",
+        "en": "Sit, dear. No need to get up."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia nggak ngomong apa-apa lagi. Dia ke dapur, dan nggak lama balik bawa satu gelas teh. Ditaruh di depan gue.",
+        "en": "She doesn't say anything else. She goes into the kitchen and comes back with a glass of tea. She sets it down in front of me."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nyeruput. Tawar.",
+        "en": "I take a sip. No sugar."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sekar bilang kamu sukanya nggak pake gula. \"Kayak orang tua, Bu.\" Gitu katanya.",
+        "en": "Sekar said you take it without sugar. \"Like an old man, Mom.\" That's what she said."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Makasih, Tante.",
+        "en": "Thank you, Auntie."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tante belum kuat ngobrol lama. Tapi Tante mau lihat muka kamu sekali. Biar Tante tahu yang di sini beneran kamu.",
+        "en": "I'm not strong enough to talk for long yet. But I wanted to see your face once. So I know it's really you here."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngusap kepala Dinda sekali, sambil lewat, kayak ngusap kepala anak SD. Terus balik ke kamarnya. Kali ini pintunya nggak ditutup rapat.",
+        "en": "She strokes Dinda's hair once on her way past, the way you'd pat a little kid. Then she goes back to her room. This time she leaves the door open a crack."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu pertama kalinya Ibu keluar kamar bukan buat salat.",
+        "en": "That's the first time Mom's come out of her room for something other than prayer."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Makan. Nanti dingin.",
+        "en": "...Eat. It'll get cold."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_notification.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP Sekar geter di saku gue. Cuma notif grup. Tapi tangan gue langsung dingin lagi, sama kayak tengah malem tadi.",
+        "en": "Sekar's phone buzzes in my pocket. Just a group notification. But my hands go cold again, the same as at midnight."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo kenapa? Muka lo kayak abis lihat setan.",
+        "en": "What's wrong with you? You look like you've seen a ghost."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "\"Berhenti nyari. Demi adiknya.\" Adiknya itu dia.",
+        "en": "\"Stop looking. For her sister's sake.\" The sister is her."
+      },
+      "variable": "TELL_THREAT",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "(Tunjukin screenshot-nya.)",
+            "en": "(Show her the screenshot.)"
+          },
+          "value": "show",
+          "condition": "threat_screenshot == true",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Ceritain pesan tengah malem itu.",
+            "en": "Tell her about the midnight message."
+          },
+          "value": "tell",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Kurang tidur aja.\"",
+            "en": "\"Just didn't sleep much.\""
+          },
+          "value": "hide",
+          "effects": [
+            {
+              "variable": "hid_threat",
+              "op": "set",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TELL_THREAT == 'show'",
+      "text": {
+        "id": "Gue buka galeri dan nyodorin HP-nya. Dinda baca dua kali. Jempolnya berhenti di kata yang sama dua-duanya.",
+        "en": "I open the gallery and hand her the phone. Dinda reads it twice. Both times her thumb stops on the same word."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TELL_THREAT == 'tell'",
+      "text": {
+        "id": "Gue buka chat nomor asing itu dan nyodorin HP-nya. Dinda baca dua kali. Jempolnya berhenti di kata yang sama dua-duanya.",
+        "en": "I open the unknown number's chat and hand her the phone. Dinda reads it twice. Both times her thumb stops on the same word."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide'",
+      "text": {
+        "id": "\"Adiknya.\" Mereka tahu gue ada.",
+        "en": "\"Her sister.\" They know I exist."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT == 'show'",
+      "text": {
+        "id": "Bagus lo screenshot. Kalau nomornya ngilang, buktinya masih ada.",
+        "en": "Good thing you took a screenshot. If the number disappears, we still have proof."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide' && THREAT_REPLY == 'threaten'",
+      "text": {
+        "id": "Terus lo bales \"gue cari lo duluan\"? Ka. Lo bukan preman. Lo tukang edit audio.",
+        "en": "And you replied \"I'll find you first\"? Ka. You're not a thug. You edit audio."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide' && THREAT_REPLY == 'threaten'",
+      "text": {
+        "id": "Jam dua belas malem, gue preman.",
+        "en": "At midnight, I'm a thug."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide' && THREAT_REPLY == 'threaten'",
+      "text": {
+        "id": "Jangan lagi. Kalau ada yang mau dibales, kita bales bareng.",
+        "en": "Don't do it again. If something needs answering, we answer it together."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide' && THREAT_REPLY == 'ask'",
+      "text": {
+        "id": "Lo nanya \"siapa ini\", dan dia cuma baca. Dia mau kita tahu dia bisa baca.",
+        "en": "You asked \"who is this\", and they just read it. They want us to know they can."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide'",
+      "text": {
+        "id": "Gue nggak takut, Ka.{w} ...Oke, takut. Tapi gue lebih takut nggak ngapa-ngapain.",
+        "en": "I'm not scared, Ka.{w} ...Okay, I am. But I'm more scared of doing nothing."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide'",
+      "text": {
+        "id": "Satu syarat. Mulai sekarang, apa pun yang masuk ke HP itu, gue ikut lihat.",
+        "en": "One condition. From now on, whatever comes into that phone, I see it too."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT != 'hide'",
+      "text": {
+        "id": "Deal.",
+        "en": "Deal."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TELL_THREAT == 'hide'",
+      "text": {
+        "id": "Gue masukin HP-nya lagi ke saku. Dia udah kehilangan kakaknya tiga hari. Dia nggak perlu tahu ada orang yang nyebut dia sebagai ancaman.",
+        "en": "I put the phone back in my pocket. She's been without her sister for three days. She doesn't need to know someone is using her as a threat."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "TELL_THREAT == 'hide'",
+      "text": {
+        "id": "Ya udah. Nanti malem tidur yang bener. Lo kayak zombie.",
+        "en": "Fine. Sleep properly tonight. You look like a zombie."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TELL_THREAT == 'hide'",
+      "text": {
+        "id": "Bohong pertama ke Dinda. Gampang banget. Justru itu yang bikin nggak enak.",
+        "en": "My first lie to Dinda. It was easy. That's exactly what feels wrong about it."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Grup pendengarnya. Sekarang?",
+        "en": "The listener group. Now?"
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sekarang.",
+        "en": "Now."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_group"
+    }
+  ]
+}

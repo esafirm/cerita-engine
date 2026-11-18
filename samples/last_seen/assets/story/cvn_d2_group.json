@@ -1,0 +1,557 @@
+{
+  "conversation_id": "cvn_d2_group",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Pendengar Ep. 12",
+    "en": "Episode 12 Listeners"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "group_ep12",
+    "day": 2,
+    "time": "07:30",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda duduk di sebelah gue di sofa, lututnya nempel ke lutut gue. Kita scroll ke atas dulu. Ke sebelum semuanya.",
+        "en": "Dinda sits next to me on the sofa, her knee against mine. We scroll up first. To before everything."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Jumat lalu, 19.02",
+        "en": "Last Friday, 7:02 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "OFFICIAL ANNOUNCEMENT 📣 teaser ep 12 udah up yaa. \"Siapa yang punya laut?\" jangan lupa share guys!!",
+        "en": "OFFICIAL ANNOUNCEMENT 📣 the ep 12 teaser is up. \"Who owns the sea?\" don't forget to share guys!!"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "AAAA akhirnya 😭 kak sekar kak tasya the best",
+        "en": "AAAA finally 😭 kak sekar kak tasya the best"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Siap mbak. Saya dengerin sambil nunggu orderan 👍",
+        "en": "Will do, miss. I'll listen while I wait for rides 👍"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "siapa yg punya laut? ya ikan lah",
+        "en": "who owns the sea? the fish obviously"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "mpus plis 😭",
+        "en": "mpus pls 😭"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "hahaha mpus bener sih. tapi ikannya ga punya sertifikat 😌",
+        "en": "hahaha mpus has a point. but the fish don't have a land certificate 😌"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ok ini lucu. saya akui",
+        "en": "ok that was funny. i'll give you that"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar bales di grup kayak orang biasa. Bercanda. Tiga hari sebelum dia hilang.",
+        "en": "Sekar is replying in the group like anyone would. Joking. Three days before she vanished."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak ep 12 ini soal patok2 di depan angke ya?",
+        "en": "kak is ep 12 about the stakes off angke?"
+      },
+      "profile": "pesisir77",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "nanti dengerin aja ya 🙂",
+        "en": "you'll just have to listen 🙂"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "hati2 kak",
+        "en": "be careful kak"
+      },
+      "profile": "pesisir77",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Hati-hati.\" Dari akun yang foto profilnya kapal, bukan muka. \"Pesisir_77 siapa?\" tanya Dinda. Gue nggak tahu. Kayaknya pendengar dari kampung nelayan.",
+        "en": "\"Be careful.\" From an account whose picture is a boat, not a face. \"Who's pesisir_77?\" Dinda asks. I don't know. A listener from the fishing village, probably."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin, 21.47",
+        "en": "Monday, 9:47 PM"
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_listener_auction.webp",
+      "caption": {
+        "id": "kak sekar lagi liputan malem2?? 👀",
+        "en": "kak sekar out reporting this late?? 👀"
+      },
+      "profile": "pesisir77",
+      "unlock_id": "photo_listener_auction",
+      "typing_delay_ms": 0,
+      "effects": [
+        {
+          "variable": "clue_listener_photo",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "wah behind the scene!!",
+        "en": "ooh behind the scenes!!"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Semangat mbak. Angke jam segini rawan, hati2 👍",
+        "en": "Go for it, miss. Angke's rough this time of night, take care 👍"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Senin, jam sepuluh kurang tiga belas. Empat puluh tujuh menit setelah dia pamit ke Dinda.",
+        "en": "Monday, thirteen minutes to ten. Forty-seven minutes after she said goodbye to Dinda."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda nyubit layar, ngegedein fotonya. Rambut setengah diiket. Jaket hijau tentara yang kegedean. Headphone di leher. \"Itu Kak Sekar,\" katanya. \"Itu jaketnya.\"",
+        "en": "Dinda pinches the screen, zooming in. Hair tied half up. An oversized army-green jacket. Headphones round her neck. \"That's Sekar,\" she says. \"That's her jacket.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di belakangnya ada haluan kapal kayu biru-putih. Ada nama di haluannya, \"SRI REJ\", terus sisanya ketutup ban bekas. Di bawahnya, lebih kecil, \"No. 14\", terus ketutup ban yang sama.",
+        "en": "Behind her is the bow of a blue and white wooden boat. There's a name on it, \"SRI REJ\", then an old tire hides the rest. Under it, smaller, \"No. 14\", hidden by the same tire."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar nggak bales foto ini. Sekar selalu bales. Mungkin dia lagi nggak bisa. Atau dia nggak mau ada yang tahu dia di sana.",
+        "en": "Sekar didn't reply to this photo. Sekar always replies. Maybe she couldn't. Or she didn't want anyone to know she was there."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Selasa, 08.15",
+        "en": "Tuesday, 8:15 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak sekar ep 12 kapan tayang? 🥺",
+        "en": "kak sekar when's ep 12 coming out? 🥺"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak?",
+        "en": "kak?"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Selasa, 22.30",
+        "en": "Tuesday, 10:30 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mohon maaf. Ada yang tahu mbak Sekar ke mana? Di status adiknya katanya hilang",
+        "en": "Sorry to ask. Does anyone know where Miss Sekar is? Her sister's status says she's missing"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "HAH",
+        "en": "WHAT"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ini beneran?",
+        "en": "is this real?"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "guys please. jangan spekulasi dulu ya. keluarga lagi butuh ketenangan 🙏",
+        "en": "guys please. no speculating for now ok. the family needs some peace 🙏"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kalau ada info japri gue aja. jangan di grup",
+        "en": "if you have any info just DM me. not in the group"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Japri gue aja.\" Bukan \"lapor polisi\". Bukan \"kabarin Dinda\".",
+        "en": "\"Just DM me.\" Not \"tell the police\". Not \"let Dinda know\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Rabu, 11.20",
+        "en": "Wednesday, 11:20 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "teori: kak sekar lagi undercover. ep 12 bakal jadi gede banget",
+        "en": "theory: kak sekar is undercover. ep 12 is going to be huge"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "mpus ini bukan waktunya",
+        "en": "mpus this isn't the time"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aku serius. aku takut. makanya bercanda",
+        "en": "i'm serious. i'm scared. that's why i'm joking"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aku bikin akun @carikaksekar, udah 2rb follower. kalau ada yg liat kak sekar dm ke situ ya",
+        "en": "i made an account @findkaksekar, 2k followers already. if anyone sees kak sekar dm it"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya ojol di Angke tiap malam. Saya tanya2 ke teman pangkalan. Nanti saya kabari",
+        "en": "I drive around Angke every night. I'll ask the guys at the bike stand. I'll let you know"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Bang Jaya,\" kata Dinda pelan. \"Dia pernah nganter Kak Sekar pulang hujan-hujan, terus nggak mau dibayar. Kak Sekar cerita.\"",
+        "en": "\"Bang Jaya,\" Dinda says quietly. \"He drove Sekar home in the rain once and wouldn't take her money. She told me.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Hari ini, 07.12",
+        "en": "Today, 7:12 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak sekar kalau kakak baca ini... kasih tanda apa aja ya 🙏",
+        "en": "kak sekar if you're reading this... give us any kind of sign 🙏"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "🙏",
+        "en": "🙏"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "🙏",
+        "en": "🙏"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tiga emoji tangan. Semuanya kebaca, di HP yang mereka kira mati.",
+        "en": "Three praying hands. All of them read, on a phone they think is dead."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Akun Sekar bisa bales. Mereka nggak tahu siapa yang pegang HP-nya.",
+        "en": "Sekar's account can reply. They don't know who's holding her phone."
+      },
+      "variable": "GROUP_REPLY",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Tanya pesisir_77 soal fotonya, dari akun Sekar.",
+            "en": "Ask pesisir_77 about the photo, from Sekar's account."
+          },
+          "value": "reply",
+          "effects": [
+            {
+              "variable": "group_alerted",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Simpan fotonya. Diam.",
+            "en": "Save the photo. Say nothing."
+          },
+          "value": "quiet",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "@pesisir_77 foto ini jam berapa persisnya? lo liat dia sama siapa?",
+        "en": "@pesisir_77 what time exactly was this photo? who did you see her with?"
+      },
+      "profile": "sekar:0",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "KAK SEKAR?????",
+        "en": "KAK SEKAR?????"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 1200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "Mbak Sekar?? Mbak aman??",
+        "en": "Miss Sekar?? Are you safe??"
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 1600,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "tunggu. \"dia\"?",
+        "en": "wait. \"her\"?"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 2200,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "ini bukan kak sekar",
+        "en": "this isn't kak sekar"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 2400,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "siapa yang pegang hp sekar",
+        "en": "who has sekar's phone"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'reply'",
+      "style": "system",
+      "text": {
+        "id": "pesisir_77 keluar dari grup",
+        "en": "pesisir_77 left the group"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'reply'",
+      "style": "system",
+      "text": {
+        "id": "+62 812-9047-xxxx bergabung lewat tautan undangan",
+        "en": "+62 812-9047-xxxx joined using the invite link"
+      },
+      "sfx": "sfx_notification.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "Nomor itu. Nomor yang tengah malem tadi nyuruh gue berhenti. Dia nggak ngetik apa-apa. Dia cuma ada di sana, di antara tiga emoji tangan.",
+        "en": "That number. The one that told me to stop at midnight. It doesn't type anything. It's just there, among the three praying hands."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'reply'",
+      "text": {
+        "id": "\"Ka,\" kata Dinda pelan. \"Sekarang dia tahu HP-nya hidup.\"",
+        "en": "\"Ka,\" Dinda says quietly. \"Now they know the phone is alive.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'quiet'",
+      "text": {
+        "id": "Gue simpen fotonya. Gue nggak ngetik apa-apa.",
+        "en": "I save the photo. I don't type anything."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "GROUP_REPLY == 'quiet'",
+      "text": {
+        "id": "\"Bener,\" kata Dinda. \"Kalau kita bales, semua orang tahu HP ini nyala. Termasuk yang ngancem.\"",
+        "en": "\"Right,\" Dinda says. \"If we reply, everyone knows this phone is on. Including whoever sent that threat.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_tasya_thread"
+    }
+  ]
+}

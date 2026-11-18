@@ -920,6 +920,28 @@ edges, heard as a tick every 48 seconds. The loop point now sits at a zero cross
 the old ends are joined inside the file with a 10 ms crossfade, and the file is encoded at 96 kbps. Its edges
 now step no more than the music does next to them.
 
+## Old messages on Sekar's phone show without typing
+
+*2026-11-19. Last Seen Day 2, presentation modes §1.1.*
+
+In Day 2 Raka scrolls back through Sekar's group, her thread with Tasya and her thread with Bima. Every
+incoming message in that history has `typing=0`, so it appears at reading pace with no "typing…" bubble. Messages
+that arrive while Raka is reading, like the group's answers after he replies as Sekar, keep the typing bubble.
+
+- **Why:** chat gives incoming messages without a delay a default typing time. In history sent days ago a
+  typing bubble says "someone is writing this now", which is wrong.
+- **Not an engine change:** a "history" flag on a scene or thread would save writing `typing=0` 62 times. Worth
+  it if Days 3 and 4 read more old threads (Sekar's notes app, `d4_notebook`).
+
+## Day 2 is drafted short of its budget
+
+*2026-11-19. Last Seen spec §2, M2 plan §3.*
+
+Day 2 came in at 2.7k Indonesian words and an estimated 15.7 minutes, against a budget of 4.5k words and 30
+minutes. That's the same ratio as Day 1 (2.7k of 4.0k), so it stays as written until the M1 timed playtest
+says whether the estimator or the budget is wrong. Padding it now could mean cutting it again after the
+playtest.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does
@@ -939,5 +961,6 @@ mode waiting while HIDE is on and resuming after.
 
 Not yet checked: the desktop mouse wheel rollback, story hot reload on a device, and fades and volumes by ear.
 Also not yet checked: the ringtone loop of a `ring=` call, the vibration while it rings, the keypad click,
-holding the stage to hide the UI (and holding a button not hiding it), and the cast's heights on a real phone.
+holding the stage to hide the UI (and holding a button not hiding it), the cast's heights on a real phone, and
+emoji in the Day 2 group chat (the test renderer has no emoji font, so it draws boxes).
 See the backlog.

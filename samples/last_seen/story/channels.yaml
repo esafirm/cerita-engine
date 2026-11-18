@@ -24,3 +24,31 @@ thread_unknown:
   avatar: assets/story/sprites/unknown_avatar.webp
   status: online
   members: [unknown]
+
+# Sekar's threads, read on her spare phone (Day 2). Her messages sit on the outgoing side.
+
+group_ep12:
+  name: Pendengar Ep. 12
+  avatar: assets/story/sprites/group_ep12_avatar.webp
+  status: { id: "Nadia, Bang Jaya, mpus, pesisir_77, Tasya, +209", en: "Nadia, Bang Jaya, mpus, pesisir_77, Tasya, +209" }
+  members: [nadia, jaya, mpus, pesisir77, tasya]
+  owner: sekar
+
+sekar_tasya:
+  name: Tasya
+  avatar: assets/story/sprites/tasya_avatar.webp
+  members: [tasya]
+  owner: sekar
+
+sekar_bima:
+  name: Bima
+  avatar: assets/story/sprites/bima_avatar.webp
+  members: [bima]
+  owner: sekar
+
+# Raka's own calls.
+
+thread_tasya:
+  name: Tasya
+  avatar: assets/story/sprites/tasya_avatar.webp
+  members: [tasya]

@@ -1,0 +1,347 @@
+{
+  "conversation_id": "cvn_d2_bima_thread",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Bima",
+    "en": "Bima"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "sekar_bima",
+    "day": 2,
+    "time": "09:00",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Chat Bima. Empat puluh pesan baru. Dinda buang muka. \"Gue nggak mau baca chat pacaran kakak gue.\" Tapi dia tetep duduk di situ.",
+        "en": "Bima's chat. Forty new messages. Dinda looks away. \"I don't want to read my sister's couple texts.\" But she stays put."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Tiga bulan lalu, 19.40",
+        "en": "Three months ago, 7:40 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "udah makan belum",
+        "en": "have you eaten"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "udah. mie",
+        "en": "yeah. noodles"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "itu bukan makan itu hukuman",
+        "en": "that's not a meal that's a punishment"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aku bawain martabak ya. telor spesial. buat ibu juga",
+        "en": "i'll bring martabak. the special egg one. some for your mom too"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kamu kok baik banget hari ini, salah apa",
+        "en": "why are you being so nice today, what did you do"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "salah sayang kamu kebanyakan 😌",
+        "en": "loved you too much, guilty 😌"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "geli bim",
+        "en": "gross bim"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak kenal Bima. Tapi chatnya kedengeran kayak orang yang beneran sayang. Itu yang bikin semuanya lebih susah.",
+        "en": "I don't know Bima. But his texts sound like someone who really loved her. That makes everything harder."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Lima minggu lalu, 21.12",
+        "en": "Five weeks ago, 9:12 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "bim, klien kantor kamu ada yang main di pesisir utara ga",
+        "en": "bim, does your office have any clients working the north coast"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kenapa nanya",
+        "en": "why do you ask"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "nanya aja",
+        "en": "just asking"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar. kamu tau aku nggak boleh cerita soal klien",
+        "en": "kar. you know i can't talk about clients"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "berarti ada",
+        "en": "so there is one"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "berarti aku nggak boleh cerita",
+        "en": "so i can't talk about it"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Dua minggu lalu, 22.48",
+        "en": "Two weeks ago, 10:48 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aku cuma mau kamu aman. itu aja",
+        "en": "i just want you safe. that's all"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aman dari siapa bim?",
+        "en": "safe from who bim?"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "dari diri kamu sendiri kadang 🙃",
+        "en": "from yourself sometimes 🙃"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar aku serius. ep 12 itu nggak usah dulu",
+        "en": "kar i'm serious. hold off on ep 12"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kamu ngomong kayak orang PR",
+        "en": "you sound like a PR guy"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin, 20.40",
+        "en": "Monday, 8:40 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "{i}Pesan ini telah dihapus{/i}",
+        "en": "{i}This message was deleted{/i}"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ok",
+        "en": "ok"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin, 23.10",
+        "en": "Monday, 11:10 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kamu udah sampe?",
+        "en": "did you get there?"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0,
+      "effects": [
+        {
+          "variable": "clue_bima_deleted",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Selasa, 06.02",
+        "en": "Tuesday, 6:02 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar?",
+        "en": "kar?"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar angkat",
+        "en": "kar pick up"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "hp kamu mati?",
+        "en": "is your phone dead?"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Rabu, 21.15",
+        "en": "Wednesday, 9:15 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "aku udah ke rumah. dinda galak banget",
+        "en": "i went to your house. dinda was so harsh"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar kalau kamu baca ini. hapus semuanya ya. demi kamu",
+        "en": "kar if you read this. delete everything ok. for your own sake"
+      },
+      "profile": "bima:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Senin, jam delapan empat puluh. Bima ngirim sesuatu, terus dihapus. Semenit kemudian Sekar bales \"ok\". Dua puluh menit kemudian dia pamit ke Dinda. Katanya dijemput.",
+        "en": "Monday, eight forty. Bima sent something, then deleted it. A minute later Sekar replied \"ok\". Twenty minutes later she said goodbye to Dinda. She said someone was picking her up."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam sebelas malem, Bima nanya \"kamu udah sampe?\". Orang yang nggak tahu dia pergi ke mana nggak bakal nanya \"udah sampe\".",
+        "en": "At eleven that night, Bima asked \"did you get there?\". Someone who didn't know where she was going wouldn't ask that."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Bima bilang ke polisi, Senin dia lembur di kantor sampai pagi,\" kata Dinda. Suaranya datar. Terlalu datar.",
+        "en": "\"Bima told the police he was working late at the office Monday, until morning,\" Dinda says. Her voice is flat. Too flat."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_podcast"
+    }
+  ]
+}

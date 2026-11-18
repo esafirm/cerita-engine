@@ -183,7 +183,7 @@
     },
     {
       "type": "JUMP",
-      "target": "d2_stub"
+      "target": "d2_morning"
     }
   ]
 }

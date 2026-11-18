@@ -1,0 +1,469 @@
+{
+  "conversation_id": "cvn_d2_podcast",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Draf Episode 12",
+    "en": "The Episode 12 Draft"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 2,
+    "time": "14:20",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_unsent.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Siang. Kamar Sekar lagi, dengan gorden yang sekarang gue buka. Laptopnya udah dicas dari pagi. Nggak dikunci. Sekar nggak pernah ngunci laptop, katanya \"nggak ada yang mau nyolong laptop seberat batako\".",
+        "en": "Afternoon. Sekar's room again, with the curtains open now. Her laptop has been charging since morning. It isn't locked. Sekar never locked her laptop, she said \"nobody's going to steal a laptop that weighs as much as a brick\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Browser-nya masih kebuka di halaman masuk situs hosting podcast-nya. \"Suara Pesisir, Dasbor Kreator.\" Email-nya udah keisi. Sandinya kosong.",
+        "en": "The browser is still open on the login page of her podcast host. \"Suara Pesisir, Creator Dashboard.\" The email is filled in. The password is empty."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di bawah kolom sandi ada tulisan kecil. \"Petunjuk dari pemilik akun:{w} kapal siapa, jam berapa.\"",
+        "en": "Under the password field is a line of small print. \"Hint from the account owner:{w} whose boat, what time.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sebulan lalu Kak Sekar ganti semua sandinya. Gue lihat dia nulis-nulis di kertas, terus kertasnya dibakar di wastafel. Gue kira dia lebay.",
+        "en": "A month ago Sekar changed all her passwords. I saw her writing on a piece of paper, then she burned it in the sink. I thought she was being dramatic."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sandinya selalu jam yang ada ceritanya. Yang ini minta lebih dari angka.",
+        "en": "Her passwords are always a time with a story. This one wants more than numbers."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "INPUT",
+      "id": "dash_pass",
+      "text": {
+        "id": "Masukkan sandi dasbor. Petunjuk: \"kapal siapa, jam berapa\".",
+        "en": "Enter the dashboard password. Hint: \"whose boat, what time\"."
+      },
+      "variable": "DASH_PASS",
+      "profile": "raka:0",
+      "max_length": 24
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "DASH_PASS == 'karta0530' || DASH_PASS == 'Karta0530' || DASH_PASS == 'KARTA0530' || DASH_PASS == 'karta05.30' || DASH_PASS == 'Karta05.30' || DASH_PASS == 'pakkarta0530' || DASH_PASS == 'PakKarta0530' || DASH_PASS == 'Pakkarta0530'",
+          "target": "#dash_open"
+        },
+        {
+          "condition": "DASH_PASS == '0530' || DASH_PASS == '05.30' || DASH_PASS == '05:30'",
+          "target": "#dash_time"
+        },
+        {
+          "condition": "DASH_PASS == 'karta' || DASH_PASS == 'Karta' || DASH_PASS == 'KARTA' || DASH_PASS == 'pakkarta' || DASH_PASS == 'PakKarta'",
+          "target": "#dash_name"
+        }
+      ]
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "dash_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_wrong_code.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sandi salah",
+        "en": "Wrong password"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "dash_tries == 1",
+      "text": {
+        "id": "Kapal siapa. Jam berapa. Dia nulis petunjuk ini buat dirinya sendiri. Atau buat orang yang tahu ceritanya.",
+        "en": "Whose boat. What time. She wrote this hint for herself. Or for someone who knows the story."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "dash_tries == 2",
+      "text": {
+        "id": "Kemarin lo bilang kodenya jam kapal yang harusnya lo naikin bareng dia. Kapalnya punya siapa?",
+        "en": "Yesterday you said the code was the time of the boat you were supposed to take with her. Whose boat was it?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "#dash_check"
+    },
+    {
+      "type": "STAGE",
+      "id": "dash_time",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_wrong_code.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sandi salah",
+        "en": "Wrong password"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jamnya bener, gue yakin. Tapi petunjuknya nanya dua hal. Kapalnya punya siapa.",
+        "en": "The time's right, I'm sure of it. But the hint asks for two things. Whose boat it was."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "dash_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#dash_check"
+    },
+    {
+      "type": "STAGE",
+      "id": "dash_name",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_wrong_code.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sandi salah",
+        "en": "Wrong password"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Namanya doang nggak cukup. Sekar nggak pernah lupa jamnya.",
+        "en": "The name alone isn't enough. Sekar never leaves out the time."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "dash_tries",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#dash_check"
+    },
+    {
+      "type": "BRANCH",
+      "id": "dash_check",
+      "branches": [
+        {
+          "condition": "dash_tries >= 3",
+          "target": "#dash_remember"
+        }
+      ],
+      "fallback_target": "#dash_pass"
+    },
+    {
+      "type": "NARRATION",
+      "id": "dash_remember",
+      "text": {
+        "id": "Kapalnya Pak Karta. Berangkat jam setengah enam. Hari itu kapalnya berangkat tepat waktu.{w} Gue yang nggak dateng.",
+        "en": "Pak Karta's boat. It left at five thirty. That day the boat left right on time.{w} I'm the one who didn't show."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue ngetik pelan, huruf kecil semua, kayak cara dia ngechat. k, a, r, t, a, nol, lima, tiga, nol.",
+        "en": "I type it slowly, all lower case, the way she texts. k, a, r, t, a, zero, five, three, zero."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "#dash_open"
+    },
+    {
+      "type": "STAGE",
+      "id": "dash_open",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_unlock.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Masuk",
+        "en": "Signed in"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "dash_tries == 0",
+      "text": {
+        "id": "Sekali coba lagi. Lo hafal isi kepala dia, sumpah.",
+        "en": "First try again. You know the inside of her head, I swear."
+      },
+      "profile": "dinda:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "dash_tries > 0",
+      "text": {
+        "id": "Masuk! Kapal Pak Karta, ya?",
+        "en": "We're in! Pak Karta's boat, right?"
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dasbornya sederhana. Sebelas episode, semuanya tayang. Paling atas, satu baris abu-abu. \"Episode 12: Siapa yang Punya Laut? Draf. Terakhir diubah Minggu, 23.48.\"",
+        "en": "The dashboard is simple. Eleven episodes, all published. At the top, one grey row. \"Episode 12: Who Owns the Sea? Draft. Last edited Sunday, 11:48 PM.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ada tiga file. \"intro_ep12.wav, 0:41.\" Di bawahnya, dua baris merah. \"seg2_narsum.wav, unggahan gagal.\" \"seg3_dokumen.pdf, unggahan gagal.\"",
+        "en": "There are three files. \"intro_ep12.wav, 0:41.\" Under it, two red rows. \"seg2_source.wav, upload failed.\" \"seg3_documents.pdf, upload failed.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Catatan episodenya cuma dua baris, diketik buru-buru. \"SEG 2: narsum dari dalam. SAMARKAN SUARANYA. jangan sebut kantornya.\" \"SEG 3: dua dokumen. yg asli vs yg diajukan. bandingin hal. 37.\"",
+        "en": "The show notes are just two lines, typed in a hurry. \"SEG 2: inside source. DISGUISE THE VOICE. don't name the office.\" \"SEG 3: two documents. the real one vs the one they filed. compare p. 37.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gagal. Bukan dihapus. Gagal keunggah.",
+        "en": "Failed. Not deleted. They failed to upload."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kuotanya habis. Sama kayak pesan buat lo.",
+        "en": "Out of data. Same as the message to you."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue pasang headphone dan nyolok kabelnya ke laptop. Kebiasaan lama. Satu sisi buat gue, satu sisi gue sodorin ke Dinda.",
+        "en": "I put on my headphones and plug them into the laptop. Old habit. One side for me, the other I hold out to Dinda."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "music",
+          "file": null,
+          "fade_ms": 1500
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Halo, pendengar Suara Pesisir. Ini episode dua belas. Kalau kalian lagi dengerin ini, berarti gue akhirnya berani mencet tombol tayang.",
+        "en": "Hi, Suara Pesisir listeners. This is episode twelve. If you're hearing this, it means I finally worked up the nerve to press publish."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d2_ep12_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tiga bulan lalu, ada patok bambu baru di laut depan Muara Angke. Nggak ada papan, nggak ada sosialisasi. Nelayan cuma dikasih tahu satu hal. Jangan lewat sini lagi.",
+        "en": "Three months ago, new bamboo stakes went up in the sea off Muara Angke. No sign, no public meeting. The fishermen were told one thing. Don't go through here anymore."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d2_ep12_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nanya ke semua orang, ini punya siapa. Jawabannya selalu sama. \"Ada izinnya, Mbak.\" Jadi gue cari izinnya. Dan gue nemu sesuatu yang nggak seharusnya ada.",
+        "en": "I asked everyone whose they were. The answer was always the same. \"There's a permit, miss.\" So I went looking for the permit. And I found something that shouldn't exist."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d2_ep12_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Episode ini bukan soal siapa yang salah. Ini soal satu pertanyaan yang gampang banget. Siapa yang punya laut?",
+        "en": "This episode isn't about who's to blame. It's about one very simple question. Who owns the sea?"
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d2_ep12_04.mp3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "clue_ep12_draft",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Filenya habis di situ. Empat puluh satu detik.",
+        "en": "The file ends there. Forty-one seconds."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue puter sekali lagi, kali ini pake kuping kerja. Napasnya dipotong rapi. Nggak ada \"eee\". Noise kipas angin di belakang dibersihin tanpa bikin suaranya kedengeran kayak di dalem kaleng.",
+        "en": "I play it again, this time with my work ears. The breaths are trimmed neatly. No \"umm\"s. The fan noise in the background is cleaned up without making her sound like she's inside a tin can."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia ngedit sendiri. Lo belajar, Kar.",
+        "en": "She edited it herself. You learned, Kar."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu suara dia. Kayak dia lagi duduk di sini.",
+        "en": "That's her voice. Like she's sitting right here."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "music",
+          "file": "bgm_unease.mp3",
+          "fade_ms": 2000
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Narsum dari dalam.\" Dalam apa?",
+        "en": "\"Inside source.\" Inside what?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dalam perusahaan yang punya patok. Atau dalam kantor yang ngasih izinnya.",
+        "en": "Inside the company that owns the stakes. Or inside the office that gave them the permit."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tasya pasti tahu siapa narsumnya. Dia co-host-nya. Gue telepon dia sekarang. Pake HP gue sendiri.",
+        "en": "Tasya must know who the source is. She's the co-host. I'm calling her now. From my own phone."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_tasya_call"
+    }
+  ]
+}

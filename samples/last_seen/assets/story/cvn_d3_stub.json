@@ -1,0 +1,42 @@
+{
+  "conversation_id": "cvn_d3_stub",
+  "chapter": {
+    "id": "Hari 3",
+    "en": "Day 3"
+  },
+  "title": {
+    "id": "Dermaga",
+    "en": "The Pier"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 3,
+    "time": "05:10",
+    "background": "bg_muara_angke_dawn.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 3 belum ditulis. Ceritanya berlanjut di versi berikutnya.",
+        "en": "Day 3 isn't written yet. The story continues in the next build."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_00_preview",
+      "title": {
+        "id": "Bersambung",
+        "en": "To Be Continued"
+      },
+      "category": "NORMAL",
+      "summary": {
+        "id": "Sekar pergi ke dermaga Senin malem, dan orang-orang terdekatnya menyimpan sisanya. Raka baru mulai menyusun potongannya.",
+        "en": "Sekar went to the pier on Monday night, and the people closest to her are keeping the rest. Raka has only begun to put the pieces together."
+      }
+    }
+  ]
+}

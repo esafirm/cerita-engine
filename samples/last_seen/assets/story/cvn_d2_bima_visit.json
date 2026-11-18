@@ -1,0 +1,461 @@
+{
+  "conversation_id": "cvn_d2_bima_visit",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Tamu Malam",
+    "en": "A Night Visitor"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 2,
+    "time": "20:15",
+    "background": "bg_sekar_house_gate_night.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malem. Jam delapan lewat. Lampu jalan di gang ini cuma satu yang nyala, dan itu pun kedip-kedip.",
+        "en": "Night. Past eight. Only one streetlight in the alley works, and even that one flickers."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TASYA_PROOF == 'tasya_warning'",
+      "text": {
+        "id": "Kalimat Tasya masih muter di kepala gue. \"Ketemu narsum di dermaga.\"",
+        "en": "Tasya's words are still going round in my head. \"Meeting a source at the pier.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Mobil berhenti di depan pagar. Lampunya nggak dimatiin.",
+        "en": "A car stops outside the gate. Its headlights stay on."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_gate.mp3"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "center"
+        },
+        {
+          "action": "show",
+          "profile": "bima:1",
+          "position": "right",
+          "transition": "slide_left",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Din. Martabak. Telor spesial, buat Ibu juga.",
+        "en": "Din. Martabak. The special egg one, some for your mom too."
+      },
+      "profile": "bima:1",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Makasih, Kak Bima.",
+        "en": "Thanks, Bima."
+      },
+      "profile": "dinda:0",
+      "position": "center"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dan lo pasti Raka. Sekar banyak cerita soal lo.",
+        "en": "And you must be Raka. Sekar's told me a lot about you."
+      },
+      "profile": "bima:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Cerita apa?",
+        "en": "Told you what?"
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Yang bagus-bagus. Kebanyakan.",
+        "en": "Good things. Mostly."
+      },
+      "profile": "bima:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kemeja linen, lengannya digulung. Jam tangannya nangkep cahaya lampu jalan tiap kali dia gerak. Dia nggak masuk pagar. Dia nunggu disuruh masuk, dan nggak ada yang nyuruh.",
+        "en": "A linen shirt with the sleeves rolled. His watch catches the streetlight every time he moves. He doesn't come through the gate. He waits to be asked in, and nobody asks."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "Tadi temen gue bilang grup pendengar heboh. Katanya akun Sekar bales.",
+        "en": "A friend told me the listener group went crazy today. Said Sekar's account replied."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "Temen siapa?",
+        "en": "What friend?"
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "Temen. Banyak yang dengerin podcast-nya, Ka.",
+        "en": "A friend. Lots of people listen to her podcast, Ka."
+      },
+      "profile": "bima:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue to the point aja. HP cadangan Sekar. Dinda bilang nggak ada, tapi...",
+        "en": "I'll get to the point. Sekar's spare phone. Dinda says there isn't one, but..."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Matanya turun ke saku celana gue. Cuma sedetik.",
+        "en": "His eyes drop to my pocket. Just for a second."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue kenal orang di Polda. Lebih cepet daripada Polsek. Kasih ke gue, besok pagi udah ada di meja yang bener.",
+        "en": "I know someone at the regional police. Faster than the local station. Give it to me, and by tomorrow morning it'll be on the right desk."
+      },
+      "profile": "bima:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngulurin tangan lewat sela pagar. Telapaknya kebuka. Nunggu.",
+        "en": "He reaches through the bars of the gate. His palm is open. Waiting."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Pesan ini telah dihapus.\" Senin, jam delapan empat puluh.",
+        "en": "\"This message was deleted.\" Monday, eight forty."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Tangan Bima masih kebuka di sela pagar.",
+        "en": "Bima's hand is still open between the bars."
+      },
+      "variable": "BIMA_PHONE",
+      "profile": "bima:0",
+      "timeout_ms": 10000,
+      "default_choice": 3,
+      "choices": [
+        {
+          "text": {
+            "id": "\"HP-nya kami pegang dulu.\"",
+            "en": "\"We're keeping the phone for now.\""
+          },
+          "value": "keep",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Kasih HP-nya.)",
+            "en": "(Hand over the phone.)"
+          },
+          "value": "give",
+          "silent": true
+        },
+        {
+          "text": {
+            "id": "\"Senin malem lo di mana, Bim?\"",
+            "en": "\"Where were you Monday night, Bim?\""
+          },
+          "value": "ask",
+          "effects": [
+            {
+              "variable": "bima_on_edge",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Diam. Tangan tetap di saku.)",
+            "en": "(Say nothing. Keep your hand in your pocket.)"
+          },
+          "value": "silent",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'keep'",
+      "text": {
+        "id": "Oke. Fair. Lo belum kenal gue.",
+        "en": "Okay. Fair. You don't know me yet."
+      },
+      "profile": "bima:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'keep'",
+      "text": {
+        "id": "Tapi jangan lama-lama, Ka. Barang kayak gitu bahaya kalau dipegang orang yang nggak ngerti isinya.",
+        "en": "But don't hold on to it too long, Ka. Something like that is dangerous in the hands of someone who doesn't understand what's on it."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'silent'",
+      "text": {
+        "id": "...Oke. Gue anggap itu \"belum\".",
+        "en": "...Okay. I'll take that as \"not yet\"."
+      },
+      "profile": "bima:2"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Gue ngeluarin HP-nya. Gue nggak tahu kenapa. Mungkin karena dia ngomong kayak orang yang tahu caranya ngurus sesuatu, dan gue capek.",
+        "en": "I take out the phone. I don't know why. Maybe because he talks like someone who knows how to handle things, and I'm tired."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Ujung jari Bima udah nyentuh casing-nya waktu tangan Dinda nyamber duluan.",
+        "en": "Bima's fingertips are already on the case when Dinda's hand snatches it first."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Jangan.",
+        "en": "Don't."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Ka. Lo baru kenal dia lima menit. Ini HP kakak gue.",
+        "en": "Ka. You've known him five minutes. This is my sister's phone."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Din, aku cuma mau bantu.",
+        "en": "Din, I just want to help."
+      },
+      "profile": "bima:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'give'",
+      "text": {
+        "id": "Kalau mau bantu, bilang ke polisi Kak Bima ke mana Senin malem.",
+        "en": "If you want to help, tell the police where you really were Monday night."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "SET",
+      "condition": "BIMA_PHONE == 'give'",
+      "effects": [
+        {
+          "variable": "trust_dinda",
+          "op": "subtract",
+          "value": 3
+        },
+        {
+          "variable": "trust_bima",
+          "op": "subtract",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'ask'",
+      "text": {
+        "id": "Di kantor. Lembur. Udah gue bilang ke polisi.",
+        "en": "At the office. Working late. I already told the police."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'ask'",
+      "text": {
+        "id": "Lembur. Terus jam sebelas malem lo nanya ke dia, \"kamu udah sampe?\"",
+        "en": "Working late. And then at eleven at night you ask her \"did you get there?\""
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'ask'",
+      "text": {
+        "id": "...",
+        "en": "..."
+      },
+      "profile": "bima:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PHONE == 'ask'",
+      "text": {
+        "id": "Lo baca chat gue? Itu privat, Ka. Lo nggak tahu apa-apa soal gue sama Sekar.",
+        "en": "You read my messages? That's private, Ka. You don't know anything about me and Sekar."
+      },
+      "profile": "bima:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue balik. Salam buat Ibu.",
+        "en": "I'm going. Give your mom my best."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "bima",
+          "transition": "fade",
+          "duration_ms": 800
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia jalan ke mobilnya. Lampu jalan kedip sekali, terus nyala lagi, pas mobilnya mundur.",
+        "en": "He walks back to his car. The streetlight flickers once, then comes back on, just as the car reverses."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di gelap tadi, gue kira mobilnya abu-abu. Kena lampu, warnanya perak.",
+        "en": "In the dark, I'd thought the car was grey. Under the light, it's silver."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Mobil perak itu mundur pelan keluar gang, belok, terus hilang.",
+        "en": "The silver car backs slowly out of the alley, turns, and is gone."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kenapa lo ngelihatin mobilnya kayak gitu?",
+        "en": "Why are you staring at his car like that?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nggak tahu. Belum tahu.",
+        "en": "I don't know. Not yet."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "nvl"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari kedua. Seseorang nelpon Tasya, dan dia diem. Seseorang jemput Sekar, dan dia bohong. Seseorang motret Sekar di dermaga, dan dia nggak ngomong apa-apa lagi.",
+        "en": "Day two. Someone called Tasya, and she kept quiet. Someone picked Sekar up, and he lied. Someone photographed Sekar at the pier, and never said another word."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Semua orang di sekitar dia pegang satu potong. Nggak ada yang mau naruh potongannya di meja.",
+        "en": "Everyone around her is holding one piece. No one wants to put their piece on the table."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Besok gue ke dermaga. Nyari kapal yang namanya ketutup ban.",
+        "en": "Tomorrow I go to the pier. To find a boat whose name is hidden behind a tire."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d3_stub"
+    }
+  ]
+}

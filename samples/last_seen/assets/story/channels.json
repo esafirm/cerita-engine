@@ -37,6 +37,49 @@
       "members": [
         "unknown"
       ]
+    },
+    {
+      "id": "group_ep12",
+      "name": "Pendengar Ep. 12",
+      "avatar": "assets/story/sprites/group_ep12_avatar.webp",
+      "status": {
+        "id": "Nadia, Bang Jaya, mpus, pesisir_77, Tasya, +209",
+        "en": "Nadia, Bang Jaya, mpus, pesisir_77, Tasya, +209"
+      },
+      "members": [
+        "nadia",
+        "jaya",
+        "mpus",
+        "pesisir77",
+        "tasya"
+      ],
+      "owner": "sekar"
+    },
+    {
+      "id": "sekar_tasya",
+      "name": "Tasya",
+      "avatar": "assets/story/sprites/tasya_avatar.webp",
+      "members": [
+        "tasya"
+      ],
+      "owner": "sekar"
+    },
+    {
+      "id": "sekar_bima",
+      "name": "Bima",
+      "avatar": "assets/story/sprites/bima_avatar.webp",
+      "members": [
+        "bima"
+      ],
+      "owner": "sekar"
+    },
+    {
+      "id": "thread_tasya",
+      "name": "Tasya",
+      "avatar": "assets/story/sprites/tasya_avatar.webp",
+      "members": [
+        "tasya"
+      ]
     }
   ]
 }

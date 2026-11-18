@@ -109,3 +109,21 @@ unknown:
   name: { id: Nomor Tak Dikenal, en: Unknown Number }
   avatar: assets/story/sprites/unknown_avatar.webp
 
+
+# Listeners in the "Pendengar Ep. 12" group, on Sekar's phone.
+
+nadia:
+  name: Nadia
+  avatar: assets/story/sprites/listener_nadia_avatar.webp
+
+jaya:
+  name: Bang Jaya
+  avatar: assets/story/sprites/listener_bang_ojol_avatar.webp
+
+mpus:
+  name: mpus
+  avatar: assets/story/sprites/listener_mpus_avatar.webp
+
+pesisir77:
+  name: pesisir_77
+  avatar: assets/story/sprites/listener_pesisir77_avatar.webp

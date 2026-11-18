@@ -51,6 +51,26 @@ Budget share: 4.5k words, about 30 min in the M0 plan.
 
 Day 2 ends at the gate: Bima drives off, and Raka sees the car is silver.
 
+**As written** (`story/20_day2.cerita`, 2.7k words, about 16 minutes by the estimator):
+
+- `d2_morning`: Bu Wulan has no sprite, so her lines are `[offstage]` while the narration places her in the room.
+  `TELL_THREAT` offers the screenshot only with `threat_screenshot` (+4), telling (+2) or hiding (`hid_threat`).
+  Telling also reacts to how Raka answered the threat on Day 1.
+- `d2_group`: the listeners are chat-only profiles (`nadia`, `jaya`, `mpus`, `pesisir77`). Replying as Sekar slips
+  ("who did you see *her* with?"): the group works out it isn't her, pesisir_77 leaves, and the threat's number
+  joins through the invite link. That join is how the player sees that `group_alerted` reached Didit's side.
+  Bima and Tasya both mention the reply later the same day.
+- `d2_podcast`: the login page shows Sekar's own hint, "kapal siapa, jam berapa". The engine compares strings
+  exactly, so the branch lists the likely spellings of `karta0530` (capitalized, `pakkarta0530`, `karta05.30`).
+  The time alone or the name alone gets its own hint, and three misses make Raka remember it, as with the passcode.
+  The show notes hint at the source and the two documents without naming the permit office.
+- `d2_tasya_call`: the notebook still gets "a source at the pier" out of her, but not the PR call. Any other clue
+  gets nothing. Sets `tasya_admitted` on the right answer.
+- `d2_bima_visit`: a fourth option, saying nothing, is the timer's default. It keeps the phone without the
+  `trust_dinda` of saying so.
+
+Read by later days: `hid_threat`, `group_alerted`, `tasya_admitted`, `bima_on_edge`, `trust_tasya`, `trust_bima`.
+
 ## 4. Day 3: Dermaga
 
 VN and CALL at Muara Angke. Theme: the coast as Sekar saw it. The early bad end lives here.

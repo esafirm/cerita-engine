@@ -67,8 +67,13 @@ const _Run _kind = (
     "ROOF_TRUTH": "truth",
     "WULAN_REPLY": "care",
     "THREAT_REPLY": "quiet",
+    "TELL_THREAT": "show",
+    "GROUP_REPLY": "quiet",
+    "TASYA_OPEN": "warm",
+    "TASYA_PROOF": "tasya_warning",
+    "BIMA_PHONE": "ask",
   },
-  inputs: ["0530"],
+  inputs: ["0530", "karta0530"],
 );
 
 /// Cold all the way, a short room search, three wrong passcodes before Raka remembers.
@@ -92,8 +97,13 @@ const _Run _cold = (
     "ROOF_TRUTH": "half",
     "WULAN_REPLY": "sorry",
     "THREAT_REPLY": "threaten",
+    "TELL_THREAT": "hide",
+    "GROUP_REPLY": "reply",
+    "TASYA_OPEN": "blunt",
+    "TASYA_PROOF": "threat_message",
+    "BIMA_PHONE": "give",
   },
-  inputs: ["1234", "0500", "9999"],
+  inputs: ["1234", "0500", "9999", "0530", "karta", "sekar"],
 );
 
 /// Every timed choice left to run out, and a room search that walks past the gear shelf.
@@ -105,8 +115,10 @@ const _Run _timeouts = (
     "YUSUF_PROOF": "missing_recorder",
     "TELL_YUSUF": _timeout,
     "THREAT_REPLY": _timeout,
+    "TASYA_PROOF": "sekar_notebook",
+    "BIMA_PHONE": _timeout,
   },
-  inputs: ["0530"],
+  inputs: ["0530", "Karta0530"],
 );
 
 void main() {
@@ -127,31 +139,45 @@ void main() {
   });
 
   for (final locale in ["id", "en"]) {
-    test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV', () async {
+    test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV, Tasya talks', () async {
       final (ending, engine) = await _play(locale, _kind);
       expect(ending.endingId, "end_00_preview");
       expect(engine.dataMap["pass_tries"], isNull, reason: "first try");
       expect(engine.dataMap["yusuf_cctv"], isTrue);
       expect(engine.dataMap["told_dinda_truth"], isTrue);
       expect(engine.dataMap["threat_screenshot"], isTrue);
-      // worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3
-      expect(engine.dataMap["trust_dinda"], 30);
+      // Day 1: worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3.
+      // Day 2: the screenshot 4, staying quiet in the group 1.
+      expect(engine.dataMap["trust_dinda"], 35);
+      expect(engine.dataMap["dash_tries"], isNull, reason: "the dashboard on the first try");
+      expect(engine.dataMap["tasya_admitted"], isTrue);
+      expect(engine.dataMap["trust_tasya"], 7);
+      expect(engine.dataMap["bima_on_edge"], isTrue);
+      expect(engine.dataMap["group_alerted"], isNull);
+      expect(engine.dataMap["hid_threat"], isNull);
       expect(engine.dataMap["trust_yusuf"], 8);
       for (final clue in ["unsent_message", "ep12_teaser", "stake_map", "ferry_schedule", "missing_recorder",
-          "sekar_notebook", "threat_message"]) {
+          "sekar_notebook", "threat_message", "listener_photo", "tasya_warning", "bima_deleted", "ep12_draft"]) {
         expect(engine.dataMap["clue_$clue"], isTrue, reason: clue);
       }
     });
 
-    test('cold run ($locale): wrong passcodes, Yusuf unconvinced', () async {
+    test('cold run ($locale): wrong passwords, Yusuf unconvinced, the phone nearly handed over', () async {
       final (ending, engine) = await _play(locale, _cold);
       expect(ending.endingId, "end_00_preview");
       expect(engine.dataMap["pass_tries"], 2, reason: "the third wrong code sends Raka to remember it");
       expect(engine.dataMap["yusuf_cctv"], isNull);
       expect(engine.dataMap["lied_to_yusuf"], isTrue);
-      // alone -3, silent -2, hedge -4, unlocked 3, ferry -3, lie 3, police -3, half -2
-      expect(engine.dataMap["trust_dinda"], -11);
+      // Day 1: alone -3, silent -2, hedge -4, unlocked 3, ferry -3, lie 3, police -3, half -2. Day 2: giving the phone -3.
+      expect(engine.dataMap["trust_dinda"], -14);
       expect(engine.dataMap["clue_sekar_notebook"], isNull);
+      expect(engine.dataMap["hid_threat"], isTrue);
+      expect(engine.dataMap["group_alerted"], isTrue);
+      expect(engine.dataMap["dash_tries"], 3, reason: "three wrong passwords send Raka to remember it");
+      expect(engine.dataMap["clue_ep12_draft"], isTrue);
+      expect(engine.dataMap["tasya_admitted"], isNull);
+      expect(engine.dataMap["trust_tasya"], -1);
+      expect(engine.dataMap["trust_bima"], -2);
     });
 
     test('timeout run ($locale): timed choices fall back to silence, the room waits for the shelf', () async {
@@ -168,6 +194,11 @@ void main() {
       expect(engine.dataMap["clue_missing_recorder"], isTrue);
       expect(engine.dataMap["yusuf_cctv"], isTrue);
       expect(engine.dataMap["lunch_served"], isTrue);
+      // Day 2: a capitalized password still opens the dashboard, and the notebook makes Tasya defensive.
+      expect(engine.dataMap["dash_tries"], isNull);
+      expect(engine.dataMap["TASYA_PROOF"], "sekar_notebook");
+      expect(engine.dataMap["trust_tasya"], -1);
+      expect(engine.dataMap["BIMA_PHONE"], "silent");
     });
   }
 }

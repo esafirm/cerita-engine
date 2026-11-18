@@ -146,6 +146,26 @@
         "en": "Unknown Number"
       },
       "avatar": "assets/story/sprites/unknown_avatar.webp"
+    },
+    {
+      "id": "nadia",
+      "name": "Nadia",
+      "avatar": "assets/story/sprites/listener_nadia_avatar.webp"
+    },
+    {
+      "id": "jaya",
+      "name": "Bang Jaya",
+      "avatar": "assets/story/sprites/listener_bang_ojol_avatar.webp"
+    },
+    {
+      "id": "mpus",
+      "name": "mpus",
+      "avatar": "assets/story/sprites/listener_mpus_avatar.webp"
+    },
+    {
+      "id": "pesisir77",
+      "name": "pesisir_77",
+      "avatar": "assets/story/sprites/listener_pesisir77_avatar.webp"
     }
   ]
 }

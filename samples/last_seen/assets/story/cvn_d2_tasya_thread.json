@@ -1,0 +1,389 @@
+{
+  "conversation_id": "cvn_d2_tasya_thread",
+  "chapter": {
+    "id": "Hari 2",
+    "en": "Day 2"
+  },
+  "title": {
+    "id": "Tasya",
+    "en": "Tasya"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "sekar_tasya",
+    "day": 2,
+    "time": "08:10",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Chat Tasya. Dua puluh tiga pesan belum dibaca. Gue scroll ke atas, sampai sebulan lalu.",
+        "en": "Tasya's chat. Twenty-three unread messages. I scroll up, back to a month ago."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Lima minggu lalu, 16.20",
+        "en": "Five weeks ago, 4:20 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "KAR",
+        "en": "KAR"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "KAR ANGKAT",
+        "en": "KAR PICK UP"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ada yang mau sponsorin kitaaa 😭😭😭",
+        "en": "someone wants to sponsor ussss 😭😭😭"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "15 juta per episode. FIFTEEN. kita bisa beli mic beneran, bukan minjem punya kampus terus",
+        "en": "15 million rupiah an episode. FIFTEEN. we could buy real mics instead of borrowing the campus ones forever"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "hah serius? dari siapa",
+        "en": "wait seriously? from who"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "PT properti gitu, namanya panjang bgt. orang PR-nya ramah sih. katanya suka sama ep ibu2 kerang",
+        "en": "some property company, super long name. the PR guy's really nice tho. says he loved the mussel ladies ep"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "mereka cuma minta satu segmen \"konten positif soal pembangunan pesisir\". that's it",
+        "en": "they just want one segment of \"positive content about coastal development\". that's it"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "tas.",
+        "en": "tas."
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "properti di pesisir. kita lagi bikin episode soal patok reklamasi",
+        "en": "coastal property. we're making an episode about the reclamation stakes"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "itu bukan sponsor. itu iklan yang nyamar jadi episode",
+        "en": "that's not a sponsor. that's an ad dressed up as an episode"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ok tapi hear me out",
+        "en": "ok but hear me out"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ep 12 tetep jalan kok. beda segmen. beda minggu",
+        "en": "ep 12 still happens. different segment. different week"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "dan pendengar kita bakal mikir apa",
+        "en": "and what will our listeners think"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "pendengar kita nggak bayarin kontrakan gue kar",
+        "en": "our listeners don't pay my rent kar"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue berhenti scroll sebentar. Kalimat itu nggak kedengeran kayak orang serakah. Kedengeran kayak orang capek.",
+        "en": "I stop scrolling for a moment. That line doesn't sound greedy. It sounds tired."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "nyokap gue kontrol lagi bulan depan. lo tau kan biayanya",
+        "en": "my mom has another checkup next month. you know what that costs"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "gue tau tas. sori. tapi jangan yang ini",
+        "en": "i know tas. i'm sorry. but not this one"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Tiga minggu lalu, 10.05",
+        "en": "Three weeks ago, 10:05 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "tas rekaman kamis jadi?",
+        "en": "tas are we still recording thursday?"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "skip dulu ya",
+        "en": "skip this one ok"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "skip lagi?",
+        "en": "skip again?"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "lagi banyak pikiran. next week deh",
+        "en": "got a lot on my mind. next week"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua minggu nggak rekaman bareng. Persis kata Dinda di warung kemarin.",
+        "en": "Two weeks without recording together. Just like Dinda said at the stall yesterday."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin lalu, 23.04",
+        "en": "Last Monday, 11:04 PM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar.",
+        "en": "kar."
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "mereka nelpon gue.",
+        "en": "they called me."
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "lo beneran mau publish?",
+        "en": "are you really going to publish?"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "siapa yang nelpon lo",
+        "en": "who called you"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "tas",
+        "en": "tas"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "SIAPA yang nelpon lo",
+        "en": "WHO called you"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Dibaca 23.11",
+        "en": "Read 11:11 PM"
+      },
+      "effects": [
+        {
+          "variable": "clue_tasya_warning",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dibaca. Nggak dibales. Seminggu sebelum Sekar hilang, ada yang nelpon Tasya. Dan Tasya nggak pernah cerita ke siapa-siapa.",
+        "en": "Read. No reply. A week before Sekar vanished, someone called Tasya. And Tasya never told anyone."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Selasa, 07.20",
+        "en": "Tuesday, 7:20 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar lo di mana",
+        "en": "kar where are you"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "dinda nelpon gue jam 6 pagi",
+        "en": "dinda called me at 6 am"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kar please bales",
+        "en": "kar please answer"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Rabu, 01.33",
+        "en": "Wednesday, 1:33 AM"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "maaf",
+        "en": "i'm sorry"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 0
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Maaf.\" Jam setengah dua pagi. Buat apa?",
+        "en": "\"I'm sorry.\" At half past one in the morning. For what?"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook == true",
+      "text": {
+        "id": "\"Jangan percaya T,\" gue bilang pelan. Dinda ngelirik gue. \"Lo pikir Tasya...?\" Gue nggak tahu. Tapi Tasya tahu sesuatu.",
+        "en": "\"Don't trust T,\" I say quietly. Dinda glances at me. \"You think Tasya...?\" I don't know. But Tasya knows something."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook != true",
+      "text": {
+        "id": "\"Tasya kemarin bilang ke gue dia nggak tahu apa-apa,\" kata Dinda. Suaranya pelan, tapi tangannya ngepal.",
+        "en": "\"Tasya told me yesterday she doesn't know anything,\" Dinda says. Her voice is quiet, but her hand is a fist."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d2_bima_thread"
+    }
+  ]
+}
