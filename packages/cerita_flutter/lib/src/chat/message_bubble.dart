@@ -180,11 +180,13 @@ class _ClueContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
-          onTap: () => ImageViewerPage.open(context, image, caption: title),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.asset(image, width: 220, fit: BoxFit.cover),
+        Builder(
+          builder: (thumbnail) => GestureDetector(
+            onTap: () => ImageViewerPage.open(context, image, caption: title, from: thumbnail),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset(image, width: 220, fit: BoxFit.cover),
+            ),
           ),
         ),
         Padding(padding: const EdgeInsets.fromLTRB(8, 6, 8, 4), child: label),
@@ -206,11 +208,13 @@ class _MediaContent extends StatelessWidget {
     final path = setup.mediaPath(item);
     final caption = item.caption;
     final media = switch (item.mediaType) {
-      MediaType.image || MediaType.cg => GestureDetector(
-          onTap: () => ImageViewerPage.open(context, path, caption: caption),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Hero(tag: path, child: Image.asset(path, width: 220, fit: BoxFit.cover)),
+      MediaType.image || MediaType.cg => Builder(
+          builder: (thumbnail) => GestureDetector(
+            onTap: () => ImageViewerPage.open(context, path, caption: caption, from: thumbnail),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset(path, width: 220, fit: BoxFit.cover),
+            ),
           ),
         ),
       MediaType.audio => VoiceNotePlayer(

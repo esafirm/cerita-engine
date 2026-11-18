@@ -122,7 +122,7 @@ class _UnlockedTile extends StatelessWidget {
     final (Widget preview, VoidCallback onTap) = switch (item.mediaType) {
       MediaType.image || MediaType.cg => (
           Image.asset(path, fit: BoxFit.cover),
-          () => ImageViewerPage.open(context, path, caption: item.caption),
+          () => ImageViewerPage.open(context, path, caption: item.caption, from: context),
         ),
       MediaType.audio => (
           ColoredBox(color: scheme.primaryContainer, child: Icon(Icons.graphic_eq, size: 48, color: scheme.primary)),

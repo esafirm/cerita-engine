@@ -61,12 +61,56 @@ void main() {
     ImageViewerPage.open(context, "photo.png", caption: "The unsent message");
     await tester.pumpAndSettle();
 
-    expect(sheetHeight(tester), screen.height);
+    final viewer = tester.getRect(find.byType(ImageViewerPage));
+    expect(viewer.top, lessThan(100));
+    expect(viewer.bottom, greaterThan(screen.height - 40));
     expect(find.text("Photo"), findsOneWidget);
     expect(find.text("The unsent message"), findsOneWidget);
     expect(find.byType(InteractiveViewer), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(find.byType(ImageViewerPage), findsNothing);
+  });
+
+  testWidgets('a picture grows out of its thumbnail and shrinks back into it', (tester) async {
+    await pumpHost(tester);
+    const thumbnail = Rect.fromLTWH(40, 500, 120, 90);
+    await tester.pumpWidget(MaterialApp(
+      builder: (context, child) => DefaultAssetBundle(bundle: _PixelBundle(), child: child!),
+      home: Scaffold(
+        body: Stack(children: [
+          Positioned.fromRect(
+            rect: thumbnail,
+            child: Builder(
+              builder: (thumb) => GestureDetector(
+                onTap: () => ImageViewerPage.open(thumb, "photo.png", from: thumb),
+                child: const ColoredBox(color: Colors.red),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    ));
+    Rect flight() => tester.getRect(find.byKey(ImageViewerPage.flightKey));
+
+    await tester.tapAt(thumbnail.center);
+    await tester.pump();
+    await tester.pump();
+    // It starts on the thumbnail, and the viewer leaves its own copy out until it lands.
+    expect(flight().center.dy, moreOrLessEquals(thumbnail.center.dy, epsilon: 20));
+    expect(find.byType(InteractiveViewer), findsNothing);
+    await tester.pump(const Duration(milliseconds: 190));
+    expect(flight().width, greaterThan(thumbnail.width + 20));
+
+    await tester.pumpAndSettle();
+    expect(find.byKey(ImageViewerPage.flightKey), findsNothing);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 280));
+    expect(flight().center.dy, moreOrLessEquals(thumbnail.center.dy, epsilon: 40));
     await tester.pumpAndSettle();
     expect(find.byType(ImageViewerPage), findsNothing);
   });

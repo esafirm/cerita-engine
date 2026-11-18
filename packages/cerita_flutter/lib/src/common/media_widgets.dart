@@ -9,36 +9,70 @@ import '../l10n/localized_assets.dart';
 import '../l10n/story_language.dart';
 import 'story_sheet.dart';
 
-/// A picture at full size, pinch to zoom, with its caption under it. [open] shows it in a full-screen
-/// [StorySheet], so it closes like every other sheet and keeps the skin's frame.
+/// A picture at full size, pinch to zoom, with its caption under it. [open] shows it in a full-screen sheet in the
+/// skin's frame, grown out of the thumbnail that was tapped.
 class ImageViewerPage extends StatelessWidget {
+  /// The picture flying between its thumbnail and the viewer, while the viewer opens or closes.
+  static const flightKey = ValueKey("picture flight");
+
   final String asset;
   final String? caption;
 
-  const ImageViewerPage({super.key, required this.asset, this.caption});
+  /// Set by [open] when the picture flies in: the viewer leaves its own copy out until it lands, and says where
+  /// that is.
+  final PictureFlight? flight;
 
-  static Future<void> open(BuildContext context, String asset, {String? caption}) {
-    return StorySheet.show(
-      context,
+  const ImageViewerPage({super.key, required this.asset, this.caption, this.flight});
+
+  /// Opens [asset]. With [from], the context of the thumbnail tapped, the picture grows out of that thumbnail and
+  /// shrinks back into it on close, while the frame fades in around it.
+  static Future<void> open(BuildContext context, String asset, {String? caption, BuildContext? from}) {
+    final navigator = Navigator.of(context);
+    final origin = _rectOf(from, navigator.overlay?.context.findRenderObject());
+    return navigator.push(_PictureRoute(
+      asset: asset,
+      flight: origin == null ? null : PictureFlight(origin),
       title: StoryLanguage.of(context).strings.photo,
-      icon: Icons.image_outlined,
-      fullScreen: true,
-      builder: (_) => ImageViewerPage(asset: asset, caption: caption),
-    );
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      caption: caption,
+    ));
+  }
+
+  /// Where [context]'s box is in [ancestor], or null when either has no layout.
+  static Rect? _rectOf(BuildContext? context, RenderObject? ancestor) {
+    final box = context?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize || !box.attached) return null;
+    return box.localToGlobal(Offset.zero, ancestor: ancestor) & box.size;
   }
 
   @override
   Widget build(BuildContext context) {
     final caption = this.caption;
+    final route = ModalRoute.of(context);
+    final viewer = ClipRect(
+      child: InteractiveViewer(maxScale: 5, child: Center(child: Image.asset(asset))),
+    );
+    final flight = this.flight;
+    final animation = route?.animation;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-            child: ClipRect(
-              child: InteractiveViewer(maxScale: 5, child: Center(child: Image.asset(asset))),
-            ),
+            child: flight == null || animation == null
+                ? viewer
+                : _LandingSpot(
+                    flight: flight,
+                    overlay: Navigator.of(context).overlay,
+                    // The flying copy stands in for the picture until it lands.
+                    child: AnimatedBuilder(
+                      animation: animation,
+                      builder: (context, viewer) =>
+                          animation.status == AnimationStatus.completed ? viewer! : const SizedBox.expand(),
+                      child: viewer,
+                    ),
+                  ),
           ),
         ),
         if (caption != null)
@@ -47,6 +81,177 @@ class ImageViewerPage extends StatelessWidget {
             child: Text(caption, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
           ),
       ],
+    );
+  }
+}
+
+/// A picture's way from its thumbnail to the viewer: where it starts, and where the viewer's picture box turns
+/// out to be once laid out. Both are in the navigator's overlay.
+class PictureFlight {
+  final Rect origin;
+  final ValueNotifier<Rect?> landing = ValueNotifier(null);
+
+  PictureFlight(this.origin);
+}
+
+/// Reports where its child sits to [flight], after each layout.
+class _LandingSpot extends StatelessWidget {
+  final PictureFlight flight;
+  final OverlayState? overlay;
+  final Widget child;
+
+  const _LandingSpot({required this.flight, required this.overlay, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        final rect = ImageViewerPage._rectOf(context, overlay?.context.findRenderObject());
+        if (rect != null) flight.landing.value = rect;
+      });
+      return child;
+    });
+  }
+}
+
+/// The picture viewer's route: the sheet frame fades in over a dimmed screen, and the picture flies above it,
+/// so the fade doesn't touch the picture.
+class _PictureRoute extends PopupRoute<void> {
+  final String asset;
+  final String? caption;
+  final String title;
+  final PictureFlight? flight;
+
+  _PictureRoute({
+    required this.asset,
+    required this.title,
+    required this.barrierLabel,
+    this.caption,
+    this.flight,
+  });
+
+  @override
+  final String barrierLabel;
+
+  @override
+  Color get barrierColor => Colors.black54;
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 380);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+    return SafeArea(
+      bottom: false,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: StorySheet.frame(
+          context,
+          title: title,
+          icon: Icons.image_outlined,
+          fullScreen: true,
+          builder: (_) => ImageViewerPage(asset: asset, caption: caption, flight: flight),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final frame = FadeTransition(
+      opacity: CurvedAnimation(parent: animation, curve: const Interval(0, 0.6, curve: Curves.easeOut)),
+      child: child,
+    );
+    final flight = this.flight;
+    if (flight == null) return frame;
+    return Stack(
+      fit: StackFit.expand,
+      children: [frame, IgnorePointer(child: _Flight(asset: asset, flight: flight, animation: animation))],
+    );
+  }
+
+  @override
+  void dispose() {
+    flight?.landing.dispose();
+    super.dispose();
+  }
+}
+
+/// The picture on its way: from the thumbnail's box to the picture's fitted box in the viewer, cropped like the
+/// thumbnail at the start and whole at the end.
+class _Flight extends StatefulWidget {
+  final String asset;
+  final PictureFlight flight;
+  final Animation<double> animation;
+
+  const _Flight({required this.asset, required this.flight, required this.animation});
+
+  @override
+  State<_Flight> createState() => _FlightState();
+}
+
+class _FlightState extends State<_Flight> {
+  ImageStream? _stream;
+  late final _listener = ImageStreamListener((image, _) {
+    if (mounted) setState(() => _size = Size(image.image.width.toDouble(), image.image.height.toDouble()));
+  });
+  Size? _size;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _stream?.removeListener(_listener);
+    // The thumbnail loaded it already, so this is usually answered from the cache right away.
+    _stream = AssetImage(widget.asset).resolve(createLocalImageConfiguration(context))..addListener(_listener);
+  }
+
+  @override
+  void dispose() {
+    _stream?.removeListener(_listener);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = widget.animation;
+    return AnimatedBuilder(
+      animation: Listenable.merge([animation, widget.flight.landing]),
+      builder: (context, _) {
+        final box = widget.flight.landing.value;
+        final status = animation.status;
+        if (box == null || status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
+          return const SizedBox.shrink();
+        }
+        final size = _size;
+        final landing = size == null
+            ? box
+            : Alignment.center.inscribe(applyBoxFit(BoxFit.contain, size, box.size).destination, box);
+        final t = Curves.easeInOutCubic.transform(animation.value);
+        return Stack(
+          children: [
+            Positioned.fromRect(
+              key: ImageViewerPage.flightKey,
+              rect: Rect.lerp(widget.flight.origin, landing, t)!,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8 * (1 - t)),
+                child: Image.asset(widget.asset, fit: BoxFit.cover, gaplessPlayback: true),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

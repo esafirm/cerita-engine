@@ -52,7 +52,6 @@ abstract final class StorySheet {
     bool expand = false,
     bool fullScreen = false,
   }) {
-    final skin = StorySkin.of(context);
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
@@ -61,24 +60,42 @@ abstract final class StorySheet {
       backgroundColor: Colors.transparent,
       elevation: 0,
       barrierColor: Colors.black54,
-      builder: (sheetContext) {
-        final screen = MediaQuery.sizeOf(sheetContext).height;
-        // Taller than the room left under the status bar is fine: the sheet's constraints cut it down.
-        final maxHeight = fullScreen ? screen : screen * maxHeightFactor;
-        final fill = expand || fullScreen;
-        return skin.sheet(
-          sheetContext,
-          StorySheetFrame(
-            title: title,
-            icon: icon,
-            expand: fill,
-            minHeight: fill ? maxHeight : screen * minHeightFactor,
-            maxHeight: maxHeight,
-            body: builder(sheetContext),
-            onClose: () => Navigator.of(sheetContext).pop(),
-          ),
-        );
-      },
+      builder: (sheetContext) => frame(
+        sheetContext,
+        builder: builder,
+        title: title,
+        icon: icon,
+        expand: expand,
+        fullScreen: fullScreen,
+      ),
+    );
+  }
+
+  /// The skin's frame around [builder]'s body, sized for the screen, for a route that shows a sheet its own way
+  /// (the picture viewer's). Its close button pops the route of [context].
+  static Widget frame(
+    BuildContext context, {
+    required WidgetBuilder builder,
+    String? title,
+    IconData? icon,
+    bool expand = false,
+    bool fullScreen = false,
+  }) {
+    final screen = MediaQuery.sizeOf(context).height;
+    // Taller than the room left under the status bar is fine: the sheet's constraints cut it down.
+    final maxHeight = fullScreen ? screen : screen * maxHeightFactor;
+    final fill = expand || fullScreen;
+    return StorySkin.of(context).sheet(
+      context,
+      StorySheetFrame(
+        title: title,
+        icon: icon,
+        expand: fill,
+        minHeight: fill ? maxHeight : screen * minHeightFactor,
+        maxHeight: maxHeight,
+        body: builder(context),
+        onClose: () => Navigator.of(context).pop(),
+      ),
     );
   }
 }

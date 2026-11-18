@@ -853,6 +853,10 @@ its framed retro window.
   playtest note). The floor keeps every sheet the same kind of object, and the body starts at its top.
 - **The picture viewer** was a black page with an app bar, the one screen that looked like a stock app. As a sheet
   it keeps the skin's frame and closes like the rest.
+- **The picture grows out of its thumbnail** (third playtest note). A Hero can't do it: Flutter flies heroes only
+  between page routes, and the clue's thumbnail sits in a modal sheet. So the viewer has its own route, which
+  fades the skin's frame in, and the picture flies above the fade from the thumbnail's box to its fitted box in
+  the viewer, cropped like the thumbnail at the start. The viewer's own copy shows once it lands.
 
 ## Deferred
 

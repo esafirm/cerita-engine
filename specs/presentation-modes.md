@@ -286,7 +286,7 @@ a chapter's actions on the route chart, a picture shown full screen and the deve
 frame, drawn by `StorySkin.sheet(context, StorySheetFrame)`: a handle, a header with an icon, the title and a
 close button, and the body under a rule. A sheet is as tall as its body, but at least 40% of the screen and at
 most 88%, and its body scrolls from there. The developer tools take the full 88% (`expand`). A picture takes the
-whole screen below the status bar (`fullScreen`).
+whole screen below the status bar (`fullScreen`), in the same frame (`StorySheet.frame`).
 
 - **In-game menu**: the main actions as a row of big buttons (`StorySheetAction`): Save, Load, Case Board (with
   its new-clue count) and Backlog. Settings, Gallery, Endings, Story variables and Developer follow as a list,
@@ -295,7 +295,9 @@ whole screen below the status bar (`fullScreen`).
 - **Clue detail**: the clue's title in the header, then the key-clue marker, its image and its description.
   An expand mark on the image says a tap opens it full screen.
 - **Picture** (`ImageViewerPage.open`, from a clue, a chat photo or the gallery): "Photo" in the header, the
-  picture with pinch to zoom, and its caption under it.
+  picture with pinch to zoom, and its caption under it. It grows out of the thumbnail that was tapped while the frame
+  fades in around it, and shrinks back into the thumbnail on close. It has its own route rather than a modal
+  bottom sheet, because the frame fades instead of sliding up, and the picture flies above that fade.
 
 The default frame is a raised panel with rounded top corners. Last Seen draws it as one of its framed windows,
 with an uppercase title, a dotted rule and a CLOSE tag.
