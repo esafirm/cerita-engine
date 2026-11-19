@@ -75,6 +75,12 @@ void main() {
     expect((await setup.storage.loadSlot(SaveSlot.autoSlotId))?.conversationKey, "index",
         reason: "the autosave stays before the gate");
 
+    // The story's menu sits under the gate screen: no tap reaches it, so nothing can save the half-made move.
+    await tester.tap(find.byIcon(Icons.menu), warnIfMissed: false);
+    await _settle(tester);
+    expect(find.byType(StorySheetAction), findsNothing);
+    expect(find.text("Buy Day 2"), findsOneWidget);
+
     await tester.tap(find.text("Buy Day 2"));
     await _settle(tester);
     expect(find.text("Buy Day 2"), findsNothing);

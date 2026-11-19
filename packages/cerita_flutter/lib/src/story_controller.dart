@@ -279,7 +279,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   bool canRollbackTo(int historyIndex) => _canRewind && engine.canRollback(historyIndex: historyIndex);
 
   bool get _canRewind =>
-      !_busy && !_callPaused && phase != StoryPhase.idle && phase != StoryPhase.typing && phase != StoryPhase.waiting;
+      !_busy && !_callPaused && phase != StoryPhase.idle && phase != StoryPhase.typing && phase != StoryPhase.waiting &&
+      phase != StoryPhase.gated;
 
   /// Starts the story fresh, from a [save] or from a [checkpoint]. With [replay], only the checkpoint's
   /// chapter is played and nothing is saved.
@@ -517,7 +518,7 @@ class StoryController extends ChangeNotifier with EngineListener {
   }
 
   Future<void> saveTo(int slotId) async {
-    if (replay) return;
+    if (replay || phase == StoryPhase.gated) return;
     await engine.saveTo(slotId);
     switch (slotId) {
       case SaveSlot.autoSlotId:

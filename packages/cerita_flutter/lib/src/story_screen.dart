@@ -307,8 +307,12 @@ class _StoryScreenState extends State<StoryScreen> {
     );
   }
 
-  /// Over the story while its gate keeps it out of the next conversation: the app's screen, or a plain notice.
-  Widget _gateView(StoryController controller) {
+  /// Over the story while its gate keeps it out of the next conversation: the app's screen, or a plain notice. It
+  /// takes every tap, so the story's menu can't save the half-made move behind it.
+  Widget _gateView(StoryController controller) =>
+      Positioned.fill(child: GestureDetector(behavior: HitTestBehavior.opaque, child: _gateContent(controller)));
+
+  Widget _gateContent(StoryController controller) {
     void leave() => Navigator.of(context).pop();
     final builder = widget.setup.gateBuilder;
     if (builder != null) {
