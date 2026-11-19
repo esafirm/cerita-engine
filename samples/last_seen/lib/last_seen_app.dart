@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
 
+import 'store/full_game.dart';
 import 'title_screen.dart';
 import 'ui/retro.dart';
 import 'ui/retro_skin.dart';
@@ -10,8 +11,9 @@ import 'ui/retro_skin.dart';
 class LastSeenApp extends StatelessWidget {
   final StorySetup setup;
   final StoryLanguage language;
+  final FullGame fullGame;
 
-  const LastSeenApp({super.key, required this.setup, required this.language});
+  const LastSeenApp({super.key, required this.setup, required this.language, required this.fullGame});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class LastSeenApp extends StatelessWidget {
           child: _PhoneFrame(child: child!),
         ),
       ),
-      home: TitleScreen(setup: setup),
+      home: TitleScreen(setup: setup, fullGame: fullGame),
     );
   }
 }

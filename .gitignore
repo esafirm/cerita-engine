@@ -54,3 +54,5 @@ app.*.map.json
 
 # Local secrets, e.g. the Telegram bot for build uploads
 .env.local
+# Last Seen's RevenueCat SDK keys, passed to builds with --dart-define-from-file (see its README)
+/samples/last_seen/revenuecat.json

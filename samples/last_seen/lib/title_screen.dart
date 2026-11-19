@@ -1,13 +1,16 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
 
+import 'store/full_game.dart';
+import 'store/paywall.dart';
 import 'ui/retro.dart';
 
 /// The Last Seen title screen: key art and logo with a blinking "tap to start", then a text menu with a cursor.
 class TitleScreen extends StatefulWidget {
   final StorySetup setup;
+  final FullGame fullGame;
 
-  const TitleScreen({super.key, required this.setup});
+  const TitleScreen({super.key, required this.setup, required this.fullGame});
 
   @override
   State<TitleScreen> createState() => _TitleScreenState();
@@ -39,6 +42,7 @@ class _TitleScreenState extends State<TitleScreen> {
     super.initState();
     _audio.addObserver();
     _playMusic();
+    widget.fullGame.addListener(_fullGameChanged);
     setup.loader.loadCredits().then((credits) {
       if (mounted) setState(() => _credits = credits);
     }, onError: (Object _) {});
@@ -49,8 +53,19 @@ class _TitleScreenState extends State<TitleScreen> {
 
   @override
   void dispose() {
+    widget.fullGame.removeListener(_fullGameChanged);
     _audio.removeObserver();
     super.dispose();
+  }
+
+  // The Unlock entry comes and goes with the purchase.
+  void _fullGameChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _openPaywall() {
+    void close() => Navigator.of(context).pop();
+    _push(Scaffold(body: Paywall(fullGame: widget.fullGame, onUnlocked: close, onLeave: close)));
   }
 
   void _playMusic() {
@@ -134,6 +149,7 @@ class _TitleScreenState extends State<TitleScreen> {
           ),
         ),
       ),
+      if (!widget.fullGame.unlocked) (en ? "Unlock full game" : "Buka game lengkap", _openPaywall),
       (en ? "Extras" : "Ekstra", () => _showExtras(true)),
       (strings.settings, () => _push(SettingsScreen(settings: setup.settings, loader: setup.loader))),
       (strings.language, () => LanguagePicker.show(context)),

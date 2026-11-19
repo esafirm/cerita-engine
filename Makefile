@@ -3,6 +3,10 @@
 FLUTTER_PACKAGES := packages/cerita_flutter packages/cerita_ui example samples/last_seen
 LAST_SEEN := samples/last_seen
 LAST_SEEN_ID := id.twk.lastseen
+# RevenueCat keys from the git-ignored revenuecat.json, when it exists. TESTER=1 builds play every day without buying
+# (playtest APKs only, never a store upload).
+LAST_SEEN_KEYS := $(if $(wildcard $(LAST_SEEN)/revenuecat.json),--dart-define-from-file=revenuecat.json,)
+LAST_SEEN_DEFINES := $(LAST_SEEN_KEYS) $(if $(TESTER),--dart-define=LAST_SEEN_TESTER=true,)
 # Target device for run/install, e.g. `make install DEVICE=emulator-5554`. Empty picks the only one.
 DEVICE ?=
 DEVICE_FLAG := $(if $(DEVICE),-d $(DEVICE),)
@@ -77,14 +81,14 @@ voice: get ## Last Seen: render missing voice lines with Gemini TTS (ARGS="--dry
 	node $(LAST_SEEN)/tools/voice.mjs $(ARGS)
 
 run-last-seen: get ## Last Seen: run the app (DEVICE=<id> to pick a device)
-	cd $(LAST_SEEN) && flutter run $(DEVICE_FLAG)
+	cd $(LAST_SEEN) && flutter run $(DEVICE_FLAG) $(LAST_SEEN_DEFINES)
 
 install-last-seen: get ## Last Seen: build a profile APK, install it and launch it
-	cd $(LAST_SEEN) && flutter build apk --profile
+	cd $(LAST_SEEN) && flutter build apk --profile $(LAST_SEEN_DEFINES)
 	$(ADB) install -r $(LAST_SEEN)/build/app/outputs/flutter-apk/app-profile.apk
 	$(ADB) shell am start -n $(LAST_SEEN_ID)/.MainActivity
 
-release-last-seen: get ## Last Seen: build the store bundle and a release APK (signed with android/key.properties if present)
-	cd $(LAST_SEEN) && flutter build appbundle --release
-	cd $(LAST_SEEN) && flutter build apk --release --split-per-abi
-	ls -lh $(LAST_SEEN)/build/app/outputs/bundle/release/*.aab $(LAST_SEEN)/build/app/outputs/flutter-apk/*-release.apk
+release-last-seen: get ## Last Seen: build the store bundle and a release APK (signed with android/key.properties if present, TESTER=1 for playtest APKs only)
+	$(if $(TESTER),@echo "TESTER=1 skips the store bundle: playtest APKs only",cd $(LAST_SEEN) && flutter build appbundle --release $(LAST_SEEN_KEYS))
+	cd $(LAST_SEEN) && flutter build apk --release --split-per-abi $(LAST_SEEN_DEFINES)
+	ls -lh $(if $(TESTER),,$(LAST_SEEN)/build/app/outputs/bundle/release/*.aab) $(LAST_SEEN)/build/app/outputs/flutter-apk/*-release.apk

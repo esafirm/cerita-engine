@@ -53,7 +53,33 @@ set `LAST_SEEN_KEY_PASSPHRASE` (or `LAST_SEEN_KEY_PASSFILE`) instead of typing i
 `upload-key.sh encrypt` and commit the new blob. A Play listing can only be updated with the key it started with.
 
 Without `key.properties`, release builds are signed with the debug key, which installs fine for testing but can't go
-to a store. iOS builds need a team set in Xcode (`ios/Runner.xcworkspace`).
+to a store. iOS builds need a team set in Xcode (`ios/Runner.xcworkspace`) and Xcode 16 or later. Xcode 15 can't
+build on macOS 26, see the decisions log.
+
+## Full game purchase
+
+The Prologue, Day 1 and Day 2 are free. One non-consumable, sold through RevenueCat (`purchases_flutter`), opens
+Day 3 to Day 7 and every ending. The code is in `lib/store/`: `FullGame` decides and is what the story's gate asks,
+`RevenueCatStore` talks to the SDK, and `Paywall` is the store page shown over the story at Day 3 and from the title
+menu's *Unlock full game* entry. Players who reached Day 3 in 1.0.0, before the game was sold, keep the full game.
+
+RevenueCat setup, in the dashboard:
+
+- One non-consumable product per store (App Store Connect, Play Console), attached to the entitlement `full_game`.
+- A package for it in the current offering, preferably the Lifetime package. The paywall shows its store price.
+
+The public SDK keys stay out of git. Put them in `revenuecat.json` next to this README (git-ignored, copy
+`revenuecat.example.json`), and the `make` targets pass it with `--dart-define-from-file`. Without a key for the
+platform, and on the web, the store is off: Day 3 stays closed and the paywall says the store isn't available.
+
+| Build | Paid days |
+| :--- | :--- |
+| Debug (`make run-last-seen`) | Open. Add `--dart-define=LAST_SEEN_TESTER=false` to `flutter run` to see the paywall |
+| Profile and release | Closed until bought |
+| `make release-last-seen TESTER=1` | Open, for playtest APKs. Builds no store bundle |
+
+The admin sheet's *Unlock everything* fills the chapter list but doesn't open paid days. Use a tester build, or a
+store sandbox / Play license tester account to test the purchase itself.
 
 ## Status
 

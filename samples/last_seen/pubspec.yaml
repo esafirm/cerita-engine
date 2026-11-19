@@ -4,7 +4,7 @@ description: "Last Seen, a full-length mystery built on Cerita Engine."
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ^3.12.2
@@ -18,6 +18,8 @@ dependencies:
     path: ../../packages/cerita_ui
   flutter:
     sdk: flutter
+  purchases_flutter: 11.0.1
+  shared_preferences: ^2.5.6
 
 dev_dependencies:
   flutter_test:

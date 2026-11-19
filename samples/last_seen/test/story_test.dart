@@ -1,5 +1,6 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:last_seen/store/full_game.dart';
 
 /// One playthrough's answers: a choice `value` (or a clue id for an evidence question) per variable, and the
 /// text typed into each INPUT, in order.
@@ -10,8 +11,8 @@ const _timeout = "<timeout>";
 
 /// Plays Last Seen headlessly in [locale], so every route and JSON file is exercised. A choice without an
 /// answer in [run] takes its first available option. Pass [meta] to carry cross-run memory from an earlier run.
-Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run, {GlobalMetaState? meta}) async {
-  final engine = RealFsseEngine(AssetEngineLoader(const LoaderConfig()))..locale = locale;
+Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run, {GlobalMetaState? meta, StoryGate? gate}) async {
+  final engine = RealFsseEngine(AssetEngineLoader(const LoaderConfig()), gate: gate)..locale = locale;
   if (meta != null) engine.meta = meta;
   final inputs = [...run.inputs];
   // "a|b" answers an evidence question asked twice: a, then b.
@@ -246,6 +247,28 @@ void main() {
       expect(day4["clue_$clue"], isTrue, reason: clue);
     }
     expect(meta.rememberedFacts, isEmpty);
+  });
+
+  test('without the full game, the story stops as it enters Day 3', () async {
+    final entered = <String>[];
+    bool gate(Conversation conversation) {
+      final free = FullGame.isFree(conversation.chapterText);
+      if (free) entered.add(conversation.key);
+      return free;
+    }
+
+    await expectLater(
+      _play("id", _kind, gate: gate),
+      throwsA(isA<StoryGateException>().having((e) => e.conversation.key, "conversation", "d3_angke")),
+    );
+    expect(entered, containsAll(["index", "d1_house", "d2_morning"]));
+
+    // Every chapter is either free or sold: a renamed free chapter would close Day 1 or open Day 3 for nothing.
+    final catalog = await StoryCatalog.load(AssetEngineLoader(const LoaderConfig()));
+    final chapters = {for (final c in catalog.conversations) c.chapterText?.resolve("id")};
+    expect(chapters, containsAll(FullGame.freeChapters));
+    expect(chapters.where((chapter) => !FullGame.freeChapters.contains(chapter)),
+        {"Hari 3", "Hari 4", "Hari 5", "Hari 6", "Hari 7"});
   });
 
   for (final locale in ["id", "en"]) {

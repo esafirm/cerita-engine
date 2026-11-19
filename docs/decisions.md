@@ -1067,6 +1067,68 @@ decrypt` restores both, git-ignored. The passphrase is in the owner's password m
 - **Cost:** the passphrase is the only protection, and git history keeps every version of the blob. If the
   passphrase leaks, rotate the key (Play Console can reset an upload key) rather than just re-encrypting.
 
+## Last Seen sells Day 3 onwards as one purchase
+
+*2026-11-20. Last Seen spec §1.*
+
+The Prologue, Day 1 and Day 2 (about 65 minutes) are free. One non-consumable, through RevenueCat, opens Day 3 to
+Day 7 and all ten endings. The paywall shows over the story as it enters Day 3, and from an *Unlock full game* entry in
+the title menu while the game is locked. Restore is on the paywall.
+
+- **Why Day 3:** Day 2 ends on the first contradictions in the group chat, and Day 3 takes Raka to the harbor and
+  Pak Hendra. It's also before the early bad end, so the free part never ends on a bad ending.
+- **Why at the gate, not only in the menu:** a player who reaches Day 3 wants to go on now. The autosave sits on the
+  last free line, so after buying the story plays on from there. A choice that led into Day 3 is asked again.
+- **Entitlement, not meta-state:** `FullGame` decides from the store's answer, cached in shared preferences so an
+  owner can play offline. It never writes to `GlobalMetaState`, which the engine saves over from its own copy. A
+  refund the store reports closes the game again.
+- **No bypass in store builds:** the admin sheet's *Unlock everything* still fills chapters, gallery and endings, but
+  the gate still asks `FullGame`, so a paid chapter from the list opens the paywall. Anyone can find seven taps on a
+  logo. Playtest APKs get `LAST_SEEN_TESTER=true` (`make release-last-seen TESTER=1`, which builds no store bundle),
+  and debug builds default to it.
+- **Players from 1.0.0:** every day was free in 1.0.0, so a player whose meta-state or saves already reach a paid
+  chapter keeps the full game. It's checked once, on the first launch of 1.1.0, before anything can write progress,
+  so a later *Unlock everything* doesn't count.
+- **Free chapters by name:** the gate compares the conversation's Indonesian chapter name with `Prolog`, `Hari 1`,
+  `Hari 2`. A route test plays the story locked and checks it stops entering `d3_angke`, and that every chapter is
+  either free or one of Days 3 to 7, so renaming a chapter fails the tests.
+- **Keys:** the public SDK keys come in with `--dart-define-from-file=revenuecat.json`, git-ignored. Without a key,
+  and on the web, the store is off and Day 3 stays closed.
+- **SDK version:** `purchases_flutter` 11.0.1, pinned, the newest release at least two weeks old. It uses Swift
+  Package Manager on iOS, so CocoaPods isn't needed.
+- **Revisit if** the free part converts badly or reviews call it a demo. Moving the gate is one constant in
+  `FullGame`.
+
+## The engine gates conversations, the app decides why
+
+*2026-11-20. Engine and state §8.1.*
+
+`RealFsseEngine.gate` is asked before the story enters any conversation and throws `StoryGateException` when it says
+no. `StorySetup.gateBuilder` gives the screen shown over the story. The engine and `cerita_flutter` know nothing about
+stores, and `purchases_flutter` is only a dependency of the sample.
+
+- **Why in `_enterConversation`:** every way into a chapter goes through it: a new game, a save, a checkpoint from the
+  chapter list, a jump, a return and a developer jump. A check in the chapter list alone would miss saves and jumps.
+- **Why no retry in place:** the move that hits the gate may already have applied its effects. Undoing that would
+  need a snapshot before every `next`. The autosave already is that snapshot, so `reopen` loads it, and a refused
+  start just runs again.
+- **Cost:** a replay saves nothing, so a gate inside a replayed chapter can only be left. Chapter-based gates never
+  hit it, since the replay ends at the chapter's edge first.
+
+## iOS needs Xcode 16 or later on macOS 26
+
+*2026-11-20. Follows up the iOS note in "Last Seen ships through the release lint".*
+
+The asset catalog failure was this Mac, not the project. It runs macOS 26.5.2 with Xcode 15.0.1, which Apple doesn't
+support there, and Flutter 3.44 asks for Xcode 16. The iOS 17.0 simulator runtime boots and runs its own binaries,
+but `launchd_sim` kills Xcode 15's `AssetCatalogSimulatorAgent` at exec (`OS_REASON_EXEC`, code 8: the exec security
+policy), so `actool` reports "Failed to launch AssetCatalogSimulatorAgent via CoreSimulator spawn". Repairing the
+runtime or CoreSimulator can't fix that.
+
+- **Fix:** the latest Xcode 26.x next to Xcode 15 (Xcode 27 needs macOS 26.6), selected with `xcode-select`, plus the
+  iOS 26 simulator runtime. Not done yet: the owner chose to leave iOS for now.
+- **Signing:** a team still has to be set in `ios/Runner.xcworkspace` before a device or App Store build.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

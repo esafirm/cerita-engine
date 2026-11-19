@@ -21,6 +21,7 @@ A full-length mystery sample built on Cerita Engine. It ships in `samples/last_s
 | Audio | CC0 music and SFX. Gemini TTS (the `gemini-voice.mjs` route from menolakngantor) for voice notes and calls only |
 | ID review | Manual, once, near the end (M5). Not a gate before then |
 | Platforms | Android + iOS, store-ready build (no submission). Web build as a CI smoke check |
+| Monetization | Prologue to Day 2 free. One non-consumable (RevenueCat) opens Day 3 to Day 7 and every ending |
 | Location | `samples/last_seen/` workspace member |
 
 ## 2. Story bible
