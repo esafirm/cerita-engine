@@ -23,6 +23,9 @@ class PlayerSettings {
   /// The player's language, a story locale code. Null until the player or the device picks one.
   final String? locale;
 
+  /// Shows the developer panel in the in-game menu, in any build. Turned on from the admin sheet, for testers.
+  final bool developerTools;
+
   const PlayerSettings({
     this.textMsPerChar = 40,
     this.autoDelayMs = 1200,
@@ -33,6 +36,7 @@ class PlayerSettings {
     this.voiceVolume = 1,
     this.voiceVolumes = const {},
     this.locale,
+    this.developerTools = false,
   }) : chatPacing = chatPacing < 0 ? 0 : (chatPacing > 1 ? 1 : chatPacing);
 
   /// Voice volume of the character [profileId].
@@ -54,6 +58,7 @@ class PlayerSettings {
     double? voiceVolume,
     Map<String, double>? voiceVolumes,
     String? locale,
+    bool? developerTools,
   }) =>
       PlayerSettings(
         textMsPerChar: textMsPerChar ?? this.textMsPerChar,
@@ -65,6 +70,7 @@ class PlayerSettings {
         voiceVolume: voiceVolume ?? this.voiceVolume,
         voiceVolumes: voiceVolumes ?? this.voiceVolumes,
         locale: locale ?? this.locale,
+        developerTools: developerTools ?? this.developerTools,
       );
 
   factory PlayerSettings.fromJson(Map<String, dynamic> json) {
@@ -84,6 +90,7 @@ class PlayerSettings {
           key: clamp(value, 1),
       },
       locale: json["locale"] as String?,
+      developerTools: json["developer_tools"] as bool? ?? defaults.developerTools,
     );
   }
 
@@ -97,6 +104,7 @@ class PlayerSettings {
         "voice_volume": voiceVolume,
         if (voiceVolumes.isNotEmpty) "voice_volumes": voiceVolumes,
         if (locale != null) "locale": locale,
+        if (developerTools) "developer_tools": true,
       };
 
   @override
@@ -110,6 +118,7 @@ class PlayerSettings {
       other.soundVolume == soundVolume &&
       other.voiceVolume == voiceVolume &&
       other.locale == locale &&
+      other.developerTools == developerTools &&
       _sameVolumes(other.voiceVolumes, voiceVolumes);
 
   static bool _sameVolumes(Map<String, double> a, Map<String, double> b) =>
@@ -125,6 +134,7 @@ class PlayerSettings {
         soundVolume,
         voiceVolume,
         locale,
+        developerTools,
         Object.hashAllUnordered(voiceVolumes.entries.map((entry) => Object.hash(entry.key, entry.value))),
       );
 }

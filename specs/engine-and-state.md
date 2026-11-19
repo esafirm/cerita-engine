@@ -1,3 +1,4 @@
+| `developer_tools` | `false` | Shows the developer panel in the in-game menu in any build. Turned on from the admin tools (authoring tools §5). Written only when on. |
 # Engine, State & Persistence Specification
 
 This document specifies how `FsseEngine` manages runtime state, evaluates conditions and effects, interpolates variables, and persists progress across sessions.

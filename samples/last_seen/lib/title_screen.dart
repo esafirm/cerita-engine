@@ -183,7 +183,11 @@ class _TitleScreenState extends State<TitleScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _Logo(subtitle: en ? "A North Jakarta mystery" : "Misteri Jakarta Utara"),
+                          // Seven quick taps on the logo open the admin tools: unlock everything, developer panel.
+                          AdminGate(
+                            setup: setup,
+                            child: _Logo(subtitle: en ? "A North Jakarta mystery" : "Misteri Jakarta Utara"),
+                          ),
                           const Spacer(),
                           if (_started)
                             FutureBuilder(

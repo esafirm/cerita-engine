@@ -355,6 +355,12 @@ void main() {
       expect(PlayerSettings.fromJson({"chat_pacing": 3}).chatPacing, 1);
       expect(const PlayerSettings(chatPacing: -1).chatTypingFor(1500), 0);
 
+      // Developer tools are off unless turned on, and only written when on.
+      expect(PlayerSettings.fromJson({}).developerTools, isFalse);
+      expect(const PlayerSettings().toJson(), isNot(contains("developer_tools")));
+      expect(PlayerSettings.fromJson(const PlayerSettings(developerTools: true).toJson()).developerTools, isTrue);
+      expect(const PlayerSettings(developerTools: true), isNot(const PlayerSettings()));
+
       final storage = InMemoryStoryStorage();
       expect(await storage.loadSettings(), const PlayerSettings());
       await storage.saveSettings(settings);

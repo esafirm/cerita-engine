@@ -182,7 +182,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 title: Text(strings.storyVariables),
                 onTap: () => close(_showVariables),
               ),
-              if (widget.setup.developer)
+              if (widget.setup.developer || widget.setup.settings.value.developerTools)
                 ListTile(
                   leading: const Icon(Icons.build_outlined),
                   title: Text(strings.developer),

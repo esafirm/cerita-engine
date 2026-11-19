@@ -950,6 +950,24 @@ not filler: the phone switched off on purpose, Bu Wulan and the boat, the report
 If the budgets hold, Days 4 and 3 grow first: the Bima call's aftermath, the Yusuf call and the evening at home
 are the thinnest scenes.
 
+## Admin tools hide behind seven taps, in every build
+
+*2026-11-19. Authoring tools §5.*
+
+Testers need every chapter on a release APK, where the developer panel is off. The admin sheet (unlock
+everything, developer tools on) opens after seven quick taps on whatever the story wraps in `AdminGate`. Last Seen
+uses its title logo.
+
+- **Why hidden, not a debug-only flag:** the playtest builds are release builds, sent as APKs. A visible entry
+  would be in front of players. A build flavor would mean a second APK to keep in step.
+- **Why chapters are played, not just listed:** a chapter unlocked with no variables starts Day 3 without the
+  Day 2 clues, and an evidence question with nothing to present has no right answer. The headless runs give each
+  chapter a real state. Four answer policies reach both sides of a timed bad end (Day 3's handover takes the
+  timeout option on two of them). A chapter no run reaches still unlocks, empty, and is named in the report.
+- **Cost:** four playthroughs of the bundled story. Last Seen's four days take under a second in tests.
+- **Revisit if** M3's routes put a checkpoint behind a condition none of the four policies meets. Then a story
+  could name the answers that reach it, or the unlocker could explore choices breadth first.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

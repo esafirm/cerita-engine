@@ -173,6 +173,20 @@ void main() {
     }
   });
 
+  test('unlocking everything reaches every chapter with a real playthrough behind it', () async {
+    final meta = GlobalMetaState();
+    final report = await StoryUnlocker(AssetEngineLoader(const LoaderConfig())).unlockAll(meta);
+    expect(report.unplayedChapters, isEmpty);
+    expect(meta.unlockedEndingIds, containsAll(["end_00_preview", "end_07_handed_over"]));
+    expect(meta.unlockedMediaIds, contains("cg_handed_over"));
+    // Day 4 starts with what Days 2 and 3 found.
+    final day4 = meta.unlockedCheckpoints["d4_timeline"]!.dataMap;
+    for (final clue in ["listener_photo", "bima_deleted", "boat_registration", "cctv_still", "didit_card"]) {
+      expect(day4["clue_$clue"], isTrue, reason: clue);
+    }
+    expect(meta.rememberedFacts, isEmpty);
+  });
+
   for (final locale in ["id", "en"]) {
     test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV, Tasya talks', () async {
       final (ending, engine) = await _play(locale, _kind);

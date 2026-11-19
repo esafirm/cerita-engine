@@ -140,9 +140,39 @@ dart run cerita_core:cerita graph example/assets/story > story.mmd
 
 ## 4. Developer Panel
 
-Opened from the in-game menu when `StorySetup.developer` is true (the demo turns it on in debug builds). Never shown to players otherwise.
+Opened from the in-game menu when `StorySetup.developer` is true (the demo turns it on in debug builds) or the player setting `developer_tools` is on (§5, engine and state §5). Never shown to players otherwise.
 
 - **Variables**: every playthrough and `persistent.*` variable with its value. Values can be edited or added (numbers, `true` / `false`, or text), and take effect right away. Remembered facts (`meta.flag.*`) are listed too, read-only, since only the `meta_set` effect can remember one.
 - **Jump**: every conversation and its labels. Picking one continues the story there, keeping the variables.
 - **Check**: runs the linter (§1) on the bundled story, including missing assets.
 - **Reload story**: reads the story files again and continues at the same conversation and item. A Flutter hot reload (`r` in `flutter run`) does it automatically, so edits to the JSON show up without restarting the story. If items were added or removed above the current one, the story continues at the same position, which may be another item.
+
+## 5. Admin Tools
+
+For testers and reviewers on a release build, where the developer panel is off. A story opens them through
+`AdminGate`, which wraps any widget and shows the `AdminSheet` after seven quick taps on it (each within 600 ms of
+the last, like the build number tap behind Android's developer options). Nothing on screen says it is there. Last
+Seen puts the gate on the title screen's logo.
+
+- **Unlock everything** (`StoryUnlocker.unlockAll`): every gallery item (`MEDIA` with an `unlock_id`), every ending
+  and every music track is added to the meta-state, and every checkpoint to the chapter list. Progress already
+  there stays, including a chapter's own snapshot.
+- **Chapters** need the variables of a real playthrough, or the story after them misses its clues and flags. So
+  the unlocker plays the story headlessly, once per policy, and keeps the first snapshot each run takes at each
+  checkpoint:
+
+  | Policy | Choices | Evidence |
+  | :--- | :--- | :--- |
+  | `defaults` | A timed choice's timeout option, else the first | The first response |
+  | `defaultsLast` | A timed choice's timeout option, else the last | The last response |
+  | `first` | The first option | The first response |
+  | `last` | The last option | The last response |
+
+  Inputs get their `default_value`, or nothing, so a puzzle goes through its wrong answers until its own hints
+  solve it. A run stops at an ending or after 5,000 items. A chapter no run reaches is unlocked with no variables
+  and named in the report. The runs keep a meta-state of their own, so what they read, choose or remember never
+  reaches the player's: read-skip, choice marks and `meta.flag.*` stay as the player left them.
+- **Developer tools**: a switch for the `developer_tools` player setting, which adds the developer panel (§4) to
+  the in-game menu in any build. It persists like the other settings.
+
+There is no "lock again". Unlocking is meant for test devices, whose progress can be cleared with the app data.

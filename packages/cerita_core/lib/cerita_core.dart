@@ -37,6 +37,7 @@ export 'src/story_catalog.dart';
 export 'src/tools/route_map.dart';
 export 'src/tools/story_graph.dart';
 export 'src/tools/story_linter.dart';
+export 'src/tools/story_unlocker.dart';
 export 'src/utils/condition_evaluator.dart';
 export 'src/utils/text_markup.dart';
 export 'src/utils/var_replacer.dart';
