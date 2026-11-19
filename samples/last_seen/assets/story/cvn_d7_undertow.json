@@ -116,6 +116,22 @@
     },
     {
       "type": "NARRATION",
+      "condition": "told_dinda_truth == true",
+      "text": {
+        "id": "Sabtu itu Dinda yang bangunin gue jam empat. \"Lo udah pernah telat sekali. Gue yang jagain sekarang.\"",
+        "en": "That Saturday it was Dinda who woke me at four. \"You were late once already. I'm on watch now.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "dinda_found_threat == true",
+      "text": {
+        "id": "Dia masih ngungkit ancaman yang dulu gue sembunyiin dari dia, seminggu sekali. Sekarang sambil ketawa. Hampir.",
+        "en": "She still brings up the threat I once hid from her, once a week. Laughing now. Almost."
+      }
+    },
+    {
+      "type": "NARRATION",
       "text": {
         "id": "Gue nggak balik ke Bandung. Kerjaan gue bisa dikerjain dari mana aja. Ternyata yang nggak bisa dikerjain dari mana aja itu yang lain.",
         "en": "I didn't go back to Bandung. My work can be done from anywhere. It turns out the things that can't be done from anywhere are the other things."

@@ -41,6 +41,14 @@
     },
     {
       "type": "NARRATION",
+      "condition": "saw_bentang_men == true",
+      "text": {
+        "id": "Dua laki-laki BPM itu gue kenal. Warung kopi di dermaga, Senin pagi. Yang satu gulanya tiga sendok.",
+        "en": "I know those two BPM men. The coffee stall on the pier, Monday morning. One of them takes three sugars."
+      }
+    },
+    {
+      "type": "NARRATION",
       "text": {
         "id": "Terakhir, laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Lebih pendek dari suaranya. Aditya Nugraha. Didit.",
         "en": "Last, a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. Shorter than his voice. Aditya Nugraha. Didit."
@@ -123,6 +131,24 @@
         "en": "Ms. Sekar's word against an official report with a witness, Raka. I need more than that. Now. Before I'm forced to do my job."
       },
       "profile": "yusuf:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_yusuf >= 10",
+      "text": {
+        "id": "Mas Raka, dari hari pertama Anda nggak pernah bohong ke saya. Saya kasih Anda dua menit sebelum saya menjalankan tugas.",
+        "en": "Raka, you haven't lied to me once since the first day. I'll give you two minutes before I do my job."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_yusuf < 10",
+      "text": {
+        "id": "Dan jangan buang waktu saya, Mas. Saya sudah cukup sering dibuat menunggu minggu ini.",
+        "en": "And don't waste my time, Raka. I've been kept waiting often enough this week."
+      },
+      "profile": "yusuf:2"
     },
     {
       "type": "CHOICE",

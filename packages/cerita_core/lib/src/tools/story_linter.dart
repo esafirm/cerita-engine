@@ -47,18 +47,25 @@ class LintIssue {
   /// option, `["choices", 2, "effects", 0]` for its first effect. Empty when it's about the whole item.
   final List<Object> path;
 
-  const LintIssue(this.severity, this.conversationKey, this.itemIndex, this.message,
-      {this.fileName, this.path = const []});
+  const LintIssue(
+    this.severity,
+    this.conversationKey,
+    this.itemIndex,
+    this.message, {
+    this.fileName,
+    this.path = const [],
+  });
 
   bool get isError => severity == LintSeverity.error;
 
   /// [path] as text, e.g. `choices[2].effects[0]`.
-  String get part => [
-        for (final (index, step) in path.indexed) step is int ? "[$step]" : "${index > 0 ? "." : ""}$step",
-      ].join();
+  String get part =>
+      [for (final (index, step) in path.indexed) step is int ? "[$step]" : "${index > 0 ? "." : ""}$step"].join();
 
   /// The file the issue is in.
-  String get file => fileName ?? switch (conversationKey) {
+  String get file =>
+      fileName ??
+      switch (conversationKey) {
         null => "profiles.json",
         Conversation.indexKey => "index.json",
         final key => "cvn_$key.json",
@@ -122,8 +129,14 @@ class StoryLinter {
     }
     final byKey = {for (final conversation in conversations) conversation.key: conversation};
 
-    void asset(String? key, int? index, String? name, String Function(String) path, String what,
-        [List<Object> at = const []]) {
+    void asset(
+      String? key,
+      int? index,
+      String? name,
+      String Function(String) path,
+      String what, [
+      List<Object> at = const [],
+    ]) {
       final exists = assetExists;
       if (exists == null || name == null) return;
       if (!exists(path(name))) error(key, index, "Missing $what file '${path(name)}'", at);
@@ -152,8 +165,15 @@ class StoryLinter {
       for (final channel in channels) {
         for (final id in [...channel.members, ?channel.owner]) {
           if (profiles.byId(id) == null) {
-            issues.add(LintIssue(LintSeverity.error, null, null, "Thread '${channel.id}' names unknown character '$id'",
-                fileName: "channels.json"));
+            issues.add(
+              LintIssue(
+                LintSeverity.error,
+                null,
+                null,
+                "Thread '${channel.id}' names unknown character '$id'",
+                fileName: "channels.json",
+              ),
+            );
           }
         }
       }
@@ -187,6 +207,9 @@ class StoryLinter {
     // Where each variable is first read and set: conversation, item and the part of the item.
     final reads = <String, (String, int, List<Object>)>{};
     final sets = <String, (String, int, List<Object>)>{};
+    // Variables that name a CHOICE or evidence question. Nothing has to read them: they name the question for route
+    // tests, the developer panel and saves, so they aren't reported as set but never read.
+    final questionVariables = <String>{};
     final endingIds = <String>{};
 
     // Where each clue is awarded, and each evidence question with the clues it has a response for.
@@ -285,7 +308,10 @@ class StoryLinter {
               asset(key, index, item.uri, (_) => config.mediaPath(item), "media");
             }
           case EvidenceItemType(:final responses, :final variable, :final retries):
-            if (variable != null) sets.putIfAbsent(variable, () => (key, index, const []));
+            if (variable != null) {
+              sets.putIfAbsent(variable, () => (key, index, const []));
+              questionVariables.add(variable);
+            }
             if (responses.isEmpty) error(key, index, "Evidence question without responses");
             if (item.json.containsKey("choices")) error(key, index, "An evidence question takes no choices");
             if (item.json.containsKey("default_choice")) {
@@ -307,7 +333,10 @@ class StoryLinter {
             }
             questions.add((key, index, answered));
           case ChoiceItemType(:final choices, :final variable, :final defaultChoice):
-            if (variable != null) sets.putIfAbsent(variable, () => (key, index, const []));
+            if (variable != null) {
+              sets.putIfAbsent(variable, () => (key, index, const []));
+              questionVariables.add(variable);
+            }
             if (choices.isEmpty) error(key, index, "CHOICE without options");
             if (defaultChoice != null && (defaultChoice < 0 || defaultChoice >= choices.length)) {
               error(key, index, "default_choice $defaultChoice isn't one of the ${choices.length} options");
@@ -358,11 +387,12 @@ class StoryLinter {
         scene,
         byKey,
         (index, option) => warn(
-            key,
-            index,
-            "Option ${option + 1} is sent as the player's message and a player line follows it, so the message "
-            "shows twice. Mark the option silent",
-            ["choices", option]),
+          key,
+          index,
+          "Option ${option + 1} is sent as the player's message and a player line follows it, so the message "
+          "shows twice. Mark the option silent",
+          ["choices", option],
+        ),
       );
     }
 
@@ -414,7 +444,10 @@ class StoryLinter {
       }
     }
     for (final MapEntry(key: variable, value: (key, index, at)) in sets.entries) {
-      if (!reads.containsKey(variable) && !_engineReads.contains(variable) && !isClue(variable)) {
+      if (!reads.containsKey(variable) &&
+          !_engineReads.contains(variable) &&
+          !isClue(variable) &&
+          !questionVariables.contains(variable)) {
         warn(key, index, "Variable '$variable' is set but never read", at);
       }
     }
@@ -486,10 +519,12 @@ class StoryLinter {
 
     for (final (key, index, answered) in questions) {
       final earlier = before(key, index);
-      final found = answered.any((clue) => (awards[clue] ?? const []).any((award) {
-            final (from, at) = award;
-            return earlier.contains(from) || (from == key && at < index);
-          }));
+      final found = answered.any(
+        (clue) => (awards[clue] ?? const []).any((award) {
+          final (from, at) = award;
+          return earlier.contains(from) || (from == key && at < index);
+        }),
+      );
       if (!found) report(key, index);
     }
   }
@@ -533,17 +568,18 @@ class StoryLinter {
   /// Whether the story never runs past [item]: it ends the story, jumps away or returns. A choice does when every
   /// option goes somewhere and one of them is always there.
   static bool _leadsOn(ItemType item) => switch (item) {
-        EndingItemType() => true,
-        // A response or outcome without a target continues after the question. `retry` asks it again.
-        EvidenceItemType(:final responses, :final fallback, :final timeout) =>
-          responses.every((response) => response.target != null) &&
-              fallback?.target != null &&
-              (timeout == null || timeout.target != null),
-        ChoiceItemType(:final choices) => choices.isNotEmpty &&
-            choices.every((choice) => choice.target != null) &&
-            choices.any((choice) => choice.condition == null && !choice.once),
-        _ => _endsFlow(item),
-      };
+    EndingItemType() => true,
+    // A response or outcome without a target continues after the question. `retry` asks it again.
+    EvidenceItemType(:final responses, :final fallback, :final timeout) =>
+      responses.every((response) => response.target != null) &&
+          fallback?.target != null &&
+          (timeout == null || timeout.target != null),
+    ChoiceItemType(:final choices) =>
+      choices.isNotEmpty &&
+          choices.every((choice) => choice.target != null) &&
+          choices.any((choice) => choice.condition == null && !choice.once),
+    _ => _endsFlow(item),
+  };
 
   /// The scene each conversation plays in, as its mode and chat thread. A conversation without a `scene` keeps
   /// the one it is entered from, so it gets the scene of every conversation whose targets lead to it (and the
@@ -773,10 +809,10 @@ class StoryLinter {
   }
 
   static bool _endsFlow(ItemType item) => switch (item) {
-        JumpItemType() || ReturnItemType() => true,
-        BranchItemType(:final fallbackTarget) => fallbackTarget != null,
-        _ => false,
-      };
+    JumpItemType() || ReturnItemType() => true,
+    BranchItemType(:final fallbackTarget) => fallbackTarget != null,
+    _ => false,
+  };
 
   static int _order(LintIssue a, LintIssue b) {
     final severity = a.severity.index.compareTo(b.severity.index);

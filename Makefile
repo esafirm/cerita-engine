@@ -63,12 +63,12 @@ clean: ## Remove build output of every package
 
 story: get ## Last Seen: compile the scripts, then lint and measure them
 	dart run cerita_tools compile $(LAST_SEEN)/story
-	dart run cerita_tools lint $(LAST_SEEN)/story
+	dart run cerita_tools lint $(LAST_SEEN)/story --release
 	dart run cerita_tools stats $(LAST_SEEN)/story
 
 story-check: get ## Last Seen: fail if the compiled JSON is stale or the scripts have errors
 	dart run cerita_tools compile $(LAST_SEEN)/story --check
-	dart run cerita_tools lint $(LAST_SEEN)/story
+	dart run cerita_tools lint $(LAST_SEEN)/story --release
 
 placeholders: get ## Last Seen: fill every missing image and sound with a placeholder
 	$(LAST_SEEN)/tools/placeholders.sh
@@ -83,3 +83,8 @@ install-last-seen: get ## Last Seen: build a profile APK, install it and launch 
 	cd $(LAST_SEEN) && flutter build apk --profile
 	$(ADB) install -r $(LAST_SEEN)/build/app/outputs/flutter-apk/app-profile.apk
 	$(ADB) shell am start -n $(LAST_SEEN_ID)/.MainActivity
+
+release-last-seen: get ## Last Seen: build the store bundle and a release APK (signed with android/key.properties if present)
+	cd $(LAST_SEEN) && flutter build appbundle --release
+	cd $(LAST_SEEN) && flutter build apk --release --split-per-abi
+	ls -lh $(LAST_SEEN)/build/app/outputs/bundle/release/*.aab $(LAST_SEEN)/build/app/outputs/flutter-apk/*-release.apk

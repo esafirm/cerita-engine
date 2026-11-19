@@ -39,6 +39,12 @@ narration
 narration
   id: Bima keluar dari kantornya dan ngasih kesaksian. Tasya nolak duit sponsor ketiga. Bu Wulan masak buat sepuluh orang, dan Dinda ngebentak gue karena nambah nasi tiga kali.
   en: Bima quit his job and gave a statement. Tasya turned down a third sponsor offer. Mrs. Wulan cooked for ten people, and Dinda yelled at me for taking rice three times.
+narration [if told_dinda_truth == true]
+  id: Sabtu itu Dinda yang bangunin gue jam empat. "Lo udah pernah telat sekali. Gue yang jagain sekarang."
+  en: That Saturday it was Dinda who woke me at four. "You were late once already. I'm on watch now."
+narration [if dinda_found_threat == true]
+  id: Dia masih ngungkit ancaman yang dulu gue sembunyiin dari dia, seminggu sekali. Sekarang sambil ketawa. Hampir.
+  en: She still brings up the threat I once hid from her, once a week. Laughing now. Almost.
 narration
   id: Gue nggak balik ke Bandung. Kerjaan gue bisa dikerjain dari mana aja. Ternyata yang nggak bisa dikerjain dari mana aja itu yang lain.
   en: I didn't go back to Bandung. My work can be done from anywhere. It turns out the things that can't be done from anywhere are the other things.
@@ -77,10 +83,10 @@ media CG cg_still_water.webp unlock=cg_still_water
 narration
   id: Waktu polisi merapat, cuma ada gue di ujung dermaga. Didit senyum, kayak orang yang dateng ke pesta dan ternyata salah tanggal.
   en: When the police dock, there's only me at the end of the jetty. Didit smiles, like a man who came to a party and got the date wrong.
-narration [if route == 'harbor']
+narration [if reached_pari == true]
   id: Mereka nyari ke semua rumah di dermaga bakau. Nggak ketemu apa-apa. Sepupu Pak Hendra bilang dia nggak pernah lihat perempuan berjaket hijau.
   en: They search every house by the mangrove jetty. They find nothing. Pak Hendra's cousin says she's never seen a woman in a green jacket.
-narration [if route != 'harbor']
+narration [if on_first_ferry == true]
   id: Tasya ngelihat gue kayak mau mukul. Dia nggak mukul. Dia cuma duduk di sebelah gue sampai kapal pulang.
   en: Tasya looks at me like she wants to hit me. She doesn't. She just sits next to me until the boat home.
 narration
@@ -155,6 +161,9 @@ narration
 narration
   id: Gue buka chat yang ada nama gue di HP Sekar. Draf-draf yang nggak pernah kekirim. Maret. Juni. Agustus. Voice note dua puluh detik yang nyuruh gue mulai.
   en: I open the chat with my name on it on Sekar's phone. The drafts she never sent. March. June. August. The twenty-second voice note that told me to start.
+narration [if phone_unlocked == true]
+  id: Nol lima tiga nol. Jempol gue udah hafal tanpa mikir.
+  en: Zero five three zero. My thumb knows it without thinking now.
 narration
   id: Terus gue buka HP gue sendiri. Chat dengan nama dia. Setahun kosong.
   en: Then I open my own phone. The chat with her name on it. A year of nothing.
@@ -257,13 +266,16 @@ narration [if found_sekar == true && knows_source == true]
 narration [if found_sekar == true && knows_source != true]
   id: Dua hari kemudian, narsumnya narik semua omongannya. Dia bilang dia nggak pernah naik kapal itu. Rekaman tanpa narsum cuma suara orang asing di tengah laut.
   en: Two days later, the source takes back everything he said. He says he was never on that boat. A recording without its source is just a stranger's voice at sea.
-narration [if found_sekar != true]
+narration [if found_sekar != true && hendra_cleared == true]
   id: Pak Hendra pulang ke Muara Angke dengan nama bersih. Sekar nggak pulang. Nggak ada yang tahu perahu nelayan pagi itu ke mana, dan Pak Hendra nggak mau bilang. Ke siapa pun. Termasuk gue.
   en: Pak Hendra goes home to Muara Angke with his name cleared. Sekar doesn't come home. Nobody knows where that fishing boat went that morning, and Pak Hendra won't say. To anyone. Including me.
 
 media CG cg_low_tide.webp unlock=cg_low_tide
   id: Air surut di Muara Angke. Patok-patoknya kelihatan sampai ke ujung.
   en: Low tide at Muara Angke. You can see the stakes all the way out.
+narration [if proof_threat == true]
+  id: Ipda Yusuf nyimpen ancaman Didit di berkas. Didit dipanggil dua kali, terus dipindah ke Surabaya. Ancaman doang nggak bikin izin dicabut.
+  en: Inspector Yusuf kept Didit's threat on file. Didit was called in twice, then transferred to Surabaya. A threat alone doesn't get a permit pulled.
 
 sekar:tired [right] [if found_sekar == true]
   id: Ada orang deket gue yang ngebocorin, Ka. Gue nggak bakal pernah tahu siapa.

@@ -70,7 +70,7 @@
     },
     {
       "type": "NARRATION",
-      "condition": "yusuf_heard_didit == true",
+      "condition": "yusuf_heard_didit == true && pari_raid == true",
       "text": {
         "id": "HP gue geter. Ipda Yusuf. \"Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat.\"",
         "en": "My phone buzzes. Inspector Yusuf. \"I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow.\""

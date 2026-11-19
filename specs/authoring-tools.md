@@ -47,7 +47,7 @@ Probably a mistake, but the story still runs.
 | :--- | :--- |
 | Unknown text tag | `{shaek}` is shown as written. An escaped `{{b}` is not reported. |
 | Variable read but never set | A condition, `expr` or `{{VAR}}` uses a variable that no effect, `CHOICE` or `INPUT` sets. Usually a typo. |
-| Variable set but never read | Nothing reads it, so it has no effect. |
+| Variable set but never read | Nothing reads it, so it has no effect. A `CHOICE` or evidence question's own `variable` isn't reported: it names the question for route tests, the developer panel and saves. |
 | Unreachable conversation | No `target` from `index.json` leads to it, directly or through other conversations. |
 | Dead items | Items right after a `JUMP` or `RETURN` without a condition, that no label leads to. |
 | Unknown chat thread | A `channel_id` that `channels.json` doesn't list (when the file exists). |

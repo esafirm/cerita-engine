@@ -902,6 +902,10 @@ wulan typing=6s sfx=sfx_msg_receive.mp3
   id: Sekar dulu sering cerita soal kamu. Setahun ini juga. Dia bilang, "Raka itu kalau takut suka lari, Bu. Tapi dia selalu balik."
   en: Sekar used to talk about you a lot. This past year too. She said, "Raka runs when he's scared, Mom. But he always comes back."
 
+narration [if meta.flag.promised_wulan]
+  id: Gue pernah janji ini. Entah di mana, entah kapan. Rasanya kayak ngulang kalimat yang udah pernah gue ucapin, dan kali ini gue lebih serius.
+  en: I've made this promise before. I don't know where, or when. It feels like repeating something I've already said, and this time I mean it more.
+
 choice WULAN_REPLY by=wulan silent
   id: Balas Bu Wulan.
   en: Reply to Mrs. Wulan.

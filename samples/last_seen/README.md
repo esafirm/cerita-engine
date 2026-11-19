@@ -38,10 +38,31 @@ samples/last_seen/tools/codex-image.sh bg/bg_seawall_night.webp
 
 `tools/placeholders.sh --list` prints the placeholders no real asset has replaced yet.
 
+## Release builds
+
+`make release-last-seen` builds the Play Store bundle and per-ABI release APKs. Store builds need an upload key,
+which stays out of git. Make one once and keep it safe: a Play listing can only ever be updated with the same key.
+
+```bash
+keytool -genkey -v -keystore ~/last-seen-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+Then write `samples/last_seen/android/key.properties` (git-ignored):
+
+```properties
+storeFile=/Users/you/last-seen-upload.jks
+storePassword=...
+keyAlias=upload
+keyPassword=...
+```
+
+Without it, release builds are signed with the debug key, which installs fine for testing but can't go to a store.
+iOS builds need a team set in Xcode (`ios/Runner.xcworkspace`).
+
 ## Status
 
-M1 (vertical slice): the prologue and Day 1 in both languages, with real art in the flat house style
-(`art/style-guide.md`), CC0 music and sound, and every call line and voice note voiced. Day 2 is a stub that ends in
-a "To Be Continued" ending. Tasya, Bima, Hendra and Didit are still placeholders: they first appear in Day 2.
+M5 (release polish): the whole story is written in both languages, Prologue to Day 7 with all ten endings, and
+`lint --release` is clean. Still open: the Indonesian review, the timed playtest and the pacing fixes it brings, and
+the phone checks in the decisions log.
 
 Character references live in `art/refs/`: pass one to `codex-image.sh` so new expressions stay on-model.

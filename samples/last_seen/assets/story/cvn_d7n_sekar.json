@@ -100,6 +100,31 @@
     },
     {
       "type": "TEXT",
+      "condition": "bima_confessed == true && jaya_saw_bima == true",
+      "text": {
+        "id": "Dia serius, Kar. Bang Jaya lihat dia duduk lima menit di mobil, kepalanya di setir, malem itu.",
+        "en": "He means it, Kar. Bang Jaya saw him sit in his car for five minutes that night, head on the wheel."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed == true && trust_bima < 3",
+      "text": {
+        "id": "Bima nggak maju lagi. Dia berdiri di ujung dermaga, kayak orang yang nunggu dipanggil dan tahu dia nggak bakal dipanggil.",
+        "en": "Bima doesn't come any closer. He stays at the end of the jetty, like someone waiting to be called who knows he won't be."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed == true && trust_bima >= 3",
+      "text": {
+        "id": "Sekar nepuk lengan Bima sekali. Bukan maaf. Belum. Tapi juga bukan pergi.",
+        "en": "Sekar pats Bima's arm, once. Not forgiveness. Not yet. But not leaving, either."
+      }
+    },
+    {
+      "type": "TEXT",
       "text": {
         "id": "Dan lo. Lo telat setahun.",
         "en": "And you. You're a year late."
@@ -212,6 +237,60 @@
         "en": "See? Quiet again."
       },
       "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "tasya_admitted == true",
+      "text": {
+        "id": "Gue udah cerita ke dia soal telepon PR itu, Kar. Hari kedua. Harusnya gue cerita ke lo duluan.",
+        "en": "I already told him about the PR call, Kar. On the second day. I should have told you first."
+      },
+      "profile": "tasya:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "tasya_admitted == true",
+      "text": {
+        "id": "Gue tahu lo ditelepon, Tas. Gue selalu tahu. Gue cuma nunggu lo yang bilang.",
+        "en": "I knew you got a call, Tas. I always knew. I was just waiting for you to say it."
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_unsent_03 == true",
+      "text": {
+        "id": "Dan gue muterin menit dua belas buat dia. Yang di luar mic.",
+        "en": "And I played him minute twelve. The off-mic bit."
+      },
+      "profile": "tasya:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_unsent_03 == true",
+      "text": {
+        "id": "Tas! Itu rahasia negara!",
+        "en": "Tas! That was classified!"
+      },
+      "profile": "sekar:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "reconciled == true && heard_unsent_04 == true",
+      "text": {
+        "id": "Gue juga denger yang jam enam dua belas. Dua gelas kopi.",
+        "en": "I heard the six twelve one too. Two cups of coffee."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "reconciled == true && heard_unsent_04 == true",
+      "text": {
+        "id": "Yang itu bukan buat siapa-siapa.{w} ...Kopinya gue minum dua-duanya. Gue nggak tidur sampai Senin.",
+        "en": "That one wasn't for anyone.{w} ...I drank both coffees. I didn't sleep until Monday."
+      },
+      "profile": "sekar:3"
     },
     {
       "type": "STAGE",

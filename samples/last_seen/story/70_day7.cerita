@@ -70,6 +70,24 @@ sekar:serious [if reconciled == true]
 sekar:scared [if reconciled == true]
   id: Tapi nggak ada yang bakal percaya selama polisi mikir gue diculik. Mereka bakal ngambil ini sebagai "barang bukti", terus ini hilang. Kayak semua barang bukti lain di kota ini.
   en: But nobody will believe it as long as the police think I was kidnapped. They'll take this as "evidence", and then it'll disappear. Like every other piece of evidence in this city.
+raka:sad [if reconciled == true && saw_old_photo == true]
+  id: Lo nyimpen foto tembok laut itu. Yang gue setengah kepotong.
+  en: You kept that photo from the seawall. The one where I'm half cut off.
+sekar:smile [if reconciled == true && saw_old_photo == true]
+  id: Lo emang selalu setengah kepotong, Ka. Setengah di sini, setengah udah mau kabur.
+  en: You're always half cut off, Ka. Half here, half already leaving.
+raka:neutral [if reconciled == true && heard_unsent_02 == true]
+  id: Pak Hendra muterin yang dari kapal. Senin malem.
+  en: Pak Hendra played me the one from the boat. Monday night.
+sekar:tired [if reconciled == true && heard_unsent_02 == true]
+  id: Itu harusnya dikirim kalau gue nggak balik.{w} Gue balik, kok. Kebetulan lo juga.
+  en: That was only meant to be sent if I didn't come back.{w} I came back, though. So did you, as it happens.
+raka:sad [if reconciled == true && heard_unsent_04 == true]
+  id: Gue juga denger yang jam enam dua belas. Dua gelas kopi.
+  en: I heard the six twelve one too. Two cups of coffee.
+sekar:serious [if reconciled == true && heard_unsent_04 == true]
+  id: Yang itu bukan buat siapa-siapa.{w} ...Kopinya gue minum dua-duanya. Gue nggak tidur sampai Senin.
+  en: That one wasn't for anyone.{w} ...I drank both coffees. I didn't sleep until Monday.
 
 # The secret ending (beat plan last-seen-m4.md §6): every unsent voice note heard, across any runs.
 choice ASK_0612 by=sekar:neutral [if reconciled == true && meta.flag.heard_unsent_01 && meta.flag.heard_unsent_02 && meta.flag.heard_unsent_03 && meta.flag.heard_unsent_04]
@@ -184,7 +202,7 @@ bima:neutral [if bima_confessed == true]
   id: Gue bawa printout email-nya. Tiga lembar. Kalau HP kita mati semua.
   en: I brought a printout of the email. Three copies. In case all our phones die.
 
-narration [if yusuf_heard_didit == true]
+narration [if yusuf_heard_didit == true && pari_raid == true]
   id: HP gue geter. Ipda Yusuf. "Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat."
   en: My phone buzzes. Inspector Yusuf. "I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow."
 
@@ -259,6 +277,15 @@ bima:ashamed [if bima_confessed == true]
 sekar:serious [if bima_confessed == true]
   id: Gue tahu, Bim. Gue tahu dari Senin malem. Nanti. Bukan sekarang.
   en: I know, Bim. I've known since Monday night. Later. Not now.
+raka:neutral [if bima_confessed == true && jaya_saw_bima == true]
+  id: Dia serius, Kar. Bang Jaya lihat dia duduk lima menit di mobil, kepalanya di setir, malem itu.
+  en: He means it, Kar. Bang Jaya saw him sit in his car for five minutes that night, head on the wheel.
+narration [if bima_confessed == true && trust_bima < 3]
+  id: Bima nggak maju lagi. Dia berdiri di ujung dermaga, kayak orang yang nunggu dipanggil dan tahu dia nggak bakal dipanggil.
+  en: Bima doesn't come any closer. He stays at the end of the jetty, like someone waiting to be called who knows he won't be.
+narration [if bima_confessed == true && trust_bima >= 3]
+  id: Sekar nepuk lengan Bima sekali. Bukan maaf. Belum. Tapi juga bukan pergi.
+  en: Sekar pats Bima's arm, once. Not forgiveness. Not yet. But not leaving, either.
 
 sekar:neutral
   id: Dan lo. Lo telat setahun.
@@ -297,6 +324,24 @@ sekar:serious [if REUNION == 'started']
 sekar:tired [if REUNION == 'silent']
   id: Tuh kan. Diem lagi.
   en: See? Quiet again.
+tasya:guilty [if tasya_admitted == true]
+  id: Gue udah cerita ke dia soal telepon PR itu, Kar. Hari kedua. Harusnya gue cerita ke lo duluan.
+  en: I already told him about the PR call, Kar. On the second day. I should have told you first.
+sekar:neutral [if tasya_admitted == true]
+  id: Gue tahu lo ditelepon, Tas. Gue selalu tahu. Gue cuma nunggu lo yang bilang.
+  en: I knew you got a call, Tas. I always knew. I was just waiting for you to say it.
+tasya:smile [if heard_unsent_03 == true]
+  id: Dan gue muterin menit dua belas buat dia. Yang di luar mic.
+  en: And I played him minute twelve. The off-mic bit.
+sekar:laugh [if heard_unsent_03 == true]
+  id: Tas! Itu rahasia negara!
+  en: Tas! That was classified!
+raka:sad [if reconciled == true && heard_unsent_04 == true]
+  id: Gue juga denger yang jam enam dua belas. Dua gelas kopi.
+  en: I heard the six twelve one too. Two cups of coffee.
+sekar:serious [if reconciled == true && heard_unsent_04 == true]
+  id: Yang itu bukan buat siapa-siapa.{w} ...Kopinya gue minum dua-duanya. Gue nggak tidur sampai Senin.
+  en: That one wasn't for anyone.{w} ...I drank both coffees. I didn't sleep until Monday.
 
 stage
   show hendra:wary far_left transition=fade duration=600
@@ -374,6 +419,9 @@ stage
 narration
   id: Kapal polisi merapat duluan. Ipda Yusuf turun pertama, seragamnya basah sampai lutut. Di belakangnya dua laki-laki pake polo BPM.
   en: The police boat docks first. Inspector Yusuf steps off first, his uniform wet to the knees. Behind him, two men in BPM polos.
+narration [if saw_bentang_men == true]
+  id: Dua laki-laki BPM itu gue kenal. Warung kopi di dermaga, Senin pagi. Yang satu gulanya tiga sendok.
+  en: I know those two BPM men. The coffee stall on the pier, Monday morning. One of them takes three sugars.
 narration
   id: Terakhir, laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Lebih pendek dari suaranya. Aditya Nugraha. Didit.
   en: Last, a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. Shorter than his voice. Aditya Nugraha. Didit.
@@ -404,6 +452,12 @@ set
 yusuf:conflicted
   id: Kata-kata Mbak Sekar melawan laporan resmi dengan saksi, Mas Raka. Saya butuh lebih dari itu. Sekarang. Sebelum saya terpaksa menjalankan tugas saya.
   en: Ms. Sekar's word against an official report with a witness, Raka. I need more than that. Now. Before I'm forced to do my job.
+yusuf:polite [if trust_yusuf >= 10]
+  id: Mas Raka, dari hari pertama Anda nggak pernah bohong ke saya. Saya kasih Anda dua menit sebelum saya menjalankan tugas.
+  en: Raka, you haven't lied to me once since the first day. I'll give you two minutes before I do my job.
+yusuf:stern [if trust_yusuf < 10]
+  id: Dan jangan buang waktu saya, Mas. Saya sudah cukup sering dibuat menunggu minggu ini.
+  en: And don't waste my time, Raka. I've been kept waiting often enough this week.
 
 # Cross-run memory (beat plan last-seen-m4.md §5): the Network route can know the logbook from an earlier run.
 choice LOGBOOK by=raka:determined [if meta.flag.knows_crossing_log && clue_crossing_log != true]

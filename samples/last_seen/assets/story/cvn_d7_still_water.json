@@ -53,7 +53,7 @@
     },
     {
       "type": "NARRATION",
-      "condition": "route == 'harbor'",
+      "condition": "reached_pari == true",
       "text": {
         "id": "Mereka nyari ke semua rumah di dermaga bakau. Nggak ketemu apa-apa. Sepupu Pak Hendra bilang dia nggak pernah lihat perempuan berjaket hijau.",
         "en": "They search every house by the mangrove jetty. They find nothing. Pak Hendra's cousin says she's never seen a woman in a green jacket."
@@ -61,7 +61,7 @@
     },
     {
       "type": "NARRATION",
-      "condition": "route != 'harbor'",
+      "condition": "on_first_ferry == true",
       "text": {
         "id": "Tasya ngelihat gue kayak mau mukul. Dia nggak mukul. Dia cuma duduk di sebelah gue sampai kapal pulang.",
         "en": "Tasya looks at me like she wants to hit me. She doesn't. She just sits next to me until the boat home."

@@ -113,13 +113,13 @@ void main() {
           _text("Hi {{curiousity}}", condition: "curiosity > 1"),
           {"type": "SET", "effects": [{"variable": "curiosity", "op": "add", "value": 1}]},
           {"type": "SET", "effects": [{"variable": "unused", "op": "set", "value": true}]},
+          // A choice's own variable names it, so nothing has to read it.
           {"type": "CHOICE", "text": "?", "variable": "PICK", "choices": [{"text": "a", "condition": "!flag"}]},
         ]),
       });
       expect(issues, unorderedEquals([
         "warning index.json #0  Variable 'curiousity' is read but never set",
         "warning index.json #2 effects[0]  Variable 'unused' is set but never read",
-        "warning index.json #3  Variable 'PICK' is set but never read",
         "warning index.json #3 choices[0]  Variable 'flag' is read but never set",
       ]));
     });

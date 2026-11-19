@@ -55,6 +55,14 @@
       "sfx": "sfx_msg_receive.mp3"
     },
     {
+      "type": "NARRATION",
+      "condition": "meta.flag.promised_wulan",
+      "text": {
+        "id": "Gue pernah janji ini. Entah di mana, entah kapan. Rasanya kayak ngulang kalimat yang udah pernah gue ucapin, dan kali ini gue lebih serius.",
+        "en": "I've made this promise before. I don't know where, or when. It feels like repeating something I've already said, and this time I mean it more."
+      }
+    },
+    {
       "type": "CHOICE",
       "text": {
         "id": "Balas Bu Wulan.",

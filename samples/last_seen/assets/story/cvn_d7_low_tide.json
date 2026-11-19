@@ -53,7 +53,7 @@
     },
     {
       "type": "NARRATION",
-      "condition": "found_sekar != true",
+      "condition": "found_sekar != true && hendra_cleared == true",
       "text": {
         "id": "Pak Hendra pulang ke Muara Angke dengan nama bersih. Sekar nggak pulang. Nggak ada yang tahu perahu nelayan pagi itu ke mana, dan Pak Hendra nggak mau bilang. Ke siapa pun. Termasuk gue.",
         "en": "Pak Hendra goes home to Muara Angke with his name cleared. Sekar doesn't come home. Nobody knows where that fishing boat went that morning, and Pak Hendra won't say. To anyone. Including me."
@@ -68,6 +68,14 @@
         "en": "Low tide at Muara Angke. You can see the stakes all the way out."
       },
       "unlock_id": "cg_low_tide"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "proof_threat == true",
+      "text": {
+        "id": "Ipda Yusuf nyimpen ancaman Didit di berkas. Didit dipanggil dua kali, terus dipindah ke Surabaya. Ancaman doang nggak bikin izin dicabut.",
+        "en": "Inspector Yusuf kept Didit's threat on file. Didit was called in twice, then transferred to Surabaya. A threat alone doesn't get a permit pulled."
+      }
     },
     {
       "type": "TEXT",

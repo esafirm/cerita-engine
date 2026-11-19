@@ -994,6 +994,32 @@ uses its title logo.
 - **Revisit if** M3's routes put a checkpoint behind a condition none of the four policies meets. Then a story
   could name the answers that reach it, or the unlocker could explore choices breadth first.
 
+## Last Seen ships through the release lint
+
+*2026-11-19. Last Seen spec §8 and §9 (M5).*
+
+- **Context:** `lint --release` turns every warning into an error. After M4 it found 30, all "set but never read".
+- **Decision:** the linter no longer reports a `CHOICE` or evidence question's own variable. The DSL makes the name
+  optional, but Last Seen's route tests pick answers by it, and the developer panel and saves show it, so a named
+  question isn't a mistake. Effect and `INPUT` variables are still reported. The other 18 were story flags set for a
+  payoff that hadn't been written, so each now has one: Raka knows the BPM men from the pier stall, Yusuf's patience
+  follows `trust_yusuf`, Bang Jaya's sighting speaks for Bima, Tasya owns up to the PR call in front of Sekar, the
+  reunion answers the seawall photo and the voice notes, and a promise to Bu Wulan made in an earlier run is felt in
+  the next. `make story`, `make story-check` and CI now lint in release mode.
+- **Release builds:** `make release-last-seen` builds the Play bundle and per-ABI APKs. The upload key is read from
+  a git-ignored `android/key.properties`, and without it the build falls back to the debug key, so it still installs
+  for testing. No key was made: the first key that signs a Play upload can never change, so it's the owner's to make
+  (README, *Release builds*). The version is 1.0.0+1.
+- **Size:** 27 MB of assets, a 45 MB arm64 APK and a 77 MB bundle, well under the 200 MB budget. No WebP or Opus
+  pass is needed.
+- **Credits** roll after *Undertow* and *Off the Record*.
+- **iOS:** `flutter build ios --release --no-codesign` stops in Xcode's asset catalog step on this Mac ("Failed to
+  launch AssetCatalogSimulatorAgent"), with or without the sandbox. Only the iOS 17.0 simulator runtime is installed,
+  so it looks like a local Xcode setup problem, not the project. Android and web release builds pass.
+- **Open:** five sounds have no source in `credits.json` or the logs: `sfx_msg_receive`, `sfx_msg_send`,
+  `sfx_notification`, `sfx_phone_ring` and `sfx_wrong_code`. They need a source or a replacement before a store
+  release. The Indonesian review, the timed playtest and its pacing fixes wait for the owner.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

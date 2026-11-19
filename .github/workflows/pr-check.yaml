@@ -33,7 +33,7 @@ jobs:
       - name: Check Last Seen scripts match the compiled JSON
         run: |
           dart run cerita_tools compile samples/last_seen/story --check
-          dart run cerita_tools lint samples/last_seen/story
+          dart run cerita_tools lint samples/last_seen/story --release
 
       - name: Test Flutter packages and example
         run: |

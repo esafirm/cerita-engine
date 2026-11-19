@@ -43,6 +43,14 @@
     },
     {
       "type": "NARRATION",
+      "condition": "phone_unlocked == true",
+      "text": {
+        "id": "Nol lima tiga nol. Jempol gue udah hafal tanpa mikir.",
+        "en": "Zero five three zero. My thumb knows it without thinking now."
+      }
+    },
+    {
+      "type": "NARRATION",
       "text": {
         "id": "Terus gue buka HP gue sendiri. Chat dengan nama dia. Setahun kosong.",
         "en": "Then I open my own phone. The chat with her name on it. A year of nothing."
