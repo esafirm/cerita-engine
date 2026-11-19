@@ -1020,6 +1020,28 @@ uses its title logo.
   `sfx_notification`, `sfx_phone_ring` and `sfx_wrong_code`. They need a source or a replacement before a store
   release. The Indonesian review, the timed playtest and its pacing fixes wait for the owner.
 
+## Sekar and Bima talk aku/kamu to each other
+
+The cast table listed Bima as gue/lo only, but the script has Sekar and Bima on aku/kamu in their private chat.
+The script is right, so the table now says so (`specs/last-seen.md` §2).
+
+- **Why:** couples in Jakarta commonly switch to aku/kamu with each other while staying gue/lo with friends.
+  It makes their chat read as intimate, and Bima's "ngelindungin kamu" on the jetty carries that over.
+- **Cost:** new scenes have to follow it.
+
+## Only the calque fixes from a model pass on the Indonesian were kept
+
+A GPT-6.2 Sol pass rewrote 70 unvoiced `id:` lines to remove English word order and calques. 20 of them were
+kept: lines that copied an English phrase ("dengan cara yang", "untuk catatan", "kehilangan bau", "sudah
+berbagi"), Yusuf's police phrasing ("dimintai keterangan"), and Bima's "udah sampe?", which now matches how
+Day 4 quotes it. The rest were dropped.
+
+- **Why:** the brief asked for short, clipped lines with dropped subjects. Where the original wasn't a calque,
+  the model chopped sentences into fragments, flattened wordplay, removed Tasya's intended English, and made
+  Yusuf wordier.
+- **Revisit if** the owner's own review wants another model pass. Give it the owner's marked lines as examples
+  rather than a general style brief.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

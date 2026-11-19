@@ -15,7 +15,7 @@ sekar:neutral
   id: Lo telat setahun.
   en: You're a year late.
 raka:sad
-  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.
+  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang telat.
   en: Pak Karta's boat left on time. I didn't.
 sekar:tired
   id: Pak Hendra cerita lewat radio. Dinda. Didit. Lo masuk dasbor gue pake nama kapal. Lo ke rumah Pak Karta.
@@ -203,7 +203,7 @@ bima:neutral [if bima_confessed == true]
   en: I brought a printout of the email. Three copies. In case all our phones die.
 
 narration [if yusuf_heard_didit == true && pari_raid == true]
-  id: HP gue geter. Ipda Yusuf. "Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat."
+  id: HP gue geter. Ipda Yusuf. "Saya di kapal polisi jam 06.30. Pak Aditya ikut sebagai 'perwakilan perusahaan'. Saya coba ulur waktu."
   en: My phone buzzes. Inspector Yusuf. "I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow."
 
 tasya:defensive
@@ -232,7 +232,7 @@ evidence WHERE_PARI by=tasya:defensive retries=1 label=where_pari
   -> d7n_cold
 
 raka:worried label=where_retry
-  id: Itu cuma bilang dia ke Pari. Gue butuh yang bilang di Pari-nya di mana.
+  id: Itu cuma nunjukin dia ke Pari. Di sebelah mananya?
   en: That only says she went to Pari. I need something that says where on Pari.
 -> #where_pari
 
@@ -291,7 +291,7 @@ sekar:neutral
   id: Dan lo. Lo telat setahun.
   en: And you. You're a year late.
 raka:sad
-  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.
+  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang telat.
   en: Pak Karta's boat left on time. I didn't.
 
 choice REUNION by=sekar:serious timeout=12s
@@ -436,7 +436,7 @@ narration
   id: Dia nunjuk Pak Hendra. Pak Hendra lagi ngegulung tali dan nggak berhenti.
   en: He points at Pak Hendra. Pak Hendra is coiling rope and doesn't stop.
 yusuf:stern
-  id: Mbak Sekar. Saya harus tanya, untuk catatan. Anda di sini atas kemauan sendiri?
+  id: Mbak Sekar. Saya perlu tanya untuk keperluan laporan. Anda di sini atas kemauan sendiri?
   en: Ms. Sekar. I have to ask, for the record. Are you here of your own free will?
 sekar:serious
   id: Iya, Pak. Saya yang minta Pak Hendra nganter.

@@ -152,7 +152,7 @@ hendra:worried [if left_phone != true && trust_hendra >= 5]
   id: Sini. Bungkus plastik. Taruh di kotak seng mesin. Sinyal nggak tembus seng.
   en: Give it here. Wrap it in plastic. Into the engine's tin box. Signal doesn't get through tin.
 narration [if left_phone != true && trust_hendra >= 5]
-  id: Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang kehilangan bau.
+  id: Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang udah nggak bisa nyium jejaknya.
   en: Five minutes later, the searchlight behind us stops and circles on the spot, like a dog that's lost the scent.
 
 choice THROW_PHONE by=hendra:gruff timeout=10s [if left_phone != true && trust_hendra < 5]
@@ -447,7 +447,7 @@ tasya:neutral [if bima_confessed == true]
   id: ...Gue juga bisa aja bilang ke dia soal teleponnya. Dan gue diem. Jadi kita sama-sama bego.
   en: ...I could have told her about the call too. And I kept quiet. So we're both idiots.
 narration [if bima_confessed == true]
-  id: Bima ketawa, kecil, kayak orang yang lupa caranya. Tasya nyodorin sisa kopinya. Dia minum.
+  id: Bima ketawa pelan. Kayak udah lupa cara ketawa. Tasya nyodorin sisa kopinya. Dia minum.
   en: Bima laughs, a small laugh, like someone who forgot how. Tasya holds out what's left of her coffee. He drinks it.
 
 stage

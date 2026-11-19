@@ -197,7 +197,7 @@ narration label=hull_found
   id: Petugasnya akhirnya ngangkat kepala.
   en: The man finally looks up.
 narration
-  id: "Sri Rejeki? Punya Pak Hendra. Dulu punya abangnya, Pak Karta. Pak Karta udah nggak melaut dari stroke tahun lalu, jadi kapalnya dipegang adiknya."
+  id: "Sri Rejeki? Punya Pak Hendra. Dulu punya abangnya, Pak Karta. Sejak kena stroke tahun lalu, Pak Karta udah nggak melaut. Kapalnya dipegang adiknya."
   en: "Sri Rejeki? That's Pak Hendra's. It used to be his older brother's, Pak Karta. Pak Karta hasn't been out since his stroke last year, so his brother took the boat."
   clue boat_registration
 raka:shocked
@@ -414,7 +414,7 @@ yusuf voice=vo_d3_yusuf_09.mp3 [if yusuf_cctv != true && lied_to_yusuf != true]
   delivery: sincere but tired, the decision isn't his
 
 choice TELL_BOAT by=yusuf
-  id: Kapal Pak Hendra. Polisi bisa nanya ke dia dengan cara yang gue nggak bisa.
+  id: Kapal Pak Hendra. Kalau polisi yang nanya, lain ceritanya.
   en: Pak Hendra's boat. The police could question him in ways I can't.
 ? "Pak, ada kapal namanya Sri Rejeki. Nomor 1427." | "Sir, there's a boat called the Sri Rejeki. Number 1427."
   value tell
@@ -466,7 +466,7 @@ narration
   id: Sore. Gue pulang naik ojek, bau ikan, kulit leher kebakar matahari. Dinda nungguin di ruang tamu dengan dua gelas teh, satu tawar.
   en: Late afternoon. I come home on a bike taxi, smelling of fish, the back of my neck sunburnt. Dinda is waiting in the living room with two glasses of tea, one without sugar.
 narration
-  id: Gue ceritain semuanya. Ibu-ibu kerang. Papan syahbandar. Kapalnya Pak Karta. Pak Hendra, yang nggak tahu Sekar di mana dengan cara yang bikin gue yakin dia tahu.
+  id: Gue ceritain semuanya. Ibu-ibu kerang. Papan syahbandar. Kapalnya Pak Karta. Pak Hendra bilang nggak tahu Sekar di mana. Dari cara ngomongnya, gue malah yakin dia tahu.
   en: I tell her everything. The mussel women. The harbor board. Pak Karta's boat. Pak Hendra, who doesn't know where Sekar is in a way that makes me sure he does.
 
 narration
@@ -613,7 +613,7 @@ narration
 -> d3_silent_call
 
 didit typing=3s sfx=sfx_msg_receive.mp3 label=didit_shrugs
-  id: Terima kasih sudah berbagi, Mas. Justru hal-hal seperti ini yang bisa diperiksa lab kami.
+  id: Terima kasih sudah memberi tahu saya, Mas. Justru hal-hal seperti ini yang bisa diperiksa lab kami.
   en: Thank you for sharing. That's exactly the kind of thing our lab can look into.
 -> #didit_stalled
 

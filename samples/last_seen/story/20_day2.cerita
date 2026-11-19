@@ -399,7 +399,7 @@ tasya typing=0
   id: ep 12 tetep jalan kok. beda segmen. beda minggu
   en: ep 12 still happens. different segment. different week
 sekar
-  id: dan pendengar kita bakal mikir apa
+  id: terus pendengar kita mikirnya gimana?
   en: and what will our listeners think
 tasya typing=0
   id: pendengar kita nggak bayarin kontrakan gue kar
@@ -589,7 +589,7 @@ timestamp
   id: Senin, 23.10
   en: Monday, 11:10 PM
 bima typing=0
-  id: kamu udah sampe?
+  id: udah sampe?
   en: did you get there?
   clue bima_deleted
 
@@ -620,7 +620,7 @@ narration
   id: Senin, jam delapan empat puluh. Bima ngirim sesuatu, terus dihapus. Semenit kemudian Sekar bales "ok". Dua puluh menit kemudian dia pamit ke Dinda. Katanya dijemput.
   en: Monday, eight forty. Bima sent something, then deleted it. A minute later Sekar replied "ok". Twenty minutes later she said goodbye to Dinda. She said someone was picking her up.
 narration
-  id: Jam sebelas malem, Bima nanya "kamu udah sampe?". Orang yang nggak tahu dia pergi ke mana nggak bakal nanya "udah sampe".
+  id: Jam sebelas malem, Bima nanya "udah sampe?". Orang yang nggak tahu dia pergi ke mana nggak bakal nanya "udah sampe".
   en: At eleven that night, Bima asked "did you get there?". Someone who didn't know where she was going wouldn't ask that.
 narration
   id: "Bima bilang ke polisi, Senin dia lembur di kantor sampai pagi," kata Dinda. Suaranya datar. Terlalu datar.
@@ -1038,7 +1038,7 @@ bima:irritated [if BIMA_PHONE == 'silent']
   en: ...Okay. I'll take that as "not yet".
 
 narration [if BIMA_PHONE == 'give']
-  id: Gue ngeluarin HP-nya. Gue nggak tahu kenapa. Mungkin karena dia ngomong kayak orang yang tahu caranya ngurus sesuatu, dan gue capek.
+  id: Gue ngeluarin HP-nya. Gue nggak tahu kenapa. Mungkin karena kedengerannya dia tahu mesti ngapain. Gue udah capek.
   en: I take out the phone. I don't know why. Maybe because he talks like someone who knows how to handle things, and I'm tired.
 narration [if BIMA_PHONE == 'give']
   id: Ujung jari Bima udah nyentuh casing-nya waktu tangan Dinda nyamber duluan.
@@ -1063,7 +1063,7 @@ bima:neutral [if BIMA_PHONE == 'ask']
   id: Di kantor. Lembur. Udah gue bilang ke polisi.
   en: At the office. Working late. I already told the police.
 raka:neutral [if BIMA_PHONE == 'ask']
-  id: Lembur. Terus jam sebelas malem lo nanya ke dia, "kamu udah sampe?"
+  id: Lembur. Terus jam sebelas malem lo nanya ke dia, "udah sampe?"
   en: Working late. And then at eleven at night you ask her "did you get there?"
 bima:panicked [if BIMA_PHONE == 'ask']
   id: ...

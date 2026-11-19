@@ -114,7 +114,7 @@
     {
       "type": "CHOICE",
       "text": {
-        "id": "Kapal Pak Hendra. Polisi bisa nanya ke dia dengan cara yang gue nggak bisa.",
+        "id": "Kapal Pak Hendra. Kalau polisi yang nanya, lain ceritanya.",
         "en": "Pak Hendra's boat. The police could question him in ways I can't."
       },
       "variable": "TELL_BOAT",

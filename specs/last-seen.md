@@ -44,10 +44,10 @@ was the key.
 | Character | Role | Voice (ID) | Sprite expressions |
 | :--- | :--- | :--- | :--- |
 | Raka Pradipta, 22 | Protagonist, Sekar's ex-best friend. Sarcastic, avoidant, guilty | gue/lo | neutral, smirk, worried, angry, shocked, sad, determined |
-| Sekar Ayuningtyas, 22 | The missing podcaster. Seen in flashbacks, chats, voice notes | gue/lo, aku/kamu with Dinda | neutral, smile, laugh, serious, scared, tired |
+| Sekar Ayuningtyas, 22 | The missing podcaster. Seen in flashbacks, chats, voice notes | gue/lo, aku/kamu with Dinda and Bima | neutral, smile, laugh, serious, scared, tired |
 | Dinda, 19 | Sekar's sister, first ally. Trust gates family access | gue/lo, aku with family | neutral, smile, crying, angry, hopeful |
 | Tasya Wirawan, 23 | Podcast co-host. Hides that she knew about the threat | gue/lo, Jaksel mix | neutral, smile, nervous, defensive, guilty, crying |
-| Bima Santoso, 24 | Sekar's boyfriend. The leak, unknowingly | gue/lo | neutral, charming, irritated, panicked, ashamed |
+| Bima Santoso, 24 | Sekar's boyfriend. The leak, unknowingly | gue/lo, aku/kamu with Sekar | neutral, charming, irritated, panicked, ashamed |
 | Pak Hendra, 56 | Muara Angke boatman, hid Sekar | saya, informal | neutral, gruff, wary, kind, worried |
 | Ipda Yusuf, 34 | Police officer on the case. Formal but decent | saya/Anda | neutral, polite, stern, conflicted |
 

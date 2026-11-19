@@ -244,7 +244,7 @@
     {
       "type": "TEXT",
       "text": {
-        "id": "kamu udah sampe?",
+        "id": "udah sampe?",
         "en": "did you get there?"
       },
       "profile": "bima:0",
@@ -328,7 +328,7 @@
     {
       "type": "NARRATION",
       "text": {
-        "id": "Jam sebelas malem, Bima nanya \"kamu udah sampe?\". Orang yang nggak tahu dia pergi ke mana nggak bakal nanya \"udah sampe\".",
+        "id": "Jam sebelas malem, Bima nanya \"udah sampe?\". Orang yang nggak tahu dia pergi ke mana nggak bakal nanya \"udah sampe\".",
         "en": "At eleven that night, Bima asked \"did you get there?\". Someone who didn't know where she was going wouldn't ask that."
       }
     },

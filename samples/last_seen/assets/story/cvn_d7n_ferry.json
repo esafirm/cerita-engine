@@ -72,7 +72,7 @@
       "type": "NARRATION",
       "condition": "yusuf_heard_didit == true && pari_raid == true",
       "text": {
-        "id": "HP gue geter. Ipda Yusuf. \"Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat.\"",
+        "id": "HP gue geter. Ipda Yusuf. \"Saya di kapal polisi jam 06.30. Pak Aditya ikut sebagai 'perwakilan perusahaan'. Saya coba ulur waktu.\"",
         "en": "My phone buzzes. Inspector Yusuf. \"I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow.\""
       }
     },
@@ -143,7 +143,7 @@
       "type": "TEXT",
       "id": "where_retry",
       "text": {
-        "id": "Itu cuma bilang dia ke Pari. Gue butuh yang bilang di Pari-nya di mana.",
+        "id": "Itu cuma nunjukin dia ke Pari. Di sebelah mananya?",
         "en": "That only says she went to Pari. I need something that says where on Pari."
       },
       "profile": "raka:2"

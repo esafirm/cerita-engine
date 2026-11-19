@@ -235,7 +235,7 @@
       "type": "NARRATION",
       "condition": "bima_confessed == true",
       "text": {
-        "id": "Bima ketawa, kecil, kayak orang yang lupa caranya. Tasya nyodorin sisa kopinya. Dia minum.",
+        "id": "Bima ketawa pelan. Kayak udah lupa cara ketawa. Tasya nyodorin sisa kopinya. Dia minum.",
         "en": "Bima laughs, a small laugh, like someone who forgot how. Tasya holds out what's left of her coffee. He drinks it."
       }
     },

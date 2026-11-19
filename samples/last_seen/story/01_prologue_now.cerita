@@ -26,7 +26,7 @@ narration
   id: "Suara Pesisir, Episode 11." Diunggah tiga minggu lalu. Empat ratus dua belas kali diputar.
   en: "Suara Pesisir, Episode 11." Uploaded three weeks ago. Four hundred and twelve plays.
 narration
-  id: Pendengarnya udah dua kali lipat. Gue nggak tahu harus ngerasa apa soal itu.
+  id: Pendengarnya udah dua kali lipat. Gue sendiri bingung mesti seneng apa gimana.
   en: Her listeners have doubled. I don't know how to feel about that.
 
 choice PLAY_EP by=raka:sad silent

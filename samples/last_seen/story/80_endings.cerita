@@ -8,7 +8,7 @@ stage
   show raka:determined left
 
 yusuf:stern [far_left]
-  id: Pak Aditya. Laporan Bapak saya tarik untuk diperiksa. Bapak ikut kami ke Polsek, kasih keterangan. HP Bapak juga.
+  id: Pak Aditya. Laporan Bapak saya tarik untuk diperiksa. Bapak ikut kami ke Polsek untuk dimintai keterangan. HP Bapak juga.
   en: Mr. Aditya. I'm pulling your report for review. You'll come with us to the station and give a statement. Your phone too.
 narration
   id: Dua laki-laki BPM saling lihat, terus jalan balik ke speedboat putih mereka tanpa nunggu bosnya.
@@ -126,7 +126,7 @@ narration [if found_sekar != true]
   en: We go home without Sekar. But we go home with Bima's email, the Episode 12 draft, and a Tasya who has stopped being afraid.
 
 media CG cg_episode_12.webp unlock=cg_episode_12
-  id: Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam yang sama kayak Sekar biasa tayang.
+  id: Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam segitu biasanya Sekar nayangin episodenya.
   en: Tasya published Episode 12 on Friday, at eleven at night. The same hour Sekar always published.
 
 narration

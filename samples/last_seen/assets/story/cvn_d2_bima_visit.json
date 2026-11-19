@@ -267,7 +267,7 @@
       "type": "NARRATION",
       "condition": "BIMA_PHONE == 'give'",
       "text": {
-        "id": "Gue ngeluarin HP-nya. Gue nggak tahu kenapa. Mungkin karena dia ngomong kayak orang yang tahu caranya ngurus sesuatu, dan gue capek.",
+        "id": "Gue ngeluarin HP-nya. Gue nggak tahu kenapa. Mungkin karena kedengerannya dia tahu mesti ngapain. Gue udah capek.",
         "en": "I take out the phone. I don't know why. Maybe because he talks like someone who knows how to handle things, and I'm tired."
       }
     },
@@ -344,7 +344,7 @@
       "type": "TEXT",
       "condition": "BIMA_PHONE == 'ask'",
       "text": {
-        "id": "Lembur. Terus jam sebelas malem lo nanya ke dia, \"kamu udah sampe?\"",
+        "id": "Lembur. Terus jam sebelas malem lo nanya ke dia, \"udah sampe?\"",
         "en": "Working late. And then at eleven at night you ask her \"did you get there?\""
       },
       "profile": "raka:0"

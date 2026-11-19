@@ -109,7 +109,7 @@
       "type": "NARRATION",
       "condition": "left_phone != true && trust_hendra >= 5",
       "text": {
-        "id": "Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang kehilangan bau.",
+        "id": "Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang udah nggak bisa nyium jejaknya.",
         "en": "Five minutes later, the searchlight behind us stops and circles on the spot, like a dog that's lost the scent."
       }
     },
