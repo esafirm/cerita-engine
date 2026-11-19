@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 
@@ -76,6 +77,22 @@ class EndOfStoryException implements Exception {
   String toString() => "EndOfStoryException: no more items in '$conversationKey'";
 }
 
+/// Asked before the story enters a [Conversation]: false keeps the player out of it. A story that sells part of
+/// itself decides here, by chapter or key, without the engine knowing about the store.
+typedef StoryGate = FutureOr<bool> Function(Conversation conversation);
+
+/// Thrown by [RealFsseEngine.start], [RealFsseEngine.next] and [RealFsseEngine.jumpTo] when the
+/// [RealFsseEngine.gate] keeps the story out of [conversation]. The engine is left part way through the move, so
+/// play goes on from a save or a fresh [RealFsseEngine.start], not from another `next`.
+class StoryGateException implements Exception {
+  final Conversation conversation;
+
+  const StoryGateException(this.conversation);
+
+  @override
+  String toString() => "StoryGateException: '${conversation.key}' is closed";
+}
+
 /* Impl */
 /* ------------------------------------------ */
 
@@ -89,7 +106,10 @@ class RealFsseEngine extends FsseEngine {
   final ConditionEvaluator evaluator;
   EngineListener? listener;
 
-  RealFsseEngine(this.loader, {this.listener, this.storage, this.evaluator = const ConditionEvaluator()});
+  /// Asked before every conversation the story enters, see [StoryGate]. Null lets the story go anywhere.
+  StoryGate? gate;
+
+  RealFsseEngine(this.loader, {this.listener, this.storage, this.gate, this.evaluator = const ConditionEvaluator()});
 
   RealFsseEngine.withListener(this.loader, this.listener)
       : storage = null,
@@ -185,7 +205,8 @@ class RealFsseEngine extends FsseEngine {
 
   /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
   /// With [replay], only the [checkpoint]'s chapter is played: entering a conversation of another
-  /// chapter throws [EndOfStoryException].
+  /// chapter throws [EndOfStoryException]. Throws [StoryGateException] when the [gate] keeps the story out of the
+  /// conversation it starts in.
   Future<void> start({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     final package = await loader.initialLoad();
     profileData = package.profiles;
@@ -873,6 +894,9 @@ class RealFsseEngine extends FsseEngine {
     if (chapter != null && conversation.chapter != null && conversation.chapter != chapter) {
       throw EndOfStoryException(conversation.key);
     }
+    // Before anything changes, so a closed conversation is never current and its checkpoint stays locked.
+    final gate = this.gate;
+    if (gate != null && !await gate(conversation)) throw StoryGateException(conversation);
     final previous = _scene;
     currentConversation = conversation;
     _conversations[conversation.key] = conversation;

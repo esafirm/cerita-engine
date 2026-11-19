@@ -28,6 +28,10 @@ enum StoryPhase {
 
   /// The story ran out of items without an ENDING.
   finished,
+
+  /// The story's [StoryGate] keeps it out of [StoryController.closedConversation]. Nothing is saved, and
+  /// [StoryController.reopen] tries again once the gate may have opened.
+  gated,
 }
 
 /// Where a `CALL` scene's call is, see [StoryController.callState].
@@ -69,11 +73,51 @@ class StoryController extends ChangeNotifier with EngineListener {
     AudioHelper? audio,
     PlayerPrefs? settings,
     LocalizedAssets? assets,
+    StoryGate? gate,
   })  : audio = audio ?? AudioHelper(),
         settings = settings ?? PlayerPrefs(storage),
         assets = assets ?? LocalizedAssets(),
-        engine = RealFsseEngine(loader, storage: storage) {
+        engine = RealFsseEngine(loader, storage: storage, gate: gate) {
     engine.listener = this;
+  }
+
+  /// The conversation the gate kept the story out of, while [phase] is [StoryPhase.gated].
+  Conversation? closedConversation;
+
+  /// Plays on from where the story stood before the gate. Null when there's nowhere to go back to.
+  Future<void> Function()? _reopen;
+
+  /// Whether [reopen] has somewhere to go on from.
+  bool get canReopen => _reopen != null;
+
+  /// Tries the closed conversation again, e.g. after a purchase. The story starts over from where it was before
+  /// the gate: the start it was asked for, or the autosave of the last line shown, so a choice that led to the
+  /// gate is asked again.
+  Future<void> reopen() async {
+    final reopen = _reopen;
+    if (phase != StoryPhase.gated || reopen == null) return;
+    await reopen();
+  }
+
+  void _close(StoryGateException gated, Future<void> Function()? reopen) {
+    _epoch++;
+    _autoTimer?.cancel();
+    autoMode = false;
+    skipMode = false;
+    notification = null;
+    typingProfile = null;
+    _typingEntry = null;
+    closedConversation = gated.conversation;
+    _reopen = reopen;
+    phase = StoryPhase.gated;
+    _notify();
+  }
+
+  /// After a gate stops [RealFsseEngine.next] or a jump: the engine is part way through the move, so play goes on
+  /// from the autosave of the last line. A replay saves nothing, so it can only be left.
+  Future<void> _closeMidStory(StoryGateException gated) async {
+    final save = replay ? null : await engine.storage?.loadSlot(SaveSlot.autoSlotId);
+    _close(gated, save == null ? null : () => _begin(save: save));
   }
 
   Scene scene = const Scene();
@@ -281,7 +325,11 @@ class StoryController extends ChangeNotifier with EngineListener {
     _resetCall();
     phase = StoryPhase.idle;
     await audio.stopVoice();
-    await engine.jumpTo(target);
+    try {
+      await engine.jumpTo(target);
+    } on StoryGateException catch (gated) {
+      return _closeMidStory(gated);
+    }
     await _next();
   }
 
@@ -343,8 +391,15 @@ class StoryController extends ChangeNotifier with EngineListener {
     phase = StoryPhase.idle;
     _resetCall();
     sceneEndHeld = false;
+    closedConversation = null;
+    _reopen = null;
     await audio.stopVoice();
-    await engine.start(save: save, checkpoint: checkpoint, replay: replay);
+    try {
+      await engine.start(save: save, checkpoint: checkpoint, replay: replay);
+    } on StoryGateException catch (gated) {
+      _close(gated, () => _begin(save: save, checkpoint: checkpoint, replay: replay));
+      return;
+    }
     _playMusic();
     _playAmbience();
 
@@ -486,6 +541,8 @@ class StoryController extends ChangeNotifier with EngineListener {
     } on EndOfStoryException {
       phase = StoryPhase.finished;
       _notify();
+    } on StoryGateException catch (gated) {
+      return _closeMidStory(gated);
     } finally {
       _busy = false;
     }

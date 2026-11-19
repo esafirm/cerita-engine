@@ -1,5 +1,5 @@
 import 'package:cerita_core/cerita_core.dart';
-import 'package:flutter/services.dart' show AssetBundle;
+import 'package:flutter/widgets.dart';
 
 import 'asset_engine_loader.dart';
 import 'audio_helper.dart';
@@ -25,6 +25,13 @@ class StorySetup {
   /// Finds per-locale voice clips.
   final LocalizedAssets assets;
 
+  /// Asked before the story enters each conversation, see [StoryGate]. Null lets the story go anywhere.
+  final StoryGate? gate;
+
+  /// The screen shown over the story when [gate] keeps it out of a conversation, e.g. a store page. Null shows
+  /// a plain notice with a way back.
+  final StoryGateBuilder? gateBuilder;
+
   StorySetup({
     required this.config,
     required this.loader,
@@ -33,6 +40,8 @@ class StorySetup {
     this.audio = AudioHelper.new,
     this.developer = false,
     LocalizedAssets? assets,
+    this.gate,
+    this.gateBuilder,
   })  : settings = settings ?? PlayerPrefs(storage),
         assets = assets ?? LocalizedAssets();
 
@@ -41,6 +50,8 @@ class StorySetup {
     StoryStorage? storage,
     bool developer = false,
     AssetBundle? bundle,
+    StoryGate? gate,
+    StoryGateBuilder? gateBuilder,
   }) {
     return StorySetup(
       config: config,
@@ -48,9 +59,27 @@ class StorySetup {
       storage: storage ?? SharedPrefsStoryStorage(),
       developer: developer,
       assets: LocalizedAssets(bundle),
+      gate: gate,
+      gateBuilder: gateBuilder,
     );
   }
 
   /// CGs live in `bg/`; photos, voice notes and videos in `media/`.
   String mediaPath(MediaItemType item) => config.mediaPath(item);
 }
+
+/// What [StorySetup.gateBuilder] gets when the gate keeps the story out of [conversation].
+class StoryGateRequest {
+  final Conversation conversation;
+
+  /// Plays on from where the story stood before the gate, once it may have opened (e.g. after a purchase). Null
+  /// when there's nowhere to play on from, as in a chapter replay.
+  final Future<void> Function()? reopen;
+
+  /// Closes the story screen.
+  final VoidCallback leave;
+
+  const StoryGateRequest({required this.conversation, required this.reopen, required this.leave});
+}
+
+typedef StoryGateBuilder = Widget Function(BuildContext context, StoryGateRequest request);

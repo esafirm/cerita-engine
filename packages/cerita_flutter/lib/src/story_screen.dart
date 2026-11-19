@@ -43,6 +43,7 @@ class _StoryScreenState extends State<StoryScreen> {
     settings: widget.setup.settings,
     audio: widget.setup.audio(),
     assets: widget.setup.assets,
+    gate: widget.setup.gate,
   );
   StreamSubscription<String>? _toasts;
   Object? _error;
@@ -297,12 +298,31 @@ class _StoryScreenState extends State<StoryScreen> {
                           onTitle: () => Navigator.of(context).pop(),
                         )
                       : EndingView(onTitle: () => Navigator.of(context).pop()),
+                if (controller.phase == StoryPhase.gated) _gateView(controller),
               ],
             ),
           ),
         );
       },
     );
+  }
+
+  /// Over the story while its gate keeps it out of the next conversation: the app's screen, or a plain notice.
+  Widget _gateView(StoryController controller) {
+    void leave() => Navigator.of(context).pop();
+    final builder = widget.setup.gateBuilder;
+    if (builder != null) {
+      return builder(
+        context,
+        StoryGateRequest(
+          conversation: controller.closedConversation!,
+          reopen: controller.canReopen ? controller.reopen : null,
+          leave: leave,
+        ),
+      );
+    }
+    final strings = StoryLanguage.of(context).strings;
+    return EndingView(title: strings.storyClosed, backLabel: strings.back, onTitle: leave);
   }
 }
 

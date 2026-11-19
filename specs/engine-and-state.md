@@ -262,6 +262,12 @@ The engine remembers the last 100 delivered items with the full playthrough stat
 
 `start(checkpoint: ..., replay: true)` plays one chapter from an unlocked checkpoint with its saved variables. The replay ends with `EndOfStoryException` when the story enters a conversation with a different `chapter` (conversations without a `chapter`, like shared subroutines, don't end it). The UI does not autosave or offer saving during a replay.
 
+### 8.1 Story gate
+
+`RealFsseEngine.gate` (a `StoryGate`, `FutureOr<bool> Function(Conversation)`) is asked before the story enters any conversation: at `start` (fresh, save or checkpoint), on every jump, call and return in `next`, and on a developer `jumpTo`. False throws `StoryGateException` before anything changes for the new conversation, so it's never current and its checkpoint isn't unlocked. A story that sells part of itself decides there, by chapter or key, and the engine never knows about a store. A replay's chapter check comes first, so a replay ends as usual at the chapter's edge.
+
+The move that hit the gate may already have applied its effects and moved the pointer, so play doesn't go on with another `next`. It goes on from a save or a fresh `start`. In `cerita_flutter`, `StorySetup.gate` and `StorySetup.gateBuilder` set it up: `StoryController` stops in `StoryPhase.gated` without saving, and `StoryScreen` shows the app's screen (or a plain notice) over the story. `StoryController.reopen` plays on from the last autosave, or repeats the start it was asked for, so a choice that led to the gate is asked again. A replay saves nothing, so a gate inside one can only be left.
+
 ---
 
 ## 9. Localization

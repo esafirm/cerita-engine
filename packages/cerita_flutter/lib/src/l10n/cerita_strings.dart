@@ -137,6 +137,9 @@ abstract class CeritaStrings {
   String get replayChapter;
   String get endOfReplay;
 
+  /// Shown when the story reaches a part the app keeps closed and gives no screen of its own for it.
+  String get storyClosed;
+
   /// Screen-reader label of the marker on choices unlocked by past runs.
   String get memoryMarker;
 
@@ -407,6 +410,8 @@ class EnglishCeritaStrings extends CeritaStrings {
   @override
   String get endOfReplay => "End of replay";
   @override
+  String get storyClosed => "This part of the story isn't available";
+  @override
   String get memoryMarker => "Unlocked by a past run";
   @override
   String get developer => "Developer";
@@ -663,6 +668,8 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String get replayChapter => "Mainkan ulang bab ini";
   @override
   String get endOfReplay => "Akhir putar ulang";
+  @override
+  String get storyClosed => "Bagian cerita ini belum tersedia";
   @override
   String get memoryMarker => "Terbuka dari permainan sebelumnya";
   @override
