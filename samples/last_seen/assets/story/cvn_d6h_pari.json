@@ -1,0 +1,120 @@
+{
+  "conversation_id": "cvn_d6h_pari",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Pulau Pari",
+    "en": "Pulau Pari"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "17:50",
+    "background": "bg_pari_jetty_dusk.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kita nyampe pas badainya udah lewat. Langit robek-robek, dan di sela-selanya ada garis oranye yang rendah banget, kayak ada yang lupa matiin lampu.",
+        "en": "We arrive just as the storm passes. The sky is torn to pieces, and between the pieces there's a low orange band, like someone forgot to switch off a light."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dermaga kayu. Bakau di kiri. Kapal biru-putih diiket di ujung. Gue udah pernah lihat tempat ini. Di layar HP Sekar, jam lima kurang dua.",
+        "en": "A wooden jetty. Mangroves on the left. A blue and white boat tied at the end. I've seen this place before. On Sekar's screen, at two minutes to five."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Polisi belum dateng. Speedboat Bentang belum dateng. Cuma ada satu lampu, digantung di tiang ujung dermaga.",
+        "en": "The police haven't come. Bentang's speedboat hasn't come. There's only one lamp, hanging from a post at the end of the jetty."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "raka",
+          "transition": "fade",
+          "duration_ms": 800
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di bawah lampu itu ada orang berdiri. Rambutnya setengah diiket. Jaket hijau tentara yang kegedean. Headphone di leher.",
+        "en": "Someone is standing under that lamp. Hair tied half up. An oversized army-green jacket. Headphones round her neck."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 700
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Klik. Klik.{w} Gue aman. Lanjut rekam.",
+        "en": "Click. Click.{w} I'm okay. Keep rolling."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Setahun telat. Satu dermaga jauhnya.{w} Gue mulai jalan.",
+        "en": "A year late. One jetty away.{w} I start walking."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "reached_pari",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d7_stub"
+    }
+  ]
+}

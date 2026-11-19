@@ -1,0 +1,298 @@
+{
+  "conversation_id": "cvn_d5h_hendra",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Malam Senin",
+    "en": "Monday Night"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "12:40",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sri Rejeki masuk dermaga jam satu kurang dua puluh. Mesinnya batuk dua kali sebelum mati. Orang-orang BPM udah pergi.",
+        "en": "The Sri Rejeki comes in at twenty to one. Its engine coughs twice before it dies. The BPM men are gone."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "hendra:1",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Yanti nelpon saya. Kamu ke rumah abang saya.",
+        "en": "Yanti called me. You went to my brother's house."
+      },
+      "profile": "hendra:1",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Karta yang nunjukin bukunya.",
+        "en": "Pak Karta showed me the book himself."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Abang saya sakit. Dia nggak ngerti apa yang dia tunjukin.",
+        "en": "My brother is sick. He doesn't understand what he's showing."
+      },
+      "profile": "hendra:2"
+    },
+    {
+      "type": "CHOICE",
+      "id": "where_sekar",
+      "source": "clues",
+      "text": {
+        "id": "\"Terus kamu mau apa?\" Tunjukkan kalau lo udah tahu ke mana dia.",
+        "en": "\"So what do you want?\" Show him you already know where she went."
+      },
+      "variable": "WHERE_SEKAR",
+      "profile": "hendra:2",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "crossing_log",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 3
+            }
+          ],
+          "target": "#hendra_tells"
+        },
+        {
+          "clue": "sunrise_photo",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 3
+            }
+          ],
+          "target": "#hendra_tells"
+        }
+      ],
+      "retry": {
+        "effects": [
+          {
+            "variable": "trust_hendra",
+            "op": "subtract",
+            "value": 1
+          }
+        ],
+        "target": "#where_retry"
+      },
+      "fallback": {
+        "effects": [
+          {
+            "variable": "trust_hendra",
+            "op": "subtract",
+            "value": 2
+          }
+        ],
+        "target": "#hendra_refuses"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "where_retry",
+      "text": {
+        "id": "Itu nggak ngejawab apa-apa.",
+        "en": "That doesn't answer anything."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "JUMP",
+      "target": "#where_sekar"
+    },
+    {
+      "type": "TEXT",
+      "id": "hendra_refuses",
+      "text": {
+        "id": "Saya nggak punya urusan sama kamu. Pulang.",
+        "en": "I've got no business with you. Go home."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia naik lagi ke kapalnya dan mulai ngegulung tali, punggungnya ke gue. Gue nunggu sepuluh menit. Punggungnya nggak pernah balik.",
+        "en": "He climbs back onto his boat and starts coiling rope, his back to me. I wait ten minutes. His back never turns."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hendra_refused",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d5h_yusuf"
+    },
+    {
+      "type": "NARRATION",
+      "id": "hendra_tells",
+      "text": {
+        "id": "Pak Hendra ngelihat layar HP gue lama. Terus dia duduk di ember terbaliknya, kayak orang yang akhirnya naruh barang berat.",
+        "en": "Pak Hendra looks at my screen for a long time. Then he sits on his upturned bucket, like a man finally setting down something heavy."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin malem dia dateng jam sepuluh kurang. Bawa tas sama alat rekamnya. Ada satu orang lagi yang udah nunggu di kapal. Orang kantor.",
+        "en": "Monday night she came at a little before ten. With her bag and her recording gear. There was someone else already waiting on the boat. An office man."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_hendra >= 5",
+      "text": {
+        "id": "Pak Darmawan. Orang dinas lingkungan, yang dulu ngukur-ngukur laut buat izin itu. Dia nggak mau ngomong di darat. Katanya di darat banyak kuping.",
+        "en": "Pak Darmawan. From the city environment office, the one who did the sea surveys for that permit. He wouldn't talk on land. He said the land has too many ears."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "SET",
+      "condition": "trust_hendra >= 5",
+      "effects": [
+        {
+          "variable": "knows_source",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_hendra < 5",
+      "text": {
+        "id": "Namanya nggak usah kamu tahu. Dia nggak mau ngomong di darat. Katanya di darat banyak kuping.",
+        "en": "You don't need his name. He wouldn't talk on land. He said the land has too many ears."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya bawa mereka keluar, lewat patok. Satu jam dia ngomong ke alat rekam anak itu. Saya di buritan, nggak dengerin. Tapi saya denger.",
+        "en": "I took them out, past the stakes. He talked into her recorder for an hour. I was at the stern, not listening. But I heard."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pulangnya jam setengah sebelas, di dermaga ada dua orang pake senter. Kaosnya sama kayak yang tadi pagi nanya-nanya ke warung.",
+        "en": "We came back at half past ten, and there were two men on the pier with flashlights. The same shirts as the ones asking at the stall this morning."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Anak itu langsung matiin HP-nya. Dia bilang, \"Pak, HP bisa dicari.\" Saya nggak ngerti apa-apa soal HP. Saya cuma ngerti dia takut.",
+        "en": "She switched her phone off right away. She said, \"Sir, phones can be tracked.\" I don't know anything about phones. I just knew she was scared."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"HP bisa dicari.\" Bapak bilang itu ke saya tiga hari lalu.",
+        "en": "\"Phones can be tracked.\" You said that to me three days ago."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu kata dia. Saya cuma ngulang.",
+        "en": "Those were her words. I was only repeating them."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya tahan kapal di tengah sampai orang-orang itu pergi. Subuh, saya bawa dia ke Pari. Ke rumah sepupu saya. Dia aman. Dia nggak mau pulang sebelum rekamannya aman.",
+        "en": "I kept the boat out until those men left. At dawn, I took her to Pari. To my cousin's house. She's safe. She won't come back until the recording is safe."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Foto kemarin subuh itu, dia yang minta saya kirim. Dan telepon tanpa suara itu. Dia bilang, \"Raka bakal ngerti.\"",
+        "en": "That photo yesterday at dawn, she asked me to send it. And the call with no voice. She said, \"Raka will understand.\""
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue ngerti.",
+        "en": "I understood."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hendra_told",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d5h_yusuf"
+    }
+  ]
+}

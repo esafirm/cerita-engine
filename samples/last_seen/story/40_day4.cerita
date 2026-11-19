@@ -644,20 +644,5 @@ narration [if DAWN_REPLY == 'quiet']
   id: Gue simpen fotonya dan nggak ngetik apa-apa. Kalau dia di sana, dia tahu gue nerima. Kalau bukan dia, gue nggak ngasih apa-apa.
   en: I save the photo and don't type anything. If it's her, she knows I got it. If it isn't, I've given them nothing.
 
--> d5_stub
+-> d5_morning
 
-
-# Day 5: Retak. M3 placeholder until the routes are written, which replaces this stub and its ending.
-
-@conversation d5_stub chapter="Hari 5" chapter.en="Day 5" title="Retak" title.en="Cracks" checkpoint
-@scene VN bg=bg_sekar_living_day.webp music=bgm_quiet_house.mp3 day=5 time=07:00
-
-narration
-  id: Hari 5 belum ditulis. Ceritanya berlanjut di versi berikutnya.
-  en: Day 5 isn't written yet. The story continues in the next build.
-
-ending end_00_preview NORMAL
-  id: Bersambung
-  en: To Be Continued
-  summary id: Raka tahu siapa yang mengantar Sekar dan siapa yang mengancamnya. Jam lima pagi, seseorang mengirim foto dermaga yang bukan Muara Angke.
-  summary en: Raka knows who drove Sekar and who threatened her. At five in the morning, someone sent a photo of a jetty that isn't Muara Angke.

@@ -164,7 +164,7 @@ Seen puts the gate on the title screen's logo.
   | Policy | Choices | Evidence |
   | :--- | :--- | :--- |
   | `defaults` | A timed choice's timeout option, else the first | The first response |
-  | `defaultsLast` | A timed choice's timeout option, else the last | The last response |
+  | `defaultsLast` | A timed choice's timeout option, else the last | The first response |
   | `first` | The first option | The first response |
   | `last` | The last option | The last response |
 

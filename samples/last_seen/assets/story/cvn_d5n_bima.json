@@ -1,0 +1,308 @@
+{
+  "conversation_id": "cvn_d5n_bima",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Orang Dekatnya",
+    "en": "Someone Close to Her"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "18:40",
+    "background": "bg_sekar_house_gate_night.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bima dateng pas magrib. Tanpa martabak kali ini. Mobil peraknya diparkir di mulut gang, jauh, kayak dia nggak mau mobilnya kelihatan di depan rumah ini.",
+        "en": "Bima comes at sunset. No martabak this time. He parks his silver car at the mouth of the alley, far away, as if he doesn't want it seen outside this house."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "center"
+        },
+        {
+          "action": "show",
+          "profile": "bima:0",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_leak_planted == true",
+      "text": {
+        "id": "Gue bilang mau ngomong yang bener. Jadi gue di sini.",
+        "en": "I said I'd tell you properly. So here I am."
+      },
+      "profile": "bima:4",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_leak_planted != true",
+      "text": {
+        "id": "Tasya bilang lo mau ketemu. Gue nggak punya banyak waktu, Ka.",
+        "en": "Tasya said you wanted to meet. I don't have much time, Ka."
+      },
+      "profile": "bima:2",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Seseorang ngasih tahu Bentang kalau Kak Sekar punya dokumen itu. Sebelum dia ngilang. Sebelum ada yang ngancem.",
+        "en": "Someone told Bentang that Sekar had those documents. Before she disappeared. Before anyone threatened anyone."
+      },
+      "profile": "dinda:3",
+      "position": "center"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Didit bilang ke Tasya, dia udah denger dari orang dekatnya. Jadi sekarang kita mau tahu siapa.",
+        "en": "Didit told Tasya he'd already heard from someone close to her. So now we want to know who."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "CHOICE",
+      "id": "who_leaked",
+      "source": "clues",
+      "text": {
+        "id": "Siapa yang ngasih tahu Bentang? Tunjukkan buktinya.",
+        "en": "Who told Bentang? Show the proof."
+      },
+      "variable": "WHO_LEAKED",
+      "profile": "raka:6",
+      "responses": [
+        {
+          "clue": "didit_card",
+          "effects": [
+            {
+              "variable": "trust_bima",
+              "op": "add",
+              "value": 2
+            }
+          ],
+          "target": "#leak_bima"
+        },
+        {
+          "clue": "bima_deleted",
+          "effects": [
+            {
+              "variable": "trust_bima",
+              "op": "add",
+              "value": 1
+            }
+          ],
+          "target": "#leak_bima"
+        },
+        {
+          "clue": "tasya_warning",
+          "target": "#leak_tasya"
+        },
+        {
+          "clue": "notebook_page",
+          "target": "#leak_tasya"
+        },
+        {
+          "clue": "sekar_notebook",
+          "target": "#leak_tasya"
+        }
+      ],
+      "fallback": {
+        "target": "#leak_vague"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "leak_bima",
+      "condition": "WHO_LEAKED == 'didit_card'",
+      "text": {
+        "id": "\"Nomor ini saya dapat dari Mas Bima.\" Kartu namanya Didit, Bim. Lo kenal dia. Lo ngasih dia nomor HP Sekar.",
+        "en": "\"I got this number from Bima.\" That's Didit's card, Bim. You know him. You gave him Sekar's number."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "condition": "WHO_LEAKED == 'bima_deleted'",
+      "text": {
+        "id": "Lo hapus pesan jam delapan empat puluh karena kantor lo nyuruh jauhin Sekar. Kenapa kantor konsultan peduli sama podcaster, Bim?",
+        "en": "You deleted that message at eight forty because your office told you to stay away from Sekar. Why would a consulting firm care about a podcaster, Bim?"
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bima nyender ke pagar. Jam tangannya yang mahal kena lampu jalan, dan untuk pertama kalinya kelihatan kayak barang yang kebesaran buat tangannya.",
+        "en": "Bima leans against the gate. His expensive watch catches the streetlight, and for the first time it looks too big for his wrist."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue cerita ke bos gue. Pak Rudy. Tiga minggu lalu. Gue bilang Sekar lagi bikin episode soal izin reklamasi, dan dia pegang AMDAL yang asli.",
+        "en": "I told my boss. Pak Rudy. Three weeks ago. I said Sekar was making an episode about the reclamation permit, and that she had the real environmental review."
+      },
+      "profile": "bima:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue pikir kalau kantor tahu, mereka bakal bilang ke klien buat hati-hati, buat beresin izinnya. Gue pikir itu bakal ngelindungin dia.",
+        "en": "I thought if the office knew, they'd tell the client to be careful, to fix the permit. I thought it would protect her."
+      },
+      "profile": "bima:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Malemnya Pak Rudy email Didit. Gue di-CC. Gue baca, dan gue tahu gue udah ngelakuin sesuatu yang nggak bisa dibalikin.",
+        "en": "That night Pak Rudy emailed Didit. He copied me in. I read it, and I knew I'd done something I couldn't undo."
+      },
+      "profile": "bima:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngeluarin HP-nya, ngetik sesuatu, dan HP gue geter. Email. Diteruskan.",
+        "en": "He takes out his phone, types something, and my phone buzzes. An email. Forwarded."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_bima_email.webp",
+      "caption": {
+        "id": "\"Pak Didit, info dari Bima (tim kami): Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak.\"",
+        "en": "\"Pak Didit, info from Bima (on our team): Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely.\""
+      },
+      "unlock_id": "photo_bima_email"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "clue_bima_email",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "knows_bima_email",
+          "op": "meta_set"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Ditangani dengan bijak.\"",
+        "en": "\"Handle it wisely.\""
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin sore Sekar nanya ke gue jadwal kapal ke Pulau Pari. Gue kira buat liputan. Gue nggak nanya. Gue nggak pernah nanya apa-apa ke dia.",
+        "en": "Monday afternoon Sekar asked me about the ferry times to Pulau Pari. I thought it was for a story. I didn't ask. I never asked her anything."
+      },
+      "profile": "bima:4"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "bima_confessed",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d5n_night"
+    },
+    {
+      "type": "BRANCH",
+      "id": "leak_tasya",
+      "branches": [
+        {
+          "condition": "trust_dinda >= 10 && dinda_stopped_wrong != true",
+          "target": "#dinda_stops"
+        }
+      ],
+      "fallback_target": "d5n_wrong_name"
+    },
+    {
+      "type": "TEXT",
+      "id": "dinda_stops",
+      "text": {
+        "id": "Bukan Tasya, Ka. Halaman itu bilang dia bukan jahat. Dan Didit sendiri yang bilang ke Tasya dia udah denger dari orang lain.",
+        "en": "It isn't Tasya, Ka. That page says she isn't bad. And Didit told Tasya himself that he'd already heard from someone else."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "dinda_stopped_wrong",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "trust_dinda",
+          "op": "subtract",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#who_leaked"
+    },
+    {
+      "type": "TEXT",
+      "id": "leak_vague",
+      "text": {
+        "id": "Itu nggak ngebuktiin apa-apa, Ka. Gue capek dicurigain.",
+        "en": "That doesn't prove anything, Ka. I'm tired of being suspected."
+      },
+      "profile": "bima:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia balik ke mobilnya. Lampu belakangnya merah, terus belok, terus hilang. Kayak semua orang di cerita ini.",
+        "en": "He walks back to his car. Its tail lights are red, then they turn, then they're gone. Like everyone in this story."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d5n_night"
+    }
+  ]
+}

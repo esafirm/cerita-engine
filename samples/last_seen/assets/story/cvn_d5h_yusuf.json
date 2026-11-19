@@ -1,0 +1,105 @@
+{
+  "conversation_id": "cvn_d5h_yusuf",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Laporan",
+    "en": "The Report"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_yusuf",
+    "day": 5,
+    "time": "15:10",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Itu Ipda Yusuf. Dia nggak bakal nelpon siang-siang kalau nggak ada apa-apa.",
+      "en": "It's Inspector Yusuf. He wouldn't call in the middle of the afternoon for nothing."
+    }
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Ada perkembangan, dan saya rasa Anda harus dengar dari saya duluan.",
+        "en": "Mr. Raka. There's been a development, and I think you should hear it from me first."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "PT Bentang Pesisir Makmur melapor tadi siang. Mereka bilang seorang nelayan, Hendra, diduga membawa Mbak Sekar pergi. Ada saksi yang melihat Mbak Sekar naik kapalnya.",
+        "en": "PT Bentang Pesisir Makmur filed a report at noon. They say a fisherman, Hendra, is suspected of taking Ms. Sekar away. They have a witness who saw her board his boat."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Besok pagi ada tim ke Pulau Pari. Polisi, dan \"pengamanan\" dari pihak pelapor. Itu bukan prosedur yang saya suka.",
+        "en": "Tomorrow morning a team goes to Pulau Pari. Police, and \"security\" from the complainant's side. That isn't a procedure I like."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_knows_didit == true",
+      "text": {
+        "id": "Saya sudah minta masuk tim. Setelah rekaman ancaman yang Anda laporkan, saya bisa menahan keberangkatannya sampai siang. Tidak lebih.",
+        "en": "I've asked to be on the team. After the threat you reported, I can hold the departure until noon. No later."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_knows_didit != true",
+      "text": {
+        "id": "Saya tidak bisa menahan apa-apa, Mas. Saran saya, jauhi Pulau Pari. Jangan sampai Anda ikut terseret.",
+        "en": "I can't hold anything back. My advice is to stay away from Pulau Pari. Don't get yourself dragged into this."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_knows_boat == true",
+      "text": {
+        "id": "Satu lagi. Nama kapal itu saya catat tiga hari lalu, dari Anda. Sekarang orang Bentang tahu nama itu sama baiknya dengan saya. Saya tidak tahu dari mana.",
+        "en": "One more thing. I wrote that boat's name down three days ago, from you. Now Bentang knows it as well as I do. I don't know how."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d5_yusuf_06.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "pari_raid",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d5h_night"
+    }
+  ]
+}

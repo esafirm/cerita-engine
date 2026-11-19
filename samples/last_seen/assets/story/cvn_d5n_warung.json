@@ -1,0 +1,195 @@
+{
+  "conversation_id": "cvn_d5n_warung",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Orang-Orang",
+    "en": "The People"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "10:15",
+    "background": "bg_warung_day.webp",
+    "music": "bgm_quiet_house.mp3",
+    "ambience": "amb_kampung_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "center"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tasya dateng ke warung Bu Sari jam sepuluh lewat, bawa es kopi literan yang udah berembun. Rambutnya diiket asal. Matanya bengkak, tapi lipstiknya rapi.",
+        "en": "Tasya arrives at Bu Sari's stall just after ten, carrying a giant iced coffee already beaded with water. Her hair is tied up any old way. Her eyes are puffy, but her lipstick is perfect."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "tasya:2",
+          "position": "right",
+          "transition": "slide_left",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_tasya >= 0",
+      "text": {
+        "id": "Hai. Sori telat. Gue muter tiga kali di gang, nggak berani masuk.",
+        "en": "Hi. Sorry I'm late. I circled the alley three times, too scared to come in."
+      },
+      "profile": "tasya:2",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_tasya < 0",
+      "text": {
+        "id": "Gue dateng karena Dinda yang minta. Bukan karena lo.",
+        "en": "I came because Dinda asked. Not because of you."
+      },
+      "profile": "tasya:3",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Duduk, Kak. Bu Sari udah bikinin teh.",
+        "en": "Sit down. Bu Sari made you tea."
+      },
+      "profile": "dinda:0",
+      "position": "center"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tasya duduk di ujung bangku plastik, jauh dari gue. Es kopinya nggak diminum, cuma diputer-puter.",
+        "en": "Tasya sits at the very end of the plastic bench, far from me. She doesn't drink her iced coffee, just turns it round and round."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue belum cerita semuanya. Waktu orang PR itu nelpon, dia nggak cuma nawarin duit.",
+        "en": "I haven't told you everything. When that PR guy called, he didn't just offer money."
+      },
+      "profile": "tasya:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia nanya, \"Selain Mbak Sekar, siapa lagi yang tahu soal dokumennya?\" Kayak... dia udah tahu ada dokumen. Gue bahkan belum tahu waktu itu.",
+        "en": "He asked, \"Apart from Ms. Sekar, who else knows about the documents?\" Like... he already knew there were documents. I didn't even know yet."
+      },
+      "profile": "tasya:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Terus dia bilang, \"Kami sudah dengar dari orang dekatnya.\" Gue kira maksudnya gue. Biar gue ngerasa bersalah. Dan berhasil.",
+        "en": "Then he said, \"We've already heard from someone close to her.\" I thought he meant me. To make me feel guilty. And it worked."
+      },
+      "profile": "tasya:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Orang dekatnya.",
+        "en": "Someone close to her."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "clue_notebook_page == true",
+      "text": {
+        "id": "Halaman yang disobek ada di HP Sekar. \"Dia bukan jahat, dia butuh uang.\"",
+        "en": "The torn-out page is on Sekar's phone. \"She isn't bad, she needs the money.\""
+      },
+      "variable": "SHOW_PAGE",
+      "profile": "tasya:4",
+      "choices": [
+        {
+          "text": {
+            "id": "(Tunjukin halamannya ke Tasya.)",
+            "en": "(Show Tasya the page.)"
+          },
+          "value": "show",
+          "effects": [
+            {
+              "variable": "trust_tasya",
+              "op": "add",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Simpen dulu.)",
+            "en": "(Keep it for now.)"
+          },
+          "value": "keep",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "SHOW_PAGE == 'show'",
+      "text": {
+        "id": "Tasya baca sekali. Terus nutup mulutnya pake tangan, dan nangis tanpa suara, kayak orang yang udah latihan nangis tanpa ketahuan.",
+        "en": "Tasya reads it once. Then she covers her mouth with her hand and cries without a sound, like someone who has practiced crying without being caught."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "SHOW_PAGE == 'show'",
+      "text": {
+        "id": "Dia masih belain gue. Waktu gue nggak bales chatnya. Dia masih belain gue.",
+        "en": "She was still defending me. When I wasn't answering her messages. She was still defending me."
+      },
+      "profile": "tasya:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "SHOW_PAGE == 'show'",
+      "text": {
+        "id": "Itu Kak Sekar banget.",
+        "en": "That's so Sekar."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Satu lagi. mpus, yang di grup, dia anak IT. Dia DM gue semalem. Katanya dia ngecek nomor yang ngancem kalian.",
+        "en": "One more thing. mpus, from the group, works in IT. He DMed me last night. He says he looked up the number that threatened you."
+      },
+      "profile": "tasya:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "d5n_mpus"
+    }
+  ]
+}

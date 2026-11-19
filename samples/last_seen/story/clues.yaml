@@ -116,3 +116,26 @@ clues:
       en: 'From an unknown number, 4:58 AM, "still there." A wooden jetty and a blue and white boat like Sekar''s wallpaper, but with mangroves at the edge. Not Muara Angke.'
     image: photo_sunrise_pier.webp
     chapter: { id: Hari 4, en: Day 4 }
+  crossing_log:
+    title: { id: Buku log Sri Rejeki, en: The Sri Rejeki's logbook }
+    description:
+      id: Buku log kapal Pak Karta, ditulis Pak Hendra. Selasa 05.30, ke Pari, 1 orang (S.). Senin malam nggak dicatat.
+      en: Pak Karta's logbook, kept by Pak Hendra. Tuesday 5:30 AM, to Pari, 1 person (S.). Monday night isn't in it.
+    image: photo_crossing_log.webp
+    key: true
+    chapter: { id: Hari 5, en: Day 5 }
+  burner_profile:
+    title: { id: Foto profil nomor ancaman, en: The threat number's profile photo }
+    description:
+      id: 'Dari mpus. Foto profil nomor yang ngancem, yang udah dihapus tapi ke-cache. Didit, di depan spanduk "BPM GOLF DAY".'
+      en: 'From mpus. The threat number''s deleted profile photo, still cached. Didit, in front of a "BPM GOLF DAY" banner.'
+    image: photo_burner_profile.webp
+    chapter: { id: Hari 5, en: Day 5 }
+  bima_email:
+    title: { id: Email Pak Rudy, en: Pak Rudy's email }
+    description:
+      id: 'Bos Bima ke Didit, Bima di-CC: "Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak." Bocorannya dari Bima.'
+      en: 'Bima''s boss to Didit, Bima copied in: "Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely." The leak was Bima.'
+    image: photo_bima_email.webp
+    key: true
+    chapter: { id: Hari 5, en: Day 5 }

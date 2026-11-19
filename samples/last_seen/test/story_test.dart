@@ -13,15 +13,19 @@ const _timeout = "<timeout>";
 Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
   final engine = RealFsseEngine(AssetEngineLoader(const LoaderConfig()))..locale = locale;
   final inputs = [...run.inputs];
+  // "a|b" answers an evidence question asked twice: a, then b.
+  final asked = <String, int>{};
   ItemResult? result;
-  for (var step = 0; step < 2000; step++) {
+  for (var step = 0; step < 4000; step++) {
     final item = await engine.next(prevResult: result);
     result = null;
     switch (item) {
       case EndingItemType():
         return (item, engine);
       case EvidenceItemType():
-        final clue = engine.clues.byId(run.picks[item.variable]!);
+        final answers = run.picks[item.variable]!.split("|");
+        final times = asked.update(item.variable!, (n) => n + 1, ifAbsent: () => 0);
+        final clue = engine.clues.byId(answers[times.clamp(0, answers.length - 1)]);
         expect(clue, isNotNull, reason: "no clue '${run.picks[item.variable]}'");
         result = ItemResult.present(item, clue!);
       case ChoiceItemType():
@@ -83,6 +87,11 @@ const _Run _kind = (
     "ROUTE_LEAN": "harbor",
     "DAWN_REPLY": "ask",
     "REPORT_DIDIT": "recording",
+    "WATCH_MEN": "watch",
+    "TALK_KARTA": "sorry",
+    "WHERE_SEKAR": "crossing_log",
+    "LEAVE_PHONE": "leave",
+    "CROSS_NOW": "wait",
   },
   inputs: ["0530", "karta0530", "1427"],
 );
@@ -136,6 +145,10 @@ const _Run _timeouts = (
     "HANDOVER": _timeout,
     "WHO_PICKED": "cctv_still",
     "BIMA_PUSH": _timeout,
+    "WHERE_SEKAR": "unsent_message",
+    "LEAVE_PHONE": "take",
+    "CROSS_NOW": _timeout,
+    "THROW_PHONE": _timeout,
   },
   inputs: ["0530", "Karta0530", "1427"],
 );
@@ -152,9 +165,27 @@ final _Run _wary = (
     "ROUTE_LEAN": "network",
     "DAWN_REPLY": "quiet",
     "REPORT_DIDIT": "keep",
+    "WHO_LEAKED": "tasya_warning",
   },
   inputs: _cold.inputs,
 );
+
+/// The kind run on the Network route: Dinda stops a wrong accusation once, Bima confesses, Yusuf hears Didit, and
+/// they wait for the first ferry.
+final _Run _network = (
+  picks: {
+    ..._kind.picks,
+    "ROUTE_LEAN": "network",
+    "SHOW_PAGE": "show",
+    "WHO_LEAKED": "tasya_warning|didit_card",
+    "DIDIT_DEAL": "yusuf",
+    "CROSS_NOW": "wait",
+  },
+  inputs: _kind.inputs,
+);
+
+/// The kind run, except Raka takes the speedboat into the storm.
+final _Run _reckless = (picks: {..._kind.picks, "CROSS_NOW": "now"}, inputs: _kind.inputs);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -194,7 +225,6 @@ void main() {
       // Day 3: the CCTV comes from Yusuf, Hendra warns Raka, and the threat makes Didit slip.
       expect(engine.dataMap["heard_of_didit"], isTrue);
       expect(engine.dataMap["hull_tries"], isNull);
-      expect(engine.dataMap["trust_hendra"], 5);
       expect(engine.dataMap["hendra_warned"], isTrue);
       expect(engine.dataMap["yusuf_knows_boat"], isNull);
       expect(engine.dataMap["didit_slipped"], isTrue);
@@ -204,8 +234,9 @@ void main() {
       expect(engine.dataMap["told_dinda_truth"], isTrue);
       expect(engine.dataMap["threat_screenshot"], isTrue);
       // Day 1: worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3.
-      // Day 2: the screenshot 4, staying quiet in the group 1. Day 4: naming Bima on the timeline 2.
-      expect(engine.dataMap["trust_dinda"], 37);
+      // Day 2: the screenshot 4, staying quiet in the group 1. Day 4: naming Bima on the timeline 2. Day 5: leaving
+      // her the phone 2.
+      expect(engine.dataMap["trust_dinda"], 39);
       expect(engine.dataMap["dash_tries"], isNull, reason: "the dashboard on the first try");
       expect(engine.dataMap["tasya_admitted"], isTrue);
       expect(engine.dataMap["trust_tasya"], 7);
@@ -266,16 +297,50 @@ void main() {
       expect(engine.dataMap["BIMA_PHONE"], "silent");
       // Day 3: the handover timer runs out, which only stalls Didit.
       expect(engine.dataMap["HANDOVER"], "ignore");
-      // the ferry schedule 4, telling Yusuf about the boat -2
-      expect(engine.dataMap["trust_hendra"], 2);
+      // Day 3: the ferry schedule 4, telling Yusuf about the boat -2. Day 5: sorry 2, a wrong answer -1, then -2.
+      expect(engine.dataMap["trust_hendra"], 1);
       expect(engine.dataMap["yusuf_knows_boat"], isTrue);
       expect(engine.dataMap["BIMA_PUSH"], "listen", reason: "silence lets Bima talk");
+      // Day 5: a wrong answer twice and Hendra refuses. Day 6: the lull, and the phone over the side on the timer.
+      expect(engine.dataMap["hendra_refused"], isTrue);
+      expect(engine.dataMap["hendra_told"], isNull);
+      expect(engine.dataMap["CROSS_NOW"], "sit");
+      expect(engine.dataMap["THROW_PHONE"], "throw");
+      expect(engine.dataMap["phone_lost"], isTrue);
+      expect(engine.dataMap["reached_pari"], isTrue);
       expect(engine.dataMap["heard_silent_call"], isTrue);
     });
 
-    test('wary run ($locale): Dinda finds the hidden threat, Bima hangs up, Didit unrecorded', () async {
-      final (ending, engine) = await _play(locale, _wary);
+    test('network run ($locale): Dinda stops a wrong name, Bima confesses, the first ferry', () async {
+      final (ending, engine) = await _play(locale, _network);
       expect(ending.endingId, "end_00_preview");
+      expect(engine.dataMap["route"], "network");
+      expect(engine.dataMap["dinda_stopped_wrong"], isTrue);
+      expect(engine.dataMap["clue_burner_profile"], isTrue);
+      expect(engine.dataMap["clue_bima_email"], isTrue);
+      expect(engine.meta.rememberedFacts, contains("knows_bima_email"));
+      expect(engine.dataMap["bima_confessed"], isTrue);
+      expect(engine.dataMap["yusuf_heard_didit"], isTrue);
+      expect(engine.dataMap["on_first_ferry"], isTrue);
+      // Through Day 4 as the kind run, 37. Day 5: Dinda arguing -2.
+      expect(engine.dataMap["trust_dinda"], 35);
+      // Day 2: warm 2, the right clue 5. Day 5: the notebook page 4. Day 6: waiting together 2.
+      expect(engine.dataMap["trust_tasya"], 13);
+      // Day 4: letting him talk 3. Day 5: Didit's card 2.
+      expect(engine.dataMap["trust_bima"], 5);
+    });
+
+    test('reckless run ($locale): the speedboat into the storm', () async {
+      final (ending, engine) = await _play(locale, _reckless);
+      expect(ending.endingId, "end_09_the_storm");
+      expect(engine.dataMap["reached_pari"], isNull);
+    });
+
+    test('wary run ($locale): Dinda finds the hidden threat, Bima hangs up, Raka names Tasya', () async {
+      final (ending, engine) = await _play(locale, _wary);
+      expect(ending.endingId, "end_08_wrong_name", reason: "with Dinda's trust gone, nobody stops Raka naming Tasya");
+      expect(engine.dataMap["route"], "network");
+      expect(engine.dataMap["dinda_stopped_wrong"], isNull);
       expect(engine.dataMap["dinda_found_threat"], isTrue);
       expect(engine.dataMap["heard_unsent_01"], isTrue, reason: "the voice note is replayed on Day 4");
       expect(engine.dataMap["WHO_PICKED"], isNotNull);

@@ -118,6 +118,13 @@
       "note": { "id": "Motor kurir", "en": "Courier's motorbike" }
     },
     {
+      "title": "Storm and thunder",
+      "author": "Made for Last Seen with ffmpeg, from filtered noise",
+      "source": "samples/last_seen/assets/story/music",
+      "license": "CC0 1.0",
+      "note": { "id": "Badai", "en": "The storm" }
+    },
+    {
       "title": "DotGothic16",
       "author": "The DotGothic16 Project Authors (Fontworks)",
       "source": "github.com/fontworks-fonts/DotGothic16",

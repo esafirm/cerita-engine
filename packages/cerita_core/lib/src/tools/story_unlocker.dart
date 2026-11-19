@@ -33,7 +33,8 @@ enum UnlockPolicy {
   /// A timed choice takes its timeout option, any other choice its first option, evidence its first response.
   defaults,
 
-  /// A timed choice takes its timeout option, any other choice its last option, evidence its last response.
+  /// A timed choice takes its timeout option, any other choice its last option, evidence its first response. It
+  /// reaches the routes behind last options without the wrong answers authors tend to list after the right one.
   defaultsLast,
 
   /// Every choice and evidence question takes its first option.
@@ -127,7 +128,7 @@ class StoryUnlocker {
     final last = policy == UnlockPolicy.last || policy == UnlockPolicy.defaultsLast;
     switch (item) {
       case EvidenceItemType(:final responses):
-        final ordered = last ? responses.reversed : responses;
+        final ordered = policy == UnlockPolicy.last ? responses.reversed : responses;
         for (final response in ordered) {
           final clue = engine.clues.byId(response.clue);
           if (clue != null) return ItemResult.present(item, clue);

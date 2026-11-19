@@ -1,0 +1,162 @@
+{
+  "conversation_id": "cvn_d6n_kali_adem",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Kali Adem",
+    "en": "Kali Adem"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "09:30",
+    "background": "bg_kali_adem_storm.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_storm.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "weather",
+          "name": "rain"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "tasya:2",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pelabuhan Kali Adem. Loket kapal penumpang ditutup pake rolling door. Kertas di depannya ditulis tangan. \"SEMUA KEBERANGKATAN DIBATALKAN.\"",
+        "en": "The Kali Adem ferry port. The ticket window is shut behind a roller door. The paper taped to it is handwritten. \"ALL DEPARTURES CANCELLED.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tasya dateng pake jas hujan plastik kebesaran, rambutnya basah, es kopinya udah jadi kopi biasa.",
+        "en": "Tasya shows up in an oversized plastic raincoat, her hair soaked, her iced coffee now just coffee."
+      }
+    },
+    {
+      "type": "STAGE",
+      "condition": "bima_confessed == true",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "bima:0",
+          "position": "far_right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Mobil kantor Bentang parkir di ujung. Dua orang, sama polisi. Mereka juga nunggu.",
+        "en": "Bentang's company car is parked at the far end. Two men, with the police. They're waiting too."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Didit nggak bakal nunggu sampai besok. Dia orang yang selalu punya jalan lain.",
+        "en": "Didit won't wait until tomorrow. He's the kind of man who always has another way."
+      },
+      "profile": "tasya:3"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_thunder.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 3
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Laki-laki pake jas hujan kuning nyamperin. Speedboat wisata, mesin dua, berani jalan sekarang. \"Tiga juta, Bang. Satu jam nyampe Pari. Sebelum mereka.\"",
+        "en": "A man in a yellow raincoat comes over. A tourist speedboat, two engines, he'll go now. \"Three million, man. Pari in an hour. Before them.\""
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Tasya megang lengan jas hujan lo.",
+        "en": "Tasya grips the sleeve of your raincoat."
+      },
+      "variable": "CROSS_NOW",
+      "profile": "tasya:2",
+      "timeout_ms": 10000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "Naik speedboat-nya. Sekarang.",
+            "en": "Take the speedboat. Now."
+          },
+          "value": "now"
+        },
+        {
+          "text": {
+            "id": "\"Kita nunggu kapal pertama. Bareng.\"",
+            "en": "\"We wait for the first ferry. Together.\""
+          },
+          "value": "wait",
+          "effects": [
+            {
+              "variable": "trust_tasya",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Diam. Lihat lautnya.)",
+            "en": "(Say nothing. Watch the sea.)"
+          },
+          "value": "sit",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "condition": "CROSS_NOW == 'now'",
+      "target": "d6_storm"
+    },
+    {
+      "type": "TEXT",
+      "condition": "CROSS_NOW == 'wait'",
+      "text": {
+        "id": "Oke. Bareng. Sekar bilang lo selalu kabur kalau berat. Ternyata lo bisa nunggu juga.",
+        "en": "Okay. Together. Sekar said you always run when things get heavy. Turns out you can wait too."
+      },
+      "profile": "tasya:1"
+    },
+    {
+      "type": "JUMP",
+      "target": "d6n_night"
+    }
+  ]
+}

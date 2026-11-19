@@ -137,3 +137,7 @@ private:
 dawn:
   name: "+62 857-1130-xxxx"
   avatar: assets/story/sprites/unknown_avatar.webp
+
+# Pak Karta speaks from his bed off stage (Day 5, Harbor route). No sprite.
+karta:
+  name: Pak Karta

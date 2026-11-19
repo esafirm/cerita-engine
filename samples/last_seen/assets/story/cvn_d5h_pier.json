@@ -1,0 +1,138 @@
+{
+  "conversation_id": "cvn_d5h_pier",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Kapal Pak Karta",
+    "en": "Pak Karta's Boat"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "08:40",
+    "background": "bg_pier_day.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tempat Sri Rejeki biasanya bersandar kosong. Cuma ban bekasnya yang ketinggalan, masih diiket ke tiang, ngambang sendirian.",
+        "en": "The Sri Rejeki's berth is empty. Only its old tire is left, still tied to the post, floating on its own."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di warung kopi, dua laki-laki pake kaos polo biru dongker lagi ngobrol sama bapak pemilik warung. Di dada kaosnya ada logo kecil. Ombak di bawah matahari terbit. \"BPM\".",
+        "en": "At the coffee stall, two men in navy polo shirts are talking to the owner. There's a small logo on their chests. A wave under a rising sun. \"BPM\"."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bentang Pesisir Makmur.",
+        "en": "Bentang Pesisir Makmur."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Mereka belum lihat lo.",
+        "en": "They haven't seen you yet."
+      },
+      "variable": "WATCH_MEN",
+      "profile": "raka:2",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Duduk di ujung bangku warung, pura-pura main HP, dengerin.",
+            "en": "Sit at the end of the stall's bench, pretend to look at your phone, listen."
+          },
+          "value": "watch",
+          "effects": [
+            {
+              "variable": "saw_bentang_men",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Pergi sebelum mereka nengok.",
+            "en": "Leave before they turn around."
+          },
+          "value": "leave"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "WATCH_MEN == 'watch'",
+      "text": {
+        "id": "\"Sri Rejeki baliknya jam berapa, Pak?\" tanya yang lebih tinggi. \"Senin malem minggu lalu, ada yang naik nggak? Cewek, pake headphone?\"",
+        "en": "\"What time does the Sri Rejeki come back?\" asks the taller one. \"Monday night last week, did anyone go out on it? A girl, with headphones?\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "WATCH_MEN == 'watch'",
+      "text": {
+        "id": "Bapak warung ngelap gelas lama banget. \"Kapal mah banyak, Pak. Cewek juga banyak.\"",
+        "en": "The stall owner takes a long time wiping a glass. \"Lots of boats, sir. Lots of girls too.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "WATCH_MEN == 'watch'",
+      "text": {
+        "id": "Yang pendek nengok ke gue. Lama. Bapak warung naruh kopi di depan gue tanpa gue pesen. \"Ponakan saya. Kerjanya main HP doang.\" Mereka ketawa. Gue juga, telat sedetik.",
+        "en": "The shorter one looks at me. A long look. The owner sets a coffee in front of me that I never ordered. \"My nephew. All he does is play on his phone.\" They laugh. So do I, a second too late."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "WATCH_MEN == 'leave'",
+      "text": {
+        "id": "Gue muter lewat belakang krat-krat ikan. Bau amisnya nempel lagi di baju. Kali ini gue bersyukur.",
+        "en": "I go the long way round, behind the fish crates. The smell gets into my clothes again. This time I'm grateful for it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "wulan_knows_karta == true",
+      "text": {
+        "id": "Tadi pagi Bu Wulan nyelipin kertas ke tangan gue di pintu. Bekas struk belanja. Di baliknya, tulisan tangannya. \"Pak Karta. Gg. Kerapu 3, Kamal Muara. Rumah cat kuning.\"",
+        "en": "This morning Mrs. Wulan slipped a piece of paper into my hand at the door. An old shopping receipt. On the back, in her handwriting. \"Pak Karta. Gg. Kerapu 3, Kamal Muara. Yellow house.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "wulan_knows_karta != true",
+      "text": {
+        "id": "Bu Rohmah, ibu pengupas kerang, ngasih tahu alamatnya sambil tetep ngupas. \"Kamal Muara. Gang Kerapu, yang catnya kuning. Bilang aja dari saya.\"",
+        "en": "Bu Rohmah, the mussel woman, gives me the address without stopping her shelling. \"Kamal Muara. Gang Kerapu, the yellow house. Tell them I sent you.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d5h_karta"
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "conversation_id": "cvn_d5h_karta",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Pak Karta",
+    "en": "Pak Karta"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "10:05",
+    "background": "bg_karta_house_day.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_kampung_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Yang buka pintu perempuan umur tiga puluhan, anaknya Pak Karta. Namanya Mbak Yanti. Dia ngelihat gue dari kepala sampai sepatu, terus minggir.",
+        "en": "The door is opened by a woman in her thirties, Pak Karta's daughter. Her name is Yanti. She looks me over from head to shoes, then steps aside."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pak Karta berbaring di dipan kayu deket jendela. Setengah mukanya turun, kayak lilin yang meleleh di satu sisi. Tangan kirinya diem di atas selimut batik. Tangan kanannya masih kuat, megangin pinggiran dipan.",
+        "en": "Pak Karta lies on a wooden bed by the window. Half his face has fallen, like a candle melted on one side. His left hand lies still on the batik blanket. His right hand is still strong, gripping the edge of the bed."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia ngelihat gue lama. Terus mulut yang setengah itu gerak.",
+        "en": "He looks at me for a long time. Then the half of his mouth that works begins to move."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Anak...{w=600} jam lima.",
+        "en": "The boy...{w=600} five o'clock."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Setahun. Orang yang cuma sekali denger cerita soal gue, masih inget gue sebagai orang yang nggak dateng.",
+        "en": "A year. A man who heard about me once still remembers me as the one who didn't show up."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Apa yang lo bilang?",
+        "en": "What do you say?"
+      },
+      "variable": "TALK_KARTA",
+      "profile": "raka:5",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Maaf saya nggak dateng, Pak. Waktu itu.\"",
+            "en": "\"I'm sorry I didn't come, sir. That day.\""
+          },
+          "value": "sorry",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Pak, saya nyari Sekar. Bapak tahu dia di mana?\"",
+            "en": "\"Sir, I'm looking for Sekar. Do you know where she is?\""
+          },
+          "value": "direct"
+        },
+        {
+          "text": {
+            "id": "(Duduk di bangku plastik. Nunggu dia ngomong.)",
+            "en": "(Sit on the plastic stool. Wait for him to speak.)"
+          },
+          "value": "wait",
+          "silent": true,
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "TALK_KARTA == 'sorry'",
+      "text": {
+        "id": "Dia...{w=500} nunggu kamu.{w=500} Terus...{w=500} tetep naik.{w=600} Anak itu...{w=400} keras kepala.",
+        "en": "She...{w=500} waited for you.{w=500} Then...{w=500} came aboard anyway.{w=600} That girl...{w=400} stubborn."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "condition": "TALK_KARTA == 'direct'",
+      "text": {
+        "id": "Jangan...{w=600} keras-keras.",
+        "en": "Not...{w=600} so loud."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TALK_KARTA == 'direct'",
+      "text": {
+        "id": "Matanya ngelirik ke pintu, ke jalan gang. Mbak Yanti nutup gordennya tanpa disuruh.",
+        "en": "His eyes flick to the door, to the alley. Yanti draws the curtain without being asked."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "TALK_KARTA == 'wait'",
+      "text": {
+        "id": "Gue duduk. Kipas angin muter. Di luar ada yang jualan sayur pake pengeras suara. Lima menit, mungkin lebih.",
+        "en": "I sit. The fan turns. Outside someone is selling vegetables through a loudspeaker. Five minutes, maybe more."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tangan kanannya terangkat, gemeteran, nunjuk ke jendela. Ke buku bersampul kain yang udah lusuh di kusennya.",
+        "en": "His right hand rises, trembling, and points at the window. At a worn cloth-bound book on the sill."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Hendra...{w=500} tulis di buku saya.{w=600} Biar saya...{w=500} tahu...{w=500} kapal saya ke mana.",
+        "en": "Hendra...{w=500} writes in my book.{w=600} So I...{w=500} know...{w=500} where my boat goes."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Buku log kapal. Halaman-halaman awalnya tulisan Pak Karta, miring dan rapi. Belakangan, tulisan lain, lebih tegas. Tanggal, jam, tujuan, jumlah orang.",
+        "en": "A boat's logbook. The early pages are in Pak Karta's hand, slanted and neat. Later, another hand, firmer. Date, time, destination, number of people."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Senin malem nggak ada catatan apa-apa. Apa pun yang terjadi di laut malam itu, Pak Hendra nggak nulisnya.",
+        "en": "Monday night has no entry at all. Whatever happened at sea that night, Pak Hendra didn't write it down."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Selasa. \"05.30. Pari. 1 org (S.).\" Digaris bawahi sekali.",
+        "en": "Tuesday. \"05:30. Pari. 1 person (S.).\" Underlined once."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "clue_crossing_log",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "knows_crossing_log",
+          "op": "meta_set"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pulau Pari. Jam setengah enam.",
+        "en": "Pulau Pari. Five thirty."
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jadwal di papan gabus Sekar. Dilingkarin dua kali. Bukan kapal penumpang. Kapal ini.",
+        "en": "The schedule on Sekar's corkboard. Circled twice. Not the passenger ferry. This boat."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan...{w=600} bawa orang...{w=500} ke pulau.",
+        "en": "Don't...{w=600} bring anyone...{w=500} to the island."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tangan kanannya megang pergelangan gue. Kuat, lebih kuat dari yang gue kira.",
+        "en": "His right hand grips my wrist. Strong, stronger than I expected."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kamu...{w=500} jangan telat...{w=500} lagi.",
+        "en": "Don't...{w=500} be late...{w=500} again."
+      },
+      "profile": "karta",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue motret halamannya dan naruh bukunya balik di kusen, persis di tempatnya. Mbak Yanti nganter gue sampai pintu. \"Om Hendra pulang siang,\" katanya. \"Jangan bikin dia marah. Dia lagi capek jagain banyak orang.\"",
+        "en": "I photograph the page and put the book back on the sill, exactly where it was. Yanti walks me to the door. \"Uncle Hendra comes back at noon,\" she says. \"Don't make him angry. He's tired of looking after so many people.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d5h_hendra"
+    }
+  ]
+}

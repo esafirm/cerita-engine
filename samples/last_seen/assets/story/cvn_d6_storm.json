@@ -1,0 +1,117 @@
+{
+  "conversation_id": "cvn_d6_storm",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Badai",
+    "en": "The Storm"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "13:00",
+    "background": "bg_sea_storm.webp",
+    "music": "bgm_tense_call.mp3",
+    "ambience": "amb_storm.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "weather",
+          "name": "rain"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THROW_PHONE != 'refuse'",
+      "text": {
+        "id": "Speedboat-nya lompat dari satu gelombang ke gelombang lain, dan tiap kali jatuh, rasanya kayak nabrak tembok.",
+        "en": "The speedboat leaps from one wave to the next, and every time it comes down, it feels like hitting a wall."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THROW_PHONE == 'refuse'",
+      "text": {
+        "id": "Laki-laki jas kuning dapet penumpangnya. Gue. Speedboat-nya lompat dari satu gelombang ke gelombang lain, dan tiap kali jatuh, rasanya kayak nabrak tembok.",
+        "en": "The man in the yellow raincoat gets his passenger. Me. The speedboat leaps from one wave to the next, and every time it comes down, it feels like hitting a wall."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Mesin pertama mati di tengah patok-patok. Mesin kedua batuk, terus diem. Terus gelombang yang lebih tinggi dari speedboat-nya dateng dari samping.",
+        "en": "The first engine dies among the stakes. The second coughs, then goes quiet. Then a wave taller than the boat comes from the side."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_thunder.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 8
+        }
+      ]
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_the_storm.webp",
+      "caption": {
+        "id": "Gue inget dingin. Gue inget nggak bisa bedain atas sama bawah.",
+        "en": "I remember cold. I remember not knowing up from down."
+      },
+      "unlock_id": "cg_the_storm"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kapal nelayan nemu kita tiga jam kemudian, nempel di patok bambu. Gue bangun di rumah sakit di Pluit dengan dua rusuk retak dan Dinda yang nggak mau ngomong sama gue.",
+        "en": "A fishing boat found us three hours later, clinging to a bamboo stake. I woke up in a hospital in Pluit with two cracked ribs and Dinda refusing to speak to me."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Waktu gue masih di ranjang, polisi nyampe ke Pari pas lautnya buka. Sama orang Bentang. Sekar dibawa pulang, \"ditemukan dalam keadaan sehat\".",
+        "en": "While I was still in bed, the police reached Pari when the sea opened. With Bentang's men. Sekar was brought home, \"found in good health\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Alat rekamnya hilang di perjalanan. Nggak ada yang tahu ke mana. Pak Hendra diperiksa tiga hari. Episode dua belas nggak pernah tayang.",
+        "en": "Her recorder was lost on the way. Nobody knows where. Pak Hendra was questioned for three days. Episode twelve never aired."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar dateng ke rumah sakit sekali. Duduk di kursi sebelah ranjang, nggak ngomong apa-apa. Terus pulang.{w} Kali ini gue yang telat. Dan yang nggak ngomong.",
+        "en": "Sekar came to the hospital once. Sat in the chair by the bed, said nothing. Then went home.{w} This time I was the one who was late. And the one who said nothing."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_09_the_storm",
+      "title": {
+        "id": "Badai",
+        "en": "The Storm"
+      },
+      "category": "BAD",
+      "summary": {
+        "id": "Raka menyeberang sebelum badai reda. Polisi dan Bentang sampai ke Sekar duluan, dan buktinya hilang di perjalanan.",
+        "en": "Raka crossed before the storm let up. The police and Bentang reached Sekar first, and the evidence was lost on the way."
+      }
+    }
+  ]
+}

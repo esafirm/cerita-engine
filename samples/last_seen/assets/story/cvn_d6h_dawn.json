@@ -1,0 +1,228 @@
+{
+  "conversation_id": "cvn_d6h_dawn",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Badai",
+    "en": "The Storm"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "06:40",
+    "background": "bg_muara_angke_dawn.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_storm.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "weather",
+          "name": "rain"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 6. Selasa. Hujan udah turun dari jam empat, nyamping, kayak dilempar.",
+        "en": "Day 6. Tuesday. The rain has been coming down since four, sideways, like it's being thrown."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di pintu kantor syahbandar ada kertas yang ditempel pake selotip, udah basah. \"LAUT DITUTUP. GELOMBANG TINGGI. SAMPAI PEMBERITAHUAN.\"",
+        "en": "On the harbor master's door is a sheet of paper taped up, already soaked. \"SEA CLOSED. HIGH WAVES. UNTIL FURTHER NOTICE.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kapal-kapal di dermaga saling bentur, kayu sama kayu, kayak orang-orang yang nggak bisa diem.",
+        "en": "The boats at the pier knock against each other, wood on wood, like people who can't sit still."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "hendra:2",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 700
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kamu dateng. Bagus. Sekarang tunggu.",
+        "en": "You came. Good. Now wait."
+      },
+      "profile": "hendra:2",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Polisi berangkat kapan, Pak?",
+        "en": "When do the police leave?"
+      },
+      "profile": "raka:2",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Polisi juga nggak bisa nyeberang di badai. Semua orang nunggu reda. Bedanya, saya tahu jalan lewat patok. Mereka harus muter.",
+        "en": "The police can't cross in a storm either. Everyone is waiting for the lull. The difference is, I know a way through the stakes. They have to go round."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_thunder.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 3
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ada laki-laki pake jas hujan kuning nyamperin gue di emperan warung. Speedboat wisata, katanya. Mesin dua. Berani jalan sekarang. \"Dua juta, Bang. Satu jam nyampe Pari. Sebelum polisi.\"",
+        "en": "A man in a yellow raincoat comes up to me under the stall's awning. A tourist speedboat, he says. Two engines. He'll go now. \"Two million, man. Pari in an hour. Before the police.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sebelum polisi. Sebelum orang Bentang. Sebelum ada yang nyampe ke Sekar duluan.",
+        "en": "Before the police. Before Bentang's men. Before anyone reaches Sekar first."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Pak Hendra ngelihat lo, terus ngelihat laki-laki jas kuning itu. Dia nggak ngomong apa-apa.",
+        "en": "Pak Hendra looks at you, then at the man in the yellow raincoat. He doesn't say anything."
+      },
+      "variable": "CROSS_NOW",
+      "profile": "hendra:2",
+      "timeout_ms": 10000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "Naik speedboat-nya. Sekarang.",
+            "en": "Take the speedboat. Now."
+          },
+          "value": "now"
+        },
+        {
+          "text": {
+            "id": "\"Saya nunggu Bapak.\"",
+            "en": "\"I'll wait for you, sir.\""
+          },
+          "value": "wait",
+          "effects": [
+            {
+              "variable": "trust_hendra",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Duduk di bangku warung. Nunggu reda.)",
+            "en": "(Sit on the stall's bench. Wait for the lull.)"
+          },
+          "value": "sit",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "condition": "CROSS_NOW == 'now'",
+      "target": "d6_storm"
+    },
+    {
+      "type": "TEXT",
+      "condition": "CROSS_NOW == 'wait'",
+      "text": {
+        "id": "Abang saya bilang kamu nggak bakal telat lagi. Saya kira dia ngelantur.",
+        "en": "My brother said you wouldn't be late again. I thought he was rambling."
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kita nunggu. Lima jam. Gue minum tujuh gelas kopi sachet dan nelpon Dinda tiap jam dari HP gue sendiri. Laki-laki jas kuning nyari penumpang lain. Gue nggak tahu dia dapet atau nggak.",
+        "en": "We wait. Five hours. I drink seven cups of instant coffee and call Dinda every hour from my own phone. The man in the yellow raincoat goes looking for another passenger. I don't know if he finds one."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pertama kali anak itu naik kapal abang saya, umurnya sepuluh. Ikut bapaknya. Dia mabok laut dari dermaga sampai patok pertama, terus dapet ikan kakap segede kepalanya, terus lupa kalau dia mabok.",
+        "en": "The first time that girl came aboard my brother's boat, she was ten. With her father. She was seasick from the pier to the first stake, then she caught a snapper as big as her head, and forgot she was seasick."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Fotonya ada di ruang tamu. Dia ompong.",
+        "en": "The photo's in their living room. She's missing a tooth."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Giginya copot pas narik ikan itu. Dia nggak nangis. Ikannya mau dilepas lagi, baru dia nangis.",
+        "en": "The tooth came out pulling that fish in. She didn't cry. When they were going to throw the fish back, then she cried."
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bapaknya meninggal, abang saya sakit, kapalnya tinggal satu. Tiap tahun crane-nya nambah. Anak itu satu-satunya yang nanya kenapa. Makanya saya bawa dia ke pulau. Bukan karena saya berani. Karena dia nanya.",
+        "en": "Her father died, my brother got sick, there's only one boat left. Every year there's another crane. That girl was the only one who asked why. That's why I took her to the island. Not because I'm brave. Because she asked."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam sebelas, dua laki-laki pake polo BPM turun dari mobil di ujung dermaga, payungan, ngelihatin laut. Pak Hendra narik topinya lebih rendah dan pura-pura tidur.",
+        "en": "At eleven, two men in BPM polos get out of a car at the end of the pier, under umbrellas, watching the sea. Pak Hendra pulls his cap lower and pretends to sleep."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d6h_crossing"
+    }
+  ]
+}

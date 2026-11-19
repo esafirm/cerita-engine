@@ -1,0 +1,181 @@
+{
+  "conversation_id": "cvn_d6n_didit",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Badai",
+    "en": "The Storm"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_didit",
+    "day": 6,
+    "time": "06:05",
+    "background": "bg_sekar_living_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Kalau gue nggak angkat, dia bakal nelpon Dinda.",
+      "en": "If I don't answer, he'll call Dinda."
+    }
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Selamat pagi, Mas Raka. Badai, ya. Kapal-kapal nggak ada yang jalan. Kita semua jadi punya waktu buat ngobrol.",
+        "en": "Good morning, Raka. Quite a storm. No boats are running. It gives us all time to talk."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Saya tahu Mas Bima kemarin meneruskan sebuah email. Server kantornya rapi sekali. Email itu, dan HP Mbak Sekar. Dua-duanya.",
+        "en": "I know Bima forwarded an email yesterday. His office's server keeps very good records. That email, and Ms. Sekar's phone. Both."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed != true",
+      "text": {
+        "id": "HP Mbak Sekar. Cuma itu yang saya minta. Saya sudah sabar empat hari.",
+        "en": "Ms. Sekar's phone. That's all I'm asking for. I've been patient for four days."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sebagai gantinya, saya pastikan Dik Dinda bisa kuliah dengan tenang. Semester enam, tujuh, sampai wisuda. Tidak ada yang mengganggu.",
+        "en": "In exchange, I'll make sure Dinda can study in peace. Sixth semester, seventh, all the way to graduation. Nobody bothering her."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_04.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda berdiri di pintu dapur. Dia denger semuanya.",
+        "en": "Dinda is standing in the kitchen doorway. She heard all of it."
+      },
+      "variable": "DIDIT_DEAL",
+      "profile": "didit",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Nggak.\"",
+            "en": "\"No.\""
+          },
+          "value": "refuse"
+        },
+        {
+          "text": {
+            "id": "\"Semuanya udah gue kirim ke wartawan.\"",
+            "en": "\"I've already sent everything to the press.\""
+          },
+          "value": "bluff"
+        },
+        {
+          "text": {
+            "id": "(Tambahin Ipda Yusuf ke telepon.)",
+            "en": "(Add Inspector Yusuf to the call.)"
+          },
+          "value": "yusuf",
+          "condition": "yusuf_knows_didit == true",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 3
+            },
+            {
+              "variable": "yusuf_heard_didit",
+              "op": "set",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "DIDIT_DEAL == 'refuse'",
+      "text": {
+        "id": "Sayang sekali.",
+        "en": "What a pity."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "DIDIT_DEAL == 'bluff'",
+      "text": {
+        "id": "Kalau sudah, Mas, Anda tidak akan mengangkat telepon saya jam enam pagi.",
+        "en": "If you had, you wouldn't be answering my call at six in the morning."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_06.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "DIDIT_DEAL == 'yusuf'",
+      "style": "system",
+      "text": {
+        "id": "Ipda Yusuf bergabung",
+        "en": "Inspector Yusuf joined"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "DIDIT_DEAL == 'yusuf'",
+      "text": {
+        "id": "Pak Aditya. Ipda Yusuf, Polsek Penjaringan. Silakan lanjutkan tawaran Bapak soal Dik Dinda. Saya mencatat.",
+        "en": "Mr. Aditya. Inspector Yusuf, Penjaringan police. Please go on with your offer about Dinda. I'm taking notes."
+      },
+      "profile": "yusuf:0",
+      "voice": "vo_d6_yusuf_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "DIDIT_DEAL == 'yusuf'",
+      "text": {
+        "id": "Ah. Selamat pagi, Pak. Sepertinya ada salah paham. Permisi.",
+        "en": "Ah. Good morning, Inspector. There seems to be a misunderstanding. Excuse me."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_07.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "DIDIT_DEAL != 'yusuf'",
+      "text": {
+        "id": "Saya juga ke Pari hari ini, begitu lautnya buka. Sampai bertemu di sana.",
+        "en": "I'm going to Pari today too, as soon as the sea opens. See you there."
+      },
+      "profile": "didit",
+      "voice": "vo_d6_didit_08.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d6n_kali_adem"
+    }
+  ]
+}

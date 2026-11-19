@@ -1,0 +1,88 @@
+{
+  "conversation_id": "cvn_d5n_mpus",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "mpus",
+    "en": "mpus"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_tasya",
+    "day": 5,
+    "time": "10:40",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "gue forward dari mpus ya",
+        "en": "forwarding this from mpus"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 1500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"nomornya burner, tapi orangnya males. foto profilnya dihapus tapi ke-cache di aplikasi cek nomor. nih\"",
+        "en": "\"it's a burner, but the guy got lazy. he deleted the profile photo but a number lookup app cached it. here\""
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_burner_profile.webp",
+      "caption": {
+        "id": "\"BPM golf day\" 🙃",
+        "en": "\"BPM golf day\" 🙃"
+      },
+      "profile": "tasya:0",
+      "unlock_id": "photo_burner_profile",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_burner_profile",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kacamata tanpa bingkai. Rambut belah samping, rapi. Senyum yang kebanyakan. Di belakangnya spanduk \"BPM GOLF DAY\".",
+        "en": "Rimless glasses. Neat side-parted hair. A smile that's a bit too much. Behind him, a banner. \"BPM GOLF DAY\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Didit. Nomor yang nyuruh gue berhenti nyari, tengah malem itu, adalah nomor Didit sendiri.",
+        "en": "Didit. The number that told me to stop looking, that midnight, was Didit's own."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "mpus bilang screenshot ini dia simpen di 3 tempat. dia takut tapi dia seneng bisa bantu",
+        "en": "mpus says he saved the screenshot in 3 places. he's scared but glad he could help"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d5n_listeners"
+    }
+  ]
+}

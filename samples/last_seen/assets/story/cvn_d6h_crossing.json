@@ -1,0 +1,260 @@
+{
+  "conversation_id": "cvn_d6h_crossing",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Lewat Patok",
+    "en": "Through the Stakes"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "12:10",
+    "background": "bg_sea_storm.webp",
+    "music": "bgm_tense_call.mp3",
+    "ambience": "amb_storm.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "weather",
+          "name": "rain"
+        },
+        {
+          "action": "show",
+          "profile": "hendra:1",
+          "position": "right"
+        },
+        {
+          "action": "show",
+          "profile": "raka:2",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam dua belas lewat sepuluh, hujannya berubah jadi gerimis, dan angin berhenti kayak orang yang tarik napas. Pak Hendra nyalain mesin.",
+        "en": "At ten past twelve, the rain turns to drizzle, and the wind stops like someone drawing a breath. Pak Hendra starts the engine."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Lautnya masih tinggi. Sri Rejeki naik, terus jatuh, terus naik lagi. Tiap jatuh, air masuk dari samping, dan gue nyiduk pake ember cat bekas.",
+        "en": "The sea is still high. The Sri Rejeki climbs, then drops, then climbs again. Every drop, water comes over the side, and I bail it out with an old paint bucket."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Patok-patok bambu muncul dari kabut, ratusan, kayak hutan yang ditanam di laut. Pak Hendra belok di antara dua patok yang kelihatan sama persis kayak patok-patok lain.",
+        "en": "The bamboo stakes come out of the mist, hundreds of them, like a forest planted in the sea. Pak Hendra turns between two stakes that look exactly like all the others."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_thunder.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 5
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "left_phone != true",
+      "text": {
+        "id": "HP anak itu. Kamu bawa?",
+        "en": "That girl's phone. You brought it?"
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "left_phone != true",
+      "text": {
+        "id": "...Iya.",
+        "en": "...Yes."
+      },
+      "profile": "raka:4"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "left_phone != true",
+      "text": {
+        "id": "Di belakang kita, jauh, ada lampu sorot speedboat yang muncul dan hilang di antara gelombang. Ngikutin jalur yang sama.",
+        "en": "Far behind us, a speedboat's searchlight appears and disappears between the waves. Following the same line."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "left_phone != true && trust_hendra >= 5",
+      "text": {
+        "id": "Sini. Bungkus plastik. Taruh di kotak seng mesin. Sinyal nggak tembus seng.",
+        "en": "Give it here. Wrap it in plastic. Into the engine's tin box. Signal doesn't get through tin."
+      },
+      "profile": "hendra:4"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "left_phone != true && trust_hendra >= 5",
+      "text": {
+        "id": "Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang kehilangan bau.",
+        "en": "Five minutes later, the searchlight behind us stops and circles on the spot, like a dog that's lost the scent."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "condition": "left_phone != true && trust_hendra < 5",
+      "text": {
+        "id": "\"Lempar ke laut, atau saya putar balik.\"",
+        "en": "\"Throw it in the sea, or I turn back.\""
+      },
+      "variable": "THROW_PHONE",
+      "profile": "hendra:1",
+      "timeout_ms": 10000,
+      "choices": [
+        {
+          "text": {
+            "id": "Lempar HP-nya.",
+            "en": "Throw the phone."
+          },
+          "value": "throw",
+          "effects": [
+            {
+              "variable": "phone_lost",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Pak, buktinya ada di situ!\"",
+            "en": "\"Sir, the evidence is on it!\""
+          },
+          "value": "refuse"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THROW_PHONE == 'throw'",
+      "text": {
+        "id": "HP Sekar jatuh ke air dan hilang sebelum gue sempet lihat ke mana. Rekaman Didit, foto-foto, draf-draf yang nggak pernah dikirim. Semuanya di bawah gelombang.",
+        "en": "Sekar's phone hits the water and is gone before I can see where. Didit's recording, the photos, the drafts she never sent. All of it under the waves."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "THROW_PHONE == 'throw'",
+      "text": {
+        "id": "Lampu sorot di belakang kita berhenti. Pak Hendra nggak ngomong apa-apa. Tangannya nepuk bahu gue sekali.",
+        "en": "The searchlight behind us stops. Pak Hendra doesn't say anything. His hand pats my shoulder, once."
+      }
+    },
+    {
+      "type": "JUMP",
+      "condition": "THROW_PHONE == 'refuse'",
+      "target": "#turn_back"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_thunder.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 4
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di tengah patok, mesinnya batuk, terus diem. Sri Rejeki langsung miring, gelombang dari samping.",
+        "en": "Among the stakes, the engine coughs, then goes quiet. The Sri Rejeki lurches at once, the waves coming from the side."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pegang kemudi! Lurus ke dua patok yang ada kainnya!",
+        "en": "Take the tiller! Straight between the two stakes with the rags on them!"
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak pernah megang kemudi kapal seumur hidup. Kayunya licin, dan tiap gelombang narik tangan gue ke arah yang salah. Pak Hendra jongkok di atas mesin, nyumpahin busi pake bahasa yang gue nggak tahu.",
+        "en": "I've never held a boat's tiller in my life. The wood is slick, and every wave pulls my hands the wrong way. Pak Hendra crouches over the engine, cursing the spark plug in a language I don't know."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua patok berkain. Gue tahan. Gue tahan. Mesinnya nyala lagi, dan Pak Hendra ngambil kemudinya tanpa ngomong apa-apa. Tangan gue gemeteran sampai pulau.",
+        "en": "Two stakes with rags. I hold it. I hold it. The engine catches, and Pak Hendra takes the tiller back without a word. My hands shake all the way to the island."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Abang saya bener. Nggak telat.",
+        "en": "My brother was right. Not late."
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Satu jam lewat patok. Terus laut terbuka. Terus, di depan, garis hijau rendah. Bakau.",
+        "en": "An hour through the stakes. Then open sea. Then, ahead, a low green line. Mangroves."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d6h_pari"
+    },
+    {
+      "type": "TEXT",
+      "id": "turn_back",
+      "text": {
+        "id": "Saya nggak bawa mereka ke anak itu.",
+        "en": "I'm not leading them to that girl."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia muter kemudi. Sri Rejeki balik ke arah dermaga, ke arah lampu sorot itu, dan lewat di sebelahnya kayak kapal nelayan yang kebetulan lewat.",
+        "en": "He turns the wheel. The Sri Rejeki heads back toward the pier, toward that searchlight, and passes it like any fishing boat that happens to be passing."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di dermaga, laki-laki jas kuning masih nyari penumpang.",
+        "en": "At the pier, the man in the yellow raincoat is still looking for a passenger."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d6_storm"
+    }
+  ]
+}

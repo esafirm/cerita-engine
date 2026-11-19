@@ -933,9 +933,9 @@ that arrive while Raka is reading, like the group's answers after he replies as 
 - **Not an engine change:** a "history" flag on a scene or thread would save writing `typing=0` 62 times. Worth
   it if Days 3 and 4 read more old threads (Sekar's notes app, `d4_notebook`).
 
-## Days 2 to 4 are drafted short of their budgets
+## Days 2 to 6 are drafted short of their budgets
 
-*2026-11-19. Last Seen spec §2, M2 plan §3 to §5.*
+*2026-11-19. Last Seen spec §2, M2 plan §3 to §5, M3 plan §4 to §7.*
 
 | Day | Words | Estimate | Budget |
 | :--- | ---: | ---: | ---: |
@@ -943,6 +943,8 @@ that arrive while Raka is reading, like the group's answers after he replies as 
 | 2 | 2.7k | 15.7 min | 4.5k, 30 min |
 | 3 | 2.0k | 13.1 min | 4.5k, 28 min |
 | 4 | 1.8k | 10.7 min | 4.5k, 28 min |
+| 5, Harbor / Network | 1.3k / 1.0k | about 8 / 6 min | 4.5k, 28 min each |
+| 6, Harbor / Network | 0.7k / 0.5k | about 4 / 3 min | 4.5k, 28 min each |
 
 They stay as written until the M1 timed playtest says whether the estimator or the budget is wrong. Padding
 them now could mean cutting them again after the playtest. Day 4 was first drafted at 1.3k and grew with story,
@@ -963,7 +965,9 @@ uses its title logo.
 - **Why chapters are played, not just listed:** a chapter unlocked with no variables starts Day 3 without the
   Day 2 clues, and an evidence question with nothing to present has no right answer. The headless runs give each
   chapter a real state. Four answer policies reach both sides of a timed bad end (Day 3's handover takes the
-  timeout option on two of them). A chapter no run reaches still unlocks, empty, and is named in the report.
+  timeout option on two of them). A chapter no run reaches still unlocks, empty, and is named in the report. Evidence
+  takes its first response on every policy but `last`, since authors list the right answer first: with last
+  responses, the Network route ended at *Wrong Name* before Day 6 and its chapter stayed empty.
 - **Cost:** four playthroughs of the bundled story. Last Seen's four days take under a second in tests.
 - **Revisit if** M3's routes put a checkpoint behind a condition none of the four policies meets. Then a story
   could name the answers that reach it, or the unlocker could explore choices breadth first.

@@ -1,0 +1,85 @@
+{
+  "conversation_id": "cvn_d5n_wrong_name",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Nama yang Salah",
+    "en": "Wrong Name"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "21:30",
+    "background": "bg_sekar_room_night.webp",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malem itu gue buka grup pendengar dari HP Sekar. Jari gue gemeteran, tapi bukan karena ragu.",
+        "en": "That night I open the listener group on Sekar's phone. My fingers shake, but not from doubt."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Ini Raka, temennya Sekar. Tasya tahu Sekar diancam seminggu sebelum dia hilang, dan diem. Dia ditawarin duit sama orang yang sekarang nyari Sekar.\"",
+        "en": "\"This is Raka, Sekar's friend. Tasya knew Sekar was threatened a week before she disappeared, and said nothing. She was offered money by the people now looking for Sekar.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Semuanya bener. Dan semuanya salah.",
+        "en": "All of it true. And all of it wrong."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_wrong_name.webp",
+      "caption": {
+        "id": "Dalam satu jam, screenshot-nya ada di mana-mana. Akun @carikaksekar nge-repost. Komentar-komentarnya nggak bisa dibaca sampai habis.",
+        "en": "Within an hour, the screenshot is everywhere. The @findkaksekar account reposts it. The comments can't be read to the end."
+      },
+      "unlock_id": "cg_wrong_name"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Paginya, akun Tasya hilang. Podcast-nya di-private. Dia nggak pernah ngangkat telepon Dinda lagi.",
+        "en": "In the morning, Tasya's accounts are gone. The podcast is set to private. She never picks up Dinda's calls again."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bima berhenti bales chat. Didit nggak perlu ngelakuin apa-apa. Orang-orang yang dia takutin udah saling bubar sendiri.",
+        "en": "Bima stops replying. Didit doesn't have to do anything. The people he was afraid of have scattered on their own."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua minggu kemudian, gue balik ke Bandung. Kadang gue buka grup itu. Sepi. Pesan terakhir di sana masih punya gue.",
+        "en": "Two weeks later, I go back to Bandung. Sometimes I open that group. It's silent. The last message there is still mine."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_08_wrong_name",
+      "title": {
+        "id": "Nama yang Salah",
+        "en": "Wrong Name"
+      },
+      "category": "BAD",
+      "summary": {
+        "id": "Raka menuduh Tasya di depan semua pendengar. Kelompok kecil yang bisa menemukan Sekar bubar, dan orang yang sebenarnya tidak tersentuh.",
+        "en": "Raka accused Tasya in front of every listener. The small group that could have found Sekar fell apart, and the real culprit was never touched."
+      }
+    }
+  ]
+}

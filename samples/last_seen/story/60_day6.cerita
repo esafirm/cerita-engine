@@ -1,0 +1,460 @@
+# Day 6: Badai (spec §2, beat plan last-seen-m3.md §6 and §7). The storm, and the race to Pulau Pari ahead of the
+# police and Bentang. Bad end #9 The Storm is on both routes: crossing before the lull, unprepared.
+
+@conversation d6h_dawn chapter="Hari 6" chapter.en="Day 6" title="Badai" title.en="The Storm" checkpoint
+@scene VN bg=bg_muara_angke_dawn.webp music=bgm_unease.mp3 ambience=amb_storm.mp3 day=6 time=06:40
+
+stage
+  weather rain
+  show raka:neutral left
+
+narration
+  id: Hari 6. Selasa. Hujan udah turun dari jam empat, nyamping, kayak dilempar.
+  en: Day 6. Tuesday. The rain has been coming down since four, sideways, like it's being thrown.
+narration
+  id: Di pintu kantor syahbandar ada kertas yang ditempel pake selotip, udah basah. "LAUT DITUTUP. GELOMBANG TINGGI. SAMPAI PEMBERITAHUAN."
+  en: On the harbor master's door is a sheet of paper taped up, already soaked. "SEA CLOSED. HIGH WAVES. UNTIL FURTHER NOTICE."
+narration
+  id: Kapal-kapal di dermaga saling bentur, kayu sama kayu, kayak orang-orang yang nggak bisa diem.
+  en: The boats at the pier knock against each other, wood on wood, like people who can't sit still.
+
+stage
+  show hendra:wary right transition=fade duration=700
+
+hendra:wary [right]
+  id: Kamu dateng. Bagus. Sekarang tunggu.
+  en: You came. Good. Now wait.
+raka:worried [left]
+  id: Polisi berangkat kapan, Pak?
+  en: When do the police leave?
+hendra:neutral
+  id: Polisi juga nggak bisa nyeberang di badai. Semua orang nunggu reda. Bedanya, saya tahu jalan lewat patok. Mereka harus muter.
+  en: The police can't cross in a storm either. Everyone is waiting for the lull. The difference is, I know a way through the stakes. They have to go round.
+
+stage
+  sound sfx_thunder.mp3
+  shake intensity=3
+
+narration
+  id: Ada laki-laki pake jas hujan kuning nyamperin gue di emperan warung. Speedboat wisata, katanya. Mesin dua. Berani jalan sekarang. "Dua juta, Bang. Satu jam nyampe Pari. Sebelum polisi."
+  en: A man in a yellow raincoat comes up to me under the stall's awning. A tourist speedboat, he says. Two engines. He'll go now. "Two million, man. Pari in an hour. Before the police."
+narration
+  id: Sebelum polisi. Sebelum orang Bentang. Sebelum ada yang nyampe ke Sekar duluan.
+  en: Before the police. Before Bentang's men. Before anyone reaches Sekar first.
+
+choice CROSS_NOW by=hendra:wary timeout=10s
+  id: Pak Hendra ngelihat lo, terus ngelihat laki-laki jas kuning itu. Dia nggak ngomong apa-apa.
+  en: Pak Hendra looks at you, then at the man in the yellow raincoat. He doesn't say anything.
+? Naik speedboat-nya. Sekarang. | Take the speedboat. Now.
+  value now
+? "Saya nunggu Bapak." | "I'll wait for you, sir."
+  value wait
+  +trust_hendra 2
+? (Duduk di bangku warung. Nunggu reda.) | (Sit on the stall's bench. Wait for the lull.) [default] [silent]
+  value sit
+
+-> d6_storm [if CROSS_NOW == 'now']
+
+hendra:kind [if CROSS_NOW == 'wait']
+  id: Abang saya bilang kamu nggak bakal telat lagi. Saya kira dia ngelantur.
+  en: My brother said you wouldn't be late again. I thought he was rambling.
+narration
+  id: Kita nunggu. Lima jam. Gue minum tujuh gelas kopi sachet dan nelpon Dinda tiap jam dari HP gue sendiri. Laki-laki jas kuning nyari penumpang lain. Gue nggak tahu dia dapet atau nggak.
+  en: We wait. Five hours. I drink seven cups of instant coffee and call Dinda every hour from my own phone. The man in the yellow raincoat goes looking for another passenger. I don't know if he finds one.
+
+hendra:neutral
+  id: Pertama kali anak itu naik kapal abang saya, umurnya sepuluh. Ikut bapaknya. Dia mabok laut dari dermaga sampai patok pertama, terus dapet ikan kakap segede kepalanya, terus lupa kalau dia mabok.
+  en: The first time that girl came aboard my brother's boat, she was ten. With her father. She was seasick from the pier to the first stake, then she caught a snapper as big as her head, and forgot she was seasick.
+raka:sad
+  id: Fotonya ada di ruang tamu. Dia ompong.
+  en: The photo's in their living room. She's missing a tooth.
+hendra:kind
+  id: Giginya copot pas narik ikan itu. Dia nggak nangis. Ikannya mau dilepas lagi, baru dia nangis.
+  en: The tooth came out pulling that fish in. She didn't cry. When they were going to throw the fish back, then she cried.
+hendra:neutral
+  id: Bapaknya meninggal, abang saya sakit, kapalnya tinggal satu. Tiap tahun crane-nya nambah. Anak itu satu-satunya yang nanya kenapa. Makanya saya bawa dia ke pulau. Bukan karena saya berani. Karena dia nanya.
+  en: Her father died, my brother got sick, there's only one boat left. Every year there's another crane. That girl was the only one who asked why. That's why I took her to the island. Not because I'm brave. Because she asked.
+narration
+  id: Jam sebelas, dua laki-laki pake polo BPM turun dari mobil di ujung dermaga, payungan, ngelihatin laut. Pak Hendra narik topinya lebih rendah dan pura-pura tidur.
+  en: At eleven, two men in BPM polos get out of a car at the end of the pier, under umbrellas, watching the sea. Pak Hendra pulls his cap lower and pretends to sleep.
+
+-> d6h_crossing
+
+
+@conversation d6h_crossing chapter="Hari 6" chapter.en="Day 6" title="Lewat Patok" title.en="Through the Stakes"
+@scene VN bg=bg_sea_storm.webp music=bgm_tense_call.mp3 ambience=amb_storm.mp3 day=6 time=12:10
+
+stage
+  weather rain
+  show hendra:gruff right
+  show raka:worried left
+
+narration
+  id: Jam dua belas lewat sepuluh, hujannya berubah jadi gerimis, dan angin berhenti kayak orang yang tarik napas. Pak Hendra nyalain mesin.
+  en: At ten past twelve, the rain turns to drizzle, and the wind stops like someone drawing a breath. Pak Hendra starts the engine.
+narration
+  id: Lautnya masih tinggi. Sri Rejeki naik, terus jatuh, terus naik lagi. Tiap jatuh, air masuk dari samping, dan gue nyiduk pake ember cat bekas.
+  en: The sea is still high. The Sri Rejeki climbs, then drops, then climbs again. Every drop, water comes over the side, and I bail it out with an old paint bucket.
+narration
+  id: Patok-patok bambu muncul dari kabut, ratusan, kayak hutan yang ditanam di laut. Pak Hendra belok di antara dua patok yang kelihatan sama persis kayak patok-patok lain.
+  en: The bamboo stakes come out of the mist, hundreds of them, like a forest planted in the sea. Pak Hendra turns between two stakes that look exactly like all the others.
+
+stage
+  sound sfx_thunder.mp3
+  shake intensity=5
+
+hendra:gruff [if left_phone != true]
+  id: HP anak itu. Kamu bawa?
+  en: That girl's phone. You brought it?
+raka:shocked [if left_phone != true]
+  id: ...Iya.
+  en: ...Yes.
+narration [if left_phone != true]
+  id: Di belakang kita, jauh, ada lampu sorot speedboat yang muncul dan hilang di antara gelombang. Ngikutin jalur yang sama.
+  en: Far behind us, a speedboat's searchlight appears and disappears between the waves. Following the same line.
+
+# The phone gives them away. Hendra hides it in the engine's tin box if he trusts Raka enough to keep it, otherwise
+# it goes over the side or they turn back.
+hendra:worried [if left_phone != true && trust_hendra >= 5]
+  id: Sini. Bungkus plastik. Taruh di kotak seng mesin. Sinyal nggak tembus seng.
+  en: Give it here. Wrap it in plastic. Into the engine's tin box. Signal doesn't get through tin.
+narration [if left_phone != true && trust_hendra >= 5]
+  id: Lima menit kemudian, lampu sorot di belakang kita berhenti, muter-muter di tempat, kayak anjing yang kehilangan bau.
+  en: Five minutes later, the searchlight behind us stops and circles on the spot, like a dog that's lost the scent.
+
+choice THROW_PHONE by=hendra:gruff timeout=10s [if left_phone != true && trust_hendra < 5]
+  id: "Lempar ke laut, atau saya putar balik."
+  en: "Throw it in the sea, or I turn back."
+? Lempar HP-nya. | Throw the phone.
+  value throw
+  set phone_lost true
+? "Pak, buktinya ada di situ!" | "Sir, the evidence is on it!"
+  value refuse
+
+narration [if THROW_PHONE == 'throw']
+  id: HP Sekar jatuh ke air dan hilang sebelum gue sempet lihat ke mana. Rekaman Didit, foto-foto, draf-draf yang nggak pernah dikirim. Semuanya di bawah gelombang.
+  en: Sekar's phone hits the water and is gone before I can see where. Didit's recording, the photos, the drafts she never sent. All of it under the waves.
+narration [if THROW_PHONE == 'throw']
+  id: Lampu sorot di belakang kita berhenti. Pak Hendra nggak ngomong apa-apa. Tangannya nepuk bahu gue sekali.
+  en: The searchlight behind us stops. Pak Hendra doesn't say anything. His hand pats my shoulder, once.
+-> #turn_back [if THROW_PHONE == 'refuse']
+
+stage
+  sound sfx_thunder.mp3
+  shake intensity=4
+
+narration
+  id: Di tengah patok, mesinnya batuk, terus diem. Sri Rejeki langsung miring, gelombang dari samping.
+  en: Among the stakes, the engine coughs, then goes quiet. The Sri Rejeki lurches at once, the waves coming from the side.
+hendra:gruff
+  id: Pegang kemudi! Lurus ke dua patok yang ada kainnya!
+  en: Take the tiller! Straight between the two stakes with the rags on them!
+narration
+  id: Gue nggak pernah megang kemudi kapal seumur hidup. Kayunya licin, dan tiap gelombang narik tangan gue ke arah yang salah. Pak Hendra jongkok di atas mesin, nyumpahin busi pake bahasa yang gue nggak tahu.
+  en: I've never held a boat's tiller in my life. The wood is slick, and every wave pulls my hands the wrong way. Pak Hendra crouches over the engine, cursing the spark plug in a language I don't know.
+narration
+  id: Dua patok berkain. Gue tahan. Gue tahan. Mesinnya nyala lagi, dan Pak Hendra ngambil kemudinya tanpa ngomong apa-apa. Tangan gue gemeteran sampai pulau.
+  en: Two stakes with rags. I hold it. I hold it. The engine catches, and Pak Hendra takes the tiller back without a word. My hands shake all the way to the island.
+hendra:kind
+  id: Abang saya bener. Nggak telat.
+  en: My brother was right. Not late.
+
+narration
+  id: Satu jam lewat patok. Terus laut terbuka. Terus, di depan, garis hijau rendah. Bakau.
+  en: An hour through the stakes. Then open sea. Then, ahead, a low green line. Mangroves.
+
+-> d6h_pari
+
+hendra:gruff label=turn_back
+  id: Saya nggak bawa mereka ke anak itu.
+  en: I'm not leading them to that girl.
+narration
+  id: Dia muter kemudi. Sri Rejeki balik ke arah dermaga, ke arah lampu sorot itu, dan lewat di sebelahnya kayak kapal nelayan yang kebetulan lewat.
+  en: He turns the wheel. The Sri Rejeki heads back toward the pier, toward that searchlight, and passes it like any fishing boat that happens to be passing.
+narration
+  id: Di dermaga, laki-laki jas kuning masih nyari penumpang.
+  en: At the pier, the man in the yellow raincoat is still looking for a passenger.
+-> d6_storm
+
+
+@conversation d6h_pari chapter="Hari 6" chapter.en="Day 6" title="Pulau Pari" title.en="Pulau Pari"
+@scene VN bg=bg_pari_jetty_dusk.webp music=bgm_unsent.mp3 ambience=amb_sea_night.mp3 day=6 time=17:50
+
+stage
+  show raka:neutral left
+
+narration
+  id: Kita nyampe pas badainya udah lewat. Langit robek-robek, dan di sela-selanya ada garis oranye yang rendah banget, kayak ada yang lupa matiin lampu.
+  en: We arrive just as the storm passes. The sky is torn to pieces, and between the pieces there's a low orange band, like someone forgot to switch off a light.
+narration
+  id: Dermaga kayu. Bakau di kiri. Kapal biru-putih diiket di ujung. Gue udah pernah lihat tempat ini. Di layar HP Sekar, jam lima kurang dua.
+  en: A wooden jetty. Mangroves on the left. A blue and white boat tied at the end. I've seen this place before. On Sekar's screen, at two minutes to five.
+narration
+  id: Polisi belum dateng. Speedboat Bentang belum dateng. Cuma ada satu lampu, digantung di tiang ujung dermaga.
+  en: The police haven't come. Bentang's speedboat hasn't come. There's only one lamp, hanging from a post at the end of the jetty.
+
+stage
+  hide raka transition=fade duration=800
+
+narration
+  id: Di bawah lampu itu ada orang berdiri. Rambutnya setengah diiket. Jaket hijau tentara yang kegedean. Headphone di leher.
+  en: Someone is standing under that lamp. Hair tied half up. An oversized army-green jacket. Headphones round her neck.
+
+stage
+  sound sfx_recorder_click.mp3
+wait 700
+stage
+  sound sfx_recorder_click.mp3
+
+narration
+  id: Klik. Klik.{w} Gue aman. Lanjut rekam.
+  en: Click. Click.{w} I'm okay. Keep rolling.
+narration
+  id: Setahun telat. Satu dermaga jauhnya.{w} Gue mulai jalan.
+  en: A year late. One jetty away.{w} I start walking.
+set
+  set reached_pari true
+
+-> d7_stub
+
+
+@conversation d6n_didit chapter="Hari 6" chapter.en="Day 6" title="Badai" title.en="The Storm" checkpoint
+@scene CALL channel=thread_didit day=6 time=06:05 bg=bg_sekar_living_day.webp music=bgm_tense_call.mp3 ring=sfx_phone_ring.mp3 stay="Kalau gue nggak angkat, dia bakal nelpon Dinda." stay.en="If I don't answer, he'll call Dinda."
+
+didit voice=vo_d6_didit_01.mp3
+  id: Selamat pagi, Mas Raka. Badai, ya. Kapal-kapal nggak ada yang jalan. Kita semua jadi punya waktu buat ngobrol.
+  en: Good morning, Raka. Quite a storm. No boats are running. It gives us all time to talk.
+  delivery: warm and unhurried, rain audible behind him
+didit voice=vo_d6_didit_02.mp3 [if bima_confessed == true]
+  id: Saya tahu Mas Bima kemarin meneruskan sebuah email. Server kantornya rapi sekali. Email itu, dan HP Mbak Sekar. Dua-duanya.
+  en: I know Bima forwarded an email yesterday. His office's server keeps very good records. That email, and Ms. Sekar's phone. Both.
+  delivery: pleasant, a man listing items on an invoice
+didit voice=vo_d6_didit_03.mp3 [if bima_confessed != true]
+  id: HP Mbak Sekar. Cuma itu yang saya minta. Saya sudah sabar empat hari.
+  en: Ms. Sekar's phone. That's all I'm asking for. I've been patient for four days.
+  delivery: still smooth, a little tired of being smooth
+didit voice=vo_d6_didit_04.mp3
+  id: Sebagai gantinya, saya pastikan Dik Dinda bisa kuliah dengan tenang. Semester enam, tujuh, sampai wisuda. Tidak ada yang mengganggu.
+  en: In exchange, I'll make sure Dinda can study in peace. Sixth semester, seventh, all the way to graduation. Nobody bothering her.
+  delivery: generous, which is the threat
+
+choice DIDIT_DEAL by=didit
+  id: Dinda berdiri di pintu dapur. Dia denger semuanya.
+  en: Dinda is standing in the kitchen doorway. She heard all of it.
+? "Nggak." | "No."
+  value refuse
+? "Semuanya udah gue kirim ke wartawan." | "I've already sent everything to the press."
+  value bluff
+? (Tambahin Ipda Yusuf ke telepon.) | (Add Inspector Yusuf to the call.) [if yusuf_knows_didit == true]
+  value yusuf
+  +trust_yusuf 3
+  set yusuf_heard_didit true
+
+didit voice=vo_d6_didit_05.mp3 [if DIDIT_DEAL == 'refuse']
+  id: Sayang sekali.
+  en: What a pity.
+  delivery: genuinely regretful, which is worse
+didit voice=vo_d6_didit_06.mp3 [if DIDIT_DEAL == 'bluff']
+  id: Kalau sudah, Mas, Anda tidak akan mengangkat telepon saya jam enam pagi.
+  en: If you had, you wouldn't be answering my call at six in the morning.
+  delivery: a small, amused laugh
+system [if DIDIT_DEAL == 'yusuf']
+  id: Ipda Yusuf bergabung
+  en: Inspector Yusuf joined
+yusuf voice=vo_d6_yusuf_01.mp3 [if DIDIT_DEAL == 'yusuf']
+  id: Pak Aditya. Ipda Yusuf, Polsek Penjaringan. Silakan lanjutkan tawaran Bapak soal Dik Dinda. Saya mencatat.
+  en: Mr. Aditya. Inspector Yusuf, Penjaringan police. Please go on with your offer about Dinda. I'm taking notes.
+  delivery: very calm, very formal, enjoying it a little
+didit voice=vo_d6_didit_07.mp3 [if DIDIT_DEAL == 'yusuf']
+  id: Ah. Selamat pagi, Pak. Sepertinya ada salah paham. Permisi.
+  en: Ah. Good morning, Inspector. There seems to be a misunderstanding. Excuse me.
+  delivery: the smoothness cracks for a second, then he's gone
+didit voice=vo_d6_didit_08.mp3 [if DIDIT_DEAL != 'yusuf']
+  id: Saya juga ke Pari hari ini, begitu lautnya buka. Sampai bertemu di sana.
+  en: I'm going to Pari today too, as soon as the sea opens. See you there.
+  delivery: friendly, final
+
+system
+  id: Panggilan berakhir
+  en: Call ended
+
+-> d6n_kali_adem
+
+
+@conversation d6n_kali_adem chapter="Hari 6" chapter.en="Day 6" title="Kali Adem" title.en="Kali Adem"
+@scene VN bg=bg_kali_adem_storm.webp music=bgm_unease.mp3 ambience=amb_storm.mp3 day=6 time=09:30
+
+stage
+  weather rain
+  show raka:neutral left
+  show tasya:nervous right
+
+narration
+  id: Pelabuhan Kali Adem. Loket kapal penumpang ditutup pake rolling door. Kertas di depannya ditulis tangan. "SEMUA KEBERANGKATAN DIBATALKAN."
+  en: The Kali Adem ferry port. The ticket window is shut behind a roller door. The paper taped to it is handwritten. "ALL DEPARTURES CANCELLED."
+narration
+  id: Tasya dateng pake jas hujan plastik kebesaran, rambutnya basah, es kopinya udah jadi kopi biasa.
+  en: Tasya shows up in an oversized plastic raincoat, her hair soaked, her iced coffee now just coffee.
+
+stage [if bima_confessed == true]
+  show bima:neutral far_right
+
+bima:neutral [if bima_confessed == true]
+  id: Mobil kantor Bentang parkir di ujung. Dua orang, sama polisi. Mereka juga nunggu.
+  en: Bentang's company car is parked at the far end. Two men, with the police. They're waiting too.
+tasya:defensive
+  id: Didit nggak bakal nunggu sampai besok. Dia orang yang selalu punya jalan lain.
+  en: Didit won't wait until tomorrow. He's the kind of man who always has another way.
+
+stage
+  sound sfx_thunder.mp3
+  shake intensity=3
+
+narration
+  id: Laki-laki pake jas hujan kuning nyamperin. Speedboat wisata, mesin dua, berani jalan sekarang. "Tiga juta, Bang. Satu jam nyampe Pari. Sebelum mereka."
+  en: A man in a yellow raincoat comes over. A tourist speedboat, two engines, he'll go now. "Three million, man. Pari in an hour. Before them."
+
+choice CROSS_NOW by=tasya:nervous timeout=10s
+  id: Tasya megang lengan jas hujan lo.
+  en: Tasya grips the sleeve of your raincoat.
+? Naik speedboat-nya. Sekarang. | Take the speedboat. Now.
+  value now
+? "Kita nunggu kapal pertama. Bareng." | "We wait for the first ferry. Together."
+  value wait
+  +trust_tasya 2
+? (Diam. Lihat lautnya.) | (Say nothing. Watch the sea.) [default] [silent]
+  value sit
+
+-> d6_storm [if CROSS_NOW == 'now']
+
+tasya:smile [if CROSS_NOW == 'wait']
+  id: Oke. Bareng. Sekar bilang lo selalu kabur kalau berat. Ternyata lo bisa nunggu juga.
+  en: Okay. Together. Sekar said you always run when things get heavy. Turns out you can wait too.
+
+-> d6n_night
+
+
+@conversation d6n_night chapter="Hari 6" chapter.en="Day 6" title="Ruang Tunggu" title.en="The Waiting Room"
+@scene VN bg=bg_kali_adem_storm.webp music=bgm_low_tide.mp3 ambience=amb_storm.mp3 day=6 time=23:40
+
+stage
+  weather rain
+  show raka:neutral left
+  show tasya:neutral right
+
+narration
+  id: Badainya nggak berhenti seharian. Nggak ada yang nyeberang. Nggak polisi, nggak Bentang, nggak laki-laki jas kuning.
+  en: The storm doesn't stop all day. Nobody crosses. Not the police, not Bentang, not the man in the yellow raincoat.
+narration
+  id: Malem, ruang tunggu pelabuhan cuma isi kita, dua ibu-ibu yang tidur di atas karung beras, dan satu bohlam yang kedip tiap ada petir.
+  en: At night, the port's waiting room holds only us, two women asleep on sacks of rice, and one bulb that flickers with every flash of lightning.
+
+tasya:neutral
+  id: Tau nggak, Sekar bilang lo editor terbaik yang pernah dia punya. Sama editor terjelek.
+  en: You know, Sekar said you were the best editor she ever had. And the worst.
+raka:smirk
+  id: Dua-duanya bener.
+  en: Both true.
+tasya:smile
+  id: Terbaik karena lo dengerin semuanya. Napas, angin, suara motor lewat. Terjelek karena lo nggak pernah bilang ke dia kalau episodenya bagus.
+  en: The best because you listened to everything. Breaths, wind, a passing motorbike. The worst because you never once told her an episode was good.
+raka:sad
+  id: ...Episodenya bagus, Tas. Semuanya.
+  en: ...The episodes were good, Tas. All of them.
+tasya:crying
+  id: Bilang ke dia. Besok.
+  en: Tell her. Tomorrow.
+
+bima:ashamed [far_right] [if bima_confessed == true]
+  id: Gue mau minta maaf ke dia duluan. Kalau dia mau dengerin.
+  en: I want to apologize to her first. If she'll listen.
+tasya:defensive [if bima_confessed == true]
+  id: Lo ngasih tahu bos lo soal dokumennya, Bim. Gue ditelepon orang PR gara-gara itu. Gue nggak bales chat Sekar seminggu gara-gara itu.
+  en: You told your boss about the documents, Bim. I got that PR call because of it. I didn't answer Sekar's messages for a week because of it.
+bima:ashamed [if bima_confessed == true]
+  id: Gue tahu.
+  en: I know.
+tasya:neutral [if bima_confessed == true]
+  id: ...Gue juga bisa aja bilang ke dia soal teleponnya. Dan gue diem. Jadi kita sama-sama bego.
+  en: ...I could have told her about the call too. And I kept quiet. So we're both idiots.
+narration [if bima_confessed == true]
+  id: Bima ketawa, kecil, kayak orang yang lupa caranya. Tasya nyodorin sisa kopinya. Dia minum.
+  en: Bima laughs, a small laugh, like someone who forgot how. Tasya holds out what's left of her coffee. He drinks it.
+
+stage
+  sound sfx_msg_receive.mp3
+
+narration
+  id: Jam satu pagi, HP gue geter. Dinda. "Ibu masak buat besok. Katanya buat Kak Sekar sama Raka. Dia nggak nanya apa-apa, cuma masak." Terus satu lagi. "Jangan telat."
+  en: At one in the morning, my phone buzzes. Dinda. "Mom's cooking for tomorrow. She says it's for Sekar and Raka. She didn't ask anything, she just cooked." Then another. "Don't be late."
+
+narration
+  id: Jam lima lewat dua puluh, loketnya kebuka. Ombaknya masih tinggi, tapi kapal pertama boleh jalan.
+  en: At twenty past five, the ticket window opens. The waves are still high, but the first boat is allowed to go.
+narration
+  id: Jam setengah enam. Kapal ke Pulau Pari. Setahun lalu gue nggak dateng ke jam ini.{w} Kali ini gue udah di sini dari semalem.
+  en: Five thirty. A boat to Pulau Pari. A year ago I didn't show up for this time.{w} This time I've been here since last night.
+set
+  set on_first_ferry true
+
+-> d7_stub
+
+
+@conversation d6_storm chapter="Hari 6" chapter.en="Day 6" title="Badai" title.en="The Storm"
+@scene VN bg=bg_sea_storm.webp music=bgm_tense_call.mp3 ambience=amb_storm.mp3 day=6 time=13:00
+
+stage
+  weather rain
+
+narration [if THROW_PHONE != 'refuse']
+  id: Speedboat-nya lompat dari satu gelombang ke gelombang lain, dan tiap kali jatuh, rasanya kayak nabrak tembok.
+  en: The speedboat leaps from one wave to the next, and every time it comes down, it feels like hitting a wall.
+narration [if THROW_PHONE == 'refuse']
+  id: Laki-laki jas kuning dapet penumpangnya. Gue. Speedboat-nya lompat dari satu gelombang ke gelombang lain, dan tiap kali jatuh, rasanya kayak nabrak tembok.
+  en: The man in the yellow raincoat gets his passenger. Me. The speedboat leaps from one wave to the next, and every time it comes down, it feels like hitting a wall.
+narration
+  id: Mesin pertama mati di tengah patok-patok. Mesin kedua batuk, terus diem. Terus gelombang yang lebih tinggi dari speedboat-nya dateng dari samping.
+  en: The first engine dies among the stakes. The second coughs, then goes quiet. Then a wave taller than the boat comes from the side.
+
+stage
+  sound sfx_thunder.mp3
+  shake intensity=8
+
+media CG cg_the_storm.webp unlock=cg_the_storm
+  id: Gue inget dingin. Gue inget nggak bisa bedain atas sama bawah.
+  en: I remember cold. I remember not knowing up from down.
+
+narration
+  id: Kapal nelayan nemu kita tiga jam kemudian, nempel di patok bambu. Gue bangun di rumah sakit di Pluit dengan dua rusuk retak dan Dinda yang nggak mau ngomong sama gue.
+  en: A fishing boat found us three hours later, clinging to a bamboo stake. I woke up in a hospital in Pluit with two cracked ribs and Dinda refusing to speak to me.
+narration
+  id: Waktu gue masih di ranjang, polisi nyampe ke Pari pas lautnya buka. Sama orang Bentang. Sekar dibawa pulang, "ditemukan dalam keadaan sehat".
+  en: While I was still in bed, the police reached Pari when the sea opened. With Bentang's men. Sekar was brought home, "found in good health".
+narration
+  id: Alat rekamnya hilang di perjalanan. Nggak ada yang tahu ke mana. Pak Hendra diperiksa tiga hari. Episode dua belas nggak pernah tayang.
+  en: Her recorder was lost on the way. Nobody knows where. Pak Hendra was questioned for three days. Episode twelve never aired.
+narration
+  id: Sekar dateng ke rumah sakit sekali. Duduk di kursi sebelah ranjang, nggak ngomong apa-apa. Terus pulang.{w} Kali ini gue yang telat. Dan yang nggak ngomong.
+  en: Sekar came to the hospital once. Sat in the chair by the bed, said nothing. Then went home.{w} This time I was the one who was late. And the one who said nothing.
+
+ending end_09_the_storm BAD
+  id: Badai
+  en: The Storm
+  summary id: Raka menyeberang sebelum badai reda. Polisi dan Bentang sampai ke Sekar duluan, dan buktinya hilang di perjalanan.
+  summary en: Raka crossed before the storm let up. The police and Bentang reached Sekar first, and the evidence was lost on the way.
+
+
+# Day 7: Terakhir Terlihat. M4 placeholder until the endings are written, which replaces this stub and its ending.
+
+@conversation d7_stub chapter="Hari 7" chapter.en="Day 7" title="Terakhir Terlihat" title.en="Last Seen" checkpoint
+@scene VN bg=bg_pari_jetty_dusk.webp music=bgm_unsent.mp3 day=7 time=05:30
+
+narration
+  id: Hari 7 belum ditulis. Ceritanya berlanjut di versi berikutnya.
+  en: Day 7 isn't written yet. The story continues in the next build.
+
+ending end_00_preview NORMAL
+  id: Bersambung
+  en: To Be Continued
+  summary id: Raka akhirnya sampai di jam setengah enam yang dulu dia lewatkan. Sekar menunggu di ujung dermaga.
+  summary en: Raka has finally made it to the five thirty he once missed. Sekar is waiting at the end of the jetty.

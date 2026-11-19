@@ -1,0 +1,120 @@
+{
+  "conversation_id": "cvn_d5n_night",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Kabar",
+    "en": "News"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_tasya",
+    "day": 5,
+    "time": "22:05",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "ka. udah liat berita?",
+        "en": "ka. seen the news?"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 1500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "\"Nelayan Muara Angke dilaporkan terkait hilangnya podcaster. Polisi dan pihak pelapor akan menyisir Pulau Pari besok pagi.\"",
+        "en": "\"Muara Angke fisherman reported in podcaster's disappearance. Police and the complainant will search Pulau Pari tomorrow morning.\""
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "pihak pelapor = bentang. mereka mau ke sana bareng polisi",
+        "en": "complainant = bentang. they're going there with the police"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "pari_raid",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Pulau Pari. Sekar nanya jadwal kapal ke Pari, Senin sore. Foto subuh dengan bakau. \"Masih di sana.\"",
+        "en": "Pulau Pari. Sekar asked about the Pari ferry on Monday afternoon. The dawn photo with the mangroves. \"Still there.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed != true",
+      "text": {
+        "id": "Pulau Pari. Jadwal kapal di papan gabus Sekar, dilingkarin dua kali. Foto subuh dengan bakau. \"Masih di sana.\"",
+        "en": "Pulau Pari. The ferry schedule on Sekar's corkboard, circled twice. The dawn photo with the mangroves. \"Still there.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kapal pertama ke pari jam berapa?",
+        "en": "what time's the first boat to pari?"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "05.30 dari kali adem. tapi besok badai ka. bmkg udah warning",
+        "en": "05:30 from kali adem. but there's a storm tomorrow ka. the weather agency already issued a warning"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "gue ikut. jangan larang. gue udah cukup lama diem",
+        "en": "i'm coming. don't stop me. i've kept quiet long enough"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "bima juga. dia yang nyetir",
+        "en": "bima too. he's driving"
+      },
+      "profile": "tasya:0",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d6n_didit"
+    }
+  ]
+}

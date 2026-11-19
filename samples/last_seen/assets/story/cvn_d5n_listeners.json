@@ -1,0 +1,138 @@
+{
+  "conversation_id": "cvn_d5n_listeners",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Pendengar",
+    "en": "The Listeners"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "group_ep12",
+    "day": 5,
+    "time": "13:20",
+    "music": "bgm_low_tide.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kalau orang-orang di sekitar Sekar masing-masing pegang satu potong, pendengarnya juga. Gue buka grupnya, dan kali ini gue nggak pura-pura jadi siapa-siapa.",
+        "en": "If the people around Sekar each held a piece, so do her listeners. I open the group, and this time I don't pretend to be anyone."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "halo semua. ini raka, temen lama sekar, yang dulu ngedit podcast ini. hp sekar ada di gue, sama dinda adiknya. sekar belum pulang. kalau ada yang liat apa aja senin malem di angke, tolong bilang",
+        "en": "hi everyone. this is raka, sekar's old friend, i used to edit this podcast. sekar's phone is with me and her sister dinda. sekar isn't home yet. if anyone saw anything monday night in angke, please say"
+      },
+      "profile": "sekar:0",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted == true",
+      "text": {
+        "id": "jadi yang kemarin itu kak raka?? ya ampun kita kira hacker",
+        "en": "so that was you the other day kak raka?? omg we thought it was a hacker"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 1500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "group_alerted != true",
+      "text": {
+        "id": "kak raka yang editor?? kak sekar sering cerita",
+        "en": "raka the editor?? kak sekar talked about you a lot"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 1800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "tasya udah cerita. screenshotnya aman di gue",
+        "en": "tasya told me. the screenshot's safe with me"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Senin malam saya mangkal di depan TPI. Saya lihat mobil perak nurunin Mbak Sekar, terus mobilnya muter balik. Yang nyetir cowok. Dia nggak langsung jalan. Lima menit diem di situ, kepalanya di setir.",
+        "en": "Mr. Raka. Monday night I was waiting for fares outside the fish auction. I saw a silver car drop Miss Sekar off, then turn back. A guy was driving. He didn't drive off right away. Five minutes he sat there, his head on the steering wheel."
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 4000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya kira mereka berantem. Maaf baru bilang. Saya kira itu bukan urusan saya.",
+        "en": "I thought they'd had a fight. Sorry I'm only saying it now. I thought it wasn't my business."
+      },
+      "profile": "jaya",
+      "typing_delay_ms": 3000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kepalanya di setir. Lima menit. Orang yang nganter pacarnya ke sesuatu yang dia tahu bahaya, dan nggak berani ikut turun.",
+        "en": "His head on the wheel. Five minutes. A man who drove his girlfriend to something he knew was dangerous, and didn't dare get out with her."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "jaya_saw_bima",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "kak kita bantu apa? kita banyak lho. 214 orang",
+        "en": "kak how can we help? there's a lot of us. 214 people"
+      },
+      "profile": "nadia",
+      "typing_delay_ms": 2000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "belum sekarang. tapi jangan bubar ya",
+        "en": "not yet. but don't go anywhere"
+      },
+      "profile": "sekar:0",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "siap. kita nungguin ep 12",
+        "en": "got it. we're waiting for ep 12"
+      },
+      "profile": "mpus",
+      "typing_delay_ms": 1500,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "JUMP",
+      "target": "d5n_bima"
+    }
+  ]
+}

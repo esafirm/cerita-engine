@@ -1,0 +1,183 @@
+{
+  "conversation_id": "cvn_d6n_night",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Ruang Tunggu",
+    "en": "The Waiting Room"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "23:40",
+    "background": "bg_kali_adem_storm.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_storm.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "weather",
+          "name": "rain"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "tasya:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Badainya nggak berhenti seharian. Nggak ada yang nyeberang. Nggak polisi, nggak Bentang, nggak laki-laki jas kuning.",
+        "en": "The storm doesn't stop all day. Nobody crosses. Not the police, not Bentang, not the man in the yellow raincoat."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malem, ruang tunggu pelabuhan cuma isi kita, dua ibu-ibu yang tidur di atas karung beras, dan satu bohlam yang kedip tiap ada petir.",
+        "en": "At night, the port's waiting room holds only us, two women asleep on sacks of rice, and one bulb that flickers with every flash of lightning."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tau nggak, Sekar bilang lo editor terbaik yang pernah dia punya. Sama editor terjelek.",
+        "en": "You know, Sekar said you were the best editor she ever had. And the worst."
+      },
+      "profile": "tasya:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dua-duanya bener.",
+        "en": "Both true."
+      },
+      "profile": "raka:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Terbaik karena lo dengerin semuanya. Napas, angin, suara motor lewat. Terjelek karena lo nggak pernah bilang ke dia kalau episodenya bagus.",
+        "en": "The best because you listened to everything. Breaths, wind, a passing motorbike. The worst because you never once told her an episode was good."
+      },
+      "profile": "tasya:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Episodenya bagus, Tas. Semuanya.",
+        "en": "...The episodes were good, Tas. All of them."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bilang ke dia. Besok.",
+        "en": "Tell her. Tomorrow."
+      },
+      "profile": "tasya:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Gue mau minta maaf ke dia duluan. Kalau dia mau dengerin.",
+        "en": "I want to apologize to her first. If she'll listen."
+      },
+      "profile": "bima:4",
+      "position": "far_right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Lo ngasih tahu bos lo soal dokumennya, Bim. Gue ditelepon orang PR gara-gara itu. Gue nggak bales chat Sekar seminggu gara-gara itu.",
+        "en": "You told your boss about the documents, Bim. I got that PR call because of it. I didn't answer Sekar's messages for a week because of it."
+      },
+      "profile": "tasya:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Gue tahu.",
+        "en": "I know."
+      },
+      "profile": "bima:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "...Gue juga bisa aja bilang ke dia soal teleponnya. Dan gue diem. Jadi kita sama-sama bego.",
+        "en": "...I could have told her about the call too. And I kept quiet. So we're both idiots."
+      },
+      "profile": "tasya:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Bima ketawa, kecil, kayak orang yang lupa caranya. Tasya nyodorin sisa kopinya. Dia minum.",
+        "en": "Bima laughs, a small laugh, like someone who forgot how. Tasya holds out what's left of her coffee. He drinks it."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_msg_receive.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam satu pagi, HP gue geter. Dinda. \"Ibu masak buat besok. Katanya buat Kak Sekar sama Raka. Dia nggak nanya apa-apa, cuma masak.\" Terus satu lagi. \"Jangan telat.\"",
+        "en": "At one in the morning, my phone buzzes. Dinda. \"Mom's cooking for tomorrow. She says it's for Sekar and Raka. She didn't ask anything, she just cooked.\" Then another. \"Don't be late.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam lima lewat dua puluh, loketnya kebuka. Ombaknya masih tinggi, tapi kapal pertama boleh jalan.",
+        "en": "At twenty past five, the ticket window opens. The waves are still high, but the first boat is allowed to go."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam setengah enam. Kapal ke Pulau Pari. Setahun lalu gue nggak dateng ke jam ini.{w} Kali ini gue udah di sini dari semalem.",
+        "en": "Five thirty. A boat to Pulau Pari. A year ago I didn't show up for this time.{w} This time I've been here since last night."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "on_first_ferry",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d7_stub"
+    }
+  ]
+}

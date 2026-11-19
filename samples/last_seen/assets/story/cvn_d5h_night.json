@@ -1,0 +1,211 @@
+{
+  "conversation_id": "cvn_d5h_night",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Angin",
+    "en": "Wind"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "21:20",
+    "background": "bg_sekar_room_night.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_room_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malem. Angin mulai bunyi di seng-seng atap. Jendela kamar Sekar getar tiap kali ada yang lebih kenceng.",
+        "en": "Night. The wind has started to rattle the tin roofs. The window of Sekar's room shakes every time a gust comes through."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bentang yang lapor Pak Hendra nyulik? Mereka yang ngancem kita, terus mereka yang lapor?",
+        "en": "Bentang reported Pak Hendra for kidnapping? They're the ones threatening us, and they're the ones reporting?"
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kalau polisi yang dateng ke Pari, Sekar nggak bisa nolak ikut. Dan kalau orang Bentang ikut, alat rekamnya...",
+        "en": "If it's the police who come to Pari, Sekar can't refuse to go with them. And if Bentang's people are with them, her recorder..."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kita harus sampai duluan.",
+        "en": "We have to get there first."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_phone_ring.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP gue bunyi. Nomor yang nggak gue simpen. Suara di seberang berat, pendek-pendek, ditutupin angin.",
+        "en": "My phone rings. A number I haven't saved. The voice on the other end is heavy, clipped, half drowned by the wind."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "hendra_refused != true",
+      "text": {
+        "id": "Besok angin besar. Syahbandar pasti nutup laut. Siang ada reda sebentar. Saya jalan pas reda. Satu kali, nggak nunggu.",
+        "en": "Big wind tomorrow. The harbor master will close the sea. There's a lull around midday. I go in the lull. Once, no waiting."
+      },
+      "profile": "hendra:0",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "condition": "hendra_refused == true",
+      "text": {
+        "id": "Yanti cerita kamu duduk lima menit nungguin abang saya ngomong. Besok siang ada reda sebentar. Saya jalan pas reda. Kalau kamu ada di dermaga, kamu ikut.",
+        "en": "Yanti says you sat five minutes waiting for my brother to speak. There's a lull around midday tomorrow. I go in the lull. If you're on the pier, you come."
+      },
+      "profile": "hendra:0",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan bawa HP anak itu.",
+        "en": "Don't bring that girl's phone."
+      },
+      "profile": "hendra:0",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue ikut.",
+        "en": "I'm coming."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Din. Didit tahu semester lo. Kalau dua-duanya pergi, Ibu sendirian, dan HP ini...",
+        "en": "Din. Didit knows your semester. If we both go, your mom's alone, and this phone..."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan suruh gue jadi orang yang nunggu di rumah lagi, Ka.",
+        "en": "Don't make me the one who waits at home again, Ka."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "HP Sekar ada di meja di antara kalian.",
+        "en": "Sekar's phone is on the desk between you."
+      },
+      "variable": "LEAVE_PHONE",
+      "profile": "dinda:3",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Lo pegang HP-nya. Itu bukan nunggu. Itu jagain buktinya.\"",
+            "en": "\"You keep the phone. That's not waiting. That's guarding the evidence.\""
+          },
+          "value": "leave",
+          "effects": [
+            {
+              "variable": "left_phone",
+              "op": "set",
+              "value": true
+            },
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Gue bawa HP-nya. Kalau Sekar nelpon lagi, gue harus angkat.\"",
+            "en": "\"I'm taking the phone. If Sekar calls again, I have to answer.\""
+          },
+          "value": "take"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "LEAVE_PHONE == 'leave'",
+      "text": {
+        "id": "...Oke. Tapi lo telepon gue tiap jam. Dari HP lo sendiri.",
+        "en": "...Okay. But you call me every hour. From your own phone."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "LEAVE_PHONE == 'leave'",
+      "text": {
+        "id": "Dan bawa dia pulang.",
+        "en": "And bring her home."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "LEAVE_PHONE == 'take'",
+      "text": {
+        "id": "Pak Hendra bilang jangan. Kak Sekar bilang jangan. Lo selalu harus belajar sendiri, ya.",
+        "en": "Pak Hendra said don't. Sekar said don't. You always have to learn things the hard way, huh."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue tidur di lantai kamar Sekar, dengerin angin. Jam lima pagi, gue kebangun sendiri, tanpa alarm.",
+        "en": "I sleep on the floor of Sekar's room, listening to the wind. At five in the morning, I wake on my own, without an alarm."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d6h_dawn"
+    }
+  ]
+}

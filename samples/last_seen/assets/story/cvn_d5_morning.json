@@ -1,0 +1,138 @@
+{
+  "conversation_id": "cvn_d5_morning",
+  "chapter": {
+    "id": "Hari 5",
+    "en": "Day 5"
+  },
+  "title": {
+    "id": "Retak",
+    "en": "Cracks"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 5,
+    "time": "07:30",
+    "background": "bg_sekar_living_day.webp",
+    "music": "bgm_quiet_house.mp3",
+    "ambience": "amb_kampung_day.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 5. Senin. Seminggu persis sejak Sekar pamit ke Dinda.",
+        "en": "Day 5. Monday. Exactly a week since Sekar said goodbye to Dinda."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Foto subuh itu masih kebuka di HP Sekar waktu gue bangun. Dermaga kayu, bakau, kapal biru-putih. \"Masih di sana.\"",
+        "en": "The dawn photo is still open on Sekar's phone when I wake up. A wooden jetty, mangroves, a blue and white boat. \"Still there.\""
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak ke kampus. Udah izin ke dosen. Bilangnya sakit.",
+        "en": "I'm not going to campus. I told my lecturer I'm sick."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "yusuf_knows_didit == true",
+      "text": {
+        "id": "Pak Yusuf juga nelpon tadi pagi. Katanya ada polisi yang lewat depan gang tiap dua jam. Gue nggak tahu harus lega atau tambah takut.",
+        "en": "Inspector Yusuf called this morning too. He says a patrol will come past the alley every two hours. I don't know if I should feel relieved or more scared."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "threatened_bima == true",
+      "text": {
+        "id": "Dan Bima nggak ke polisi. Satu hari yang dia minta udah lewat. Gue cek ke Pak Yusuf, nggak ada laporan apa-apa.",
+        "en": "And Bima didn't go to the police. The one day he asked for is up. I checked with Inspector Yusuf, there's no statement from him."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_leak_planted == true",
+      "text": {
+        "id": "Bima ngechat gue jam dua pagi. \"Bilang ke Raka, gue mau ngomong. Yang bener.\" Abis itu dia hapus.",
+        "en": "Bima texted me at two in the morning. \"Tell Raka I want to talk. Properly.\" Then he deleted it."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jadi. Semalem kita bilang ke mana dulu?",
+        "en": "So. Where did we say we'd start last night?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "route",
+          "op": "set",
+          "expr": "route_lean"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "route == 'harbor'",
+      "text": {
+        "id": "Dermaga. Kapal Pak Karta. Kalau Pak Hendra nggak mau ngomong, gue cari orang yang dulu pegang kapal itu.",
+        "en": "The pier. Pak Karta's boat. If Pak Hendra won't talk, I'll find the man who used to own it."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "condition": "route != 'harbor'",
+      "text": {
+        "id": "Orang-orangnya. Tasya janji dateng. Dan Bima belum selesai ngomong.",
+        "en": "The people. Tasya promised to come by. And Bima isn't done talking."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "route == 'harbor'",
+          "target": "d5h_pier"
+        }
+      ],
+      "fallback_target": "d5n_warung"
+    }
+  ]
+}

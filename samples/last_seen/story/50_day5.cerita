@@ -1,0 +1,710 @@
+# Day 5: Retak (spec §2, beat plan last-seen-m3.md §3 to §5). The route split: the Harbor route follows Pak Karta's
+# boat, the Network route the people who knew. Bad end #8 Wrong Name lives on the Network route.
+
+@conversation d5_morning chapter="Hari 5" chapter.en="Day 5" title="Retak" title.en="Cracks" checkpoint
+@scene VN bg=bg_sekar_living_day.webp music=bgm_quiet_house.mp3 ambience=amb_kampung_day.mp3 day=5 time=07:30 textbox=nvl
+
+narration
+  id: Hari 5. Senin. Seminggu persis sejak Sekar pamit ke Dinda.
+  en: Day 5. Monday. Exactly a week since Sekar said goodbye to Dinda.
+narration
+  id: Foto subuh itu masih kebuka di HP Sekar waktu gue bangun. Dermaga kayu, bakau, kapal biru-putih. "Masih di sana."
+  en: The dawn photo is still open on Sekar's phone when I wake up. A wooden jetty, mangroves, a blue and white boat. "Still there."
+
+stage
+  textbox adv
+  show raka:neutral left
+  show dinda:neutral right
+
+dinda:neutral [right]
+  id: Gue nggak ke kampus. Udah izin ke dosen. Bilangnya sakit.
+  en: I'm not going to campus. I told my lecturer I'm sick.
+dinda:neutral [if yusuf_knows_didit == true]
+  id: Pak Yusuf juga nelpon tadi pagi. Katanya ada polisi yang lewat depan gang tiap dua jam. Gue nggak tahu harus lega atau tambah takut.
+  en: Inspector Yusuf called this morning too. He says a patrol will come past the alley every two hours. I don't know if I should feel relieved or more scared.
+dinda:angry [if threatened_bima == true]
+  id: Dan Bima nggak ke polisi. Satu hari yang dia minta udah lewat. Gue cek ke Pak Yusuf, nggak ada laporan apa-apa.
+  en: And Bima didn't go to the police. The one day he asked for is up. I checked with Inspector Yusuf, there's no statement from him.
+dinda:neutral [if bima_leak_planted == true]
+  id: Bima ngechat gue jam dua pagi. "Bilang ke Raka, gue mau ngomong. Yang bener." Abis itu dia hapus.
+  en: Bima texted me at two in the morning. "Tell Raka I want to talk. Properly." Then he deleted it.
+
+dinda:neutral
+  id: Jadi. Semalem kita bilang ke mana dulu?
+  en: So. Where did we say we'd start last night?
+
+set
+  set route = route_lean
+
+raka:determined [if route == 'harbor']
+  id: Dermaga. Kapal Pak Karta. Kalau Pak Hendra nggak mau ngomong, gue cari orang yang dulu pegang kapal itu.
+  en: The pier. Pak Karta's boat. If Pak Hendra won't talk, I'll find the man who used to own it.
+raka:determined [if route != 'harbor']
+  id: Orang-orangnya. Tasya janji dateng. Dan Bima belum selesai ngomong.
+  en: The people. Tasya promised to come by. And Bima isn't done talking.
+
+branch
+  if route == 'harbor' -> d5h_pier
+  -> d5n_warung
+
+
+@conversation d5h_pier chapter="Hari 5" chapter.en="Day 5" title="Kapal Pak Karta" title.en="Pak Karta's Boat"
+@scene VN bg=bg_pier_day.webp music=bgm_unease.mp3 ambience=amb_harbor_day.mp3 day=5 time=08:40
+
+stage
+  show raka:neutral left
+
+narration
+  id: Tempat Sri Rejeki biasanya bersandar kosong. Cuma ban bekasnya yang ketinggalan, masih diiket ke tiang, ngambang sendirian.
+  en: The Sri Rejeki's berth is empty. Only its old tire is left, still tied to the post, floating on its own.
+narration
+  id: Di warung kopi, dua laki-laki pake kaos polo biru dongker lagi ngobrol sama bapak pemilik warung. Di dada kaosnya ada logo kecil. Ombak di bawah matahari terbit. "BPM".
+  en: At the coffee stall, two men in navy polo shirts are talking to the owner. There's a small logo on their chests. A wave under a rising sun. "BPM".
+raka:worried
+  id: Bentang Pesisir Makmur.
+  en: Bentang Pesisir Makmur.
+
+choice WATCH_MEN by=raka:worried silent
+  id: Mereka belum lihat lo.
+  en: They haven't seen you yet.
+? Duduk di ujung bangku warung, pura-pura main HP, dengerin. | Sit at the end of the stall's bench, pretend to look at your phone, listen.
+  value watch
+  set saw_bentang_men true
+? Pergi sebelum mereka nengok. | Leave before they turn around.
+  value leave
+
+narration [if WATCH_MEN == 'watch']
+  id: "Sri Rejeki baliknya jam berapa, Pak?" tanya yang lebih tinggi. "Senin malem minggu lalu, ada yang naik nggak? Cewek, pake headphone?"
+  en: "What time does the Sri Rejeki come back?" asks the taller one. "Monday night last week, did anyone go out on it? A girl, with headphones?"
+narration [if WATCH_MEN == 'watch']
+  id: Bapak warung ngelap gelas lama banget. "Kapal mah banyak, Pak. Cewek juga banyak."
+  en: The stall owner takes a long time wiping a glass. "Lots of boats, sir. Lots of girls too."
+narration [if WATCH_MEN == 'watch']
+  id: Yang pendek nengok ke gue. Lama. Bapak warung naruh kopi di depan gue tanpa gue pesen. "Ponakan saya. Kerjanya main HP doang." Mereka ketawa. Gue juga, telat sedetik.
+  en: The shorter one looks at me. A long look. The owner sets a coffee in front of me that I never ordered. "My nephew. All he does is play on his phone." They laugh. So do I, a second too late.
+narration [if WATCH_MEN == 'leave']
+  id: Gue muter lewat belakang krat-krat ikan. Bau amisnya nempel lagi di baju. Kali ini gue bersyukur.
+  en: I go the long way round, behind the fish crates. The smell gets into my clothes again. This time I'm grateful for it.
+
+narration [if wulan_knows_karta == true]
+  id: Tadi pagi Bu Wulan nyelipin kertas ke tangan gue di pintu. Bekas struk belanja. Di baliknya, tulisan tangannya. "Pak Karta. Gg. Kerapu 3, Kamal Muara. Rumah cat kuning."
+  en: This morning Mrs. Wulan slipped a piece of paper into my hand at the door. An old shopping receipt. On the back, in her handwriting. "Pak Karta. Gg. Kerapu 3, Kamal Muara. Yellow house."
+narration [if wulan_knows_karta != true]
+  id: Bu Rohmah, ibu pengupas kerang, ngasih tahu alamatnya sambil tetep ngupas. "Kamal Muara. Gang Kerapu, yang catnya kuning. Bilang aja dari saya."
+  en: Bu Rohmah, the mussel woman, gives me the address without stopping her shelling. "Kamal Muara. Gang Kerapu, the yellow house. Tell them I sent you."
+
+-> d5h_karta
+
+
+@conversation d5h_karta chapter="Hari 5" chapter.en="Day 5" title="Pak Karta" title.en="Pak Karta"
+@scene VN bg=bg_karta_house_day.webp music=bgm_low_tide.mp3 ambience=amb_kampung_day.mp3 day=5 time=10:05
+
+stage
+  show raka:neutral left
+
+narration
+  id: Yang buka pintu perempuan umur tiga puluhan, anaknya Pak Karta. Namanya Mbak Yanti. Dia ngelihat gue dari kepala sampai sepatu, terus minggir.
+  en: The door is opened by a woman in her thirties, Pak Karta's daughter. Her name is Yanti. She looks me over from head to shoes, then steps aside.
+narration
+  id: Pak Karta berbaring di dipan kayu deket jendela. Setengah mukanya turun, kayak lilin yang meleleh di satu sisi. Tangan kirinya diem di atas selimut batik. Tangan kanannya masih kuat, megangin pinggiran dipan.
+  en: Pak Karta lies on a wooden bed by the window. Half his face has fallen, like a candle melted on one side. His left hand lies still on the batik blanket. His right hand is still strong, gripping the edge of the bed.
+narration
+  id: Dia ngelihat gue lama. Terus mulut yang setengah itu gerak.
+  en: He looks at me for a long time. Then the half of his mouth that works begins to move.
+
+karta [offstage]
+  id: Anak...{w=600} jam lima.
+  en: The boy...{w=600} five o'clock.
+
+narration
+  id: Setahun. Orang yang cuma sekali denger cerita soal gue, masih inget gue sebagai orang yang nggak dateng.
+  en: A year. A man who heard about me once still remembers me as the one who didn't show up.
+
+choice TALK_KARTA by=raka:sad
+  id: Apa yang lo bilang?
+  en: What do you say?
+? "Maaf saya nggak dateng, Pak. Waktu itu." | "I'm sorry I didn't come, sir. That day."
+  value sorry
+  +trust_hendra 2
+? "Pak, saya nyari Sekar. Bapak tahu dia di mana?" | "Sir, I'm looking for Sekar. Do you know where she is?"
+  value direct
+? (Duduk di bangku plastik. Nunggu dia ngomong.) | (Sit on the plastic stool. Wait for him to speak.) [silent]
+  value wait
+  +trust_hendra 1
+
+karta [offstage] [if TALK_KARTA == 'sorry']
+  id: Dia...{w=500} nunggu kamu.{w=500} Terus...{w=500} tetep naik.{w=600} Anak itu...{w=400} keras kepala.
+  en: She...{w=500} waited for you.{w=500} Then...{w=500} came aboard anyway.{w=600} That girl...{w=400} stubborn.
+karta [offstage] [if TALK_KARTA == 'direct']
+  id: Jangan...{w=600} keras-keras.
+  en: Not...{w=600} so loud.
+narration [if TALK_KARTA == 'direct']
+  id: Matanya ngelirik ke pintu, ke jalan gang. Mbak Yanti nutup gordennya tanpa disuruh.
+  en: His eyes flick to the door, to the alley. Yanti draws the curtain without being asked.
+narration [if TALK_KARTA == 'wait']
+  id: Gue duduk. Kipas angin muter. Di luar ada yang jualan sayur pake pengeras suara. Lima menit, mungkin lebih.
+  en: I sit. The fan turns. Outside someone is selling vegetables through a loudspeaker. Five minutes, maybe more.
+
+narration
+  id: Tangan kanannya terangkat, gemeteran, nunjuk ke jendela. Ke buku bersampul kain yang udah lusuh di kusennya.
+  en: His right hand rises, trembling, and points at the window. At a worn cloth-bound book on the sill.
+karta [offstage]
+  id: Hendra...{w=500} tulis di buku saya.{w=600} Biar saya...{w=500} tahu...{w=500} kapal saya ke mana.
+  en: Hendra...{w=500} writes in my book.{w=600} So I...{w=500} know...{w=500} where my boat goes.
+
+narration
+  id: Buku log kapal. Halaman-halaman awalnya tulisan Pak Karta, miring dan rapi. Belakangan, tulisan lain, lebih tegas. Tanggal, jam, tujuan, jumlah orang.
+  en: A boat's logbook. The early pages are in Pak Karta's hand, slanted and neat. Later, another hand, firmer. Date, time, destination, number of people.
+narration
+  id: Senin malem nggak ada catatan apa-apa. Apa pun yang terjadi di laut malam itu, Pak Hendra nggak nulisnya.
+  en: Monday night has no entry at all. Whatever happened at sea that night, Pak Hendra didn't write it down.
+narration
+  id: Selasa. "05.30. Pari. 1 org (S.)." Digaris bawahi sekali.
+  en: Tuesday. "05:30. Pari. 1 person (S.)." Underlined once.
+set
+  clue crossing_log
+  remember knows_crossing_log
+
+raka:shocked
+  id: Pulau Pari. Jam setengah enam.
+  en: Pulau Pari. Five thirty.
+narration
+  id: Jadwal di papan gabus Sekar. Dilingkarin dua kali. Bukan kapal penumpang. Kapal ini.
+  en: The schedule on Sekar's corkboard. Circled twice. Not the passenger ferry. This boat.
+
+karta [offstage]
+  id: Jangan...{w=600} bawa orang...{w=500} ke pulau.
+  en: Don't...{w=600} bring anyone...{w=500} to the island.
+narration
+  id: Tangan kanannya megang pergelangan gue. Kuat, lebih kuat dari yang gue kira.
+  en: His right hand grips my wrist. Strong, stronger than I expected.
+karta [offstage]
+  id: Kamu...{w=500} jangan telat...{w=500} lagi.
+  en: Don't...{w=500} be late...{w=500} again.
+
+narration
+  id: Gue motret halamannya dan naruh bukunya balik di kusen, persis di tempatnya. Mbak Yanti nganter gue sampai pintu. "Om Hendra pulang siang," katanya. "Jangan bikin dia marah. Dia lagi capek jagain banyak orang."
+  en: I photograph the page and put the book back on the sill, exactly where it was. Yanti walks me to the door. "Uncle Hendra comes back at noon," she says. "Don't make him angry. He's tired of looking after so many people."
+
+-> d5h_hendra
+
+
+@conversation d5h_hendra chapter="Hari 5" chapter.en="Day 5" title="Malam Senin" title.en="Monday Night"
+@scene VN bg=bg_pier_day.webp music=bgm_unease.mp3 ambience=amb_harbor_day.mp3 day=5 time=12:40
+
+stage
+  show raka:neutral left
+
+narration
+  id: Sri Rejeki masuk dermaga jam satu kurang dua puluh. Mesinnya batuk dua kali sebelum mati. Orang-orang BPM udah pergi.
+  en: The Sri Rejeki comes in at twenty to one. Its engine coughs twice before it dies. The BPM men are gone.
+
+stage
+  show hendra:gruff right transition=fade duration=700
+
+hendra:gruff [right]
+  id: Yanti nelpon saya. Kamu ke rumah abang saya.
+  en: Yanti called me. You went to my brother's house.
+raka:neutral [left]
+  id: Pak Karta yang nunjukin bukunya.
+  en: Pak Karta showed me the book himself.
+hendra:wary
+  id: Abang saya sakit. Dia nggak ngerti apa yang dia tunjukin.
+  en: My brother is sick. He doesn't understand what he's showing.
+
+evidence WHERE_SEKAR by=hendra:wary retries=1 label=where_sekar
+  id: "Terus kamu mau apa?" Tunjukkan kalau lo udah tahu ke mana dia.
+  en: "So what do you want?" Show him you already know where she went.
+? crossing_log
+  +trust_hendra 3
+  -> #hendra_tells
+? sunrise_photo
+  +trust_hendra 3
+  -> #hendra_tells
+? [retry]
+  -trust_hendra 1
+  -> #where_retry
+? [fallback]
+  -trust_hendra 2
+  -> #hendra_refuses
+
+hendra:gruff label=where_retry
+  id: Itu nggak ngejawab apa-apa.
+  en: That doesn't answer anything.
+-> #where_sekar
+
+hendra:gruff label=hendra_refuses
+  id: Saya nggak punya urusan sama kamu. Pulang.
+  en: I've got no business with you. Go home.
+narration
+  id: Dia naik lagi ke kapalnya dan mulai ngegulung tali, punggungnya ke gue. Gue nunggu sepuluh menit. Punggungnya nggak pernah balik.
+  en: He climbs back onto his boat and starts coiling rope, his back to me. I wait ten minutes. His back never turns.
+set
+  set hendra_refused true
+-> d5h_yusuf
+
+narration label=hendra_tells
+  id: Pak Hendra ngelihat layar HP gue lama. Terus dia duduk di ember terbaliknya, kayak orang yang akhirnya naruh barang berat.
+  en: Pak Hendra looks at my screen for a long time. Then he sits on his upturned bucket, like a man finally setting down something heavy.
+hendra:neutral
+  id: Senin malem dia dateng jam sepuluh kurang. Bawa tas sama alat rekamnya. Ada satu orang lagi yang udah nunggu di kapal. Orang kantor.
+  en: Monday night she came at a little before ten. With her bag and her recording gear. There was someone else already waiting on the boat. An office man.
+hendra:neutral [if trust_hendra >= 5]
+  id: Pak Darmawan. Orang dinas lingkungan, yang dulu ngukur-ngukur laut buat izin itu. Dia nggak mau ngomong di darat. Katanya di darat banyak kuping.
+  en: Pak Darmawan. From the city environment office, the one who did the sea surveys for that permit. He wouldn't talk on land. He said the land has too many ears.
+set [if trust_hendra >= 5]
+  set knows_source true
+hendra:neutral [if trust_hendra < 5]
+  id: Namanya nggak usah kamu tahu. Dia nggak mau ngomong di darat. Katanya di darat banyak kuping.
+  en: You don't need his name. He wouldn't talk on land. He said the land has too many ears.
+hendra:neutral
+  id: Saya bawa mereka keluar, lewat patok. Satu jam dia ngomong ke alat rekam anak itu. Saya di buritan, nggak dengerin. Tapi saya denger.
+  en: I took them out, past the stakes. He talked into her recorder for an hour. I was at the stern, not listening. But I heard.
+hendra:worried
+  id: Pulangnya jam setengah sebelas, di dermaga ada dua orang pake senter. Kaosnya sama kayak yang tadi pagi nanya-nanya ke warung.
+  en: We came back at half past ten, and there were two men on the pier with flashlights. The same shirts as the ones asking at the stall this morning.
+hendra:worried
+  id: Anak itu langsung matiin HP-nya. Dia bilang, "Pak, HP bisa dicari." Saya nggak ngerti apa-apa soal HP. Saya cuma ngerti dia takut.
+  en: She switched her phone off right away. She said, "Sir, phones can be tracked." I don't know anything about phones. I just knew she was scared.
+raka:worried
+  id: "HP bisa dicari." Bapak bilang itu ke saya tiga hari lalu.
+  en: "Phones can be tracked." You said that to me three days ago.
+hendra:neutral
+  id: Itu kata dia. Saya cuma ngulang.
+  en: Those were her words. I was only repeating them.
+hendra:neutral
+  id: Saya tahan kapal di tengah sampai orang-orang itu pergi. Subuh, saya bawa dia ke Pari. Ke rumah sepupu saya. Dia aman. Dia nggak mau pulang sebelum rekamannya aman.
+  en: I kept the boat out until those men left. At dawn, I took her to Pari. To my cousin's house. She's safe. She won't come back until the recording is safe.
+hendra:kind
+  id: Foto kemarin subuh itu, dia yang minta saya kirim. Dan telepon tanpa suara itu. Dia bilang, "Raka bakal ngerti."
+  en: That photo yesterday at dawn, she asked me to send it. And the call with no voice. She said, "Raka will understand."
+raka:sad
+  id: Gue ngerti.
+  en: I understood.
+set
+  set hendra_told true
+
+-> d5h_yusuf
+
+
+@conversation d5h_yusuf chapter="Hari 5" chapter.en="Day 5" title="Laporan" title.en="The Report"
+@scene CALL channel=thread_yusuf day=5 time=15:10 bg=bg_pier_day.webp music=bgm_tense_call.mp3 ring=sfx_phone_ring.mp3 stay="Itu Ipda Yusuf. Dia nggak bakal nelpon siang-siang kalau nggak ada apa-apa." stay.en="It's Inspector Yusuf. He wouldn't call in the middle of the afternoon for nothing."
+
+yusuf voice=vo_d5_yusuf_01.mp3
+  id: Mas Raka. Ada perkembangan, dan saya rasa Anda harus dengar dari saya duluan.
+  en: Mr. Raka. There's been a development, and I think you should hear it from me first.
+  delivery: formal, careful, a little uneasy
+yusuf voice=vo_d5_yusuf_02.mp3
+  id: PT Bentang Pesisir Makmur melapor tadi siang. Mereka bilang seorang nelayan, Hendra, diduga membawa Mbak Sekar pergi. Ada saksi yang melihat Mbak Sekar naik kapalnya.
+  en: PT Bentang Pesisir Makmur filed a report at noon. They say a fisherman, Hendra, is suspected of taking Ms. Sekar away. They have a witness who saw her board his boat.
+  delivery: reading from a report, distaste under the formality
+yusuf voice=vo_d5_yusuf_03.mp3
+  id: Besok pagi ada tim ke Pulau Pari. Polisi, dan "pengamanan" dari pihak pelapor. Itu bukan prosedur yang saya suka.
+  en: Tomorrow morning a team goes to Pulau Pari. Police, and "security" from the complainant's side. That isn't a procedure I like.
+  delivery: dry, the quotation marks audible
+yusuf voice=vo_d5_yusuf_04.mp3 [if yusuf_knows_didit == true]
+  id: Saya sudah minta masuk tim. Setelah rekaman ancaman yang Anda laporkan, saya bisa menahan keberangkatannya sampai siang. Tidak lebih.
+  en: I've asked to be on the team. After the threat you reported, I can hold the departure until noon. No later.
+  delivery: quiet, an ally speaking carefully on an office phone
+yusuf voice=vo_d5_yusuf_05.mp3 [if yusuf_knows_didit != true]
+  id: Saya tidak bisa menahan apa-apa, Mas. Saran saya, jauhi Pulau Pari. Jangan sampai Anda ikut terseret.
+  en: I can't hold anything back. My advice is to stay away from Pulau Pari. Don't get yourself dragged into this.
+  delivery: tired, honest about his limits
+yusuf voice=vo_d5_yusuf_06.mp3 [if yusuf_knows_boat == true]
+  id: Satu lagi. Nama kapal itu saya catat tiga hari lalu, dari Anda. Sekarang orang Bentang tahu nama itu sama baiknya dengan saya. Saya tidak tahu dari mana.
+  en: One more thing. I wrote that boat's name down three days ago, from you. Now Bentang knows it as well as I do. I don't know how.
+  delivery: troubled, half to himself
+
+system
+  id: Panggilan berakhir
+  en: Call ended
+set
+  set pari_raid true
+
+-> d5h_night
+
+
+@conversation d5h_night chapter="Hari 5" chapter.en="Day 5" title="Angin" title.en="Wind"
+@scene VN bg=bg_sekar_room_night.webp music=bgm_low_tide.mp3 ambience=amb_room_night.mp3 day=5 time=21:20
+
+stage
+  show raka:neutral left
+  show dinda:neutral right
+
+narration
+  id: Malem. Angin mulai bunyi di seng-seng atap. Jendela kamar Sekar getar tiap kali ada yang lebih kenceng.
+  en: Night. The wind has started to rattle the tin roofs. The window of Sekar's room shakes every time a gust comes through.
+dinda:angry
+  id: Bentang yang lapor Pak Hendra nyulik? Mereka yang ngancem kita, terus mereka yang lapor?
+  en: Bentang reported Pak Hendra for kidnapping? They're the ones threatening us, and they're the ones reporting?
+raka:neutral
+  id: Kalau polisi yang dateng ke Pari, Sekar nggak bisa nolak ikut. Dan kalau orang Bentang ikut, alat rekamnya...
+  en: If it's the police who come to Pari, Sekar can't refuse to go with them. And if Bentang's people are with them, her recorder...
+dinda:neutral
+  id: Kita harus sampai duluan.
+  en: We have to get there first.
+
+stage
+  sound sfx_phone_ring.mp3
+
+narration
+  id: HP gue bunyi. Nomor yang nggak gue simpen. Suara di seberang berat, pendek-pendek, ditutupin angin.
+  en: My phone rings. A number I haven't saved. The voice on the other end is heavy, clipped, half drowned by the wind.
+hendra [offstage] [if hendra_refused != true]
+  id: Besok angin besar. Syahbandar pasti nutup laut. Siang ada reda sebentar. Saya jalan pas reda. Satu kali, nggak nunggu.
+  en: Big wind tomorrow. The harbor master will close the sea. There's a lull around midday. I go in the lull. Once, no waiting.
+hendra [offstage] [if hendra_refused == true]
+  id: Yanti cerita kamu duduk lima menit nungguin abang saya ngomong. Besok siang ada reda sebentar. Saya jalan pas reda. Kalau kamu ada di dermaga, kamu ikut.
+  en: Yanti says you sat five minutes waiting for my brother to speak. There's a lull around midday tomorrow. I go in the lull. If you're on the pier, you come.
+hendra [offstage]
+  id: Jangan bawa HP anak itu.
+  en: Don't bring that girl's phone.
+
+dinda:neutral
+  id: Gue ikut.
+  en: I'm coming.
+raka:neutral
+  id: Din. Didit tahu semester lo. Kalau dua-duanya pergi, Ibu sendirian, dan HP ini...
+  en: Din. Didit knows your semester. If we both go, your mom's alone, and this phone...
+dinda:angry
+  id: Jangan suruh gue jadi orang yang nunggu di rumah lagi, Ka.
+  en: Don't make me the one who waits at home again, Ka.
+
+choice LEAVE_PHONE by=dinda:angry
+  id: HP Sekar ada di meja di antara kalian.
+  en: Sekar's phone is on the desk between you.
+? "Lo pegang HP-nya. Itu bukan nunggu. Itu jagain buktinya." | "You keep the phone. That's not waiting. That's guarding the evidence."
+  value leave
+  set left_phone true
+  +trust_dinda 2
+? "Gue bawa HP-nya. Kalau Sekar nelpon lagi, gue harus angkat." | "I'm taking the phone. If Sekar calls again, I have to answer."
+  value take
+
+dinda:neutral [if LEAVE_PHONE == 'leave']
+  id: ...Oke. Tapi lo telepon gue tiap jam. Dari HP lo sendiri.
+  en: ...Okay. But you call me every hour. From your own phone.
+dinda:hopeful [if LEAVE_PHONE == 'leave']
+  id: Dan bawa dia pulang.
+  en: And bring her home.
+dinda:angry [if LEAVE_PHONE == 'take']
+  id: Pak Hendra bilang jangan. Kak Sekar bilang jangan. Lo selalu harus belajar sendiri, ya.
+  en: Pak Hendra said don't. Sekar said don't. You always have to learn things the hard way, huh.
+
+narration
+  id: Gue tidur di lantai kamar Sekar, dengerin angin. Jam lima pagi, gue kebangun sendiri, tanpa alarm.
+  en: I sleep on the floor of Sekar's room, listening to the wind. At five in the morning, I wake on my own, without an alarm.
+
+-> d6h_dawn
+
+
+@conversation d5n_warung chapter="Hari 5" chapter.en="Day 5" title="Orang-Orang" title.en="The People"
+@scene VN bg=bg_warung_day.webp music=bgm_quiet_house.mp3 ambience=amb_kampung_day.mp3 day=5 time=10:15
+
+stage
+  show raka:neutral left
+  show dinda:neutral center
+
+narration
+  id: Tasya dateng ke warung Bu Sari jam sepuluh lewat, bawa es kopi literan yang udah berembun. Rambutnya diiket asal. Matanya bengkak, tapi lipstiknya rapi.
+  en: Tasya arrives at Bu Sari's stall just after ten, carrying a giant iced coffee already beaded with water. Her hair is tied up any old way. Her eyes are puffy, but her lipstick is perfect.
+
+stage
+  show tasya:nervous right transition=slide_left duration=700
+
+tasya:nervous [right] [if trust_tasya >= 0]
+  id: Hai. Sori telat. Gue muter tiga kali di gang, nggak berani masuk.
+  en: Hi. Sorry I'm late. I circled the alley three times, too scared to come in.
+tasya:defensive [right] [if trust_tasya < 0]
+  id: Gue dateng karena Dinda yang minta. Bukan karena lo.
+  en: I came because Dinda asked. Not because of you.
+dinda:neutral [center]
+  id: Duduk, Kak. Bu Sari udah bikinin teh.
+  en: Sit down. Bu Sari made you tea.
+
+narration
+  id: Tasya duduk di ujung bangku plastik, jauh dari gue. Es kopinya nggak diminum, cuma diputer-puter.
+  en: Tasya sits at the very end of the plastic bench, far from me. She doesn't drink her iced coffee, just turns it round and round.
+
+tasya:guilty
+  id: Gue belum cerita semuanya. Waktu orang PR itu nelpon, dia nggak cuma nawarin duit.
+  en: I haven't told you everything. When that PR guy called, he didn't just offer money.
+tasya:guilty
+  id: Dia nanya, "Selain Mbak Sekar, siapa lagi yang tahu soal dokumennya?" Kayak... dia udah tahu ada dokumen. Gue bahkan belum tahu waktu itu.
+  en: He asked, "Apart from Ms. Sekar, who else knows about the documents?" Like... he already knew there were documents. I didn't even know yet.
+tasya:nervous
+  id: Terus dia bilang, "Kami sudah dengar dari orang dekatnya." Gue kira maksudnya gue. Biar gue ngerasa bersalah. Dan berhasil.
+  en: Then he said, "We've already heard from someone close to her." I thought he meant me. To make me feel guilty. And it worked.
+raka:worried
+  id: Orang dekatnya.
+  en: Someone close to her.
+
+choice SHOW_PAGE by=tasya:guilty [if clue_notebook_page == true]
+  id: Halaman yang disobek ada di HP Sekar. "Dia bukan jahat, dia butuh uang."
+  en: The torn-out page is on Sekar's phone. "She isn't bad, she needs the money."
+? (Tunjukin halamannya ke Tasya.) | (Show Tasya the page.)
+  value show
+  +trust_tasya 4
+? (Simpen dulu.) | (Keep it for now.) [silent]
+  value keep
+
+narration [if SHOW_PAGE == 'show']
+  id: Tasya baca sekali. Terus nutup mulutnya pake tangan, dan nangis tanpa suara, kayak orang yang udah latihan nangis tanpa ketahuan.
+  en: Tasya reads it once. Then she covers her mouth with her hand and cries without a sound, like someone who has practiced crying without being caught.
+tasya:crying [if SHOW_PAGE == 'show']
+  id: Dia masih belain gue. Waktu gue nggak bales chatnya. Dia masih belain gue.
+  en: She was still defending me. When I wasn't answering her messages. She was still defending me.
+dinda:neutral [if SHOW_PAGE == 'show']
+  id: Itu Kak Sekar banget.
+  en: That's so Sekar.
+
+tasya:neutral
+  id: Satu lagi. mpus, yang di grup, dia anak IT. Dia DM gue semalem. Katanya dia ngecek nomor yang ngancem kalian.
+  en: One more thing. mpus, from the group, works in IT. He DMed me last night. He says he looked up the number that threatened you.
+
+-> d5n_mpus
+
+
+@conversation d5n_mpus chapter="Hari 5" chapter.en="Day 5" title="mpus" title.en="mpus"
+@scene CHAT channel=thread_tasya day=5 time=10:40 music=bgm_unease.mp3
+
+tasya typing=1.5s sfx=sfx_msg_receive.mp3
+  id: gue forward dari mpus ya
+  en: forwarding this from mpus
+tasya typing=2s sfx=sfx_msg_receive.mp3
+  id: "nomornya burner, tapi orangnya males. foto profilnya dihapus tapi ke-cache di aplikasi cek nomor. nih"
+  en: "it's a burner, but the guy got lazy. he deleted the profile photo but a number lookup app cached it. here"
+media IMAGE photo_burner_profile.webp by=tasya unlock=photo_burner_profile typing=2s sfx=sfx_msg_receive.mp3
+  id: "BPM golf day" 🙃
+  en: "BPM golf day" 🙃
+  clue burner_profile
+
+narration
+  id: Kacamata tanpa bingkai. Rambut belah samping, rapi. Senyum yang kebanyakan. Di belakangnya spanduk "BPM GOLF DAY".
+  en: Rimless glasses. Neat side-parted hair. A smile that's a bit too much. Behind him, a banner. "BPM GOLF DAY".
+narration
+  id: Didit. Nomor yang nyuruh gue berhenti nyari, tengah malem itu, adalah nomor Didit sendiri.
+  en: Didit. The number that told me to stop looking, that midnight, was Didit's own.
+tasya typing=2.5s sfx=sfx_msg_receive.mp3
+  id: mpus bilang screenshot ini dia simpen di 3 tempat. dia takut tapi dia seneng bisa bantu
+  en: mpus says he saved the screenshot in 3 places. he's scared but glad he could help
+
+-> d5n_listeners
+
+
+@conversation d5n_listeners chapter="Hari 5" chapter.en="Day 5" title="Pendengar" title.en="The Listeners"
+@scene CHAT channel=group_ep12 day=5 time=13:20 music=bgm_low_tide.mp3
+
+narration
+  id: Kalau orang-orang di sekitar Sekar masing-masing pegang satu potong, pendengarnya juga. Gue buka grupnya, dan kali ini gue nggak pura-pura jadi siapa-siapa.
+  en: If the people around Sekar each held a piece, so do her listeners. I open the group, and this time I don't pretend to be anyone.
+sekar sfx=sfx_msg_send.mp3
+  id: halo semua. ini raka, temen lama sekar, yang dulu ngedit podcast ini. hp sekar ada di gue, sama dinda adiknya. sekar belum pulang. kalau ada yang liat apa aja senin malem di angke, tolong bilang
+  en: hi everyone. this is raka, sekar's old friend, i used to edit this podcast. sekar's phone is with me and her sister dinda. sekar isn't home yet. if anyone saw anything monday night in angke, please say
+nadia typing=1.5s sfx=sfx_msg_receive.mp3 [if group_alerted == true]
+  id: jadi yang kemarin itu kak raka?? ya ampun kita kira hacker
+  en: so that was you the other day kak raka?? omg we thought it was a hacker
+nadia typing=1.8s sfx=sfx_msg_receive.mp3 [if group_alerted != true]
+  id: kak raka yang editor?? kak sekar sering cerita
+  en: raka the editor?? kak sekar talked about you a lot
+mpus typing=2s sfx=sfx_msg_receive.mp3
+  id: tasya udah cerita. screenshotnya aman di gue
+  en: tasya told me. the screenshot's safe with me
+jaya typing=4s sfx=sfx_msg_receive.mp3
+  id: Mas Raka. Senin malam saya mangkal di depan TPI. Saya lihat mobil perak nurunin Mbak Sekar, terus mobilnya muter balik. Yang nyetir cowok. Dia nggak langsung jalan. Lima menit diem di situ, kepalanya di setir.
+  en: Mr. Raka. Monday night I was waiting for fares outside the fish auction. I saw a silver car drop Miss Sekar off, then turn back. A guy was driving. He didn't drive off right away. Five minutes he sat there, his head on the steering wheel.
+jaya typing=3s sfx=sfx_msg_receive.mp3
+  id: Saya kira mereka berantem. Maaf baru bilang. Saya kira itu bukan urusan saya.
+  en: I thought they'd had a fight. Sorry I'm only saying it now. I thought it wasn't my business.
+
+narration
+  id: Kepalanya di setir. Lima menit. Orang yang nganter pacarnya ke sesuatu yang dia tahu bahaya, dan nggak berani ikut turun.
+  en: His head on the wheel. Five minutes. A man who drove his girlfriend to something he knew was dangerous, and didn't dare get out with her.
+set
+  set jaya_saw_bima true
+
+nadia typing=2s sfx=sfx_msg_receive.mp3
+  id: kak kita bantu apa? kita banyak lho. 214 orang
+  en: kak how can we help? there's a lot of us. 214 people
+sekar sfx=sfx_msg_send.mp3
+  id: belum sekarang. tapi jangan bubar ya
+  en: not yet. but don't go anywhere
+mpus typing=1.5s sfx=sfx_msg_receive.mp3
+  id: siap. kita nungguin ep 12
+  en: got it. we're waiting for ep 12
+
+-> d5n_bima
+
+
+@conversation d5n_bima chapter="Hari 5" chapter.en="Day 5" title="Orang Dekatnya" title.en="Someone Close to Her"
+@scene VN bg=bg_sekar_house_gate_night.webp music=bgm_unease.mp3 ambience=amb_room_night.mp3 day=5 time=18:40
+
+narration
+  id: Bima dateng pas magrib. Tanpa martabak kali ini. Mobil peraknya diparkir di mulut gang, jauh, kayak dia nggak mau mobilnya kelihatan di depan rumah ini.
+  en: Bima comes at sunset. No martabak this time. He parks his silver car at the mouth of the alley, far away, as if he doesn't want it seen outside this house.
+
+stage
+  show raka:neutral left
+  show dinda:neutral center
+  show bima:neutral right transition=fade duration=700
+
+bima:ashamed [right] [if bima_leak_planted == true]
+  id: Gue bilang mau ngomong yang bener. Jadi gue di sini.
+  en: I said I'd tell you properly. So here I am.
+bima:irritated [right] [if bima_leak_planted != true]
+  id: Tasya bilang lo mau ketemu. Gue nggak punya banyak waktu, Ka.
+  en: Tasya said you wanted to meet. I don't have much time, Ka.
+
+dinda:angry [center]
+  id: Seseorang ngasih tahu Bentang kalau Kak Sekar punya dokumen itu. Sebelum dia ngilang. Sebelum ada yang ngancem.
+  en: Someone told Bentang that Sekar had those documents. Before she disappeared. Before anyone threatened anyone.
+raka:neutral [left]
+  id: Didit bilang ke Tasya, dia udah denger dari orang dekatnya. Jadi sekarang kita mau tahu siapa.
+  en: Didit told Tasya he'd already heard from someone close to her. So now we want to know who.
+
+evidence WHO_LEAKED by=raka:determined label=who_leaked
+  id: Siapa yang ngasih tahu Bentang? Tunjukkan buktinya.
+  en: Who told Bentang? Show the proof.
+? didit_card
+  +trust_bima 2
+  -> #leak_bima
+? bima_deleted
+  +trust_bima 1
+  -> #leak_bima
+? tasya_warning
+  -> #leak_tasya
+? notebook_page
+  -> #leak_tasya
+? sekar_notebook
+  -> #leak_tasya
+? [fallback]
+  -> #leak_vague
+
+raka:determined label=leak_bima [if WHO_LEAKED == 'didit_card']
+  id: "Nomor ini saya dapat dari Mas Bima." Kartu namanya Didit, Bim. Lo kenal dia. Lo ngasih dia nomor HP Sekar.
+  en: "I got this number from Bima." That's Didit's card, Bim. You know him. You gave him Sekar's number.
+raka:determined [if WHO_LEAKED == 'bima_deleted']
+  id: Lo hapus pesan jam delapan empat puluh karena kantor lo nyuruh jauhin Sekar. Kenapa kantor konsultan peduli sama podcaster, Bim?
+  en: You deleted that message at eight forty because your office told you to stay away from Sekar. Why would a consulting firm care about a podcaster, Bim?
+narration
+  id: Bima nyender ke pagar. Jam tangannya yang mahal kena lampu jalan, dan untuk pertama kalinya kelihatan kayak barang yang kebesaran buat tangannya.
+  en: Bima leans against the gate. His expensive watch catches the streetlight, and for the first time it looks too big for his wrist.
+bima:ashamed
+  id: Gue cerita ke bos gue. Pak Rudy. Tiga minggu lalu. Gue bilang Sekar lagi bikin episode soal izin reklamasi, dan dia pegang AMDAL yang asli.
+  en: I told my boss. Pak Rudy. Three weeks ago. I said Sekar was making an episode about the reclamation permit, and that she had the real environmental review.
+bima:ashamed
+  id: Gue pikir kalau kantor tahu, mereka bakal bilang ke klien buat hati-hati, buat beresin izinnya. Gue pikir itu bakal ngelindungin dia.
+  en: I thought if the office knew, they'd tell the client to be careful, to fix the permit. I thought it would protect her.
+bima:panicked
+  id: Malemnya Pak Rudy email Didit. Gue di-CC. Gue baca, dan gue tahu gue udah ngelakuin sesuatu yang nggak bisa dibalikin.
+  en: That night Pak Rudy emailed Didit. He copied me in. I read it, and I knew I'd done something I couldn't undo.
+narration
+  id: Dia ngeluarin HP-nya, ngetik sesuatu, dan HP gue geter. Email. Diteruskan.
+  en: He takes out his phone, types something, and my phone buzzes. An email. Forwarded.
+media IMAGE photo_bima_email.webp unlock=photo_bima_email
+  id: "Pak Didit, info dari Bima (tim kami): Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak."
+  en: "Pak Didit, info from Bima (on our team): Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely."
+set
+  clue bima_email
+  remember knows_bima_email
+dinda:crying
+  id: "Ditangani dengan bijak."
+  en: "Handle it wisely."
+bima:ashamed
+  id: Senin sore Sekar nanya ke gue jadwal kapal ke Pulau Pari. Gue kira buat liputan. Gue nggak nanya. Gue nggak pernah nanya apa-apa ke dia.
+  en: Monday afternoon Sekar asked me about the ferry times to Pulau Pari. I thought it was for a story. I didn't ask. I never asked her anything.
+set
+  set bima_confessed true
+-> d5n_night
+
+# Dinda stops a wrong accusation once, if she trusts Raka enough to argue. Otherwise, or the second time, Raka names Tasya.
+branch label=leak_tasya
+  if trust_dinda >= 10 && dinda_stopped_wrong != true -> #dinda_stops
+  -> d5n_wrong_name
+
+dinda:angry label=dinda_stops
+  id: Bukan Tasya, Ka. Halaman itu bilang dia bukan jahat. Dan Didit sendiri yang bilang ke Tasya dia udah denger dari orang lain.
+  en: It isn't Tasya, Ka. That page says she isn't bad. And Didit told Tasya himself that he'd already heard from someone else.
+set
+  set dinda_stopped_wrong true
+  -trust_dinda 2
+-> #who_leaked
+
+bima:irritated label=leak_vague
+  id: Itu nggak ngebuktiin apa-apa, Ka. Gue capek dicurigain.
+  en: That doesn't prove anything, Ka. I'm tired of being suspected.
+narration
+  id: Dia balik ke mobilnya. Lampu belakangnya merah, terus belok, terus hilang. Kayak semua orang di cerita ini.
+  en: He walks back to his car. Its tail lights are red, then they turn, then they're gone. Like everyone in this story.
+-> d5n_night
+
+
+@conversation d5n_wrong_name chapter="Hari 5" chapter.en="Day 5" title="Nama yang Salah" title.en="Wrong Name"
+@scene VN bg=bg_sekar_room_night.webp music=bgm_low_tide.mp3 day=5 time=21:30
+
+narration
+  id: Malem itu gue buka grup pendengar dari HP Sekar. Jari gue gemeteran, tapi bukan karena ragu.
+  en: That night I open the listener group on Sekar's phone. My fingers shake, but not from doubt.
+narration
+  id: "Ini Raka, temennya Sekar. Tasya tahu Sekar diancam seminggu sebelum dia hilang, dan diem. Dia ditawarin duit sama orang yang sekarang nyari Sekar."
+  en: "This is Raka, Sekar's friend. Tasya knew Sekar was threatened a week before she disappeared, and said nothing. She was offered money by the people now looking for Sekar."
+narration
+  id: Semuanya bener. Dan semuanya salah.
+  en: All of it true. And all of it wrong.
+
+media CG cg_wrong_name.webp unlock=cg_wrong_name
+  id: Dalam satu jam, screenshot-nya ada di mana-mana. Akun @carikaksekar nge-repost. Komentar-komentarnya nggak bisa dibaca sampai habis.
+  en: Within an hour, the screenshot is everywhere. The @findkaksekar account reposts it. The comments can't be read to the end.
+
+narration
+  id: Paginya, akun Tasya hilang. Podcast-nya di-private. Dia nggak pernah ngangkat telepon Dinda lagi.
+  en: In the morning, Tasya's accounts are gone. The podcast is set to private. She never picks up Dinda's calls again.
+narration
+  id: Bima berhenti bales chat. Didit nggak perlu ngelakuin apa-apa. Orang-orang yang dia takutin udah saling bubar sendiri.
+  en: Bima stops replying. Didit doesn't have to do anything. The people he was afraid of have scattered on their own.
+narration
+  id: Dua minggu kemudian, gue balik ke Bandung. Kadang gue buka grup itu. Sepi. Pesan terakhir di sana masih punya gue.
+  en: Two weeks later, I go back to Bandung. Sometimes I open that group. It's silent. The last message there is still mine.
+
+ending end_08_wrong_name BAD
+  id: Nama yang Salah
+  en: Wrong Name
+  summary id: Raka menuduh Tasya di depan semua pendengar. Kelompok kecil yang bisa menemukan Sekar bubar, dan orang yang sebenarnya tidak tersentuh.
+  summary en: Raka accused Tasya in front of every listener. The small group that could have found Sekar fell apart, and the real culprit was never touched.
+
+
+@conversation d5n_night chapter="Hari 5" chapter.en="Day 5" title="Kabar" title.en="News"
+@scene CHAT channel=thread_tasya day=5 time=22:05 music=bgm_unease.mp3
+
+tasya typing=1.5s sfx=sfx_msg_receive.mp3
+  id: ka. udah liat berita?
+  en: ka. seen the news?
+tasya typing=3s sfx=sfx_msg_receive.mp3
+  id: "Nelayan Muara Angke dilaporkan terkait hilangnya podcaster. Polisi dan pihak pelapor akan menyisir Pulau Pari besok pagi."
+  en: "Muara Angke fisherman reported in podcaster's disappearance. Police and the complainant will search Pulau Pari tomorrow morning."
+tasya typing=2.5s sfx=sfx_msg_receive.mp3
+  id: pihak pelapor = bentang. mereka mau ke sana bareng polisi
+  en: complainant = bentang. they're going there with the police
+set
+  set pari_raid true
+
+narration [if bima_confessed == true]
+  id: Pulau Pari. Sekar nanya jadwal kapal ke Pari, Senin sore. Foto subuh dengan bakau. "Masih di sana."
+  en: Pulau Pari. Sekar asked about the Pari ferry on Monday afternoon. The dawn photo with the mangroves. "Still there."
+narration [if bima_confessed != true]
+  id: Pulau Pari. Jadwal kapal di papan gabus Sekar, dilingkarin dua kali. Foto subuh dengan bakau. "Masih di sana."
+  en: Pulau Pari. The ferry schedule on Sekar's corkboard, circled twice. The dawn photo with the mangroves. "Still there."
+
+player sfx=sfx_msg_send.mp3
+  id: kapal pertama ke pari jam berapa?
+  en: what time's the first boat to pari?
+tasya typing=2s sfx=sfx_msg_receive.mp3
+  id: 05.30 dari kali adem. tapi besok badai ka. bmkg udah warning
+  en: 05:30 from kali adem. but there's a storm tomorrow ka. the weather agency already issued a warning
+tasya typing=2.5s sfx=sfx_msg_receive.mp3
+  id: gue ikut. jangan larang. gue udah cukup lama diem
+  en: i'm coming. don't stop me. i've kept quiet long enough
+tasya typing=2s sfx=sfx_msg_receive.mp3 [if bima_confessed == true]
+  id: bima juga. dia yang nyetir
+  en: bima too. he's driving
+
+-> d6n_didit
