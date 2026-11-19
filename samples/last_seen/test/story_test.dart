@@ -9,9 +9,10 @@ typedef _Run = ({Map<String, String> picks, List<String> inputs});
 const _timeout = "<timeout>";
 
 /// Plays Last Seen headlessly in [locale], so every route and JSON file is exercised. A choice without an
-/// answer in [run] takes its first available option.
-Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
+/// answer in [run] takes its first available option. Pass [meta] to carry cross-run memory from an earlier run.
+Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run, {GlobalMetaState? meta}) async {
   final engine = RealFsseEngine(AssetEngineLoader(const LoaderConfig()))..locale = locale;
+  if (meta != null) engine.meta = meta;
   final inputs = [...run.inputs];
   // "a|b" answers an evidence question asked twice: a, then b.
   final asked = <String, int>{};
@@ -27,7 +28,8 @@ Future<(EndingItemType, RealFsseEngine)> _play(String locale, _Run run) async {
         final times = asked.update(item.variable!, (n) => n + 1, ifAbsent: () => 0);
         final clue = engine.clues.byId(answers[times.clamp(0, answers.length - 1)]);
         expect(clue, isNotNull, reason: "no clue '${run.picks[item.variable]}'");
-        result = ItemResult.present(item, clue!);
+        expect(engine.dataMap["clue_${clue!.id}"], isTrue, reason: "${clue.id} presented before it was found");
+        result = ItemResult.present(item, clue);
       case ChoiceItemType():
         final wanted = run.picks[item.variable];
         if (wanted == _timeout) expect(item.timeoutMs, isNotNull, reason: "${item.variable} has no timer");
@@ -92,6 +94,8 @@ const _Run _kind = (
     "WHERE_SEKAR": "crossing_log",
     "LEAVE_PHONE": "leave",
     "CROSS_NOW": "wait",
+    "KIDNAP": "crossing_log",
+    "MOTIVE": "didit_call",
   },
   inputs: ["0530", "karta0530", "1427"],
 );
@@ -149,6 +153,7 @@ const _Run _timeouts = (
     "LEAVE_PHONE": "take",
     "CROSS_NOW": _timeout,
     "THROW_PHONE": _timeout,
+    "REUNION": _timeout,
   },
   inputs: ["0530", "Karta0530", "1427"],
 );
@@ -180,9 +185,32 @@ final _Run _network = (
     "WHO_LEAKED": "tasya_warning|didit_card",
     "DIDIT_DEAL": "yusuf",
     "CROSS_NOW": "wait",
+    "WHERE_PARI": "sunrise_photo",
+    // The Network route has no logbook: the hint, then a wrong answer.
+    "KIDNAP": "ferry_schedule|sunrise_photo",
+    "MOTIVE": "bima_email",
   },
   inputs: _kind.inputs,
 );
+
+/// The Network run, except Bima never confesses and Raka picks the wrong jetty on Pari.
+final _Run _drifting = (
+  picks: {..._network.picks, "WHO_LEAKED": "ep12_draft", "WHERE_PARI": "ferry_schedule|stake_map"},
+  inputs: _kind.inputs,
+);
+
+/// The kind run, except Raka has nothing to show Yusuf on the jetty.
+final _Run _noProof = (
+  picks: {..._kind.picks, "KIDNAP": "sunrise_photo|unsent_message", "MOTIVE": "unsent_message|unsent_message"},
+  inputs: _kind.inputs,
+);
+
+/// The kind run, answering Yusuf with the email it remembers from a Network run.
+/// It hears the last voice notes before the reunion, so it also turns down the secret question.
+final _Run _true = (picks: {..._kind.picks, "MOTIVE": "bima_email", "ASK_0612": "skip"}, inputs: _kind.inputs);
+
+/// The kind run, asking Sekar about the file 0612 at the reunion.
+final _Run _secret = (picks: {..._kind.picks, "ASK_0612": "ask"}, inputs: _kind.inputs);
 
 /// The kind run, except Raka takes the speedboat into the storm.
 final _Run _reckless = (picks: {..._kind.picks, "CROSS_NOW": "now"}, inputs: _kind.inputs);
@@ -208,7 +236,9 @@ void main() {
     final meta = GlobalMetaState();
     final report = await StoryUnlocker(AssetEngineLoader(const LoaderConfig())).unlockAll(meta);
     expect(report.unplayedChapters, isEmpty);
-    expect(meta.unlockedEndingIds, containsAll(["end_00_preview", "end_07_handed_over"]));
+    expect(meta.unlockedEndingIds, containsAll(["end_01_undertow", "end_07_handed_over", "end_10_off_the_record"]));
+    expect(meta.unlockedEndingIds, isNot(contains("end_00_preview")));
+    expect(meta.unlockedCheckpoints.keys, containsAll(["d7h_dawn", "d7n_ferry"]));
     expect(meta.unlockedMediaIds, contains("cg_handed_over"));
     // Day 4 starts with what Days 2 and 3 found.
     final day4 = meta.unlockedCheckpoints["d4_timeline"]!.dataMap;
@@ -221,7 +251,15 @@ void main() {
   for (final locale in ["id", "en"]) {
     test('kind run ($locale): Dinda trusts Raka, Yusuf checks the CCTV, Tasya talks', () async {
       final (ending, engine) = await _play(locale, _kind);
-      expect(ending.endingId, "end_00_preview");
+      expect(ending.endingId, "end_06_low_tide", reason: "the logbook clears Hendra, but a threat is not the permit");
+      expect(engine.dataMap["reconciled"], isTrue);
+      expect(engine.dataMap["proof_log"], isTrue);
+      expect(engine.dataMap["proof_threat"], isTrue);
+      expect(engine.dataMap["proof_email"], isNull);
+      expect(engine.dataMap["EMAIL"], isNull, reason: "no earlier Network run to remember the email from");
+      expect(engine.dataMap["heard_unsent_02"], isTrue, reason: "Hendra plays the note from his phone");
+      expect(engine.dataMap["heard_unsent_04"], isTrue, reason: "the file 0612 on the dashboard");
+      expect(engine.meta.rememberedFacts, containsAll(["knows_crossing_log", "heard_unsent_02", "heard_unsent_04"]));
       // Day 3: the CCTV comes from Yusuf, Hendra warns Raka, and the threat makes Didit slip.
       expect(engine.dataMap["heard_of_didit"], isTrue);
       expect(engine.dataMap["hull_tries"], isNull);
@@ -278,7 +316,9 @@ void main() {
 
     test('timeout run ($locale): timed choices fall back to silence, the room waits for the shelf', () async {
       final (ending, engine) = await _play(locale, _timeouts);
-      expect(ending.endingId, "end_00_preview");
+      expect(ending.endingId, "end_02_still_water", reason: "silence at the reunion sends her to Tidung");
+      expect(engine.dataMap["REUNION"], "silent");
+      expect(engine.dataMap["reconciled"], isNull);
       expect(engine.dataMap["FALLOUT"], "silent");
       expect(engine.dataMap["ANSWER"], "silent");
       expect(engine.dataMap["TELL_YUSUF"], "silent");
@@ -313,7 +353,11 @@ void main() {
 
     test('network run ($locale): Dinda stops a wrong name, Bima confesses, the first ferry', () async {
       final (ending, engine) = await _play(locale, _network);
-      expect(ending.endingId, "end_00_preview");
+      expect(ending.endingId, "end_03_episode_12", reason: "the email without the logbook");
+      expect(engine.dataMap["found_sekar"], isTrue);
+      expect(engine.dataMap["hendra_held"], isTrue);
+      expect(engine.dataMap["proof_email"], isTrue);
+      expect(engine.dataMap["heard_unsent_03"], isTrue, reason: "Tasya plays the end of the Episode 9 tape");
       expect(engine.dataMap["route"], "network");
       expect(engine.dataMap["dinda_stopped_wrong"], isTrue);
       expect(engine.dataMap["clue_burner_profile"], isTrue);
@@ -353,6 +397,52 @@ void main() {
       expect(engine.dataMap["trust_dinda"], -18);
       // giving the phone -2, pushing -2
       expect(engine.dataMap["trust_bima"], -4);
+    });
+
+    test('drifting run ($locale): no confession, the wrong jetty, Raka answers her voice note', () async {
+      final (ending, engine) = await _play(locale, _drifting);
+      expect(ending.endingId, "end_04_unsent");
+      expect(engine.dataMap["bima_confessed"], isNull);
+      expect(engine.dataMap["found_sekar"], isNull);
+      expect(engine.dataMap["hendra_held"], isTrue);
+    });
+
+    test('no-proof run ($locale): nothing for Yusuf on the jetty, the case closed as a runaway', () async {
+      final (ending, engine) = await _play(locale, _noProof);
+      expect(ending.endingId, "end_05_runaway");
+      expect(engine.dataMap["hendra_held"], isTrue);
+      expect(engine.dataMap["proof_log"], isNull);
+      expect(engine.dataMap["proof_threat"], isNull);
+    });
+
+    test('true run ($locale): Network first, then Harbor remembers the email', () async {
+      final meta = GlobalMetaState();
+      final (first, _) = await _play(locale, _network, meta: meta);
+      expect(first.endingId, "end_03_episode_12");
+      final (ending, engine) = await _play(locale, _true, meta: meta);
+      expect(ending.endingId, "end_01_undertow");
+      expect(engine.dataMap["EMAIL"], "call", reason: "only memory brings the email to the Harbor route");
+      expect(engine.dataMap["proof_log"], isTrue);
+      expect(engine.dataMap["proof_email"], isTrue);
+    });
+
+    test('Network remembers the logbook ($locale): the boat by name, then the log on the jetty', () async {
+      final meta = GlobalMetaState();
+      await _play(locale, _kind, meta: meta);
+      final (ending, engine) = await _play(locale, (picks: {..._network.picks, "KIDNAP": "crossing_log"}, inputs: _kind.inputs), meta: meta);
+      expect(ending.endingId, "end_01_undertow");
+      expect(engine.dataMap["SRI_REJEKI"], "boat");
+      expect(engine.dataMap["LOGBOOK"], "tell");
+    });
+
+    test('secret run ($locale): all four voice notes, then the file 0612', () async {
+      final meta = GlobalMetaState();
+      final (_, harbor) = await _play(locale, _kind, meta: meta);
+      expect(harbor.dataMap["ASK_0612"], isNull, reason: "the Network note is still missing");
+      await _play(locale, _network, meta: meta);
+      expect(meta.rememberedFacts, containsAll(["heard_unsent_01", "heard_unsent_02", "heard_unsent_03", "heard_unsent_04"]));
+      final (ending, _) = await _play(locale, _secret, meta: meta);
+      expect(ending.endingId, "end_10_off_the_record");
     });
   }
 }

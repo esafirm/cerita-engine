@@ -1,0 +1,160 @@
+{
+  "conversation_id": "cvn_d7_undertow",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Arus Bawah",
+    "en": "Undertow"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "08:30",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "sekar:3",
+          "position": "right"
+        },
+        {
+          "action": "show",
+          "profile": "raka:6",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Aditya. Laporan Bapak saya tarik untuk diperiksa. Bapak ikut kami ke Polsek, kasih keterangan. HP Bapak juga.",
+        "en": "Mr. Aditya. I'm pulling your report for review. You'll come with us to the station and give a statement. Your phone too."
+      },
+      "profile": "yusuf:2",
+      "position": "far_left"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua laki-laki BPM saling lihat, terus jalan balik ke speedboat putih mereka tanpa nunggu bosnya.",
+        "en": "The two BPM men look at each other, then walk back to their white speedboat without waiting for their boss."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mbak Sekar. Alat rekam itu tetap sama Anda. Tapi tolong, salinannya buat saya. Yang ini, saya pastikan nggak hilang.",
+        "en": "Ms. Sekar. That recorder stays with you. But please, a copy for me. This one, I'll make sure doesn't disappear."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "hide",
+          "profile": "yusuf",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_undertow.webp",
+      "caption": {
+        "id": "Episode 12 tayang sembilan hari kemudian.",
+        "en": "Episode 12 aired nine days later."
+      },
+      "unlock_id": "cg_undertow"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue yang ngedit. Tasya yang bacain bagian dokumennya, karena suaranya lebih tenang dari suara Sekar kalau lagi marah. Halaman tiga puluh tujuh, dibandingin baris per baris.",
+        "en": "I edited it. Tasya read the document segment, because her voice stays calmer than Sekar's when she's angry. Page thirty-seven, compared line by line."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "knows_source == true",
+      "text": {
+        "id": "Suara Pak Darmawan kita samarkan. Seminggu kemudian dia dateng sendiri ke Ombudsman, pake nama aslinya.",
+        "en": "We disguised Pak Darmawan's voice. A week later he walked into the Ombudsman's office himself, under his own name."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "knows_source != true",
+      "text": {
+        "id": "Suara narsumnya kita samarkan. Seminggu kemudian dia dateng sendiri ke Ombudsman, pake nama aslinya. Sekar nggak kaget. Gue yang kaget.",
+        "en": "We disguised the source's voice. A week later he walked into the Ombudsman's office himself, under his own name. Sekar wasn't surprised. I was."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Izinnya dibekukan. Patok-patok di depan Muara Angke nggak dicabut semua. Tapi nggak ada yang nambah lagi.",
+        "en": "The permit was frozen. Not all the stakes off Muara Angke came out. But no new ones went in."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bima keluar dari kantornya dan ngasih kesaksian. Tasya nolak duit sponsor ketiga. Bu Wulan masak buat sepuluh orang, dan Dinda ngebentak gue karena nambah nasi tiga kali.",
+        "en": "Bima quit his job and gave a statement. Tasya turned down a third sponsor offer. Mrs. Wulan cooked for ten people, and Dinda yelled at me for taking rice three times."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak balik ke Bandung. Kerjaan gue bisa dikerjain dari mana aja. Ternyata yang nggak bisa dikerjain dari mana aja itu yang lain.",
+        "en": "I didn't go back to Bandung. My work can be done from anywhere. It turns out the things that can't be done from anywhere are the other things."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sabtu berikutnya, jam lima pagi, dermaga Muara Angke. Pak Karta di kursi roda, diantar Mbak Yanti, ngelambai pake tangan kanan. Sri Rejeki berangkat jam setengah enam. Tepat waktu.",
+        "en": "The next Saturday, five in the morning, the Muara Angke pier. Pak Karta in a wheelchair, pushed by Yanti, waving with his right hand. The Sri Rejeki leaves at five thirty. Right on time."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kali ini gue di atasnya.",
+        "en": "This time I'm on it."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Sekar terakhir terlihat Sabtu, 05.30. Sedang merekam.",
+        "en": "Sekar was last seen Saturday, 5:30 AM. Recording."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_01_undertow",
+      "title": {
+        "id": "Arus Bawah",
+        "en": "Undertow"
+      },
+      "category": "TRUE",
+      "summary": {
+        "id": "Raka menemukan Sekar, membersihkan nama Pak Hendra dan membuktikan siapa yang membocorkan rekamannya. Episode 12 tayang. Sabtu berikutnya, dia datang jam lima pagi.",
+        "en": "Raka found Sekar, cleared Pak Hendra and proved who leaked the recording. Episode 12 aired. The next Saturday, he showed up at five in the morning."
+      }
+    }
+  ]
+}

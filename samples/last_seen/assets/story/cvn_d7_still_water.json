@@ -1,0 +1,105 @@
+{
+  "conversation_id": "cvn_d7_still_water",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Air Tenang",
+    "en": "Still Water"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "06:50",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Laut pagi itu rata kayak kaca. Sri Rejeki ninggalin dermaga pelan-pelan, dan jejak airnya panjang banget, kayak nggak mau putus.",
+        "en": "The sea is flat as glass that morning. The Sri Rejeki pulls away from the jetty slowly, and its wake is so long, as if it doesn't want to break."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_still_water.webp",
+      "caption": {
+        "id": "Sekar berdiri di buritan. Dia ngangkat satu tangan. Gue juga.",
+        "en": "Sekar stands at the stern. She raises one hand. So do I."
+      },
+      "unlock_id": "cg_still_water"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Waktu polisi merapat, cuma ada gue di ujung dermaga. Didit senyum, kayak orang yang dateng ke pesta dan ternyata salah tanggal.",
+        "en": "When the police dock, there's only me at the end of the jetty. Didit smiles, like a man who came to a party and got the date wrong."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "route == 'harbor'",
+      "text": {
+        "id": "Mereka nyari ke semua rumah di dermaga bakau. Nggak ketemu apa-apa. Sepupu Pak Hendra bilang dia nggak pernah lihat perempuan berjaket hijau.",
+        "en": "They search every house by the mangrove jetty. They find nothing. Pak Hendra's cousin says she's never seen a woman in a green jacket."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "route != 'harbor'",
+      "text": {
+        "id": "Tasya ngelihat gue kayak mau mukul. Dia nggak mukul. Dia cuma duduk di sebelah gue sampai kapal pulang.",
+        "en": "Tasya looks at me like she wants to hit me. She doesn't. She just sits next to me until the boat home."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Rekamannya ikut ke Tidung, di dalam kotak seng. Episode 12 nggak pernah tayang. Patok-patok baru tetep nambah, satu-satu, kayak jahitan.",
+        "en": "The recording went to Tidung, in a tin box. Episode 12 never aired. New stakes kept going in, one at a time, like stitches."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tapi tiap Sabtu, jam lima kurang dua, HP gue geter. Nomor yang sama. Satu foto. Laut yang rata, dari tempat yang nggak pernah dia sebut.",
+        "en": "But every Saturday, at two minutes to five, my phone buzzes. The same number. One photo. Flat sea, from a place she never names."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue selalu bales. Kadang satu kata. Kadang foto Pluit. Gue nggak pernah telat bales.",
+        "en": "I always reply. Sometimes one word. Sometimes a photo of Pluit. I'm never late replying."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_02_still_water",
+      "title": {
+        "id": "Air Tenang",
+        "en": "Still Water"
+      },
+      "category": "GOOD",
+      "summary": {
+        "id": "Raka menemukan Sekar, lalu membiarkannya pergi ke Tidung bersama Pak Hendra. Rekamannya tidak pernah keluar dari pulau, tapi setiap Sabtu subuh ada satu foto laut.",
+        "en": "Raka found Sekar, then let her go to Tidung with Pak Hendra. The recording never left the island, but every Saturday at dawn there's one photo of the sea."
+      }
+    }
+  ]
+}

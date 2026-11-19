@@ -92,6 +92,110 @@
     },
     {
       "type": "TEXT",
+      "condition": "trust_tasya >= 5",
+      "text": {
+        "id": "Ada satu lagi. Gue nggak pernah ngasih tahu siapa-siapa.",
+        "en": "There's one more thing. I never told anyone."
+      },
+      "profile": "tasya:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "trust_tasya >= 5",
+      "text": {
+        "id": "Dia buka folder di HP-nya. \"EP9_MENTAH\". File terakhirnya empat jam, padahal episodenya cuma empat puluh menit.",
+        "en": "She opens a folder on her phone. \"EP9_RAW\". The last file runs four hours, though the episode is only forty minutes."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "trust_tasya >= 5",
+      "text": {
+        "id": "Sekar lupa matiin recorder abis take. Editor barunya ngirim file ini ke gue, nanya bagian ini dipotong apa nggak. Jam ketiga, menit lima puluh.",
+        "en": "Sekar forgot to switch the recorder off after the take. Her new editor sent me the file and asked if he should cut this part. Hour three, minute fifty."
+      },
+      "profile": "tasya:1"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "trust_tasya >= 5",
+      "text": {
+        "id": "Tasya nyodorin satu earphone.",
+        "en": "Tasya holds out one earbud."
+      },
+      "variable": "PLAY_OFFMIC",
+      "profile": "tasya:1",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Dengerin.",
+            "en": "Listen."
+          },
+          "value": "play"
+        },
+        {
+          "text": {
+            "id": "\"Simpen buat dia, Tas.\"",
+            "en": "\"Keep it for her, Tas.\""
+          },
+          "value": "later"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_OFFMIC == 'play'",
+      "text": {
+        "id": "...Udah mati kan ini? Oke. Ka. Episode sembilan. Bagus nggak? Pasti lo bilang anginnya kenceng di menit dua belas.",
+        "en": "...This is off, right? Okay. Ka. Episode nine. Is it good? You'd say the wind's too loud at minute twelve."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_03_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_OFFMIC == 'play'",
+      "text": {
+        "id": "Gue nggak pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Ke ruangan kosong.",
+        "en": "I never said thanks for teaching me to edit. So. Thanks. To an empty room."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_03_02.mp3"
+    },
+    {
+      "type": "SET",
+      "condition": "PLAY_OFFMIC == 'play'",
+      "effects": [
+        {
+          "variable": "heard_unsent_03",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "heard_unsent_03",
+          "op": "meta_set"
+        },
+        {
+          "variable": "clue_off_mic",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_OFFMIC == 'play'",
+      "text": {
+        "id": "Anginnya emang kenceng di menit dua belas.",
+        "en": "The wind really is too loud at minute twelve."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
       "condition": "bima_confessed == true",
       "text": {
         "id": "Gue mau minta maaf ke dia duluan. Kalau dia mau dengerin.",
@@ -177,7 +281,7 @@
     },
     {
       "type": "JUMP",
-      "target": "d7_stub"
+      "target": "d7n_ferry"
     }
   ]
 }

@@ -139,3 +139,27 @@ clues:
     image: photo_bima_email.webp
     key: true
     chapter: { id: Hari 5, en: Day 5 }
+  pier_wait:
+    title: { id: "File 0612", en: "File 0612" }
+    description:
+      id: Voice note Sekar dari dermaga Muara Angke setahun lalu, jam 06.12, waktu Raka nggak dateng. Diunggah ke folder tak terdaftar dan nggak pernah dikirim.
+      en: Sekar's voice note from the Muara Angke pier a year ago, at 6:12 AM, when Raka didn't come. Uploaded to an unlisted folder and never sent.
+    chapter: { id: Hari 2, en: Day 2 }
+  boat_note:
+    title: { id: Voice note di HP Pak Hendra, en: The voice note on Pak Hendra's phone }
+    description:
+      id: Direkam Senin malem di tengah laut, setelah ada orang di dermaga. "Rekamannya ada di alat rekam yang lo kasih."
+      en: Recorded on Monday night out at sea, after the men on the pier. "The recording's on the recorder you gave me."
+    chapter: { id: Hari 6, en: Day 6 }
+  off_mic:
+    title: { id: Di luar mic, en: Off mic }
+    description:
+      id: Ujung rekaman mentah Episode 9, waktu Sekar ngira recorder-nya udah mati. Tasya nyimpen ini dan nggak pernah cerita.
+      en: The tail of Episode 9's raw recording, when Sekar thought the recorder was off. Tasya kept it and never told anyone.
+    chapter: { id: Hari 6, en: Day 6 }
+  kidnap_report:
+    title: { id: Laporan penculikan, en: The kidnapping report }
+    description:
+      id: Laporan polisi dari PT Bentang Pesisir Makmur. Pak Hendra dituduh nyulik Sekar. Saksinya satu satpam. Dibuat enam hari setelah Sekar hilang.
+      en: A police report from PT Bentang Pesisir Makmur accusing Pak Hendra of kidnapping Sekar. Its witness is one security guard. Filed six days after Sekar vanished.
+    chapter: { id: Hari 7, en: Day 7 }

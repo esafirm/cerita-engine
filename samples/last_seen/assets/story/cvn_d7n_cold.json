@@ -1,0 +1,159 @@
+{
+  "conversation_id": "cvn_d7n_cold",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Arus Balik",
+    "en": "Ebb"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "08:10",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:2",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kita nyari di dermaga utama. Di homestay-homestay. Di Pantai Pasir Perawan, yang isinya cuma turis yang selfie sama sisa badai.",
+        "en": "We search the main jetty. The homestays. Pasir Perawan beach, where there's nobody but tourists taking selfies with what the storm left behind."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Jam delapan, kapal polisi merapat di dermaga kecil di timur, di sebelah bakau. Kita lari ke sana. Kita nyampe pas dua polisi nuntun Pak Hendra turun dari kapal biru-putih, tangannya di depan.",
+        "en": "At eight, the police boat docks at the small jetty in the east, by the mangroves. We run there. We arrive just as two officers lead Pak Hendra off a blue and white boat, his hands in front of him."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di rumah di ujung dermaga, kasurnya masih anget. Kata sepupu Pak Hendra, perempuan berjaket hijau pergi jam tujuh. Naik perahu nelayan, waktu ada yang lihat kapal polisi di cakrawala.",
+        "en": "In the house at the end of the jetty, the mattress is still warm. Pak Hendra's cousin says the woman in the green jacket left at seven. On a fishing boat, when someone saw the police boat on the horizon."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Satu jam. Gue telat satu jam.",
+        "en": "An hour. I was an hour late."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di dermaga, ada laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Dia senyum ke gue kayak orang yang udah lama kenal.",
+        "en": "On the jetty there's a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. He smiles at me like someone who's known me a long time."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Akhirnya. Sayang sekali Mbak Sekar-nya nggak ada. Tapi penculiknya sudah ketemu.",
+        "en": "Raka. At last. A pity Ms. Sekar isn't here. But her kidnapper has been found."
+      },
+      "profile": "didit",
+      "offstage": true
+    },
+    {
+      "type": "CHOICE",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Printout email Bima ada di tas Tasya.",
+        "en": "Bima's printout of the email is in Tasya's bag."
+      },
+      "variable": "CLEAR_HENDRA",
+      "profile": "raka:6",
+      "choices": [
+        {
+          "text": {
+            "id": "(Kasih email-nya ke polisi. Sekarang.)",
+            "en": "(Give the email to the police. Now.)"
+          },
+          "value": "email"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "CLEAR_HENDRA == 'email'",
+      "text": {
+        "id": "Polisinya baca dua kali. Dari Rudy Hartono, bos Bima. Untuk Aditya Nugraha. \"Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak.\" Dikirim tiga minggu sebelum Sekar hilang.",
+        "en": "The officer reads it twice. From Rudy Hartono, Bima's boss. To Aditya Nugraha. \"Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely.\" Sent three weeks before Sekar vanished."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "CLEAR_HENDRA == 'email'",
+      "text": {
+        "id": "Didit nggak senyum lagi. Pak Hendra dilepas sebelum siang, dengan catatan \"wajib lapor\". Laporan penculikannya \"akan ditinjau ulang\".",
+        "en": "Didit stops smiling. Pak Hendra is let go before noon, ordered to report in. The kidnapping report \"will be reviewed\"."
+      }
+    },
+    {
+      "type": "SET",
+      "condition": "CLEAR_HENDRA == 'email'",
+      "effects": [
+        {
+          "variable": "hendra_cleared",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "bima_confessed != true",
+      "text": {
+        "id": "Gue nggak punya apa-apa buat dikasih ke polisi. Cuma cerita, dan cerita nggak bisa ngelepasin borgol.",
+        "en": "I've got nothing to give the police. Only a story, and a story can't open handcuffs."
+      }
+    },
+    {
+      "type": "SET",
+      "condition": "bima_confessed != true",
+      "effects": [
+        {
+          "variable": "hendra_held",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "bima_confessed == true && trust_tasya >= 5",
+          "target": "d7_episode_12"
+        },
+        {
+          "condition": "heard_unsent_01 == true",
+          "target": "d7_unsent"
+        },
+        {
+          "condition": "bima_confessed == true",
+          "target": "d7_low_tide"
+        }
+      ],
+      "fallback_target": "d7_runaway"
+    }
+  ]
+}

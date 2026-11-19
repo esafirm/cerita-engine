@@ -1,0 +1,525 @@
+# Day 7: Terakhir Terlihat (spec §2, beat plan last-seen-m4.md). The Harbor reunion on Day 6's night, both routes'
+# mornings, the jetty's final deduction, and the router to the endings in 80_endings.cerita.
+
+@conversation d6h_sekar chapter="Hari 6" chapter.en="Day 6" title="Sekar" title.en="Sekar"
+@scene VN bg=bg_pari_jetty_night.webp music=bgm_unsent.mp3 ambience=amb_sea_night.mp3 day=6 time=18:05
+
+stage
+  show raka:neutral left
+  show sekar:neutral right transition=fade duration=900
+
+narration
+  id: Papan dermaganya bunyi tiap gue injek. Dia pasti denger gue dari ujung sana. Tapi dia nggak nengok sampai gue berdiri persis di pinggir lingkaran lampu.
+  en: The planks creak with every step. She must hear me from the far end. But she doesn't turn until I'm standing right at the edge of the lamp's circle.
+sekar:neutral
+  id: Lo telat setahun.
+  en: You're a year late.
+raka:sad
+  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.
+  en: Pak Karta's boat left on time. I didn't.
+sekar:tired
+  id: Pak Hendra cerita lewat radio. Dinda. Didit. Lo masuk dasbor gue pake nama kapal. Lo ke rumah Pak Karta.
+  en: Pak Hendra told me over the radio. Dinda. Didit. You got into my dashboard with a boat's name. You went to Pak Karta's house.
+sekar:serious
+  id: Gue nggak nyangka lo yang dateng. Gue ngetik "jam lima pagi" ke lo karena... nggak tahu. Karena cuma lo yang bakal ngerti angkanya.
+  en: I didn't think it would be you who came. I typed "five in the morning" to you because... I don't know. Because you're the only one who'd understand the number.
+narration
+  id: Ini saatnya. Setahun lalu, di tembok laut, gue tahu persis harus ngomong apa. Dan gue diem.
+  en: This is the moment. A year ago, on the seawall, I knew exactly what to say. And I said nothing.
+
+choice REUNION by=sekar:serious timeout=12s
+  id: Sekar nungguin jawaban. Lagi.
+  en: Sekar is waiting for an answer. Again.
+? "Maaf, Kar. Buat semuanya." | "I'm sorry, Kar. For all of it."
+  value sorry
+? "Episode-episode lo bagus. Semuanya. Harusnya gue bilang dari dulu." | "Your episodes were good. All of them. I should have said so back then."
+  value episodes
+? "Lo bilang gue bakal tahu harus mulai dari mana. Gue mulai." | "You said I'd know where to start. I started." [if heard_unsent_01 == true]
+  value started
+? (Nggak usah jawab.) | (Don't answer.) [default] [silent]
+  value silent
+
+set [if REUNION != 'silent']
+  set reconciled true
+
+sekar:tired [if REUNION == 'sorry']
+  id: Setahun gue nungguin satu kata itu. Ternyata kedengerannya biasa aja.{w} ...Nggak. Bohong. Nggak biasa.
+  en: A year I waited for that one word. Turns out it sounds pretty ordinary.{w} ...No. That's a lie. It doesn't.
+sekar:laugh [if REUNION == 'episodes']
+  id: Semuanya? Episode tiga juga? Yang suaranya kayak direkam di dalem kulkas?
+  en: All of them? Episode three too? The one that sounds like it was recorded inside a fridge?
+raka:smirk [if REUNION == 'episodes']
+  id: Episode tiga terutama.
+  en: Episode three especially.
+sekar:serious [if REUNION == 'started']
+  id: Lo denger voice note-nya.{w} Gue rekam itu jam dua pagi, sambil mikir lo nggak bakal pernah denger.
+  en: You heard the voice note.{w} I recorded that at two in the morning, thinking you'd never hear it.
+sekar:tired [if REUNION == 'silent']
+  id: Tuh kan. Diem lagi.
+  en: See? Quiet again.
+sekar:neutral [if REUNION == 'silent']
+  id: Nggak apa-apa, Ka. Lo dateng. Itu juga semacam ngomong.{w} Cuma bukan yang gue butuhin.
+  en: It's fine, Ka. You came. That's a kind of talking too.{w} Just not the kind I need.
+
+narration [if reconciled == true]
+  id: Dia duduk di ujung dermaga, kaki ngegantung di atas air, kayak di tembok laut dulu. Gue duduk di sebelahnya. Kali ini nggak terlalu jauh dari pinggir.
+  en: She sits at the end of the jetty, legs hanging over the water, like on the seawall back then. I sit beside her. This time not so far from the edge.
+sekar:serious [if reconciled == true]
+  id: Rekaman Pak Darmawan ada di sini. Satu jam. Dia nyebut nama, tanggal, nomor halaman. Halaman tiga puluh tujuh, Ka. Kajian yang mereka ajukan sama yang asli beda di situ.
+  en: Pak Darmawan's recording is in here. An hour. He names names, dates, page numbers. Page thirty-seven, Ka. That's where the review they filed and the real one differ.
+sekar:scared [if reconciled == true]
+  id: Tapi nggak ada yang bakal percaya selama polisi mikir gue diculik. Mereka bakal ngambil ini sebagai "barang bukti", terus ini hilang. Kayak semua barang bukti lain di kota ini.
+  en: But nobody will believe it as long as the police think I was kidnapped. They'll take this as "evidence", and then it'll disappear. Like every other piece of evidence in this city.
+
+# The secret ending (beat plan last-seen-m4.md §6): every unsent voice note heard, across any runs.
+choice ASK_0612 by=sekar:neutral [if reconciled == true && meta.flag.heard_unsent_01 && meta.flag.heard_unsent_02 && meta.flag.heard_unsent_03 && meta.flag.heard_unsent_04]
+  id: Ada satu angka lagi yang dari tadi muter di kepala lo. Enam dua belas. Dua gelas kopi. Menit dua belas. Satu HP jadul.
+  en: There's one more number that's been going round your head. Six twelve. Two cups of coffee. Minute twelve. One old phone.
+? "Kar. Nol enam dua belas. Itu bukan satu file, kan?" | "Kar. Zero six twelve. That isn't just one file, is it?"
+  value ask
+? (Biarin malam ini sederhana.) | (Let tonight stay simple.)
+  value skip
+-> d7_off_record [if ASK_0612 == 'ask']
+
+narration
+  id: Malam itu kita nggak ngomong soal Didit lagi. Sepupu Pak Hendra masak ikan bakar. Sekar ketiduran duluan, alat rekamnya masih di genggaman.
+  en: We don't talk about Didit again that night. Pak Hendra's cousin grills fish. Sekar falls asleep first, the recorder still in her hand.
+
+-> d7h_dawn
+
+
+@conversation d7h_dawn chapter="Hari 7" chapter.en="Day 7" title="Terakhir Terlihat" title.en="Last Seen" checkpoint
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_unease.mp3 ambience=amb_sea_night.mp3 day=7 time=06:20
+
+stage
+  show raka:neutral left
+
+narration
+  id: Hari 7. Rabu. Gue kebangun di lantai rumah sepupu Pak Hendra, di bawah sarung yang bau minyak tanah. Sekar udah nggak ada di kasurnya.
+  en: Day 7. Wednesday. I wake on the floor of Pak Hendra's cousin's house, under a sarong that smells of kerosene. Sekar's mattress is already empty.
+narration
+  id: Dia di ujung dermaga, alat rekamnya diangkat ke arah laut. Ngerekam pagi. Kebiasaan.
+  en: She's at the end of the jetty, holding the recorder up to the sea. Recording the morning. Habit.
+
+stage
+  show hendra:worried right transition=fade duration=600
+
+hendra:worried [right]
+  id: Syahbandar buka laut jam enam. Kapal polisi jalan dari Muara Angke jam enam lewat lima. Speedboat putih ikut di belakangnya. Satu jam lagi mereka di sini.
+  en: The harbor master opened the sea at six. The police boat left Muara Angke at five past six. A white speedboat right behind it. They'll be here in an hour.
+hendra:neutral
+  id: Saya bisa bawa dia ke Tidung sekarang. Keluarga istri saya di sana. Dua jam. Mereka nggak bakal nemu.
+  en: I can take her to Tidung now. My wife's family is there. Two hours. They'll never find her.
+
+narration [if left_phone == true]
+  id: HP Sekar ada di rumah, sama Dinda. Satu salinan rekaman Didit aman di Pluit. Yang di sini cuma alat rekamnya.
+  en: Sekar's phone is at home with Dinda. One copy of Didit's call is safe in Pluit. All that's here is the recorder.
+narration [if phone_lost == true]
+  id: HP Sekar ada di dasar laut, di antara patok-patok. Yang tersisa cuma alat rekam di tangan dia.
+  en: Sekar's phone is at the bottom of the sea, somewhere among the stakes. All that's left is the recorder in her hand.
+narration [if left_phone != true && phone_lost != true]
+  id: Pak Hendra buka kotak seng mesinnya. HP Sekar masih di dalam plastik, kering, mati.
+  en: Pak Hendra opens the engine's tin box. Sekar's phone is still in its plastic, dry, switched off.
+
+branch
+  if reconciled != true -> #she_goes
+
+stage
+  show sekar:serious far_right transition=fade duration=600
+
+sekar:serious [far_right]
+  id: Lo yang pilih, Ka. Kali ini gue pengen denger lo ngomong duluan.
+  en: You choose, Ka. This time I want to hear you say it first.
+
+choice STAY by=sekar:serious
+  id: Di cakrawala, dua titik. Satu abu-abu, satu putih.
+  en: On the horizon, two dots. One grey, one white.
+? "Kita tunggu mereka di sini. Bareng." | "We wait for them here. Together."
+  value stay
+? "Pergi sama Pak Hendra. Lo harus aman." | "Go with Pak Hendra. You have to be safe."
+  value go
+
+-> d7_still_water [if STAY == 'go']
+
+sekar:smile
+  id: Oke. Bareng.{w} Pak, kopi. Kita bakal kedatengan tamu.
+  en: Okay. Together.{w} Sir, coffee. We're about to have guests.
+hendra:gruff
+  id: Saya bukan warung.
+  en: I'm not a coffee stall.
+narration
+  id: Tapi dia tetep nyalain kompor.
+  en: But he lights the stove anyway.
+
+-> d7_jetty
+
+sekar:tired [far_right] label=she_goes
+  id: Pak. Tidung.
+  en: Sir. Tidung.
+narration
+  id: Dia nggak ngelihat gue waktu ngomong itu. Dia ngelihat dua titik di cakrawala. Satu abu-abu, satu putih.
+  en: She doesn't look at me when she says it. She looks at the two dots on the horizon. One grey, one white.
+
+-> d7_still_water
+
+
+@conversation d7n_ferry chapter="Hari 7" chapter.en="Day 7" title="Terakhir Terlihat" title.en="Last Seen" checkpoint
+@scene VN bg=bg_ferry_deck.webp music=bgm_unease.mp3 ambience=amb_sea_night.mp3 day=7 time=05:50
+
+stage
+  show raka:neutral left
+  show tasya:nervous right
+
+narration
+  id: Hari 7. Rabu. Kapal pertama ke Pulau Pari isinya kita, karung-karung beras, dan satu kambing yang lebih tenang dari semua penumpang.
+  en: Day 7. Wednesday. The first boat to Pulau Pari carries us, sacks of rice, and one goat calmer than any of the passengers.
+tasya:nervous
+  id: Gue mabok laut. Gue nggak pernah bilang ke Sekar. Tiap liputan pulau gue minum antimo dua.
+  en: I get seasick. I never told Sekar. Every island story, I took two motion sickness pills.
+
+stage [if bima_confessed == true]
+  show bima:neutral far_right
+
+bima:neutral [if bima_confessed == true]
+  id: Gue bawa printout email-nya. Tiga lembar. Kalau HP kita mati semua.
+  en: I brought a printout of the email. Three copies. In case all our phones die.
+
+narration [if yusuf_heard_didit == true]
+  id: HP gue geter. Ipda Yusuf. "Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat."
+  en: My phone buzzes. Inspector Yusuf. "I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow."
+
+tasya:defensive
+  id: Pari itu ada tiga dermaga, Ka. Seribu orang. Homestay di mana-mana. Kita mulai dari mana?
+  en: Pari has three jetties, Ka. A thousand people. Homestays everywhere. Where do we even start?
+
+# Cross-run memory (beat plan last-seen-m4.md §5): a run that reached Pak Karta's logbook knows the boat's name.
+choice SRI_REJEKI by=raka:determined [if meta.flag.knows_crossing_log]
+  id: Ada satu nama di kepala lo, dan lo nggak tahu datengnya dari mana. Kayak halaman buku yang pernah lo baca, di minggu yang lain.
+  en: There's a name in your head, and you don't know where it came from. Like a page from a book you read in some other week.
+? "Kita cari kapal biru-putih. Namanya Sri Rejeki." | "We look for a blue and white boat. The Sri Rejeki."
+  value boat
+? (Itu cuma perasaan. Pake yang pasti.) | (It's only a feeling. Go with what you know.)
+  value clues
+
+-> #found_jetty [if SRI_REJEKI == 'boat']
+
+evidence WHERE_PARI by=tasya:defensive retries=1 label=where_pari
+  id: "Pulau Pari itu gede, Ka." Di mana dia?
+  en: "Pari's a big island, Ka." Where is she?
+? sunrise_photo
+  -> #found_jetty
+? [retry]
+  -> #where_retry
+? [fallback]
+  -> d7n_cold
+
+raka:worried label=where_retry
+  id: Itu cuma bilang dia ke Pari. Gue butuh yang bilang di Pari-nya di mana.
+  en: That only says she went to Pari. I need something that says where on Pari.
+-> #where_pari
+
+narration label=found_jetty
+  id: Kapalnya merapat jam tujuh. Gue nunjukin layar HP ke ibu-ibu penjual gorengan di dermaga. Dia langsung nunjuk ke timur. "Dermaga bakau. Rumah sepupunya Pak Hendra."
+  en: The boat docks at seven. I show my screen to a woman selling fritters on the jetty. She points east right away. "The mangrove jetty. Pak Hendra's cousin's house."
+set
+  set found_sekar true
+
+-> d7n_sekar
+
+
+@conversation d7n_sekar chapter="Hari 7" chapter.en="Day 7" title="Sekar" title.en="Sekar"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_unsent.mp3 ambience=amb_sea_night.mp3 day=7 time=07:20
+
+stage
+  show raka:neutral left
+
+narration
+  id: Dermaga kayu. Bakau di kiri. Kapal biru-putih diiket di ujung. Gue udah pernah lihat tempat ini. Di layar HP Sekar, jam lima kurang dua.
+  en: A wooden jetty. Mangroves on the left. A blue and white boat tied at the end. I've seen this place before. On Sekar's screen, at two minutes to five.
+narration
+  id: Di ujung dermaga ada orang duduk. Rambutnya setengah diiket. Jaket hijau tentara yang kegedean. Alat rekam diangkat ke arah laut.
+  en: Someone is sitting at the end of the jetty. Hair tied half up. An oversized army-green jacket. A recorder held up toward the sea.
+
+stage
+  show sekar:scared right transition=fade duration=900
+
+sekar:scared [right]
+  id: ...Tasya?
+  en: ...Tasya?
+narration
+  id: Tasya lari duluan. Nggak peduli papannya licin. Mereka pelukan kayak dua orang yang jatuh barengan.
+  en: Tasya runs first. She doesn't care that the planks are slippery. They hug like two people falling together.
+
+stage [if bima_confessed == true]
+  show bima:ashamed far_right
+
+bima:ashamed [if bima_confessed == true]
+  id: Kar. Gue yang bilang ke bos. Gue kira gue ngelindungin kamu. Gue salah.
+  en: Kar. I'm the one who told my boss. I thought I was protecting you. I was wrong.
+sekar:serious [if bima_confessed == true]
+  id: Gue tahu, Bim. Gue tahu dari Senin malem. Nanti. Bukan sekarang.
+  en: I know, Bim. I've known since Monday night. Later. Not now.
+
+sekar:neutral
+  id: Dan lo. Lo telat setahun.
+  en: And you. You're a year late.
+raka:sad
+  id: Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.
+  en: Pak Karta's boat left on time. I didn't.
+
+choice REUNION by=sekar:serious timeout=12s
+  id: Semua orang di dermaga diem. Sekar nungguin jawaban. Lagi.
+  en: Everyone on the jetty goes quiet. Sekar is waiting for an answer. Again.
+? "Maaf, Kar. Buat semuanya." | "I'm sorry, Kar. For all of it."
+  value sorry
+? "Episode-episode lo bagus. Semuanya. Harusnya gue bilang dari dulu." | "Your episodes were good. All of them. I should have said so back then."
+  value episodes
+? "Lo bilang gue bakal tahu harus mulai dari mana. Gue mulai." | "You said I'd know where to start. I started." [if heard_unsent_01 == true]
+  value started
+? (Nggak usah jawab.) | (Don't answer.) [default] [silent]
+  value silent
+
+set [if REUNION != 'silent']
+  set reconciled true
+
+sekar:tired [if REUNION == 'sorry']
+  id: Setahun gue nungguin satu kata itu. Di depan Tasya, lagi.{w} ...Makasih, Ka.
+  en: A year I waited for that one word. In front of Tasya, too.{w} ...Thank you, Ka.
+sekar:laugh [if REUNION == 'episodes']
+  id: Tas, lo denger? Dia bilang bagus. Rekam. Rekam sekarang.
+  en: Tas, did you hear that? He said they were good. Record it. Record it now.
+tasya:smile [if REUNION == 'episodes']
+  id: Udah dari tadi.
+  en: I have been the whole time.
+sekar:serious [if REUNION == 'started']
+  id: Lo denger voice note-nya.{w} Gue rekam itu jam dua pagi, sambil mikir lo nggak bakal pernah denger.
+  en: You heard the voice note.{w} I recorded that at two in the morning, thinking you'd never hear it.
+sekar:tired [if REUNION == 'silent']
+  id: Tuh kan. Diem lagi.
+  en: See? Quiet again.
+
+stage
+  show hendra:wary far_left transition=fade duration=600
+
+hendra:wary
+  id: Kapal polisi. Sama speedboat putih. Dua puluh menit lagi.
+  en: The police boat. And a white speedboat. Twenty minutes.
+
+# Silence sends her to Tidung with Hendra. With the email Tasya publishes anyway (#3), else nothing leaves the island (#2).
+branch
+  if reconciled != true && bima_confessed == true -> d7_episode_12
+  if reconciled != true -> d7_still_water
+  -> d7_jetty
+
+
+@conversation d7n_cold chapter="Hari 7" chapter.en="Day 7" title="Arus Balik" title.en="Ebb"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=7 time=08:10
+
+stage
+  show raka:worried left
+
+narration
+  id: Kita nyari di dermaga utama. Di homestay-homestay. Di Pantai Pasir Perawan, yang isinya cuma turis yang selfie sama sisa badai.
+  en: We search the main jetty. The homestays. Pasir Perawan beach, where there's nobody but tourists taking selfies with what the storm left behind.
+narration
+  id: Jam delapan, kapal polisi merapat di dermaga kecil di timur, di sebelah bakau. Kita lari ke sana. Kita nyampe pas dua polisi nuntun Pak Hendra turun dari kapal biru-putih, tangannya di depan.
+  en: At eight, the police boat docks at the small jetty in the east, by the mangroves. We run there. We arrive just as two officers lead Pak Hendra off a blue and white boat, his hands in front of him.
+narration
+  id: Di rumah di ujung dermaga, kasurnya masih anget. Kata sepupu Pak Hendra, perempuan berjaket hijau pergi jam tujuh. Naik perahu nelayan, waktu ada yang lihat kapal polisi di cakrawala.
+  en: In the house at the end of the jetty, the mattress is still warm. Pak Hendra's cousin says the woman in the green jacket left at seven. On a fishing boat, when someone saw the police boat on the horizon.
+raka:sad
+  id: Satu jam. Gue telat satu jam.
+  en: An hour. I was an hour late.
+narration
+  id: Di dermaga, ada laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Dia senyum ke gue kayak orang yang udah lama kenal.
+  en: On the jetty there's a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. He smiles at me like someone who's known me a long time.
+didit [offstage]
+  id: Mas Raka. Akhirnya. Sayang sekali Mbak Sekar-nya nggak ada. Tapi penculiknya sudah ketemu.
+  en: Raka. At last. A pity Ms. Sekar isn't here. But her kidnapper has been found.
+
+choice CLEAR_HENDRA by=raka:determined [if bima_confessed == true]
+  id: Printout email Bima ada di tas Tasya.
+  en: Bima's printout of the email is in Tasya's bag.
+? (Kasih email-nya ke polisi. Sekarang.) | (Give the email to the police. Now.)
+  value email
+
+narration [if CLEAR_HENDRA == 'email']
+  id: Polisinya baca dua kali. Dari Rudy Hartono, bos Bima. Untuk Aditya Nugraha. "Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak." Dikirim tiga minggu sebelum Sekar hilang.
+  en: The officer reads it twice. From Rudy Hartono, Bima's boss. To Aditya Nugraha. "Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely." Sent three weeks before Sekar vanished.
+narration [if CLEAR_HENDRA == 'email']
+  id: Didit nggak senyum lagi. Pak Hendra dilepas sebelum siang, dengan catatan "wajib lapor". Laporan penculikannya "akan ditinjau ulang".
+  en: Didit stops smiling. Pak Hendra is let go before noon, ordered to report in. The kidnapping report "will be reviewed".
+set [if CLEAR_HENDRA == 'email']
+  set hendra_cleared true
+narration [if bima_confessed != true]
+  id: Gue nggak punya apa-apa buat dikasih ke polisi. Cuma cerita, dan cerita nggak bisa ngelepasin borgol.
+  en: I've got nothing to give the police. Only a story, and a story can't open handcuffs.
+set [if bima_confessed != true]
+  set hendra_held true
+
+branch
+  if bima_confessed == true && trust_tasya >= 5 -> d7_episode_12
+  if heard_unsent_01 == true -> d7_unsent
+  if bima_confessed == true -> d7_low_tide
+  -> d7_runaway
+
+
+@conversation d7_jetty chapter="Hari 7" chapter.en="Day 7" title="Dermaga" title.en="The Jetty"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_tense_call.mp3 ambience=amb_harbor_day.mp3 day=7 time=07:40
+
+stage
+  show raka:determined left
+  show sekar:serious right
+
+narration
+  id: Kapal polisi merapat duluan. Ipda Yusuf turun pertama, seragamnya basah sampai lutut. Di belakangnya dua laki-laki pake polo BPM.
+  en: The police boat docks first. Inspector Yusuf steps off first, his uniform wet to the knees. Behind him, two men in BPM polos.
+narration
+  id: Terakhir, laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Lebih pendek dari suaranya. Aditya Nugraha. Didit.
+  en: Last, a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. Shorter than his voice. Aditya Nugraha. Didit.
+
+stage
+  show yusuf:stern far_left transition=fade duration=600
+
+didit [offstage]
+  id: Alhamdulillah. Mbak Sekar, syukurlah Anda selamat. Pak, itu orangnya. Yang di kapal.
+  en: Thank God. Ms. Sekar, I'm so glad you're safe. Inspector, that's the man. The one on the boat.
+narration
+  id: Dia nunjuk Pak Hendra. Pak Hendra lagi ngegulung tali dan nggak berhenti.
+  en: He points at Pak Hendra. Pak Hendra is coiling rope and doesn't stop.
+yusuf:stern
+  id: Mbak Sekar. Saya harus tanya, untuk catatan. Anda di sini atas kemauan sendiri?
+  en: Ms. Sekar. I have to ask, for the record. Are you here of your own free will?
+sekar:serious
+  id: Iya, Pak. Saya yang minta Pak Hendra nganter.
+  en: Yes, sir. I asked Pak Hendra to bring me.
+didit [offstage]
+  id: Tentu dia bilang begitu, Pak. Empat hari sendirian sama orang itu. Perusahaan kami punya saksi yang lihat dia dipaksa naik kapal. Dan alat rekam itu, mohon diamankan. Barang bukti.
+  en: Of course she'd say that, Inspector. Four days alone with that man. My company has a witness who saw her forced onto the boat. And that recorder, please secure it. It's evidence.
+narration
+  id: Ipda Yusuf nunjukin selembar kertas ke gue. Laporan polisi. Pelapor, PT Bentang Pesisir Makmur. Saksi, satu satpam. Tanggal laporan, Senin kemarin. Enam hari setelah Sekar hilang.
+  en: Inspector Yusuf shows me a sheet of paper. A police report. Filed by PT Bentang Pesisir Makmur. Witness, one security guard. Date filed, this Monday. Six days after Sekar vanished.
+set
+  clue kidnap_report
+yusuf:conflicted
+  id: Kata-kata Mbak Sekar melawan laporan resmi dengan saksi, Mas Raka. Saya butuh lebih dari itu. Sekarang. Sebelum saya terpaksa menjalankan tugas saya.
+  en: Ms. Sekar's word against an official report with a witness, Raka. I need more than that. Now. Before I'm forced to do my job.
+
+# Cross-run memory (beat plan last-seen-m4.md §5): the Network route can know the logbook from an earlier run.
+choice LOGBOOK by=raka:determined [if meta.flag.knows_crossing_log && clue_crossing_log != true]
+  id: Ada satu halaman di kepala lo. Tulisan tangan yang tegas. Tanggal, jam, tujuan, jumlah orang.
+  en: There's a page in your head. A firm hand. Date, time, destination, number of people.
+? "Pak, di Kamal Muara ada buku log kapal ini. Di rumah Pak Karta." | "Sir, there's a logbook for this boat in Kamal Muara. At Pak Karta's house."
+  value tell
+  clue crossing_log
+? (Itu cuma perasaan.) | (It's only a feeling.)
+  value skip
+narration [if LOGBOOK == 'tell']
+  id: Ipda Yusuf ngangkat alis, tapi dia nelpon pos Kamal Muara. Lima belas menit kemudian, foto halamannya masuk ke HP-nya. Gue nggak tahu gimana gue bisa tahu. Rasanya kayak baca ulang.
+  en: Inspector Yusuf raises an eyebrow, but he calls the Kamal Muara post. Fifteen minutes later, a photo of the page comes into his phone. I don't know how I knew. It feels like rereading.
+
+evidence KIDNAP by=yusuf:conflicted retries=1 label=kidnap
+  id: "Dia nggak dateng sendiri." Buktikan sebaliknya.
+  en: "She didn't come on her own." Prove otherwise.
+? crossing_log
+  -> #kidnap_log
+? [retry]
+  -> #kidnap_retry
+? [fallback]
+  -> #kidnap_fail
+
+yusuf:conflicted label=kidnap_retry
+  id: Itu ngasih tahu saya ke mana dia pergi, Mas. Bukan gimana caranya.
+  en: That tells me where she went, Raka. Not how.
+-> #kidnap
+
+yusuf:neutral label=kidnap_log
+  id: "Selasa. 05.30. Pari. 1 org (S.)." Penumpang. Dicatat di buku yang dibuat untuk kakaknya yang sakit. Ditulis enam hari sebelum ada laporan apa pun.
+  en: "Tuesday. 05:30. Pari. 1 person (S.)." A passenger. Written in a book kept for his sick brother. Six days before any report existed.
+yusuf:polite
+  id: Penculik jarang bikin kuitansi, Pak Aditya.
+  en: Kidnappers rarely write receipts, Mr. Aditya.
+set
+  set proof_log true
+-> #motive_ask
+
+yusuf:conflicted label=kidnap_fail
+  id: Maaf, Mas. Sampai ada yang lebih kuat, Pak Hendra ikut kami.
+  en: I'm sorry, Raka. Until there's something stronger, Pak Hendra comes with us.
+narration
+  id: Pak Hendra naruh gulungan talinya, rapi, kayak orang yang baru selesai kerja. Dia ngulurin dua tangannya sendiri.
+  en: Pak Hendra sets down his coil of rope, neatly, like a man finishing a job. He holds out both his hands himself.
+set
+  set hendra_held true
+
+didit [offstage] label=motive_ask
+  id: Pak, ini semua cuma salah paham. Perusahaan kami cuma khawatir. Kenapa juga kami harus bohong?
+  en: Inspector, this is all a misunderstanding. My company was only worried. Why would we lie?
+yusuf:stern
+  id: Pertanyaan yang bagus. Mas Raka?
+  en: A good question. Raka?
+
+# Cross-run memory: the Harbor route can know Bima's email from an earlier run.
+choice EMAIL by=raka:determined [if meta.flag.knows_bima_email && clue_bima_email != true]
+  id: Ada satu email di kepala lo. Rabu malem, jam sembilan lewat. Sebuah CC yang nggak seharusnya ada.
+  en: There's an email in your head. A Wednesday night, just after nine. A CC that shouldn't be there.
+? (Telepon Bima. Pake speaker.) | (Call Bima. On speaker.)
+  value call
+  clue bima_email
+? (Itu cuma perasaan.) | (It's only a feeling.)
+  value skip
+bima [offstage] [if EMAIL == 'call']
+  id: Ka? Jam segini? Kenapa?
+  en: Ka? At this hour? What's wrong?
+raka:determined [if EMAIL == 'call']
+  id: Email Pak Rudy ke Didit. Tiga minggu lalu. Lo di-CC. Gue tahu, Bim. Forward ke gue sekarang, atau gue yang cerita ke Sekar duluan.
+  en: Pak Rudy's email to Didit. Three weeks ago. You were CC'd. I know, Bim. Forward it to me now, or I'm the one who tells Sekar first.
+narration [if EMAIL == 'call']
+  id: Lama banget nggak ada suara. Terus HP gue geter. Gue nggak tahu gimana gue bisa tahu. Rasanya kayak baca ulang.
+  en: A long silence. Then my phone buzzes. I don't know how I knew. It feels like rereading.
+
+evidence MOTIVE by=yusuf:stern retries=1 label=motive
+  id: "Kenapa kami harus bohong?" Tunjukin kenapa.
+  en: "Why would we lie?" Show them why.
+? bima_email
+  -> #motive_email
+? didit_call
+  -> #motive_threat
+? burner_profile
+  -> #motive_threat
+? threat_message
+  -> #motive_threat
+? [retry]
+  -> #motive_retry
+? [fallback]
+  -> #jetty_end
+
+yusuf:stern label=motive_retry
+  id: Itu bukan alasan, Mas. Itu cuma cerita.
+  en: That isn't a reason, Raka. That's just a story.
+-> #motive
+
+yusuf:neutral label=motive_threat
+  id: Ini ancaman. Saya catat, Pak Aditya, dan nanti kita bicarakan. Tapi ini bukan izin, bukan laut. Ini belum ngejelasin kenapa.
+  en: This is a threat. I'm noting it, Mr. Aditya, and we'll talk about it later. But it isn't the permit, it isn't the sea. It doesn't explain why.
+set
+  set proof_threat true
+-> #jetty_end
+
+narration label=motive_email
+  id: Ipda Yusuf baca pelan, keras-keras. Dari Rudy Hartono. Untuk Aditya Nugraha. Rabu, 21.14, tiga minggu lalu. "Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak."
+  en: Inspector Yusuf reads it slowly, aloud. From Rudy Hartono. To Aditya Nugraha. Wednesday, 21:14, three weeks ago. "Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely."
+yusuf:stern
+  id: Bapak tahu dia pegang rekaman itu tiga minggu sebelum dia hilang. Terus ada sponsor, terus ada ancaman. Dan sekarang Bapak melapor dia diculik.
+  en: You knew she had that recording three weeks before she vanished. Then came the sponsor offer, then the threat. And now you report her kidnapped.
+narration
+  id: Didit nutup payungnya. Pelan-pelan. Kayak itu satu-satunya hal yang masih bisa dia atur.
+  en: Didit closes his umbrella. Slowly. As if it's the only thing left he can control.
+set
+  set proof_email true
+
+branch label=jetty_end
+  if proof_log == true && proof_email == true -> d7_undertow
+  if proof_log == true -> d7_low_tide
+  if proof_email == true -> d7_episode_12
+  -> d7_runaway

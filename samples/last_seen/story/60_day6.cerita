@@ -74,6 +74,39 @@ hendra:kind
 hendra:neutral
   id: Bapaknya meninggal, abang saya sakit, kapalnya tinggal satu. Tiap tahun crane-nya nambah. Anak itu satu-satunya yang nanya kenapa. Makanya saya bawa dia ke pulau. Bukan karena saya berani. Karena dia nanya.
   en: Her father died, my brother got sick, there's only one boat left. Every year there's another crane. That girl was the only one who asked why. That's why I took her to the island. Not because I'm brave. Because she asked.
+
+# The second of Sekar's unsent voice notes (beat plan last-seen-m4.md §6): only Hendra has it, and only if he told
+# Raka the Monday night story.
+narration [if hendra_told == true]
+  id: Jam sepuluh, Pak Hendra ngeluarin HP jadul dari kantong plastik. Layarnya retak, tombolnya udah licin.
+  en: At ten, Pak Hendra takes an old phone out of a plastic bag. The screen is cracked, the keys worn smooth.
+hendra:neutral [if hendra_told == true]
+  id: Senin malem, di tengah laut, anak itu minjem HP saya. Ngomong ke situ. Katanya, "Kalau saya nggak balik, Pak, kirim ini ke Raka." Saya nggak ngerti caranya ngirim.
+  en: Monday night, out at sea, that girl borrowed my phone. Talked into it. She said, "If I don't come back, sir, send this to Raka." I don't know how to send things.
+
+choice PLAY_BOAT by=hendra:neutral silent [if hendra_told == true]
+  id: Dia nyodorin HP-nya.
+  en: He holds out the phone.
+? Dengerin. | Listen.
+  value play
+? "Nanti aja, Pak. Biar dia yang ngomong langsung." | "Later, sir. Let her tell me herself."
+  value later
+
+sekar voice=vo_unsent_02_01.mp3 [offstage] [if PLAY_BOAT == 'play']
+  id: Ka. Kalau lo denger ini dari HP Pak Hendra, berarti gue nggak sempet bilang sendiri. Ada orang di dermaga. Gue udah matiin HP gue.
+  en: Ka. If you're hearing this on Pak Hendra's phone, it means I didn't get to tell you myself. There are people on the pier. I've switched my phone off.
+  delivery: whispering over an idling boat engine, fast, scared but holding it together
+sekar voice=vo_unsent_02_02.mp3 [offstage] [if PLAY_BOAT == 'play']
+  id: Rekamannya ada di alat rekam yang lo kasih. Lucu, ya. Kado ulang tahun dari lo yang nyelametin semuanya.{w} Jangan telat.
+  en: The recording's on the recorder you gave me. Funny, right? Your birthday present saving everything.{w} Don't be late.
+  delivery: a breath of a laugh, then very soft on the last words
+set [if PLAY_BOAT == 'play']
+  set heard_unsent_02 true
+  remember heard_unsent_02
+  clue boat_note
+hendra:kind [if PLAY_BOAT == 'play']
+  id: Abang saya juga bilang gitu. Jangan telat. Kayaknya semua orang udah sepakat soal kamu.
+  en: My brother said that too. Don't be late. Seems everyone's agreed about you.
 narration
   id: Jam sebelas, dua laki-laki pake polo BPM turun dari mobil di ujung dermaga, payungan, ngelihatin laut. Pak Hendra narik topinya lebih rendah dan pura-pura tidur.
   en: At eleven, two men in BPM polos get out of a car at the end of the pier, under umbrellas, watching the sea. Pak Hendra pulls his cap lower and pretends to sleep.
@@ -215,7 +248,7 @@ narration
 set
   set reached_pari true
 
--> d7_stub
+-> d6h_sekar
 
 
 @conversation d6n_didit chapter="Hari 6" chapter.en="Day 6" title="Badai" title.en="The Storm" checkpoint
@@ -365,6 +398,42 @@ tasya:crying
   id: Bilang ke dia. Besok.
   en: Tell her. Tomorrow.
 
+# The third of Sekar's unsent voice notes (beat plan last-seen-m4.md §6): Tasya keeps it, and shares it only if
+# she trusts Raka.
+tasya:neutral [if trust_tasya >= 5]
+  id: Ada satu lagi. Gue nggak pernah ngasih tahu siapa-siapa.
+  en: There's one more thing. I never told anyone.
+narration [if trust_tasya >= 5]
+  id: Dia buka folder di HP-nya. "EP9_MENTAH". File terakhirnya empat jam, padahal episodenya cuma empat puluh menit.
+  en: She opens a folder on her phone. "EP9_RAW". The last file runs four hours, though the episode is only forty minutes.
+tasya:smile [if trust_tasya >= 5]
+  id: Sekar lupa matiin recorder abis take. Editor barunya ngirim file ini ke gue, nanya bagian ini dipotong apa nggak. Jam ketiga, menit lima puluh.
+  en: Sekar forgot to switch the recorder off after the take. Her new editor sent me the file and asked if he should cut this part. Hour three, minute fifty.
+
+choice PLAY_OFFMIC by=tasya:smile silent [if trust_tasya >= 5]
+  id: Tasya nyodorin satu earphone.
+  en: Tasya holds out one earbud.
+? Dengerin. | Listen.
+  value play
+? "Simpen buat dia, Tas." | "Keep it for her, Tas."
+  value later
+
+sekar voice=vo_unsent_03_01.mp3 [offstage] [if PLAY_OFFMIC == 'play']
+  id: ...Udah mati kan ini? Oke. Ka. Episode sembilan. Bagus nggak? Pasti lo bilang anginnya kenceng di menit dua belas.
+  en: ...This is off, right? Okay. Ka. Episode nine. Is it good? You'd say the wind's too loud at minute twelve.
+  delivery: tired after a long session, talking to herself, fond, a little teasing
+sekar voice=vo_unsent_03_02.mp3 [offstage] [if PLAY_OFFMIC == 'play']
+  id: Gue nggak pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Ke ruangan kosong.
+  en: I never said thanks for teaching me to edit. So. Thanks. To an empty room.
+  delivery: a small laugh at herself, then sincere and quiet
+set [if PLAY_OFFMIC == 'play']
+  set heard_unsent_03 true
+  remember heard_unsent_03
+  clue off_mic
+raka:sad [if PLAY_OFFMIC == 'play']
+  id: Anginnya emang kenceng di menit dua belas.
+  en: The wind really is too loud at minute twelve.
+
 bima:ashamed [far_right] [if bima_confessed == true]
   id: Gue mau minta maaf ke dia duluan. Kalau dia mau dengerin.
   en: I want to apologize to her first. If she'll listen.
@@ -397,7 +466,7 @@ narration
 set
   set on_first_ferry true
 
--> d7_stub
+-> d7n_ferry
 
 
 @conversation d6_storm chapter="Hari 6" chapter.en="Day 6" title="Badai" title.en="The Storm"
@@ -442,19 +511,3 @@ ending end_09_the_storm BAD
   en: The Storm
   summary id: Raka menyeberang sebelum badai reda. Polisi dan Bentang sampai ke Sekar duluan, dan buktinya hilang di perjalanan.
   summary en: Raka crossed before the storm let up. The police and Bentang reached Sekar first, and the evidence was lost on the way.
-
-
-# Day 7: Terakhir Terlihat. M4 placeholder until the endings are written, which replaces this stub and its ending.
-
-@conversation d7_stub chapter="Hari 7" chapter.en="Day 7" title="Terakhir Terlihat" title.en="Last Seen" checkpoint
-@scene VN bg=bg_pari_jetty_dusk.webp music=bgm_unsent.mp3 day=7 time=05:30
-
-narration
-  id: Hari 7 belum ditulis. Ceritanya berlanjut di versi berikutnya.
-  en: Day 7 isn't written yet. The story continues in the next build.
-
-ending end_00_preview NORMAL
-  id: Bersambung
-  en: To Be Continued
-  summary id: Raka akhirnya sampai di jam setengah enam yang dulu dia lewatkan. Sekar menunggu di ujung dermaga.
-  summary en: Raka has finally made it to the five thirty he once missed. Sekar is waiting at the end of the jetty.

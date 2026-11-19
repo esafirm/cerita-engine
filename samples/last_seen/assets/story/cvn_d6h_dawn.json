@@ -215,6 +215,101 @@
     },
     {
       "type": "NARRATION",
+      "condition": "hendra_told == true",
+      "text": {
+        "id": "Jam sepuluh, Pak Hendra ngeluarin HP jadul dari kantong plastik. Layarnya retak, tombolnya udah licin.",
+        "en": "At ten, Pak Hendra takes an old phone out of a plastic bag. The screen is cracked, the keys worn smooth."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "hendra_told == true",
+      "text": {
+        "id": "Senin malem, di tengah laut, anak itu minjem HP saya. Ngomong ke situ. Katanya, \"Kalau saya nggak balik, Pak, kirim ini ke Raka.\" Saya nggak ngerti caranya ngirim.",
+        "en": "Monday night, out at sea, that girl borrowed my phone. Talked into it. She said, \"If I don't come back, sir, send this to Raka.\" I don't know how to send things."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "hendra_told == true",
+      "text": {
+        "id": "Dia nyodorin HP-nya.",
+        "en": "He holds out the phone."
+      },
+      "variable": "PLAY_BOAT",
+      "profile": "hendra:0",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Dengerin.",
+            "en": "Listen."
+          },
+          "value": "play"
+        },
+        {
+          "text": {
+            "id": "\"Nanti aja, Pak. Biar dia yang ngomong langsung.\"",
+            "en": "\"Later, sir. Let her tell me herself.\""
+          },
+          "value": "later"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_BOAT == 'play'",
+      "text": {
+        "id": "Ka. Kalau lo denger ini dari HP Pak Hendra, berarti gue nggak sempet bilang sendiri. Ada orang di dermaga. Gue udah matiin HP gue.",
+        "en": "Ka. If you're hearing this on Pak Hendra's phone, it means I didn't get to tell you myself. There are people on the pier. I've switched my phone off."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_02_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_BOAT == 'play'",
+      "text": {
+        "id": "Rekamannya ada di alat rekam yang lo kasih. Lucu, ya. Kado ulang tahun dari lo yang nyelametin semuanya.{w} Jangan telat.",
+        "en": "The recording's on the recorder you gave me. Funny, right? Your birthday present saving everything.{w} Don't be late."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_02_02.mp3"
+    },
+    {
+      "type": "SET",
+      "condition": "PLAY_BOAT == 'play'",
+      "effects": [
+        {
+          "variable": "heard_unsent_02",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "heard_unsent_02",
+          "op": "meta_set"
+        },
+        {
+          "variable": "clue_boat_note",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "PLAY_BOAT == 'play'",
+      "text": {
+        "id": "Abang saya juga bilang gitu. Jangan telat. Kayaknya semua orang udah sepakat soal kamu.",
+        "en": "My brother said that too. Don't be late. Seems everyone's agreed about you."
+      },
+      "profile": "hendra:3"
+    },
+    {
+      "type": "NARRATION",
       "text": {
         "id": "Jam sebelas, dua laki-laki pake polo BPM turun dari mobil di ujung dermaga, payungan, ngelihatin laut. Pak Hendra narik topinya lebih rendah dan pura-pura tidur.",
         "en": "At eleven, two men in BPM polos get out of a car at the end of the pier, under umbrellas, watching the sea. Pak Hendra pulls his cap lower and pretends to sleep."

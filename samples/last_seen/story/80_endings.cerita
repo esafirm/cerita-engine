@@ -1,0 +1,354 @@
+# The endings Day 7 routes to (beat plan last-seen-m4.md §2). #7 to #9 live in the days that reach them.
+
+@conversation d7_undertow chapter="Hari 7" chapter.en="Day 7" title="Arus Bawah" title.en="Undertow"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_unsent.mp3 ambience=amb_harbor_day.mp3 day=7 time=08:30
+
+stage
+  show sekar:serious right
+  show raka:determined left
+
+yusuf:stern [far_left]
+  id: Pak Aditya. Laporan Bapak saya tarik untuk diperiksa. Bapak ikut kami ke Polsek, kasih keterangan. HP Bapak juga.
+  en: Mr. Aditya. I'm pulling your report for review. You'll come with us to the station and give a statement. Your phone too.
+narration
+  id: Dua laki-laki BPM saling lihat, terus jalan balik ke speedboat putih mereka tanpa nunggu bosnya.
+  en: The two BPM men look at each other, then walk back to their white speedboat without waiting for their boss.
+yusuf:polite
+  id: Mbak Sekar. Alat rekam itu tetap sama Anda. Tapi tolong, salinannya buat saya. Yang ini, saya pastikan nggak hilang.
+  en: Ms. Sekar. That recorder stays with you. But please, a copy for me. This one, I'll make sure doesn't disappear.
+
+stage
+  hide yusuf transition=fade duration=600
+
+media CG cg_undertow.webp unlock=cg_undertow
+  id: Episode 12 tayang sembilan hari kemudian.
+  en: Episode 12 aired nine days later.
+
+narration
+  id: Gue yang ngedit. Tasya yang bacain bagian dokumennya, karena suaranya lebih tenang dari suara Sekar kalau lagi marah. Halaman tiga puluh tujuh, dibandingin baris per baris.
+  en: I edited it. Tasya read the document segment, because her voice stays calmer than Sekar's when she's angry. Page thirty-seven, compared line by line.
+narration [if knows_source == true]
+  id: Suara Pak Darmawan kita samarkan. Seminggu kemudian dia dateng sendiri ke Ombudsman, pake nama aslinya.
+  en: We disguised Pak Darmawan's voice. A week later he walked into the Ombudsman's office himself, under his own name.
+narration [if knows_source != true]
+  id: Suara narsumnya kita samarkan. Seminggu kemudian dia dateng sendiri ke Ombudsman, pake nama aslinya. Sekar nggak kaget. Gue yang kaget.
+  en: We disguised the source's voice. A week later he walked into the Ombudsman's office himself, under his own name. Sekar wasn't surprised. I was.
+narration
+  id: Izinnya dibekukan. Patok-patok di depan Muara Angke nggak dicabut semua. Tapi nggak ada yang nambah lagi.
+  en: The permit was frozen. Not all the stakes off Muara Angke came out. But no new ones went in.
+narration
+  id: Bima keluar dari kantornya dan ngasih kesaksian. Tasya nolak duit sponsor ketiga. Bu Wulan masak buat sepuluh orang, dan Dinda ngebentak gue karena nambah nasi tiga kali.
+  en: Bima quit his job and gave a statement. Tasya turned down a third sponsor offer. Mrs. Wulan cooked for ten people, and Dinda yelled at me for taking rice three times.
+narration
+  id: Gue nggak balik ke Bandung. Kerjaan gue bisa dikerjain dari mana aja. Ternyata yang nggak bisa dikerjain dari mana aja itu yang lain.
+  en: I didn't go back to Bandung. My work can be done from anywhere. It turns out the things that can't be done from anywhere are the other things.
+narration
+  id: Sabtu berikutnya, jam lima pagi, dermaga Muara Angke. Pak Karta di kursi roda, diantar Mbak Yanti, ngelambai pake tangan kanan. Sri Rejeki berangkat jam setengah enam. Tepat waktu.
+  en: The next Saturday, five in the morning, the Muara Angke pier. Pak Karta in a wheelchair, pushed by Yanti, waving with his right hand. The Sri Rejeki leaves at five thirty. Right on time.
+narration
+  id: Kali ini gue di atasnya.
+  en: This time I'm on it.
+
+system
+  id: Sekar terakhir terlihat Sabtu, 05.30. Sedang merekam.
+  en: Sekar was last seen Saturday, 5:30 AM. Recording.
+
+ending end_01_undertow TRUE
+  id: Arus Bawah
+  en: Undertow
+  summary id: Raka menemukan Sekar, membersihkan nama Pak Hendra dan membuktikan siapa yang membocorkan rekamannya. Episode 12 tayang. Sabtu berikutnya, dia datang jam lima pagi.
+  summary en: Raka found Sekar, cleared Pak Hendra and proved who leaked the recording. Episode 12 aired. The next Saturday, he showed up at five in the morning.
+
+
+@conversation d7_still_water chapter="Hari 7" chapter.en="Day 7" title="Air Tenang" title.en="Still Water"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_low_tide.mp3 ambience=amb_sea_night.mp3 day=7 time=06:50
+
+stage
+  show raka:sad left
+
+narration
+  id: Laut pagi itu rata kayak kaca. Sri Rejeki ninggalin dermaga pelan-pelan, dan jejak airnya panjang banget, kayak nggak mau putus.
+  en: The sea is flat as glass that morning. The Sri Rejeki pulls away from the jetty slowly, and its wake is so long, as if it doesn't want to break.
+
+media CG cg_still_water.webp unlock=cg_still_water
+  id: Sekar berdiri di buritan. Dia ngangkat satu tangan. Gue juga.
+  en: Sekar stands at the stern. She raises one hand. So do I.
+
+narration
+  id: Waktu polisi merapat, cuma ada gue di ujung dermaga. Didit senyum, kayak orang yang dateng ke pesta dan ternyata salah tanggal.
+  en: When the police dock, there's only me at the end of the jetty. Didit smiles, like a man who came to a party and got the date wrong.
+narration [if route == 'harbor']
+  id: Mereka nyari ke semua rumah di dermaga bakau. Nggak ketemu apa-apa. Sepupu Pak Hendra bilang dia nggak pernah lihat perempuan berjaket hijau.
+  en: They search every house by the mangrove jetty. They find nothing. Pak Hendra's cousin says she's never seen a woman in a green jacket.
+narration [if route != 'harbor']
+  id: Tasya ngelihat gue kayak mau mukul. Dia nggak mukul. Dia cuma duduk di sebelah gue sampai kapal pulang.
+  en: Tasya looks at me like she wants to hit me. She doesn't. She just sits next to me until the boat home.
+narration
+  id: Rekamannya ikut ke Tidung, di dalam kotak seng. Episode 12 nggak pernah tayang. Patok-patok baru tetep nambah, satu-satu, kayak jahitan.
+  en: The recording went to Tidung, in a tin box. Episode 12 never aired. New stakes kept going in, one at a time, like stitches.
+narration
+  id: Tapi tiap Sabtu, jam lima kurang dua, HP gue geter. Nomor yang sama. Satu foto. Laut yang rata, dari tempat yang nggak pernah dia sebut.
+  en: But every Saturday, at two minutes to five, my phone buzzes. The same number. One photo. Flat sea, from a place she never names.
+narration
+  id: Gue selalu bales. Kadang satu kata. Kadang foto Pluit. Gue nggak pernah telat bales.
+  en: I always reply. Sometimes one word. Sometimes a photo of Pluit. I'm never late replying.
+
+ending end_02_still_water GOOD
+  id: Air Tenang
+  en: Still Water
+  summary id: Raka menemukan Sekar, lalu membiarkannya pergi ke Tidung bersama Pak Hendra. Rekamannya tidak pernah keluar dari pulau, tapi setiap Sabtu subuh ada satu foto laut.
+  summary en: Raka found Sekar, then let her go to Tidung with Pak Hendra. The recording never left the island, but every Saturday at dawn there's one photo of the sea.
+
+
+@conversation d7_episode_12 chapter="Hari 7" chapter.en="Day 7" title="Episode 12" title.en="Episode 12"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_unsent.mp3 ambience=amb_harbor_day.mp3 day=7 time=09:00
+
+stage
+  show raka:sad left
+
+narration [if hendra_held == true && found_sekar == true]
+  id: Waktu polisi nuntun Pak Hendra ke kapal, Sekar minta izin ngambil tas di rumah sepupunya. Dia nggak balik. Pintu belakang rumah itu langsung ke bakau, dan di bakau ada perahu.
+  en: While the police lead Pak Hendra to the boat, Sekar asks to fetch her bag from the cousin's house. She doesn't come back. The back door of that house opens straight onto the mangroves, and in the mangroves there's a boat.
+narration [if hendra_held == true && found_sekar == true]
+  id: Di kantong hoodie gue ada kartu memori, dibungkus tisu. Tulisannya, "buat tasya. tayangin. gue pulang kalau dia udah bebas."
+  en: In my hoodie pocket is a memory card, wrapped in a tissue. On it: "for tasya. publish it. i'll come home when he's free."
+narration [if reconciled != true && found_sekar == true]
+  id: Sekar naik Sri Rejeki sebelum polisi merapat. Sebelum pergi, dia naruh kartu memori di tangan Tasya, bukan di tangan gue. "Tayangin, Tas. Gue dengerin dari mana pun gue ada."
+  en: Sekar boards the Sri Rejeki before the police dock. Before she goes, she puts a memory card in Tasya's hand, not mine. "Publish it, Tas. I'll listen from wherever I am."
+narration [if found_sekar != true]
+  id: Kita pulang tanpa Sekar. Tapi kita pulang bawa email Bima, draf Episode 12, dan Tasya yang udah berhenti takut.
+  en: We go home without Sekar. But we go home with Bima's email, the Episode 12 draft, and a Tasya who has stopped being afraid.
+
+media CG cg_episode_12.webp unlock=cg_episode_12
+  id: Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam yang sama kayak Sekar biasa tayang.
+  en: Tasya published Episode 12 on Friday, at eleven at night. The same hour Sekar always published.
+
+narration
+  id: Intro empat puluh satu detik dari Sekar. Terus Tasya, yang ngebacain email Bima, satu kata satu kata. Gue yang ngedit. Gue biarin anginnya.
+  en: Sekar's forty-one-second intro. Then Tasya, reading Bima's email word by word. I edited it. I left the wind in.
+narration
+  id: Dua ratus pendengar jadi dua ratus ribu dalam seminggu. Didit dipindah ke kantor Surabaya. Laporan penculikannya ditarik "demi kebaikan bersama".
+  en: Two hundred listeners became two hundred thousand in a week. Didit was transferred to the Surabaya office. The kidnapping report was withdrawn "for the common good".
+narration
+  id: Sekar masih resmi hilang. Tapi di kolom komentar Episode 12 ada satu komentar dari akun tanpa foto, jam lima kurang dua pagi.
+  en: Sekar is still officially missing. But in the comments under Episode 12 there's one from an account with no picture, at two minutes to five in the morning.
+system
+  id: "anginnya kenceng di menit dua belas."
+  en: "the wind's too loud at minute twelve."
+
+ending end_03_episode_12 GOOD
+  id: Episode 12
+  en: Episode 12
+  summary id: Tasya menayangkan Episode 12 dengan email Bima. Didit dipindahkan dan laporannya ditarik, tapi Sekar masih belum pulang.
+  summary en: Tasya published Episode 12 with Bima's email. Didit was transferred and his report withdrawn, but Sekar still hasn't come home.
+
+
+@conversation d7_unsent chapter="Hari 7" chapter.en="Day 7" title="Belum Terkirim" title.en="Unsent"
+@scene VN bg=bg_seawall_night.webp music=bgm_unsent.mp3 ambience=amb_sea_night.mp3 day=7 time=23:40
+
+stage
+  show raka:sad left
+
+narration
+  id: Malam itu gue balik ke tembok laut Pluit. Bawa dua gelas es teh, kebiasaan yang ternyata nggak hilang.
+  en: That night I go back to the Pluit seawall. With two cups of iced tea, a habit that turns out not to have gone anywhere.
+narration
+  id: Gue buka chat yang ada nama gue di HP Sekar. Draf-draf yang nggak pernah kekirim. Maret. Juni. Agustus. Voice note dua puluh detik yang nyuruh gue mulai.
+  en: I open the chat with my name on it on Sekar's phone. The drafts she never sent. March. June. August. The twenty-second voice note that told me to start.
+narration
+  id: Terus gue buka HP gue sendiri. Chat dengan nama dia. Setahun kosong.
+  en: Then I open my own phone. The chat with her name on it. A year of nothing.
+
+media CG cg_unsent.webp unlock=cg_unsent
+  id: Gue tahan tombol rekamnya.
+  en: I hold down the record button.
+
+raka:sad
+  id: Kar. Ini konyol, gue ngomong ke HP yang nggak bakal nyampe, karena HP lo mati.{w} Tapi lo ngajarin gue caranya.
+  en: Kar. This is stupid, talking to a phone that won't reach you, because yours is off.{w} But you taught me how.
+raka:sad
+  id: Gue dateng. Telat setahun, telat satu jam. Gue nggak nemu lo. Tapi gue denger semuanya. Episode lo bagus. Semuanya.
+  en: I came. A year late, an hour late. I didn't find you. But I heard everything. Your episodes were good. All of them.
+raka:neutral
+  id: Sabtu, jam lima pagi. Dermaga Muara Angke. Gue tungguin sampai jam enam. Lewat jam enam juga.
+  en: Saturday, five in the morning. The Muara Angke pier. I'll wait till six. Past six, too.
+narration
+  id: Satu centang abu-abu. Terkirim. Nggak nyampe.
+  en: One grey tick. Sent. Not delivered.
+narration
+  id: Tiga hari kemudian, jam lima kurang dua pagi, centangnya jadi dua. Terus biru.
+  en: Three days later, at two minutes to five in the morning, the tick becomes two. Then blue.
+
+stage
+  sound sfx_recorder_click.mp3
+wait 700
+stage
+  sound sfx_recorder_click.mp3
+
+narration
+  id: Satu voice note masuk. Dua detik. Isinya cuma dua klik.{w} Gue aman. Lanjut rekam.
+  en: One voice note comes in. Two seconds. Nothing in it but two clicks.{w} I'm okay. Keep rolling.
+
+ending end_04_unsent GOOD
+  id: Belum Terkirim
+  en: Unsent
+  summary id: Raka tidak menemukan Sekar, tapi akhirnya menjawab voice note-nya. Tiga hari kemudian, pesannya terbaca, dan ada dua klik.
+  summary en: Raka didn't find Sekar, but he finally answered her voice note. Three days later, his message was read, and there were two clicks.
+
+
+@conversation d7_runaway chapter="Hari 7" chapter.en="Day 7" title="Kabur" title.en="Runaway"
+@scene VN bg=bg_pari_jetty_morning.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=7 time=09:10
+
+stage
+  show raka:sad left
+
+narration [if found_sekar == true]
+  id: Sekar pulang naik kapal polisi, duduk di antara dua laki-laki BPM yang "ngawal" dia. Alat rekamnya dimasukin kantong plastik bening dan dikasih label. Barang bukti.
+  en: Sekar goes home on the police boat, sitting between two BPM men who are "escorting" her. Her recorder goes into a clear plastic bag with a label. Evidence.
+narration [if found_sekar == true]
+  id: Di kantor polisi, biar Pak Hendra nggak dipenjara, dia bilang dia kabur sendiri. Patah hati. Butuh waktu. Kasusnya ditutup sore itu juga. Pak Hendra kena denda karena bawa penumpang tanpa izin.
+  en: At the police station, to keep Pak Hendra out of prison, she says she ran away on her own. A broken heart. Needed time. The case is closed that same afternoon. Pak Hendra is fined for carrying a passenger without a license.
+narration [if found_sekar == true]
+  id: Alat rekamnya nggak pernah dibalikin. Waktu Sekar nanya, nggak ada yang tahu ada di rak mana.
+  en: The recorder is never returned. When Sekar asks, nobody knows which shelf it's on.
+sekar:tired [right] [if found_sekar == true]
+  id: Pulang ke Bandung, Ka. Mereka ngawasin semua orang yang deket sama gue. Gue nggak mau lo jadi salah satunya.
+  en: Go back to Bandung, Ka. They're watching everyone close to me. I don't want you to be one of them.
+narration [if found_sekar != true]
+  id: Pak Hendra ditahan dua hari, terus dilepas karena keluarga sepupunya bersaksi perempuan itu dateng sendiri dan pergi sendiri. Polisi nutup kasusnya. Perempuan dewasa, pergi atas kemauan sendiri.
+  en: Pak Hendra is held for two days, then released when his cousin's family testify the woman came alone and left alone. The police close the case. An adult woman, gone of her own free will.
+narration [if found_sekar != true]
+  id: Bu Wulan nggak nangis waktu dengernya. Dia cuma masuk kamar dan nutup pintu, kayak hari pertama gue dateng.
+  en: Mrs. Wulan doesn't cry when she hears. She just goes into her room and closes the door, like the first day I came.
+
+media CG cg_runaway.webp unlock=cg_runaway
+  id: Bus ke Bandung berangkat jam enam pagi. Gue dateng tepat waktu.
+  en: The bus to Bandung leaves at six in the morning. I'm right on time.
+
+narration
+  id: Di tiang terminal ada poster orang hilang. Gue nggak tahu siapa yang nempel. Setengahnya udah sobek. Wajah Sekar tinggal mata sama senyumnya.
+  en: On a pillar in the terminal is a missing person poster. I don't know who put it up. Half of it is torn away. All that's left of Sekar's face is her eyes and her smile.
+narration
+  id: Gue nggak nyopot posternya. Gue juga nggak ngerapihinnya. Gue cuma duduk di kursi deket jendela, dan busnya jalan.
+  en: I don't take the poster down. I don't smooth it out either. I just sit in the window seat, and the bus pulls away.
+narration
+  id: Kalau ada yang nanya, kasusnya resmi ditutup. Kabur dari rumah. Itu kata yang paling gampang buat semua orang.{w} Termasuk gue.
+  en: If anyone asks, the case is officially closed. Ran away from home. That's the easiest word for everyone.{w} Including me.
+
+ending end_05_runaway NORMAL
+  id: Kabur
+  en: Runaway
+  summary id: Kasusnya ditutup sebagai anak yang kabur dari rumah. Rekamannya hilang di rak barang bukti, dan Raka kembali ke Bandung.
+  summary en: The case was closed as a runaway. The recording vanished onto an evidence shelf, and Raka went back to Bandung.
+
+
+@conversation d7_low_tide chapter="Hari 7" chapter.en="Day 7" title="Surut" title.en="Low Tide"
+@scene VN bg=bg_pier_day.webp music=bgm_low_tide.mp3 ambience=amb_harbor_day.mp3 day=7 time=16:00
+
+stage
+  show raka:neutral left
+
+narration [if found_sekar == true]
+  id: Laporan penculikannya ditarik siang itu juga. "Salah paham," kata kuasa hukum PT Bentang di TV. Pak Hendra pulang naik kapalnya sendiri, nggak ngomong sepatah kata pun sepanjang jalan.
+  en: The kidnapping report is withdrawn that same afternoon. "A misunderstanding," PT Bentang's lawyer says on TV. Pak Hendra goes home on his own boat, without a word the whole way.
+narration [if found_sekar == true && knows_source == true]
+  id: Dua hari kemudian, Pak Darmawan narik semua omongannya. Dia bilang dia nggak pernah naik kapal itu. Rekaman tanpa narsum cuma suara orang asing di tengah laut.
+  en: Two days later, Pak Darmawan takes back everything he said. He says he was never on that boat. A recording without its source is just a stranger's voice at sea.
+narration [if found_sekar == true && knows_source != true]
+  id: Dua hari kemudian, narsumnya narik semua omongannya. Dia bilang dia nggak pernah naik kapal itu. Rekaman tanpa narsum cuma suara orang asing di tengah laut.
+  en: Two days later, the source takes back everything he said. He says he was never on that boat. A recording without its source is just a stranger's voice at sea.
+narration [if found_sekar != true]
+  id: Pak Hendra pulang ke Muara Angke dengan nama bersih. Sekar nggak pulang. Nggak ada yang tahu perahu nelayan pagi itu ke mana, dan Pak Hendra nggak mau bilang. Ke siapa pun. Termasuk gue.
+  en: Pak Hendra goes home to Muara Angke with his name cleared. Sekar doesn't come home. Nobody knows where that fishing boat went that morning, and Pak Hendra won't say. To anyone. Including me.
+
+media CG cg_low_tide.webp unlock=cg_low_tide
+  id: Air surut di Muara Angke. Patok-patoknya kelihatan sampai ke ujung.
+  en: Low tide at Muara Angke. You can see the stakes all the way out.
+
+sekar:tired [right] [if found_sekar == true]
+  id: Ada orang deket gue yang ngebocorin, Ka. Gue nggak bakal pernah tahu siapa.
+  en: Someone close to me leaked it, Ka. I'll never know who.
+raka:sad [if found_sekar == true]
+  id: Kita bakal tahu.
+  en: We'll find out.
+sekar:neutral [if found_sekar == true]
+  id: Lo udah ngomong lebih banyak minggu ini daripada lima tahun kemarin. Jangan dipaksain.
+  en: You've talked more this week than in the last five years. Don't push it.
+narration [if found_sekar == true]
+  id: Kita duduk di perahu terbalik, ngelihatin patok-patok sampai airnya naik lagi. Nggak ngomong apa-apa. Kali ini diemnya bukan kabur.
+  en: We sit on an upturned boat, watching the stakes until the water comes back in. Saying nothing. This time the quiet isn't running away.
+narration [if found_sekar != true]
+  id: Gue duduk di perahu terbalik, ngelihatin patok-patok sampai airnya naik lagi. Jejaknya ilang di situ. Di antara patok.
+  en: I sit on an upturned boat, watching the stakes until the water comes back in. The trail ends there. Somewhere among the stakes.
+
+ending end_06_low_tide NORMAL
+  id: Surut
+  en: Low Tide
+  summary id: Nama Pak Hendra bersih, tapi jejak ke izin itu hilang. Patok-patoknya tetap berdiri, dan kelihatan jelas setiap air surut.
+  summary en: Pak Hendra's name was cleared, but the trail to the permit went cold. The stakes are still standing, plain to see at every low tide.
+
+
+@conversation d7_off_record chapter="Hari 7" chapter.en="Day 7" title="Di Luar Rekaman" title.en="Off the Record"
+@scene VN bg=bg_pari_jetty_night.webp music=bgm_unsent.mp3 ambience=amb_sea_night.mp3 day=7 time=00:12
+
+stage
+  show sekar:scared right
+  show raka:neutral left
+
+sekar:scared
+  id: ...Lo dapet dari mana semua itu? Pak Hendra? Tasya?
+  en: ...Where did you get all that? Pak Hendra? Tasya?
+raka:neutral
+  id: Dari mana-mana. Kayak lo naro remah roti sepanjang setahun.
+  en: From everywhere. Like you left breadcrumbs for a whole year.
+narration
+  id: Dia diem lama. Terus dia nyalain alat rekamnya, scroll ke folder yang namanya cuma "KA". Dua belas file. Satu tiap bulan. Yang pertama, "0612".
+  en: She's quiet for a long time. Then she switches on the recorder and scrolls to a folder named just "KA". Twelve files. One a month. The first one is "0612".
+sekar:tired
+  id: Episode nol. Gue bikin setahun ini. Buat lo. Nggak bakal pernah tayang. Isinya semua hal yang nggak bisa gue omongin di depan lo.
+  en: Episode zero. I made it over this year. For you. It was never going to air. It's everything I couldn't say to your face.
+
+stage
+  music none fade=1.5s
+
+sekar voice=vo_d7_ep0_01.mp3 [offstage]
+  id: Halo, pendengar. Pendengarnya satu. Namanya Raka, dan dia nggak tahu acara ini ada.
+  en: Hi, listener. There's one listener. His name is Raka, and he doesn't know this show exists.
+  delivery: a mock radio voice, then dropping it halfway, shy
+sekar voice=vo_d7_ep0_02.mp3 [offstage]
+  id: Segmen dua belas. Ka, gue takut. Tapi tiap gue takut, gue ngebayangin lo di ruang edit, ngedumel soal angin. Dan gue jadi nggak terlalu takut.
+  en: Segment twelve. Ka, I'm scared. But every time I'm scared, I picture you in the edit room, grumbling about the wind. And I'm not so scared anymore.
+  delivery: close to the mic, quiet, honest, a small laugh in the middle
+sekar voice=vo_d7_ep0_03.mp3 [offstage]
+  id: Kalau suatu hari lo denger ini, segmen terakhirnya punya lo. Gue tinggalin kosong.
+  en: If you ever hear this, the last segment is yours. I've left it empty.
+  delivery: soft, certain, the end of an episode
+
+media CG cg_off_the_record.webp unlock=cg_off_the_record
+  id: Satu headphone, dua kuping. Lampu merah kecil di alat rekamnya nyala.
+  en: One pair of headphones, two ears. The little red light on the recorder comes on.
+
+raka:sad
+  id: Segmen tiga belas. Ini Raka. Gue telat setahun.{w} Dan gue nggak bakal ke mana-mana lagi.
+  en: Segment thirteen. This is Raka. I'm a year late.{w} And I'm not going anywhere again.
+sekar:laugh
+  id: Itu intro terjelek yang pernah gue denger.
+  en: That's the worst intro I've ever heard.
+raka:smirk
+  id: Potong aja. Lo kan udah bisa ngedit sendiri.
+  en: Cut it, then. You can edit by yourself now.
+sekar:smile
+  id: Nggak. Yang ini nggak gue potong.
+  en: No. This one I'm keeping.
+narration
+  id: Kita ngerekam sampai lampu di tiang mati sendiri. Soal Didit, soal polisi, soal kapal yang dateng besok pagi. Itu episode lain.
+  en: We record until the lamp on the post goes out by itself. About Didit, about the police, about the boats coming in the morning. That's another episode.
+narration
+  id: Yang ini di luar rekaman.
+  en: This one is off the record.
+
+ending end_10_off_the_record SECRET
+  id: Di Luar Rekaman
+  en: Off the Record
+  summary id: Raka mendengar semua voice note yang tak pernah terkirim, dan Sekar memutarkan Episode 0 untuknya. Segmen terakhirnya mereka rekam berdua.
+  summary en: Raka heard every voice note that was never sent, and Sekar played him Episode 0. They recorded its last segment together.

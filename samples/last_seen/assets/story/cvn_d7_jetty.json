@@ -1,0 +1,465 @@
+{
+  "conversation_id": "cvn_d7_jetty",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Dermaga",
+    "en": "The Jetty"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "07:40",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_tense_call.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:6",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "sekar:3",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kapal polisi merapat duluan. Ipda Yusuf turun pertama, seragamnya basah sampai lutut. Di belakangnya dua laki-laki pake polo BPM.",
+        "en": "The police boat docks first. Inspector Yusuf steps off first, his uniform wet to the knees. Behind him, two men in BPM polos."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Terakhir, laki-laki pake batik yang disetrika rapi, megang payung padahal nggak hujan. Lebih pendek dari suaranya. Aditya Nugraha. Didit.",
+        "en": "Last, a man in a neatly ironed batik shirt, holding an umbrella though it isn't raining. Shorter than his voice. Aditya Nugraha. Didit."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "yusuf:2",
+          "position": "far_left",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Alhamdulillah. Mbak Sekar, syukurlah Anda selamat. Pak, itu orangnya. Yang di kapal.",
+        "en": "Thank God. Ms. Sekar, I'm so glad you're safe. Inspector, that's the man. The one on the boat."
+      },
+      "profile": "didit",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia nunjuk Pak Hendra. Pak Hendra lagi ngegulung tali dan nggak berhenti.",
+        "en": "He points at Pak Hendra. Pak Hendra is coiling rope and doesn't stop."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mbak Sekar. Saya harus tanya, untuk catatan. Anda di sini atas kemauan sendiri?",
+        "en": "Ms. Sekar. I have to ask, for the record. Are you here of your own free will?"
+      },
+      "profile": "yusuf:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Iya, Pak. Saya yang minta Pak Hendra nganter.",
+        "en": "Yes, sir. I asked Pak Hendra to bring me."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Tentu dia bilang begitu, Pak. Empat hari sendirian sama orang itu. Perusahaan kami punya saksi yang lihat dia dipaksa naik kapal. Dan alat rekam itu, mohon diamankan. Barang bukti.",
+        "en": "Of course she'd say that, Inspector. Four days alone with that man. My company has a witness who saw her forced onto the boat. And that recorder, please secure it. It's evidence."
+      },
+      "profile": "didit",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ipda Yusuf nunjukin selembar kertas ke gue. Laporan polisi. Pelapor, PT Bentang Pesisir Makmur. Saksi, satu satpam. Tanggal laporan, Senin kemarin. Enam hari setelah Sekar hilang.",
+        "en": "Inspector Yusuf shows me a sheet of paper. A police report. Filed by PT Bentang Pesisir Makmur. Witness, one security guard. Date filed, this Monday. Six days after Sekar vanished."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "clue_kidnap_report",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kata-kata Mbak Sekar melawan laporan resmi dengan saksi, Mas Raka. Saya butuh lebih dari itu. Sekarang. Sebelum saya terpaksa menjalankan tugas saya.",
+        "en": "Ms. Sekar's word against an official report with a witness, Raka. I need more than that. Now. Before I'm forced to do my job."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "meta.flag.knows_crossing_log && clue_crossing_log != true",
+      "text": {
+        "id": "Ada satu halaman di kepala lo. Tulisan tangan yang tegas. Tanggal, jam, tujuan, jumlah orang.",
+        "en": "There's a page in your head. A firm hand. Date, time, destination, number of people."
+      },
+      "variable": "LOGBOOK",
+      "profile": "raka:6",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Pak, di Kamal Muara ada buku log kapal ini. Di rumah Pak Karta.\"",
+            "en": "\"Sir, there's a logbook for this boat in Kamal Muara. At Pak Karta's house.\""
+          },
+          "value": "tell",
+          "effects": [
+            {
+              "variable": "clue_crossing_log",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Itu cuma perasaan.)",
+            "en": "(It's only a feeling.)"
+          },
+          "value": "skip"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "LOGBOOK == 'tell'",
+      "text": {
+        "id": "Ipda Yusuf ngangkat alis, tapi dia nelpon pos Kamal Muara. Lima belas menit kemudian, foto halamannya masuk ke HP-nya. Gue nggak tahu gimana gue bisa tahu. Rasanya kayak baca ulang.",
+        "en": "Inspector Yusuf raises an eyebrow, but he calls the Kamal Muara post. Fifteen minutes later, a photo of the page comes into his phone. I don't know how I knew. It feels like rereading."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "id": "kidnap",
+      "source": "clues",
+      "text": {
+        "id": "\"Dia nggak dateng sendiri.\" Buktikan sebaliknya.",
+        "en": "\"She didn't come on her own.\" Prove otherwise."
+      },
+      "variable": "KIDNAP",
+      "profile": "yusuf:3",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "crossing_log",
+          "target": "#kidnap_log"
+        }
+      ],
+      "retry": {
+        "target": "#kidnap_retry"
+      },
+      "fallback": {
+        "target": "#kidnap_fail"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "kidnap_retry",
+      "text": {
+        "id": "Itu ngasih tahu saya ke mana dia pergi, Mas. Bukan gimana caranya.",
+        "en": "That tells me where she went, Raka. Not how."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#kidnap"
+    },
+    {
+      "type": "TEXT",
+      "id": "kidnap_log",
+      "text": {
+        "id": "\"Selasa. 05.30. Pari. 1 org (S.).\" Penumpang. Dicatat di buku yang dibuat untuk kakaknya yang sakit. Ditulis enam hari sebelum ada laporan apa pun.",
+        "en": "\"Tuesday. 05:30. Pari. 1 person (S.).\" A passenger. Written in a book kept for his sick brother. Six days before any report existed."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Penculik jarang bikin kuitansi, Pak Aditya.",
+        "en": "Kidnappers rarely write receipts, Mr. Aditya."
+      },
+      "profile": "yusuf:1"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "proof_log",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#motive_ask"
+    },
+    {
+      "type": "TEXT",
+      "id": "kidnap_fail",
+      "text": {
+        "id": "Maaf, Mas. Sampai ada yang lebih kuat, Pak Hendra ikut kami.",
+        "en": "I'm sorry, Raka. Until there's something stronger, Pak Hendra comes with us."
+      },
+      "profile": "yusuf:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Pak Hendra naruh gulungan talinya, rapi, kayak orang yang baru selesai kerja. Dia ngulurin dua tangannya sendiri.",
+        "en": "Pak Hendra sets down his coil of rope, neatly, like a man finishing a job. He holds out both his hands himself."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "hendra_held",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "id": "motive_ask",
+      "text": {
+        "id": "Pak, ini semua cuma salah paham. Perusahaan kami cuma khawatir. Kenapa juga kami harus bohong?",
+        "en": "Inspector, this is all a misunderstanding. My company was only worried. Why would we lie?"
+      },
+      "profile": "didit",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pertanyaan yang bagus. Mas Raka?",
+        "en": "A good question. Raka?"
+      },
+      "profile": "yusuf:2"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "meta.flag.knows_bima_email && clue_bima_email != true",
+      "text": {
+        "id": "Ada satu email di kepala lo. Rabu malem, jam sembilan lewat. Sebuah CC yang nggak seharusnya ada.",
+        "en": "There's an email in your head. A Wednesday night, just after nine. A CC that shouldn't be there."
+      },
+      "variable": "EMAIL",
+      "profile": "raka:6",
+      "choices": [
+        {
+          "text": {
+            "id": "(Telepon Bima. Pake speaker.)",
+            "en": "(Call Bima. On speaker.)"
+          },
+          "value": "call",
+          "effects": [
+            {
+              "variable": "clue_bima_email",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Itu cuma perasaan.)",
+            "en": "(It's only a feeling.)"
+          },
+          "value": "skip"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "EMAIL == 'call'",
+      "text": {
+        "id": "Ka? Jam segini? Kenapa?",
+        "en": "Ka? At this hour? What's wrong?"
+      },
+      "profile": "bima:0",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "condition": "EMAIL == 'call'",
+      "text": {
+        "id": "Email Pak Rudy ke Didit. Tiga minggu lalu. Lo di-CC. Gue tahu, Bim. Forward ke gue sekarang, atau gue yang cerita ke Sekar duluan.",
+        "en": "Pak Rudy's email to Didit. Three weeks ago. You were CC'd. I know, Bim. Forward it to me now, or I'm the one who tells Sekar first."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "EMAIL == 'call'",
+      "text": {
+        "id": "Lama banget nggak ada suara. Terus HP gue geter. Gue nggak tahu gimana gue bisa tahu. Rasanya kayak baca ulang.",
+        "en": "A long silence. Then my phone buzzes. I don't know how I knew. It feels like rereading."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "id": "motive",
+      "source": "clues",
+      "text": {
+        "id": "\"Kenapa kami harus bohong?\" Tunjukin kenapa.",
+        "en": "\"Why would we lie?\" Show them why."
+      },
+      "variable": "MOTIVE",
+      "profile": "yusuf:2",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "bima_email",
+          "target": "#motive_email"
+        },
+        {
+          "clue": "didit_call",
+          "target": "#motive_threat"
+        },
+        {
+          "clue": "burner_profile",
+          "target": "#motive_threat"
+        },
+        {
+          "clue": "threat_message",
+          "target": "#motive_threat"
+        }
+      ],
+      "retry": {
+        "target": "#motive_retry"
+      },
+      "fallback": {
+        "target": "#jetty_end"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "motive_retry",
+      "text": {
+        "id": "Itu bukan alasan, Mas. Itu cuma cerita.",
+        "en": "That isn't a reason, Raka. That's just a story."
+      },
+      "profile": "yusuf:2"
+    },
+    {
+      "type": "JUMP",
+      "target": "#motive"
+    },
+    {
+      "type": "TEXT",
+      "id": "motive_threat",
+      "text": {
+        "id": "Ini ancaman. Saya catat, Pak Aditya, dan nanti kita bicarakan. Tapi ini bukan izin, bukan laut. Ini belum ngejelasin kenapa.",
+        "en": "This is a threat. I'm noting it, Mr. Aditya, and we'll talk about it later. But it isn't the permit, it isn't the sea. It doesn't explain why."
+      },
+      "profile": "yusuf:0"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "proof_threat",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "#jetty_end"
+    },
+    {
+      "type": "NARRATION",
+      "id": "motive_email",
+      "text": {
+        "id": "Ipda Yusuf baca pelan, keras-keras. Dari Rudy Hartono. Untuk Aditya Nugraha. Rabu, 21.14, tiga minggu lalu. \"Sekar A. pegang salinan AMDAL asli + rekaman orang dinas. Mohon ditangani dengan bijak.\"",
+        "en": "Inspector Yusuf reads it slowly, aloud. From Rudy Hartono. To Aditya Nugraha. Wednesday, 21:14, three weeks ago. \"Sekar A. has a copy of the original AMDAL + a recording of someone from the office. Please handle it wisely.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bapak tahu dia pegang rekaman itu tiga minggu sebelum dia hilang. Terus ada sponsor, terus ada ancaman. Dan sekarang Bapak melapor dia diculik.",
+        "en": "You knew she had that recording three weeks before she vanished. Then came the sponsor offer, then the threat. And now you report her kidnapped."
+      },
+      "profile": "yusuf:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Didit nutup payungnya. Pelan-pelan. Kayak itu satu-satunya hal yang masih bisa dia atur.",
+        "en": "Didit closes his umbrella. Slowly. As if it's the only thing left he can control."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "proof_email",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "BRANCH",
+      "id": "jetty_end",
+      "branches": [
+        {
+          "condition": "proof_log == true && proof_email == true",
+          "target": "d7_undertow"
+        },
+        {
+          "condition": "proof_log == true",
+          "target": "d7_low_tide"
+        },
+        {
+          "condition": "proof_email == true",
+          "target": "d7_episode_12"
+        }
+      ],
+      "fallback_target": "d7_runaway"
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "conversation_id": "cvn_d7n_ferry",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Terakhir Terlihat",
+    "en": "Last Seen"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "05:50",
+    "background": "bg_ferry_deck.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "tasya:2",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 7. Rabu. Kapal pertama ke Pulau Pari isinya kita, karung-karung beras, dan satu kambing yang lebih tenang dari semua penumpang.",
+        "en": "Day 7. Wednesday. The first boat to Pulau Pari carries us, sacks of rice, and one goat calmer than any of the passengers."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue mabok laut. Gue nggak pernah bilang ke Sekar. Tiap liputan pulau gue minum antimo dua.",
+        "en": "I get seasick. I never told Sekar. Every island story, I took two motion sickness pills."
+      },
+      "profile": "tasya:2"
+    },
+    {
+      "type": "STAGE",
+      "condition": "bima_confessed == true",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "bima:0",
+          "position": "far_right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Gue bawa printout email-nya. Tiga lembar. Kalau HP kita mati semua.",
+        "en": "I brought a printout of the email. Three copies. In case all our phones die."
+      },
+      "profile": "bima:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "yusuf_heard_didit == true",
+      "text": {
+        "id": "HP gue geter. Ipda Yusuf. \"Saya di kapal polisi jam 06.30. Pak Aditya ikut, sebagai 'perwakilan perusahaan'. Saya usahakan lambat.\"",
+        "en": "My phone buzzes. Inspector Yusuf. \"I'm on the police boat at 06:30. Mr. Aditya is coming, as a 'company representative'. I'll try to be slow.\""
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pari itu ada tiga dermaga, Ka. Seribu orang. Homestay di mana-mana. Kita mulai dari mana?",
+        "en": "Pari has three jetties, Ka. A thousand people. Homestays everywhere. Where do we even start?"
+      },
+      "profile": "tasya:3"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "meta.flag.knows_crossing_log",
+      "text": {
+        "id": "Ada satu nama di kepala lo, dan lo nggak tahu datengnya dari mana. Kayak halaman buku yang pernah lo baca, di minggu yang lain.",
+        "en": "There's a name in your head, and you don't know where it came from. Like a page from a book you read in some other week."
+      },
+      "variable": "SRI_REJEKI",
+      "profile": "raka:6",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Kita cari kapal biru-putih. Namanya Sri Rejeki.\"",
+            "en": "\"We look for a blue and white boat. The Sri Rejeki.\""
+          },
+          "value": "boat"
+        },
+        {
+          "text": {
+            "id": "(Itu cuma perasaan. Pake yang pasti.)",
+            "en": "(It's only a feeling. Go with what you know.)"
+          },
+          "value": "clues"
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "condition": "SRI_REJEKI == 'boat'",
+      "target": "#found_jetty"
+    },
+    {
+      "type": "CHOICE",
+      "id": "where_pari",
+      "source": "clues",
+      "text": {
+        "id": "\"Pulau Pari itu gede, Ka.\" Di mana dia?",
+        "en": "\"Pari's a big island, Ka.\" Where is she?"
+      },
+      "variable": "WHERE_PARI",
+      "profile": "tasya:3",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "sunrise_photo",
+          "target": "#found_jetty"
+        }
+      ],
+      "retry": {
+        "target": "#where_retry"
+      },
+      "fallback": {
+        "target": "d7n_cold"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "where_retry",
+      "text": {
+        "id": "Itu cuma bilang dia ke Pari. Gue butuh yang bilang di Pari-nya di mana.",
+        "en": "That only says she went to Pari. I need something that says where on Pari."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "JUMP",
+      "target": "#where_pari"
+    },
+    {
+      "type": "NARRATION",
+      "id": "found_jetty",
+      "text": {
+        "id": "Kapalnya merapat jam tujuh. Gue nunjukin layar HP ke ibu-ibu penjual gorengan di dermaga. Dia langsung nunjuk ke timur. \"Dermaga bakau. Rumah sepupunya Pak Hendra.\"",
+        "en": "The boat docks at seven. I show my screen to a woman selling fritters on the jetty. She points east right away. \"The mangrove jetty. Pak Hendra's cousin's house.\""
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "found_sekar",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d7n_sekar"
+    }
+  ]
+}

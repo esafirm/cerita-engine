@@ -933,24 +933,46 @@ that arrive while Raka is reading, like the group's answers after he replies as 
 - **Not an engine change:** a "history" flag on a scene or thread would save writing `typing=0` 62 times. Worth
   it if Days 3 and 4 read more old threads (Sekar's notes app, `d4_notebook`).
 
-## Days 2 to 6 are drafted short of their budgets
+## Days 2 to 7 are drafted short of their budgets
 
-*2026-11-19. Last Seen spec §2, M2 plan §3 to §5, M3 plan §4 to §7.*
+*2026-11-19. Last Seen spec §2, M2 plan §3 to §5, M3 plan §4 to §7, M4 plan §3 to §6.*
 
 | Day | Words | Estimate | Budget |
 | :--- | ---: | ---: | ---: |
 | 1 (M1) | 2.7k | 16.4 min | 4.0k, 25 min |
-| 2 | 2.7k | 15.7 min | 4.5k, 30 min |
+| 2 | 2.8k | 16.3 min | 4.5k, 30 min |
 | 3 | 2.0k | 13.1 min | 4.5k, 28 min |
 | 4 | 1.8k | 10.7 min | 4.5k, 28 min |
 | 5, Harbor / Network | 1.3k / 1.0k | about 8 / 6 min | 4.5k, 28 min each |
-| 6, Harbor / Network | 0.7k / 0.5k | about 4 / 3 min | 4.5k, 28 min each |
+| 6, Harbor / Network | 1.2k / 0.6k | about 7 / 3 min | 4.5k, 28 min each |
+| 7, Harbor / Network | 0.5k to 1.0k | about 3 to 6 min | 3.0k, 18 min |
+| Each ending | 0.2k | about 1 min | 0.8k, 5 min |
 
 They stay as written until the M1 timed playtest says whether the estimator or the budget is wrong. Padding
 them now could mean cutting them again after the playtest. Day 4 was first drafted at 1.3k and grew with story,
 not filler: the phone switched off on purpose, Bu Wulan and the boat, the report to Yusuf and the two clicks.
 If the budgets hold, Days 4 and 3 grow first: the Bima call's aftermath, the Yusuf call and the evening at home
 are the thinnest scenes.
+
+## The true ending needs a second run, by design
+
+*2026-11-19. Last Seen spec §2 and §3, M4 plan §2 and §5.*
+
+- **Context:** the true ending needs key clues from both routes, and one run takes one route.
+- **Decision:** the final deduction on the jetty asks two questions: the logbook (Harbor only) clears Hendra, and
+  Bima's email (Network only) shows why Bentang lied. With one proof a run ends at *Low Tide* (Harbor) or *Episode
+  12* (Network). Each key clue is remembered when found. On a later run of the other route, a choice that only
+  memory shows turns it into the clue in this run: Yusuf has the logbook photographed, or Bima is made to forward
+  the email. The narration calls it a feeling, like rereading a page.
+- **Cost:** the Harbor route's best first-run ending is NORMAL. That's deliberate: *Low Tide* ends with Sekar
+  saying someone close to her leaked it, which is the Network route's question.
+- **Secret ending:** it needs all four unsent voice notes, two of them route-only, and is offered at the Harbor
+  reunion only. The Network reunion happens in the morning with the police twenty minutes out, where a night scene
+  of recording until the lamp goes out doesn't fit. A run can hear the last note and reach the secret in one go.
+- **Test harness:** the route tests now fail when they present a clue the run hasn't found. The engine accepts any
+  clue by id, and the Case Board only offers found ones, so without the check a test could pass on an answer no
+  player can give. It caught exactly that while the true-ending test was being written.
+- **Revisit if** playtesters miss the memory choices. They could then show on the Case Board as a faded clue.
 
 ## Admin tools hide behind seven taps, in every build
 

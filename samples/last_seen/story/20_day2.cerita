@@ -778,6 +778,41 @@ dinda:crying
   id: Itu suara dia. Kayak dia lagi duduk di sini.
   en: That's her voice. Like she's sitting right here.
 
+# The fourth of Sekar's unsent voice notes (beat plan last-seen-m4.md §6), optional and remembered across runs.
+narration
+  id: Dinda ke dapur ngambil minum. Gue scroll dasbornya ke bawah. Di bawah sebelas episode ada satu folder lagi. "Tidak terdaftar. 1 file." Namanya cuma angka. "0612.m4a." Diunggah setahun lalu, hari Sabtu.
+  en: Dinda goes to the kitchen for water. I scroll down the dashboard. Under the eleven episodes is one more folder. "Unlisted. 1 file." Its name is just a number. "0612.m4a." Uploaded a year ago, on a Saturday.
+narration
+  id: Enam dua belas. Jam pesan "ok" itu.
+  en: Six twelve. The time of that "ok".
+
+choice PLAY_0612 by=raka:sad silent
+  id: Puter?
+  en: Play it?
+? Puter. | Play it.
+  value play
+? Tutup foldernya. | Close the folder.
+  value close
+
+sekar voice=vo_unsent_04_01.mp3 [offstage] [if PLAY_0612 == 'play']
+  id: Jam enam lewat dua belas. Kapalnya Pak Karta udah jalan. Gue masih di dermaga kayak orang bego, megangin dua gelas kopi.
+  en: Six twelve. Pak Karta's boat has gone. I'm still on the pier like an idiot, holding two cups of coffee.
+  delivery: early morning, wind on the mic, trying to sound light and failing
+sekar voice=vo_unsent_04_02.mp3 [offstage] [if PLAY_0612 == 'play']
+  id: Gue nggak bakal ngirim ini. Gue cuma pengen ada yang inget kalau gue nunggu. Udah. Gue kirim "ok" aja.
+  en: I'm not going to send this. I just want something to remember that I waited. That's it. I'll just send "ok".
+  delivery: quieter, a small breath, then making up her mind
+set [if PLAY_0612 == 'play']
+  set heard_unsent_04 true
+  remember heard_unsent_04
+  clue pier_wait
+raka:sad [if PLAY_0612 == 'play']
+  id: Dua gelas. Satu buat gue.
+  en: Two cups. One for me.
+narration [if PLAY_0612 == 'close']
+  id: Gue nutup foldernya sebelum Dinda balik. Ada hal-hal yang dia rekam bukan buat siapa-siapa.
+  en: I close the folder before Dinda comes back. Some things she recorded weren't meant for anyone.
+
 stage
   music bgm_unease.mp3 fade=2s
 

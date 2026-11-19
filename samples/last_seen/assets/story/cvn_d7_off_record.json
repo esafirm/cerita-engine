@@ -1,0 +1,176 @@
+{
+  "conversation_id": "cvn_d7_off_record",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Di Luar Rekaman",
+    "en": "Off the Record"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "00:12",
+    "background": "bg_pari_jetty_night.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "sekar:4",
+          "position": "right"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Lo dapet dari mana semua itu? Pak Hendra? Tasya?",
+        "en": "...Where did you get all that? Pak Hendra? Tasya?"
+      },
+      "profile": "sekar:4"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dari mana-mana. Kayak lo naro remah roti sepanjang setahun.",
+        "en": "From everywhere. Like you left breadcrumbs for a whole year."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia diem lama. Terus dia nyalain alat rekamnya, scroll ke folder yang namanya cuma \"KA\". Dua belas file. Satu tiap bulan. Yang pertama, \"0612\".",
+        "en": "She's quiet for a long time. Then she switches on the recorder and scrolls to a folder named just \"KA\". Twelve files. One a month. The first one is \"0612\"."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Episode nol. Gue bikin setahun ini. Buat lo. Nggak bakal pernah tayang. Isinya semua hal yang nggak bisa gue omongin di depan lo.",
+        "en": "Episode zero. I made it over this year. For you. It was never going to air. It's everything I couldn't say to your face."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "music",
+          "file": null,
+          "fade_ms": 1500
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Halo, pendengar. Pendengarnya satu. Namanya Raka, dan dia nggak tahu acara ini ada.",
+        "en": "Hi, listener. There's one listener. His name is Raka, and he doesn't know this show exists."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d7_ep0_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Segmen dua belas. Ka, gue takut. Tapi tiap gue takut, gue ngebayangin lo di ruang edit, ngedumel soal angin. Dan gue jadi nggak terlalu takut.",
+        "en": "Segment twelve. Ka, I'm scared. But every time I'm scared, I picture you in the edit room, grumbling about the wind. And I'm not so scared anymore."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d7_ep0_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kalau suatu hari lo denger ini, segmen terakhirnya punya lo. Gue tinggalin kosong.",
+        "en": "If you ever hear this, the last segment is yours. I've left it empty."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_d7_ep0_03.mp3"
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_off_the_record.webp",
+      "caption": {
+        "id": "Satu headphone, dua kuping. Lampu merah kecil di alat rekamnya nyala.",
+        "en": "One pair of headphones, two ears. The little red light on the recorder comes on."
+      },
+      "unlock_id": "cg_off_the_record"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Segmen tiga belas. Ini Raka. Gue telat setahun.{w} Dan gue nggak bakal ke mana-mana lagi.",
+        "en": "Segment thirteen. This is Raka. I'm a year late.{w} And I'm not going anywhere again."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu intro terjelek yang pernah gue denger.",
+        "en": "That's the worst intro I've ever heard."
+      },
+      "profile": "sekar:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Potong aja. Lo kan udah bisa ngedit sendiri.",
+        "en": "Cut it, then. You can edit by yourself now."
+      },
+      "profile": "raka:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Nggak. Yang ini nggak gue potong.",
+        "en": "No. This one I'm keeping."
+      },
+      "profile": "sekar:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kita ngerekam sampai lampu di tiang mati sendiri. Soal Didit, soal polisi, soal kapal yang dateng besok pagi. Itu episode lain.",
+        "en": "We record until the lamp on the post goes out by itself. About Didit, about the police, about the boats coming in the morning. That's another episode."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Yang ini di luar rekaman.",
+        "en": "This one is off the record."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_10_off_the_record",
+      "title": {
+        "id": "Di Luar Rekaman",
+        "en": "Off the Record"
+      },
+      "category": "SECRET",
+      "summary": {
+        "id": "Raka mendengar semua voice note yang tak pernah terkirim, dan Sekar memutarkan Episode 0 untuknya. Segmen terakhirnya mereka rekam berdua.",
+        "en": "Raka heard every voice note that was never sent, and Sekar played him Episode 0. They recorded its last segment together."
+      }
+    }
+  ]
+}

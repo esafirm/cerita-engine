@@ -114,7 +114,7 @@
     },
     {
       "type": "JUMP",
-      "target": "d7_stub"
+      "target": "d6h_sekar"
     }
   ]
 }

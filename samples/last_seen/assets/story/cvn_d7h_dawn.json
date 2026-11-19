@@ -1,0 +1,207 @@
+{
+  "conversation_id": "cvn_d7h_dawn",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Terakhir Terlihat",
+    "en": "Last Seen"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "06:20",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_unease.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 7. Rabu. Gue kebangun di lantai rumah sepupu Pak Hendra, di bawah sarung yang bau minyak tanah. Sekar udah nggak ada di kasurnya.",
+        "en": "Day 7. Wednesday. I wake on the floor of Pak Hendra's cousin's house, under a sarong that smells of kerosene. Sekar's mattress is already empty."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia di ujung dermaga, alat rekamnya diangkat ke arah laut. Ngerekam pagi. Kebiasaan.",
+        "en": "She's at the end of the jetty, holding the recorder up to the sea. Recording the morning. Habit."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "hendra:4",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Syahbandar buka laut jam enam. Kapal polisi jalan dari Muara Angke jam enam lewat lima. Speedboat putih ikut di belakangnya. Satu jam lagi mereka di sini.",
+        "en": "The harbor master opened the sea at six. The police boat left Muara Angke at five past six. A white speedboat right behind it. They'll be here in an hour."
+      },
+      "profile": "hendra:4",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya bisa bawa dia ke Tidung sekarang. Keluarga istri saya di sana. Dua jam. Mereka nggak bakal nemu.",
+        "en": "I can take her to Tidung now. My wife's family is there. Two hours. They'll never find her."
+      },
+      "profile": "hendra:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "left_phone == true",
+      "text": {
+        "id": "HP Sekar ada di rumah, sama Dinda. Satu salinan rekaman Didit aman di Pluit. Yang di sini cuma alat rekamnya.",
+        "en": "Sekar's phone is at home with Dinda. One copy of Didit's call is safe in Pluit. All that's here is the recorder."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "phone_lost == true",
+      "text": {
+        "id": "HP Sekar ada di dasar laut, di antara patok-patok. Yang tersisa cuma alat rekam di tangan dia.",
+        "en": "Sekar's phone is at the bottom of the sea, somewhere among the stakes. All that's left is the recorder in her hand."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "left_phone != true && phone_lost != true",
+      "text": {
+        "id": "Pak Hendra buka kotak seng mesinnya. HP Sekar masih di dalam plastik, kering, mati.",
+        "en": "Pak Hendra opens the engine's tin box. Sekar's phone is still in its plastic, dry, switched off."
+      }
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "reconciled != true",
+          "target": "#she_goes"
+        }
+      ]
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "sekar:3",
+          "position": "far_right",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo yang pilih, Ka. Kali ini gue pengen denger lo ngomong duluan.",
+        "en": "You choose, Ka. This time I want to hear you say it first."
+      },
+      "profile": "sekar:3",
+      "position": "far_right"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Di cakrawala, dua titik. Satu abu-abu, satu putih.",
+        "en": "On the horizon, two dots. One grey, one white."
+      },
+      "variable": "STAY",
+      "profile": "sekar:3",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Kita tunggu mereka di sini. Bareng.\"",
+            "en": "\"We wait for them here. Together.\""
+          },
+          "value": "stay"
+        },
+        {
+          "text": {
+            "id": "\"Pergi sama Pak Hendra. Lo harus aman.\"",
+            "en": "\"Go with Pak Hendra. You have to be safe.\""
+          },
+          "value": "go"
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "condition": "STAY == 'go'",
+      "target": "d7_still_water"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oke. Bareng.{w} Pak, kopi. Kita bakal kedatengan tamu.",
+        "en": "Okay. Together.{w} Sir, coffee. We're about to have guests."
+      },
+      "profile": "sekar:1"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya bukan warung.",
+        "en": "I'm not a coffee stall."
+      },
+      "profile": "hendra:1"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tapi dia tetep nyalain kompor.",
+        "en": "But he lights the stove anyway."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d7_jetty"
+    },
+    {
+      "type": "TEXT",
+      "id": "she_goes",
+      "text": {
+        "id": "Pak. Tidung.",
+        "en": "Sir. Tidung."
+      },
+      "profile": "sekar:5",
+      "position": "far_right"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dia nggak ngelihat gue waktu ngomong itu. Dia ngelihat dua titik di cakrawala. Satu abu-abu, satu putih.",
+        "en": "She doesn't look at me when she says it. She looks at the two dots on the horizon. One grey, one white."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d7_still_water"
+    }
+  ]
+}

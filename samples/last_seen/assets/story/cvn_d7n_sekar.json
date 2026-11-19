@@ -1,0 +1,251 @@
+{
+  "conversation_id": "cvn_d7n_sekar",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Sekar",
+    "en": "Sekar"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "07:20",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dermaga kayu. Bakau di kiri. Kapal biru-putih diiket di ujung. Gue udah pernah lihat tempat ini. Di layar HP Sekar, jam lima kurang dua.",
+        "en": "A wooden jetty. Mangroves on the left. A blue and white boat tied at the end. I've seen this place before. On Sekar's screen, at two minutes to five."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di ujung dermaga ada orang duduk. Rambutnya setengah diiket. Jaket hijau tentara yang kegedean. Alat rekam diangkat ke arah laut.",
+        "en": "Someone is sitting at the end of the jetty. Hair tied half up. An oversized army-green jacket. A recorder held up toward the sea."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "sekar:4",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 900
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Tasya?",
+        "en": "...Tasya?"
+      },
+      "profile": "sekar:4",
+      "position": "right"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tasya lari duluan. Nggak peduli papannya licin. Mereka pelukan kayak dua orang yang jatuh barengan.",
+        "en": "Tasya runs first. She doesn't care that the planks are slippery. They hug like two people falling together."
+      }
+    },
+    {
+      "type": "STAGE",
+      "condition": "bima_confessed == true",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "bima:4",
+          "position": "far_right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Kar. Gue yang bilang ke bos. Gue kira gue ngelindungin kamu. Gue salah.",
+        "en": "Kar. I'm the one who told my boss. I thought I was protecting you. I was wrong."
+      },
+      "profile": "bima:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_confessed == true",
+      "text": {
+        "id": "Gue tahu, Bim. Gue tahu dari Senin malem. Nanti. Bukan sekarang.",
+        "en": "I know, Bim. I've known since Monday night. Later. Not now."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dan lo. Lo telat setahun.",
+        "en": "And you. You're a year late."
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.",
+        "en": "Pak Karta's boat left on time. I didn't."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Semua orang di dermaga diem. Sekar nungguin jawaban. Lagi.",
+        "en": "Everyone on the jetty goes quiet. Sekar is waiting for an answer. Again."
+      },
+      "variable": "REUNION",
+      "profile": "sekar:3",
+      "timeout_ms": 12000,
+      "default_choice": 3,
+      "choices": [
+        {
+          "text": {
+            "id": "\"Maaf, Kar. Buat semuanya.\"",
+            "en": "\"I'm sorry, Kar. For all of it.\""
+          },
+          "value": "sorry"
+        },
+        {
+          "text": {
+            "id": "\"Episode-episode lo bagus. Semuanya. Harusnya gue bilang dari dulu.\"",
+            "en": "\"Your episodes were good. All of them. I should have said so back then.\""
+          },
+          "value": "episodes"
+        },
+        {
+          "text": {
+            "id": "\"Lo bilang gue bakal tahu harus mulai dari mana. Gue mulai.\"",
+            "en": "\"You said I'd know where to start. I started.\""
+          },
+          "value": "started",
+          "condition": "heard_unsent_01 == true"
+        },
+        {
+          "text": {
+            "id": "(Nggak usah jawab.)",
+            "en": "(Don't answer.)"
+          },
+          "value": "silent",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "SET",
+      "condition": "REUNION != 'silent'",
+      "effects": [
+        {
+          "variable": "reconciled",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'sorry'",
+      "text": {
+        "id": "Setahun gue nungguin satu kata itu. Di depan Tasya, lagi.{w} ...Makasih, Ka.",
+        "en": "A year I waited for that one word. In front of Tasya, too.{w} ...Thank you, Ka."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'episodes'",
+      "text": {
+        "id": "Tas, lo denger? Dia bilang bagus. Rekam. Rekam sekarang.",
+        "en": "Tas, did you hear that? He said they were good. Record it. Record it now."
+      },
+      "profile": "sekar:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'episodes'",
+      "text": {
+        "id": "Udah dari tadi.",
+        "en": "I have been the whole time."
+      },
+      "profile": "tasya:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'started'",
+      "text": {
+        "id": "Lo denger voice note-nya.{w} Gue rekam itu jam dua pagi, sambil mikir lo nggak bakal pernah denger.",
+        "en": "You heard the voice note.{w} I recorded that at two in the morning, thinking you'd never hear it."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'silent'",
+      "text": {
+        "id": "Tuh kan. Diem lagi.",
+        "en": "See? Quiet again."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "hendra:2",
+          "position": "far_left",
+          "transition": "fade",
+          "duration_ms": 600
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapal polisi. Sama speedboat putih. Dua puluh menit lagi.",
+        "en": "The police boat. And a white speedboat. Twenty minutes."
+      },
+      "profile": "hendra:2"
+    },
+    {
+      "type": "BRANCH",
+      "branches": [
+        {
+          "condition": "reconciled != true && bima_confessed == true",
+          "target": "d7_episode_12"
+        },
+        {
+          "condition": "reconciled != true",
+          "target": "d7_still_water"
+        }
+      ],
+      "fallback_target": "d7_jetty"
+    }
+  ]
+}

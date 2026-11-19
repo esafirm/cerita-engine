@@ -1,0 +1,142 @@
+{
+  "conversation_id": "cvn_d7_unsent",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Belum Terkirim",
+    "en": "Unsent"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "23:40",
+    "background": "bg_seawall_night.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malam itu gue balik ke tembok laut Pluit. Bawa dua gelas es teh, kebiasaan yang ternyata nggak hilang.",
+        "en": "That night I go back to the Pluit seawall. With two cups of iced tea, a habit that turns out not to have gone anywhere."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue buka chat yang ada nama gue di HP Sekar. Draf-draf yang nggak pernah kekirim. Maret. Juni. Agustus. Voice note dua puluh detik yang nyuruh gue mulai.",
+        "en": "I open the chat with my name on it on Sekar's phone. The drafts she never sent. March. June. August. The twenty-second voice note that told me to start."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Terus gue buka HP gue sendiri. Chat dengan nama dia. Setahun kosong.",
+        "en": "Then I open my own phone. The chat with her name on it. A year of nothing."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_unsent.webp",
+      "caption": {
+        "id": "Gue tahan tombol rekamnya.",
+        "en": "I hold down the record button."
+      },
+      "unlock_id": "cg_unsent"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kar. Ini konyol, gue ngomong ke HP yang nggak bakal nyampe, karena HP lo mati.{w} Tapi lo ngajarin gue caranya.",
+        "en": "Kar. This is stupid, talking to a phone that won't reach you, because yours is off.{w} But you taught me how."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue dateng. Telat setahun, telat satu jam. Gue nggak nemu lo. Tapi gue denger semuanya. Episode lo bagus. Semuanya.",
+        "en": "I came. A year late, an hour late. I didn't find you. But I heard everything. Your episodes were good. All of them."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Sabtu, jam lima pagi. Dermaga Muara Angke. Gue tungguin sampai jam enam. Lewat jam enam juga.",
+        "en": "Saturday, five in the morning. The Muara Angke pier. I'll wait till six. Past six, too."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Satu centang abu-abu. Terkirim. Nggak nyampe.",
+        "en": "One grey tick. Sent. Not delivered."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Tiga hari kemudian, jam lima kurang dua pagi, centangnya jadi dua. Terus biru.",
+        "en": "Three days later, at two minutes to five in the morning, the tick becomes two. Then blue."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "WAIT",
+      "duration_ms": 700
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_recorder_click.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Satu voice note masuk. Dua detik. Isinya cuma dua klik.{w} Gue aman. Lanjut rekam.",
+        "en": "One voice note comes in. Two seconds. Nothing in it but two clicks.{w} I'm okay. Keep rolling."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_04_unsent",
+      "title": {
+        "id": "Belum Terkirim",
+        "en": "Unsent"
+      },
+      "category": "GOOD",
+      "summary": {
+        "id": "Raka tidak menemukan Sekar, tapi akhirnya menjawab voice note-nya. Tiga hari kemudian, pesannya terbaca, dan ada dua klik.",
+        "en": "Raka didn't find Sekar, but he finally answered her voice note. Three days later, his message was read, and there were two clicks."
+      }
+    }
+  ]
+}

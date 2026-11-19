@@ -1,0 +1,260 @@
+{
+  "conversation_id": "cvn_d6h_sekar",
+  "chapter": {
+    "id": "Hari 6",
+    "en": "Day 6"
+  },
+  "title": {
+    "id": "Sekar",
+    "en": "Sekar"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 6,
+    "time": "18:05",
+    "background": "bg_pari_jetty_night.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "sekar:0",
+          "position": "right",
+          "transition": "fade",
+          "duration_ms": 900
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Papan dermaganya bunyi tiap gue injek. Dia pasti denger gue dari ujung sana. Tapi dia nggak nengok sampai gue berdiri persis di pinggir lingkaran lampu.",
+        "en": "The planks creak with every step. She must hear me from the far end. But she doesn't turn until I'm standing right at the edge of the lamp's circle."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Lo telat setahun.",
+        "en": "You're a year late."
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kapalnya Pak Karta berangkat tepat waktu. Gue yang nggak.",
+        "en": "Pak Karta's boat left on time. I didn't."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Hendra cerita lewat radio. Dinda. Didit. Lo masuk dasbor gue pake nama kapal. Lo ke rumah Pak Karta.",
+        "en": "Pak Hendra told me over the radio. Dinda. Didit. You got into my dashboard with a boat's name. You went to Pak Karta's house."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak nyangka lo yang dateng. Gue ngetik \"jam lima pagi\" ke lo karena... nggak tahu. Karena cuma lo yang bakal ngerti angkanya.",
+        "en": "I didn't think it would be you who came. I typed \"five in the morning\" to you because... I don't know. Because you're the only one who'd understand the number."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ini saatnya. Setahun lalu, di tembok laut, gue tahu persis harus ngomong apa. Dan gue diem.",
+        "en": "This is the moment. A year ago, on the seawall, I knew exactly what to say. And I said nothing."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Sekar nungguin jawaban. Lagi.",
+        "en": "Sekar is waiting for an answer. Again."
+      },
+      "variable": "REUNION",
+      "profile": "sekar:3",
+      "timeout_ms": 12000,
+      "default_choice": 3,
+      "choices": [
+        {
+          "text": {
+            "id": "\"Maaf, Kar. Buat semuanya.\"",
+            "en": "\"I'm sorry, Kar. For all of it.\""
+          },
+          "value": "sorry"
+        },
+        {
+          "text": {
+            "id": "\"Episode-episode lo bagus. Semuanya. Harusnya gue bilang dari dulu.\"",
+            "en": "\"Your episodes were good. All of them. I should have said so back then.\""
+          },
+          "value": "episodes"
+        },
+        {
+          "text": {
+            "id": "\"Lo bilang gue bakal tahu harus mulai dari mana. Gue mulai.\"",
+            "en": "\"You said I'd know where to start. I started.\""
+          },
+          "value": "started",
+          "condition": "heard_unsent_01 == true"
+        },
+        {
+          "text": {
+            "id": "(Nggak usah jawab.)",
+            "en": "(Don't answer.)"
+          },
+          "value": "silent",
+          "silent": true
+        }
+      ]
+    },
+    {
+      "type": "SET",
+      "condition": "REUNION != 'silent'",
+      "effects": [
+        {
+          "variable": "reconciled",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'sorry'",
+      "text": {
+        "id": "Setahun gue nungguin satu kata itu. Ternyata kedengerannya biasa aja.{w} ...Nggak. Bohong. Nggak biasa.",
+        "en": "A year I waited for that one word. Turns out it sounds pretty ordinary.{w} ...No. That's a lie. It doesn't."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'episodes'",
+      "text": {
+        "id": "Semuanya? Episode tiga juga? Yang suaranya kayak direkam di dalem kulkas?",
+        "en": "All of them? Episode three too? The one that sounds like it was recorded inside a fridge?"
+      },
+      "profile": "sekar:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'episodes'",
+      "text": {
+        "id": "Episode tiga terutama.",
+        "en": "Episode three especially."
+      },
+      "profile": "raka:1"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'started'",
+      "text": {
+        "id": "Lo denger voice note-nya.{w} Gue rekam itu jam dua pagi, sambil mikir lo nggak bakal pernah denger.",
+        "en": "You heard the voice note.{w} I recorded that at two in the morning, thinking you'd never hear it."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'silent'",
+      "text": {
+        "id": "Tuh kan. Diem lagi.",
+        "en": "See? Quiet again."
+      },
+      "profile": "sekar:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REUNION == 'silent'",
+      "text": {
+        "id": "Nggak apa-apa, Ka. Lo dateng. Itu juga semacam ngomong.{w} Cuma bukan yang gue butuhin.",
+        "en": "It's fine, Ka. You came. That's a kind of talking too.{w} Just not the kind I need."
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "reconciled == true",
+      "text": {
+        "id": "Dia duduk di ujung dermaga, kaki ngegantung di atas air, kayak di tembok laut dulu. Gue duduk di sebelahnya. Kali ini nggak terlalu jauh dari pinggir.",
+        "en": "She sits at the end of the jetty, legs hanging over the water, like on the seawall back then. I sit beside her. This time not so far from the edge."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "reconciled == true",
+      "text": {
+        "id": "Rekaman Pak Darmawan ada di sini. Satu jam. Dia nyebut nama, tanggal, nomor halaman. Halaman tiga puluh tujuh, Ka. Kajian yang mereka ajukan sama yang asli beda di situ.",
+        "en": "Pak Darmawan's recording is in here. An hour. He names names, dates, page numbers. Page thirty-seven, Ka. That's where the review they filed and the real one differ."
+      },
+      "profile": "sekar:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "reconciled == true",
+      "text": {
+        "id": "Tapi nggak ada yang bakal percaya selama polisi mikir gue diculik. Mereka bakal ngambil ini sebagai \"barang bukti\", terus ini hilang. Kayak semua barang bukti lain di kota ini.",
+        "en": "But nobody will believe it as long as the police think I was kidnapped. They'll take this as \"evidence\", and then it'll disappear. Like every other piece of evidence in this city."
+      },
+      "profile": "sekar:4"
+    },
+    {
+      "type": "CHOICE",
+      "condition": "reconciled == true && meta.flag.heard_unsent_01 && meta.flag.heard_unsent_02 && meta.flag.heard_unsent_03 && meta.flag.heard_unsent_04",
+      "text": {
+        "id": "Ada satu angka lagi yang dari tadi muter di kepala lo. Enam dua belas. Dua gelas kopi. Menit dua belas. Satu HP jadul.",
+        "en": "There's one more number that's been going round your head. Six twelve. Two cups of coffee. Minute twelve. One old phone."
+      },
+      "variable": "ASK_0612",
+      "profile": "sekar:0",
+      "choices": [
+        {
+          "text": {
+            "id": "\"Kar. Nol enam dua belas. Itu bukan satu file, kan?\"",
+            "en": "\"Kar. Zero six twelve. That isn't just one file, is it?\""
+          },
+          "value": "ask"
+        },
+        {
+          "text": {
+            "id": "(Biarin malam ini sederhana.)",
+            "en": "(Let tonight stay simple.)"
+          },
+          "value": "skip"
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "condition": "ASK_0612 == 'ask'",
+      "target": "d7_off_record"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Malam itu kita nggak ngomong soal Didit lagi. Sepupu Pak Hendra masak ikan bakar. Sekar ketiduran duluan, alat rekamnya masih di genggaman.",
+        "en": "We don't talk about Didit again that night. Pak Hendra's cousin grills fish. Sekar falls asleep first, the recorder still in her hand."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d7h_dawn"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "conversation_id": "cvn_d7_runaway",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Kabur",
+    "en": "Runaway"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "09:10",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar == true",
+      "text": {
+        "id": "Sekar pulang naik kapal polisi, duduk di antara dua laki-laki BPM yang \"ngawal\" dia. Alat rekamnya dimasukin kantong plastik bening dan dikasih label. Barang bukti.",
+        "en": "Sekar goes home on the police boat, sitting between two BPM men who are \"escorting\" her. Her recorder goes into a clear plastic bag with a label. Evidence."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar == true",
+      "text": {
+        "id": "Di kantor polisi, biar Pak Hendra nggak dipenjara, dia bilang dia kabur sendiri. Patah hati. Butuh waktu. Kasusnya ditutup sore itu juga. Pak Hendra kena denda karena bawa penumpang tanpa izin.",
+        "en": "At the police station, to keep Pak Hendra out of prison, she says she ran away on her own. A broken heart. Needed time. The case is closed that same afternoon. Pak Hendra is fined for carrying a passenger without a license."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar == true",
+      "text": {
+        "id": "Alat rekamnya nggak pernah dibalikin. Waktu Sekar nanya, nggak ada yang tahu ada di rak mana.",
+        "en": "The recorder is never returned. When Sekar asks, nobody knows which shelf it's on."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "found_sekar == true",
+      "text": {
+        "id": "Pulang ke Bandung, Ka. Mereka ngawasin semua orang yang deket sama gue. Gue nggak mau lo jadi salah satunya.",
+        "en": "Go back to Bandung, Ka. They're watching everyone close to me. I don't want you to be one of them."
+      },
+      "profile": "sekar:5",
+      "position": "right"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar != true",
+      "text": {
+        "id": "Pak Hendra ditahan dua hari, terus dilepas karena keluarga sepupunya bersaksi perempuan itu dateng sendiri dan pergi sendiri. Polisi nutup kasusnya. Perempuan dewasa, pergi atas kemauan sendiri.",
+        "en": "Pak Hendra is held for two days, then released when his cousin's family testify the woman came alone and left alone. The police close the case. An adult woman, gone of her own free will."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar != true",
+      "text": {
+        "id": "Bu Wulan nggak nangis waktu dengernya. Dia cuma masuk kamar dan nutup pintu, kayak hari pertama gue dateng.",
+        "en": "Mrs. Wulan doesn't cry when she hears. She just goes into her room and closes the door, like the first day I came."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_runaway.webp",
+      "caption": {
+        "id": "Bus ke Bandung berangkat jam enam pagi. Gue dateng tepat waktu.",
+        "en": "The bus to Bandung leaves at six in the morning. I'm right on time."
+      },
+      "unlock_id": "cg_runaway"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Di tiang terminal ada poster orang hilang. Gue nggak tahu siapa yang nempel. Setengahnya udah sobek. Wajah Sekar tinggal mata sama senyumnya.",
+        "en": "On a pillar in the terminal is a missing person poster. I don't know who put it up. Half of it is torn away. All that's left of Sekar's face is her eyes and her smile."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak nyopot posternya. Gue juga nggak ngerapihinnya. Gue cuma duduk di kursi deket jendela, dan busnya jalan.",
+        "en": "I don't take the poster down. I don't smooth it out either. I just sit in the window seat, and the bus pulls away."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kalau ada yang nanya, kasusnya resmi ditutup. Kabur dari rumah. Itu kata yang paling gampang buat semua orang.{w} Termasuk gue.",
+        "en": "If anyone asks, the case is officially closed. Ran away from home. That's the easiest word for everyone.{w} Including me."
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_05_runaway",
+      "title": {
+        "id": "Kabur",
+        "en": "Runaway"
+      },
+      "category": "NORMAL",
+      "summary": {
+        "id": "Kasusnya ditutup sebagai anak yang kabur dari rumah. Rekamannya hilang di rak barang bukti, dan Raka kembali ke Bandung.",
+        "en": "The case was closed as a runaway. The recording vanished onto an evidence shelf, and Raka went back to Bandung."
+      }
+    }
+  ]
+}

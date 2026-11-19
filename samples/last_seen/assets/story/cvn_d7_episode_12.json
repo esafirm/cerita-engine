@@ -1,0 +1,115 @@
+{
+  "conversation_id": "cvn_d7_episode_12",
+  "chapter": {
+    "id": "Hari 7",
+    "en": "Day 7"
+  },
+  "title": {
+    "id": "Episode 12",
+    "en": "Episode 12"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 7,
+    "time": "09:00",
+    "background": "bg_pari_jetty_morning.webp",
+    "music": "bgm_unsent.mp3",
+    "ambience": "amb_harbor_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "hendra_held == true && found_sekar == true",
+      "text": {
+        "id": "Waktu polisi nuntun Pak Hendra ke kapal, Sekar minta izin ngambil tas di rumah sepupunya. Dia nggak balik. Pintu belakang rumah itu langsung ke bakau, dan di bakau ada perahu.",
+        "en": "While the police lead Pak Hendra to the boat, Sekar asks to fetch her bag from the cousin's house. She doesn't come back. The back door of that house opens straight onto the mangroves, and in the mangroves there's a boat."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "hendra_held == true && found_sekar == true",
+      "text": {
+        "id": "Di kantong hoodie gue ada kartu memori, dibungkus tisu. Tulisannya, \"buat tasya. tayangin. gue pulang kalau dia udah bebas.\"",
+        "en": "In my hoodie pocket is a memory card, wrapped in a tissue. On it: \"for tasya. publish it. i'll come home when he's free.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "reconciled != true && found_sekar == true",
+      "text": {
+        "id": "Sekar naik Sri Rejeki sebelum polisi merapat. Sebelum pergi, dia naruh kartu memori di tangan Tasya, bukan di tangan gue. \"Tayangin, Tas. Gue dengerin dari mana pun gue ada.\"",
+        "en": "Sekar boards the Sri Rejeki before the police dock. Before she goes, she puts a memory card in Tasya's hand, not mine. \"Publish it, Tas. I'll listen from wherever I am.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "found_sekar != true",
+      "text": {
+        "id": "Kita pulang tanpa Sekar. Tapi kita pulang bawa email Bima, draf Episode 12, dan Tasya yang udah berhenti takut.",
+        "en": "We go home without Sekar. But we go home with Bima's email, the Episode 12 draft, and a Tasya who has stopped being afraid."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "CG",
+      "uri": "cg_episode_12.webp",
+      "caption": {
+        "id": "Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam yang sama kayak Sekar biasa tayang.",
+        "en": "Tasya published Episode 12 on Friday, at eleven at night. The same hour Sekar always published."
+      },
+      "unlock_id": "cg_episode_12"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Intro empat puluh satu detik dari Sekar. Terus Tasya, yang ngebacain email Bima, satu kata satu kata. Gue yang ngedit. Gue biarin anginnya.",
+        "en": "Sekar's forty-one-second intro. Then Tasya, reading Bima's email word by word. I edited it. I left the wind in."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dua ratus pendengar jadi dua ratus ribu dalam seminggu. Didit dipindah ke kantor Surabaya. Laporan penculikannya ditarik \"demi kebaikan bersama\".",
+        "en": "Two hundred listeners became two hundred thousand in a week. Didit was transferred to the Surabaya office. The kidnapping report was withdrawn \"for the common good\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sekar masih resmi hilang. Tapi di kolom komentar Episode 12 ada satu komentar dari akun tanpa foto, jam lima kurang dua pagi.",
+        "en": "Sekar is still officially missing. But in the comments under Episode 12 there's one from an account with no picture, at two minutes to five in the morning."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "\"anginnya kenceng di menit dua belas.\"",
+        "en": "\"the wind's too loud at minute twelve.\""
+      }
+    },
+    {
+      "type": "ENDING",
+      "ending_id": "end_03_episode_12",
+      "title": {
+        "id": "Episode 12",
+        "en": "Episode 12"
+      },
+      "category": "GOOD",
+      "summary": {
+        "id": "Tasya menayangkan Episode 12 dengan email Bima. Didit dipindahkan dan laporannya ditarik, tapi Sekar masih belum pulang.",
+        "en": "Tasya published Episode 12 with Bima's email. Didit was transferred and his report withdrawn, but Sekar still hasn't come home."
+      }
+    }
+  ]
+}
