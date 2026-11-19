@@ -1,0 +1,96 @@
+{
+  "conversation_id": "cvn_d4_unsent_replay",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Dua Puluh Detik",
+    "en": "Twenty Seconds"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "08:40",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_unsent.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:5",
+          "position": "center"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sebelum nelpon Bima, gue turun ke tangga. Duduk di anak tangga yang paling bunyi.",
+        "en": "Before I call Bima, I go out to the stairs. I sit on the step that creaks the loudest."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Voice note dua puluh detik itu masih di sana, di bawah semua draf. Gue bilang nanti, kalau udah siap. Gue nggak bakal pernah siap.",
+        "en": "The twenty-second voice note is still there, under all the drafts. I said I'd listen later, when I was ready. I'm never going to be ready."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ka. Ini konyol, gue ngomong ke HP yang nggak bakal ngirim apa-apa. Tapi gue butuh ngomong ke seseorang yang bukan Tasya, bukan Bima.",
+        "en": "Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nemu sesuatu. Sesuatu yang gede. Dan gue rasa ada yang ngebocorin kalau gue punya itu.{w} Kalau gue ngilang, lo tahu harus mulai dari mana.",
+        "en": "I found something. Something big. And I think someone leaked that I have it.{w} If I disappear, you'll know where to start."
+      },
+      "profile": "sekar:0",
+      "offstage": true,
+      "voice": "vo_unsent_02.mp3"
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "heard_unsent_01",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "heard_unsent_01",
+          "op": "meta_set"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Bukan Tasya, bukan Bima.\" Dia ngomong ke gue karena gue satu-satunya orang yang nggak ada di sekitar dia.",
+        "en": "\"Isn't Tasya, isn't Bima.\" She talked to me because I was the one person who wasn't around her."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Ada yang ngebocorin.\" Gue naik lagi ke kamar.",
+        "en": "\"Someone leaked it.\" I go back up to her room."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_bima_call"
+    }
+  ]
+}

@@ -71,3 +71,21 @@ call_private:
   name: { id: Nomor Pribadi, en: Private Number }
   avatar: assets/story/sprites/unknown_avatar.webp
   members: [private]
+
+thread_bima:
+  name: Bima
+  avatar: assets/story/sprites/bima_avatar.webp
+  members: [bima]
+
+# Sekar's notes app, which she used like a chat with herself (Day 4).
+sekar_notes:
+  name: { id: Catatan, en: Notes }
+  avatar: assets/story/sprites/sekar_avatar.webp
+  members: [sekar]
+  owner: sekar
+
+thread_dawn:
+  name: "+62 857-1130-xxxx"
+  avatar: assets/story/sprites/unknown_avatar.webp
+  status: { id: terakhir dilihat baru saja, en: last seen just now }
+  members: [dawn]

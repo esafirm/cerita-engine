@@ -1,0 +1,162 @@
+{
+  "conversation_id": "cvn_d4_didit_call",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Suara Didit",
+    "en": "Didit's Voice"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_didit",
+    "day": 4,
+    "time": "09:24",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "ring": "sfx_phone_ring.mp3",
+    "stay": {
+      "id": "Kalau gue nggak angkat, dia bakal nyari cara lain buat ngomong. Mending sekarang, di sini, sama Dinda.",
+      "en": "If I don't answer, he'll find another way to talk to me. Better now, here, with Dinda."
+    }
+  },
+  "conversations": [
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Di layar panggilan HP Sekar ada tombol merah kecil. Aplikasi perekam yang dia pasang sendiri.",
+        "en": "On Sekar's call screen there's a small red button. A recorder app she installed herself."
+      },
+      "variable": "RECORD",
+      "profile": "didit",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Rekam teleponnya.",
+            "en": "Record the call."
+          },
+          "value": "record"
+        },
+        {
+          "text": {
+            "id": "Jangan. Dengerin aja.",
+            "en": "Don't. Just listen."
+          },
+          "value": "listen"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "RECORD == 'record'",
+      "style": "system",
+      "text": {
+        "id": "Merekam",
+        "en": "Recording"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Mas Raka. Selamat pagi. Aditya. Akhirnya kita bisa ngobrol langsung.",
+        "en": "Good morning, Raka. Aditya here. At last we get to talk properly."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "didit_slipped != true",
+      "text": {
+        "id": "Tawaran saya kemarin masih berlaku. Saya orangnya sabar.",
+        "en": "My offer from yesterday still stands. I'm a patient man."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "didit_slipped == true",
+      "text": {
+        "id": "Soal pesan yang Anda kirim kemarin. Saya harap Anda tidak salah paham dengan saran saya.",
+        "en": "About the message you sent me yesterday. I hope you didn't misunderstand my advice."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya dengar Dik Dinda kuliah di Universitas Pesisir, ya. Semester lima. Kampusnya bagus. Lumayan jauh dari rumah.",
+        "en": "I hear Dinda studies at Universitas Pesisir. Fifth semester. It's a good campus. Quite far from home."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jangan sebut nama dia.",
+        "en": "Don't say her name."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya cuma ingin semua orang aman, Mas. Mbak Sekar sudah dewasa, dia pilih jalannya sendiri. Anda belum terlambat untuk pilih jalan yang lain.",
+        "en": "I just want everyone to be safe. Ms. Sekar is an adult, she chose her own path. It isn't too late for you to choose a different one."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Serahkan HP itu, pulang ke Bandung. Berhenti nyari. Demi adiknya.",
+        "en": "Hand over the phone, go back to Bandung. Stop looking. For her sister's sake."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_06.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Saya tunggu kabar baiknya.",
+        "en": "I'll wait for the good news."
+      },
+      "profile": "didit",
+      "voice": "vo_d4_didit_07.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "RECORD == 'record'",
+      "style": "system",
+      "text": {
+        "id": "Rekaman disimpan, 01.12",
+        "en": "Recording saved, 1:12"
+      },
+      "effects": [
+        {
+          "variable": "clue_didit_call",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_after_didit"
+    }
+  ]
+}

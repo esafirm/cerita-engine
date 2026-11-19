@@ -128,6 +128,28 @@ CALL and CHAT. Theme: rebuilding Monday night minute by minute. Budget share: 4.
 | 6 | `d4_choice` | VN, the roof, night | Raka and Dinda decide where to push next: the harbor (Hendra) or the people (Tasya and Bima) | Sets `route_lean` for the Day 5 split (M3) |
 | 7 | `d4_sunrise` | CHAT, unknown number | 04:58. A photo of a pier at dawn, the same as the lock screen. "Masih di sana." | Clue `sunrise_photo`. Day 4 ends |
 
+**As written** (`story/40_day4.cerita`, 1.8k words, about 11 minutes by the estimator):
+
+- `d4_timeline`: before the question, Raka works out that Sekar switched her main phone off herself (she took her
+  power bank), so she went into hiding rather than missing. The evidence question allows one retry, then Dinda
+  names Bima anyway. Bu Wulan recognizes the Sri Rejeki: Sekar's late father went out on Pak Karta's boat every
+  Saturday, and the living room photo of Sekar with the fish was taken on it (`wulan_knows_karta`).
+- `d4_bima_call`: Raka calls him. The timer's default is letting him talk (`+trust_bima 3`, `bima_leak_planted`):
+  he starts to say he told his boss about Sekar and stops. Pushing makes him hang up. Threatening to tell Yusuf
+  sets `threatened_bima`, and he asks for one day.
+- `d4_didit_call`: rings in on Sekar's phone. The recording choice comes first, on her recorder app.
+- `d4_yusuf_report` (new): a chat to Yusuf, who asked to be told first. Reporting Didit sets `yusuf_knows_didit`
+  (+2, or +4 with the recording). Yusuf tells Dinda to stay away from campus.
+- `d4_notebook`: Sekar's notes app is a thread she owns (`sekar_notes`). Her notes say the source would only talk
+  at sea and that the second backup of the recording is the one she carries, which points at her recorder.
+- `d4_choice`: before choosing, Raka explains the two clicks from the silent call. It was their old recording
+  code: one click "wait", two clicks "I'm okay, keep rolling". The route lean sets `route_lean` to `harbor` or
+  `network`.
+- `d4_sunrise`: from a new number (`dawn`). The jetty has mangroves, so it isn't Muara Angke.
+
+Read by later days: `dinda_found_threat`, `bima_leak_planted`, `threatened_bima`, `yusuf_knows_didit`,
+`wulan_knows_karta`, `route_lean`.
+
 ## 6. Systems totals after M2
 
 | System | Spec target | After M1 | M2 adds | After M2 |

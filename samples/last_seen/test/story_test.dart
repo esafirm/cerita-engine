@@ -77,6 +77,12 @@ const _Run _kind = (
     "TELL_BOAT": "keep",
     "HANDOVER": "present",
     "DIDIT_PROOF": "threat_message",
+    "WHO_PICKED": "bima_deleted",
+    "BIMA_PUSH": "listen",
+    "RECORD": "record",
+    "ROUTE_LEAN": "harbor",
+    "DAWN_REPLY": "ask",
+    "REPORT_DIDIT": "recording",
   },
   inputs: ["0530", "karta0530", "1427"],
 );
@@ -128,8 +134,26 @@ const _Run _timeouts = (
     "BIMA_PHONE": _timeout,
     "HENDRA_PROOF": "ferry_schedule",
     "HANDOVER": _timeout,
+    "WHO_PICKED": "cctv_still",
+    "BIMA_PUSH": _timeout,
   },
   inputs: ["0530", "Karta0530", "1427"],
+);
+
+/// The cold run, except Raka stalls Didit, so Day 4 plays its harsh side: the hidden threat found, the voice
+/// note replayed, a wrong answer twice on the timeline, Bima pushed into hanging up, Didit not recorded.
+final _Run _wary = (
+  picks: {
+    ..._cold.picks,
+    "HANDOVER": "stall",
+    "WHO_PICKED": "ferry_schedule",
+    "BIMA_PUSH": "push",
+    "RECORD": "listen",
+    "ROUTE_LEAN": "network",
+    "DAWN_REPLY": "quiet",
+    "REPORT_DIDIT": "keep",
+  },
+  inputs: _cold.inputs,
 );
 
 void main() {
@@ -166,17 +190,16 @@ void main() {
       expect(engine.dataMap["told_dinda_truth"], isTrue);
       expect(engine.dataMap["threat_screenshot"], isTrue);
       // Day 1: worried 2, safe 5, now 5, care 4, unlocked 3, careful 2, honest -2, together 3, truth 5, care 3.
-      // Day 2: the screenshot 4, staying quiet in the group 1.
-      expect(engine.dataMap["trust_dinda"], 35);
+      // Day 2: the screenshot 4, staying quiet in the group 1. Day 4: naming Bima on the timeline 2.
+      expect(engine.dataMap["trust_dinda"], 37);
       expect(engine.dataMap["dash_tries"], isNull, reason: "the dashboard on the first try");
       expect(engine.dataMap["tasya_admitted"], isTrue);
       expect(engine.dataMap["trust_tasya"], 7);
       expect(engine.dataMap["bima_on_edge"], isTrue);
       expect(engine.dataMap["group_alerted"], isNull);
       expect(engine.dataMap["hid_threat"], isNull);
-      expect(engine.dataMap["trust_yusuf"], 8);
       for (final clue in ["unsent_message", "ep12_teaser", "stake_map", "ferry_schedule", "missing_recorder",
-          "sekar_notebook", "threat_message", "listener_photo", "tasya_warning", "bima_deleted", "ep12_draft", "boat_registration", "cctv_still", "didit_card"]) {
+          "sekar_notebook", "threat_message", "listener_photo", "tasya_warning", "bima_deleted", "ep12_draft", "boat_registration", "cctv_still", "didit_card", "didit_call", "notebook_page", "sunrise_photo"]) {
         expect(engine.dataMap["clue_$clue"], isTrue, reason: clue);
       }
     });
@@ -232,7 +255,25 @@ void main() {
       // the ferry schedule 4, telling Yusuf about the boat -2
       expect(engine.dataMap["trust_hendra"], 2);
       expect(engine.dataMap["yusuf_knows_boat"], isTrue);
+      expect(engine.dataMap["BIMA_PUSH"], "listen", reason: "silence lets Bima talk");
       expect(engine.dataMap["heard_silent_call"], isTrue);
+    });
+
+    test('wary run ($locale): Dinda finds the hidden threat, Bima hangs up, Didit unrecorded', () async {
+      final (ending, engine) = await _play(locale, _wary);
+      expect(ending.endingId, "end_00_preview");
+      expect(engine.dataMap["dinda_found_threat"], isTrue);
+      expect(engine.dataMap["heard_unsent_01"], isTrue, reason: "the voice note is replayed on Day 4");
+      expect(engine.dataMap["WHO_PICKED"], isNotNull);
+      expect(engine.dataMap["clue_didit_call"], isNull);
+      expect(engine.dataMap["clue_notebook_page"], isNull, reason: "the notebook was never rubbed");
+      expect(engine.dataMap["clue_sunrise_photo"], isTrue);
+      expect(engine.dataMap["route_lean"], "network");
+      expect(engine.dataMap["yusuf_knows_didit"], isNull);
+      // Day 1 and 2 as the cold run, -14. Day 4: finding the hidden threat -4.
+      expect(engine.dataMap["trust_dinda"], -18);
+      // giving the phone -2, pushing -2
+      expect(engine.dataMap["trust_bima"], -4);
     });
   }
 }

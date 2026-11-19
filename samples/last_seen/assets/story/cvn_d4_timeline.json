@@ -1,0 +1,412 @@
+{
+  "conversation_id": "cvn_d4_timeline",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Malam Itu",
+    "en": "That Night"
+  },
+  "checkpoint": true,
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "08:10",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_unease.mp3",
+    "textbox": "nvl"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Hari 4. Minggu, jam delapan pagi.",
+        "en": "Day 4. Sunday, eight in the morning."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Gue nggak tidur. Telepon semalem masih bunyi di kuping gue. Ombak, genset, dua klik.",
+        "en": "I didn't sleep. Last night's call is still in my ears. Waves, a generator, two clicks."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda masuk ke kamar Sekar bawa satu pak kertas tempel kuning dan spidol. Dia nyabut beberapa foto nelayan dari papan gabus, hati-hati, kayak nyabut plester.",
+        "en": "Dinda comes into Sekar's room with a pad of yellow sticky notes and a marker. She takes a few of the fishermen's photos off the corkboard, carefully, like peeling off a plaster."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kak Sekar selalu bikin timeline kalau ceritanya ruwet. Kita bikin juga. Senin malem. Menit per menit.",
+        "en": "Sekar always made a timeline when a story got messy. We'll make one too. Monday night. Minute by minute."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "nvl"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "20.40. Bima ngirim pesan, terus dihapus. Sekar bales \"ok\".",
+        "en": "8:40 PM. Bima sends a message, then deletes it. Sekar replies \"ok\"."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "20.50. Sekar nulis pesan buat gue. \"Ka. Inget jam lima pagi itu? Gue masih di sana.\" Gagal kirim.",
+        "en": "8:50 PM. Sekar writes a message to me. \"Ka. Remember five in the morning? I'm still there.\" It fails to send."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "21.00. Pamit ke Dinda. \"Dijemput.\"",
+        "en": "9:00 PM. Says goodbye to Dinda. \"Someone's picking me up.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "21.47. Foto pesisir_77 di TPI. Kapal Sri Rejeki di belakangnya.",
+        "en": "9:47 PM. pesisir_77's photo at the fish auction. The Sri Rejeki behind her."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "21.52. CCTV. Turun dari mobil perak.",
+        "en": "9:52 PM. The CCTV. Getting out of a silver car."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "22.40. HP utamanya mati, terakhir di sekitar Muara Angke.",
+        "en": "10:40 PM. Her main phone dies, last seen near Muara Angke."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "05.30. Kapal ke Pulau Pari. Dilingkarin dua kali.",
+        "en": "5:30 AM. The boat to Pulau Pari. Circled twice."
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "textbox",
+          "style": "adv"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "22.40. Dia selalu bawa powerbank. Dulu dia ngamuk kalau baterainya di bawah lima puluh persen.",
+        "en": "10:40. She always carried a power bank. She used to freak out if her battery went under fifty percent."
+      },
+      "profile": "raka:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Powerbank-nya dibawa. Gue udah cek laci. Yang ketinggalan cuma HP cadangan.",
+        "en": "She took the power bank. I checked the drawer. The only thing she left was the spare phone."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Berarti HP-nya nggak mati sendiri, Din. Dia yang matiin.",
+        "en": "Then her phone didn't die, Din. She switched it off."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"HP bisa dicari,\" kata Pak Hendra. Sekar tahu itu duluan. Dia matiin HP utamanya di laut, dan ninggalin HP cadangannya di laci, buat orang yang bisa nebak sandinya.",
+        "en": "\"Phones can be tracked,\" Pak Hendra said. Sekar knew that first. She switched her main phone off at sea, and left the spare one in a drawer, for whoever could guess its code."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia nggak ilang, Ka. Dia ngilang.",
+        "en": "She didn't go missing, Ka. She went into hiding."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ada satu kertas tempel yang masih kosong, di antara 21.00 dan 21.47. Dinda nulis tanda tanya gede di situ.",
+        "en": "One sticky note is still blank, between 9:00 and 9:47. Dinda draws a big question mark on it."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "id": "who_picked",
+      "source": "clues",
+      "text": {
+        "id": "Siapa yang jemput Sekar jam sembilan? Tunjukkan buktinya.",
+        "en": "Who picked Sekar up at nine? Show the proof."
+      },
+      "variable": "WHO_PICKED",
+      "profile": "dinda:0",
+      "retries": 1,
+      "responses": [
+        {
+          "clue": "bima_deleted",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ],
+          "target": "#picked_bima"
+        },
+        {
+          "clue": "cctv_still",
+          "effects": [
+            {
+              "variable": "trust_dinda",
+              "op": "add",
+              "value": 2
+            }
+          ],
+          "target": "#picked_bima"
+        }
+      ],
+      "retry": {
+        "target": "#picked_retry"
+      },
+      "fallback": {
+        "target": "#picked_guess"
+      }
+    },
+    {
+      "type": "TEXT",
+      "id": "picked_retry",
+      "text": {
+        "id": "Itu nggak ngejawab siapa yang nyetir, Ka. Mikir lagi.",
+        "en": "That doesn't tell us who was driving, Ka. Think again."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "#who_picked"
+    },
+    {
+      "type": "TEXT",
+      "id": "picked_guess",
+      "text": {
+        "id": "Udahlah. Kita sama-sama tahu jawabannya.",
+        "en": "Forget it. We both know the answer."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "JUMP",
+      "target": "#picked_name"
+    },
+    {
+      "type": "TEXT",
+      "id": "picked_bima",
+      "text": {
+        "id": "Pesannya dihapus jam delapan empat puluh, Sekar bales \"ok\", dan dua jam kemudian dia nanya \"udah sampe?\". Mobilnya perak, hatchback.",
+        "en": "The message is deleted at eight forty, Sekar replies \"ok\", and two hours later he asks \"did you get there?\". The car is silver, a hatchback."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "id": "picked_name",
+      "text": {
+        "id": "Bima.",
+        "en": "Bima."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda nulis namanya di kertas tempel yang kosong. Tulisannya lebih tebel dari yang lain. Spidolnya hampir nembus.",
+        "en": "Dinda writes his name on the blank note. Her letters are thicker than the others. The marker nearly goes through."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia duduk di ruang tamu kita, makan martabak sama Ibu, dan bilang dia lembur.",
+        "en": "He sat in our living room, eating martabak with Mom, and said he was working late."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "hid_threat == true",
+      "text": {
+        "id": "Dinda ngambil HP Sekar dari meja buat motret timeline-nya. Jempolnya berhenti.",
+        "en": "Dinda picks up Sekar's phone from the desk to photograph the timeline. Her thumb stops."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "hid_threat == true",
+      "text": {
+        "id": "\"Berhenti nyari. Demi adiknya.\"{w} Ini masuk Kamis malem, Ka. Jumat pagi lo bilang \"kurang tidur\".",
+        "en": "\"Stop looking. For her sister's sake.\"{w} This came in Thursday night, Ka. Friday morning you said you \"didn't sleep much\"."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "hid_threat == true",
+      "text": {
+        "id": "Gue nggak mau lo takut.",
+        "en": "I didn't want you to be scared."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "hid_threat == true",
+      "text": {
+        "id": "Gue udah takut dari Senin! Yang gue nggak mau itu dibohongin. Sama Bima, sama polisi, sama lo juga?",
+        "en": "I've been scared since Monday! What I don't want is to be lied to. By Bima, by the police, and by you too?"
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "SET",
+      "condition": "hid_threat == true",
+      "effects": [
+        {
+          "variable": "trust_dinda",
+          "op": "subtract",
+          "value": 4
+        },
+        {
+          "variable": "dinda_found_threat",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Ada yang ngetok kusen pintu. Bu Wulan berdiri di situ bawa piring pisang goreng, matanya ke papan gabus. Ke foto kapal biru-putih yang kita tempel di tengah.",
+        "en": "Someone knocks on the door frame. Mrs. Wulan is standing there with a plate of fried bananas, her eyes on the corkboard. On the photo of the blue and white boat we pinned in the middle."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Itu kapalnya Pak Karta.",
+        "en": "That's Pak Karta's boat."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Ibu kenal?",
+        "en": "You know it, Mom?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Bapakmu dulu ikut melaut sama Pak Karta tiap Sabtu, sebelum sakit. Foto Sekar megang ikan di ruang tamu itu, diambil di kapal itu. Dia nangis dua jam karena ikannya mau dilepas lagi.",
+        "en": "Your father used to go out with Pak Karta every Saturday, before he got sick. That photo of Sekar holding the fish, in the living room, was taken on that boat. She cried for two hours because they were going to throw the fish back."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pak Karta itu orang baik. Kalau Sekar pergi ke kapal itu, dia pergi ke tempat yang aman.",
+        "en": "Pak Karta is a good man. If Sekar went to that boat, she went somewhere safe."
+      },
+      "profile": "wulan",
+      "offstage": true
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bu Wulan naruh piringnya di meja, ngelus foto kapal itu sekali pake ujung jari, terus keluar. Nggak nanya apa-apa soal kertas tempel yang tulisannya \"Bima\".",
+        "en": "Mrs. Wulan sets the plate on the desk, touches the boat photo once with her fingertip, and leaves. She doesn't ask anything about the note that says \"Bima\"."
+      }
+    },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "wulan_knows_karta",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Telepon dia. Sekarang. Gue mau denger dia ngomong.",
+        "en": "Call him. Now. I want to hear him say it."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "JUMP",
+      "condition": "heard_unsent_01 != true",
+      "target": "d4_unsent_replay"
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_bima_call"
+    }
+  ]
+}

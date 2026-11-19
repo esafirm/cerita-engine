@@ -1,0 +1,129 @@
+{
+  "conversation_id": "cvn_d4_after_didit",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Demi Adiknya",
+    "en": "For Her Sister's Sake"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "09:30",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:3",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Demi adiknya.\" Kata yang sama. Pesan tengah malem itu nggak ditulis orang suruhan. Ditulis orang yang barusan nanya kabar kampus Dinda.",
+        "en": "\"For her sister's sake.\" The same words. That midnight message wasn't written by some hired thug. It was written by the man who just asked after Dinda's campus."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "RECORD == 'record'",
+      "text": {
+        "id": "Lo rekam?",
+        "en": "Did you record it?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "RECORD == 'record'",
+      "text": {
+        "id": "Satu menit dua belas detik. Suaranya sendiri.",
+        "en": "One minute twelve seconds. In his own voice."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "condition": "RECORD == 'record'",
+      "text": {
+        "id": "Kak Sekar pasti bangga. Itu kerjaan jurnalis.",
+        "en": "Sekar would be proud. That's a journalist's work."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "RECORD == 'listen'",
+      "text": {
+        "id": "Harusnya gue rekam.",
+        "en": "I should have recorded it."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "RECORD == 'listen'",
+      "text": {
+        "id": "Iya. Harusnya.",
+        "en": "Yeah. You should have."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Semester lima. Dia tahu semester gue, Ka.",
+        "en": "Fifth semester. He knows what semester I'm in, Ka."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Gue nggak bakal ke kampus minggu ini.",
+        "en": "I'm not going to campus this week."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dinda ngambil laptop Sekar dari meja dan mulai ngetik cepet, kayak orang yang butuh tangannya sibuk.",
+        "en": "Dinda pulls Sekar's laptop off the desk and starts typing fast, like someone who needs her hands busy."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kalau Kak Sekar takut HP-nya diambil, dia pasti backup. Dasbor podcast-nya bisa dibuka, berarti akun cloud-nya juga. Sandinya sama polanya.",
+        "en": "If Sekar was scared of losing her phone, she'd have backed it up. Her podcast dashboard opened, so her cloud account will too. Same password pattern."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Sementara Dinda ngetik, gue inget satu kalimat lain dari kemarin siang. \"Kalau ada yang menghubungi Anda soal HP itu, siapa pun, kabari saya dulu.\"",
+        "en": "While Dinda types, I remember something else from yesterday afternoon. \"If anyone contacts you about that phone, anyone at all, tell me first.\""
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_yusuf_report"
+    }
+  ]
+}

@@ -132,3 +132,8 @@ pesisir77:
 private:
   name: { id: Nomor Pribadi, en: Private Number }
   avatar: assets/story/sprites/unknown_avatar.webp
+
+# The 4:58 photo on Day 4, from a number nobody knows.
+dawn:
+  name: "+62 857-1130-xxxx"
+  avatar: assets/story/sprites/unknown_avatar.webp

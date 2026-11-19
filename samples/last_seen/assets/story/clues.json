@@ -220,6 +220,54 @@
         "id": "Hari 3",
         "en": "Day 3"
       }
+    },
+    {
+      "id": "didit_call",
+      "title": {
+        "id": "Rekaman telepon Didit",
+        "en": "Didit's recorded call"
+      },
+      "description": {
+        "id": "Satu menit dua belas detik. Didit tahu semester Dinda, dan menutup dengan kata-kata pesan ancaman itu, \"Berhenti nyari. Demi adiknya.\"",
+        "en": "One minute twelve seconds. Didit knows Dinda's semester, and he signs off with the words of the threat, \"Stop looking. For her sister's sake.\""
+      },
+      "key": true,
+      "chapter": {
+        "id": "Hari 4",
+        "en": "Day 4"
+      }
+    },
+    {
+      "id": "notebook_page",
+      "title": {
+        "id": "Halaman yang disobek",
+        "en": "The torn-out page"
+      },
+      "description": {
+        "id": "Foto halaman terakhir buku catatan Sekar, dari backup cloud-nya. \"Jangan percaya Tasya soal sponsor. Dia bukan jahat, dia butuh uang.\"",
+        "en": "A photo of the last page of Sekar's notebook, from her cloud backup. \"Don't trust Tasya on the sponsor. She isn't bad, she needs the money.\""
+      },
+      "image": "photo_notebook_page.webp",
+      "chapter": {
+        "id": "Hari 4",
+        "en": "Day 4"
+      }
+    },
+    {
+      "id": "sunrise_photo",
+      "title": {
+        "id": "Foto subuh",
+        "en": "The dawn photo"
+      },
+      "description": {
+        "id": "Dari nomor tak dikenal, 04.58, \"masih di sana.\" Dermaga kayu dan kapal biru-putih seperti wallpaper HP Sekar, tapi ada bakau di pinggirnya. Bukan Muara Angke.",
+        "en": "From an unknown number, 4:58 AM, \"still there.\" A wooden jetty and a blue and white boat like Sekar's wallpaper, but with mangroves at the edge. Not Muara Angke."
+      },
+      "image": "photo_sunrise_pier.webp",
+      "chapter": {
+        "id": "Hari 4",
+        "en": "Day 4"
+      }
     }
   ]
 }

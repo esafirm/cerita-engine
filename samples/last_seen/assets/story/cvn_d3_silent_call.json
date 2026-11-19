@@ -157,7 +157,7 @@
     },
     {
       "type": "JUMP",
-      "target": "d4_stub"
+      "target": "d4_timeline"
     }
   ]
 }

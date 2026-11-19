@@ -1,0 +1,154 @@
+{
+  "conversation_id": "cvn_d4_notebook",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Catatan",
+    "en": "Notes"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "sekar_notes",
+    "day": 4,
+    "time": "11:15",
+    "status": null,
+    "music": "bgm_unsent.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Akun cloud-nya kebuka di percobaan ketiga. Isinya foto-foto liputan, ratusan. Dan satu aplikasi catatan yang Sekar pake kayak chat sama dirinya sendiri.",
+        "en": "Her cloud account opens on the third try. Hundreds of reporting photos. And a notes app that Sekar used like a chat with herself."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Tiga minggu lalu",
+        "en": "Three weeks ago"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "patok baru di depan angke. 14 titik. nggak ada papan",
+        "en": "new stakes off angke. 14 of them. no sign"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "izinnya keluar 2019. survei lingkungannya tanggal berapa??",
+        "en": "the permit came out in 2019. when was the environmental survey??"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Dua minggu lalu",
+        "en": "Two weeks ago"
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "narsum mau ngomong. tapi cuma di laut. katanya darat banyak kuping",
+        "en": "the source will talk. but only out at sea. says the land has too many ears"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "rekaman udah 2x backup. satu di laptop. satu yang gue bawa ke mana2",
+        "en": "recording backed up twice. one on the laptop. one i carry everywhere"
+      },
+      "profile": "sekar:0"
+    },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin lalu",
+        "en": "Last Monday"
+      }
+    },
+    {
+      "type": "MEDIA",
+      "condition": "clue_sekar_notebook == true",
+      "media_type": "IMAGE",
+      "uri": "photo_notebook_page.webp",
+      "caption": {
+        "id": "buat jaga2 kalau halamannya gue sobek",
+        "en": "just in case i tear the page out"
+      },
+      "profile": "sekar:0",
+      "unlock_id": "photo_notebook_page",
+      "effects": [
+        {
+          "variable": "clue_notebook_page",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook == true",
+      "text": {
+        "id": "Halaman yang disobek itu. Kertas yang sama yang gue gosok pake pensil hari pertama. Sekarang kebaca semuanya.",
+        "en": "The torn-out page. The same page I rubbed with a pencil on the first day. Now all of it is readable."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook == true",
+      "text": {
+        "id": "\"Jangan percaya Tasya soal sponsor. Dia bukan jahat, dia butuh uang.\"",
+        "en": "\"Don't trust Tasya on the sponsor. She isn't bad, she needs the money.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook == true",
+      "text": {
+        "id": "Bukan \"jangan percaya Tasya\". Jangan percaya Tasya soal satu hal. Sekar masih belain dia, bahkan di catatan yang cuma buat dirinya sendiri.",
+        "en": "Not \"don't trust Tasya\". Don't trust Tasya about one thing. Sekar was still defending her, even in notes meant only for herself."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook != true",
+      "text": {
+        "id": "Ada satu foto halaman buku catatan, tapi buram, kefoto miring. Dinda ngegedein layarnya, nyipitin mata.",
+        "en": "There's one photo of a notebook page, but it's blurry, taken at an angle. Dinda zooms in, squinting."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "clue_sekar_notebook != true",
+      "text": {
+        "id": "\"Kak Sekar pernah bilang ke gue soal Tasya,\" katanya pelan. \"Tasya bukan orang jahat. Dia cuma lagi butuh duit banget. Nyokapnya sakit.\"",
+        "en": "\"Sekar told me something about Tasya once,\" she says quietly. \"Tasya isn't a bad person. She just really needs money. Her mom's sick.\""
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "\"Satu yang gue bawa ke mana-mana.\"{w} Perekam Zoom-nya. Kartu memorinya. Dia bawa buktinya bareng dia.",
+        "en": "\"One I carry everywhere.\"{w} Her Zoom recorder. Its memory card. She took the proof with her."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_choice"
+    }
+  ]
+}

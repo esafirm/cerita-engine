@@ -727,20 +727,6 @@ narration
   id: Gue duduk di lantai kamar Sekar sampai subuh, megangin HP-nya kayak megangin sesuatu yang bisa kabur.
   en: I sit on the floor of Sekar's room until dawn, holding her phone like something that might run away.
 
--> d4_stub
+-> d4_timeline
 
 
-# Day 4: Malam Itu. M2 placeholder until Day 4 is written, which replaces this stub and its ending.
-
-@conversation d4_stub chapter="Hari 4" chapter.en="Day 4" title="Malam Itu" title.en="That Night" checkpoint
-@scene VN bg=bg_sekar_room_day.webp music=bgm_quiet_house.mp3 day=4 time=07:00
-
-narration
-  id: Hari 4 belum ditulis. Ceritanya berlanjut di versi berikutnya.
-  en: Day 4 isn't written yet. The story continues in the next build.
-
-ending end_00_preview NORMAL
-  id: Bersambung
-  en: To Be Continued
-  summary id: Sekar naik ke kapal Pak Karta Senin malem. Seseorang menelepon tanpa suara, dan tombol perekamnya berbunyi dua kali.
-  summary en: Sekar went to Pak Karta's boat on Monday night. Someone called without a word, and a recorder button clicked twice.

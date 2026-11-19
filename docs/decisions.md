@@ -933,15 +933,22 @@ that arrive while Raka is reading, like the group's answers after he replies as 
 - **Not an engine change:** a "history" flag on a scene or thread would save writing `typing=0` 62 times. Worth
   it if Days 3 and 4 read more old threads (Sekar's notes app, `d4_notebook`).
 
-## Days 2 and 3 are drafted short of their budgets
+## Days 2 to 4 are drafted short of their budgets
 
-*2026-11-19. Last Seen spec §2, M2 plan §3 and §4.*
+*2026-11-19. Last Seen spec §2, M2 plan §3 to §5.*
 
-Day 2 came in at 2.7k Indonesian words and an estimated 15.7 minutes, against a budget of 4.5k words and 30
-minutes. That's the same ratio as Day 1 (2.7k of 4.0k). Day 3 is shorter still: 2.0k words and 13.1 minutes
-against 4.5k and 28. They stay as written until the M1 timed playtest says whether the estimator or the budget
-is wrong. Padding them now could mean cutting them again after the playtest. If the budgets hold, Day 3 is the
-first to grow: the Yusuf call and the evening at home are the thinnest scenes.
+| Day | Words | Estimate | Budget |
+| :--- | ---: | ---: | ---: |
+| 1 (M1) | 2.7k | 16.4 min | 4.0k, 25 min |
+| 2 | 2.7k | 15.7 min | 4.5k, 30 min |
+| 3 | 2.0k | 13.1 min | 4.5k, 28 min |
+| 4 | 1.8k | 10.7 min | 4.5k, 28 min |
+
+They stay as written until the M1 timed playtest says whether the estimator or the budget is wrong. Padding
+them now could mean cutting them again after the playtest. Day 4 was first drafted at 1.3k and grew with story,
+not filler: the phone switched off on purpose, Bu Wulan and the boat, the report to Yusuf and the two clicks.
+If the budgets hold, Days 4 and 3 grow first: the Bima call's aftermath, the Yusuf call and the evening at home
+are the thinnest scenes.
 
 ## Deferred
 

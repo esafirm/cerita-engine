@@ -1,0 +1,235 @@
+{
+  "conversation_id": "cvn_d4_choice",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Atap",
+    "en": "The Roof"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "18:10",
+    "background": "bg_sekar_roof_dusk.webp",
+    "music": "bgm_low_tide.mp3",
+    "ambience": "amb_kampung_day.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Magrib lagi dari tiga masjid. Crane-crane reklamasi udah nyalain lampu merahnya, satu-satu, kayak mata.",
+        "en": "The call to prayer again, from three mosques. The reclamation cranes have switched on their red lights, one by one, like eyes."
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Telepon semalem. Lo bilang ada bunyi klik dua kali. Itu apa?",
+        "en": "Last night's call. You said there were two clicks. What were they?"
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Waktu gue masih jadi editornya, kita rekaman di tempat-tempat berisik. Pasar, dermaga, demo. Nggak bisa ngomong, nggak bisa teriak.",
+        "en": "Back when I was still her editor, we recorded in loud places. Markets, piers, protests. You couldn't talk, couldn't shout."
+      },
+      "profile": "raka:5",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Jadi kita bikin kode. Klik tombol rekam sekali artinya \"tunggu\". Dua kali artinya \"gue aman, lanjut rekam\".",
+        "en": "So we made up a code. One click of the record button meant \"wait\". Two clicks meant \"I'm okay, keep rolling\"."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Dia aman.",
+        "en": "She's okay."
+      },
+      "profile": "dinda:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Dia pake kode yang cuma gue yang ngerti. Setahun gue nggak ngomong sama dia, dan dia masih pake kode kita.",
+        "en": "She used a code only I would understand. A year I didn't speak to her, and she still used our code."
+      },
+      "profile": "raka:5"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "heard_silent_call == true",
+      "text": {
+        "id": "Dinda nangis tanpa suara, mukanya ditutupin lengan sweater Sekar. Gue biarin. Gue juga.",
+        "en": "Dinda cries without a sound, her face hidden in the sleeve of Sekar's sweater. I let her. I do too."
+      }
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oke. Kita punya dua jalan.",
+        "en": "Okay. We have two ways in."
+      },
+      "profile": "dinda:0",
+      "position": "right"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Satu, dermaga. Pak Hendra tahu sesuatu. Kapalnya, telepon tanpa suara itu, ombak sama genset.",
+        "en": "One, the pier. Pak Hendra knows something. His boat, that silent call, the waves and the generator."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dua, orang-orangnya. Tasya ditelepon orang PT. Bima ngomong sesuatu ke bosnya. Didit dapet nomor HP ini dari Bima. Ada yang nyambung di situ.",
+        "en": "Two, the people. Tasya got a call from the company. Bima said something to his boss. Didit got this phone's number from Bima. Something connects there."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Kita bisa dua-duanya.",
+        "en": "We could do both."
+      },
+      "profile": "raka:0",
+      "position": "left"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Didit tahu semester gue, Ka. Kita nggak punya waktu buat dua-duanya.",
+        "en": "Didit knows what semester I'm in, Ka. We don't have time for both."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Ke mana dulu?",
+        "en": "Where first?"
+      },
+      "variable": "ROUTE_LEAN",
+      "profile": "dinda:0",
+      "choices": [
+        {
+          "text": {
+            "id": "Ke dermaga. Cari Pak Hendra lagi.",
+            "en": "The pier. Find Pak Hendra again."
+          },
+          "value": "harbor",
+          "effects": [
+            {
+              "variable": "route_lean",
+              "op": "set",
+              "value": "harbor"
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Ke orang-orangnya. Tasya dan Bima.",
+            "en": "The people. Tasya and Bima."
+          },
+          "value": "network",
+          "effects": [
+            {
+              "variable": "route_lean",
+              "op": "set",
+              "value": "network"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "ROUTE_LEAN == 'harbor'",
+      "text": {
+        "id": "Dermaga. Kalau Kak Sekar ketemu narsumnya di laut, jawabannya ada di laut.",
+        "en": "The pier. If Sekar met her source at sea, the answer is at sea."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ROUTE_LEAN == 'harbor' && trust_hendra > 0",
+      "text": {
+        "id": "Dia bilang \"jaga adiknya\". Dia nggak bakal bilang gitu kalau dia nggak peduli.",
+        "en": "He said \"look after her sister\". He wouldn't say that if he didn't care."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ROUTE_LEAN == 'harbor' && trust_hendra <= 0",
+      "text": {
+        "id": "Dia nutup pintu waktu itu. Kali ini gue harus ngetok dengan cara yang bener.",
+        "en": "He shut me out last time. This time I have to knock the right way."
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ROUTE_LEAN == 'network'",
+      "text": {
+        "id": "Orang-orangnya. Tasya bukan jahat, Bima bukan jahat. Tapi salah satu dari mereka yang bikin Didit tahu.",
+        "en": "The people. Tasya isn't bad, Bima isn't bad. But one of them is how Didit found out."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "ROUTE_LEAN == 'network'",
+      "text": {
+        "id": "Dan orang yang ngerasa bersalah biasanya pengen ngaku. Mereka cuma butuh orang yang mau dengerin.",
+        "en": "And people who feel guilty usually want to confess. They just need someone who'll listen."
+      },
+      "profile": "raka:6"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Kita duduk di dak sampai gelap. Dinda nyenderin kepalanya ke bahu gue, cuma sebentar, kayak lupa.",
+        "en": "We sit on the roof until it's dark. Dinda leans her head on my shoulder, just for a moment, like she forgot not to."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_sunrise"
+    }
+  ]
+}

@@ -112,6 +112,38 @@
       "members": [
         "private"
       ]
+    },
+    {
+      "id": "thread_bima",
+      "name": "Bima",
+      "avatar": "assets/story/sprites/bima_avatar.webp",
+      "members": [
+        "bima"
+      ]
+    },
+    {
+      "id": "sekar_notes",
+      "name": {
+        "id": "Catatan",
+        "en": "Notes"
+      },
+      "avatar": "assets/story/sprites/sekar_avatar.webp",
+      "members": [
+        "sekar"
+      ],
+      "owner": "sekar"
+    },
+    {
+      "id": "thread_dawn",
+      "name": "+62 857-1130-xxxx",
+      "avatar": "assets/story/sprites/unknown_avatar.webp",
+      "status": {
+        "id": "terakhir dilihat baru saja",
+        "en": "last seen just now"
+      },
+      "members": [
+        "dawn"
+      ]
     }
   ]
 }

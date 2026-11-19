@@ -1,0 +1,663 @@
+# Day 4: Malam Itu (spec §2, beat plan last-seen-m2.md §5). Rebuilding Monday night minute by minute, Bima's
+# confession, Didit's first call. Budget: 4.5k Indonesian words, about 28 minutes, to be retuned after the M1
+# playtest.
+
+@conversation d4_timeline chapter="Hari 4" chapter.en="Day 4" title="Malam Itu" title.en="That Night" checkpoint
+@scene VN bg=bg_sekar_room_day.webp music=bgm_unease.mp3 day=4 time=08:10 textbox=nvl
+
+narration
+  id: Hari 4. Minggu, jam delapan pagi.
+  en: Day 4. Sunday, eight in the morning.
+narration
+  id: Gue nggak tidur. Telepon semalem masih bunyi di kuping gue. Ombak, genset, dua klik.
+  en: I didn't sleep. Last night's call is still in my ears. Waves, a generator, two clicks.
+narration
+  id: Dinda masuk ke kamar Sekar bawa satu pak kertas tempel kuning dan spidol. Dia nyabut beberapa foto nelayan dari papan gabus, hati-hati, kayak nyabut plester.
+  en: Dinda comes into Sekar's room with a pad of yellow sticky notes and a marker. She takes a few of the fishermen's photos off the corkboard, carefully, like peeling off a plaster.
+
+stage
+  textbox adv
+  show raka:neutral left
+  show dinda:neutral right
+
+dinda:neutral [right]
+  id: Kak Sekar selalu bikin timeline kalau ceritanya ruwet. Kita bikin juga. Senin malem. Menit per menit.
+  en: Sekar always made a timeline when a story got messy. We'll make one too. Monday night. Minute by minute.
+
+stage
+  textbox nvl
+
+narration
+  id: 20.40. Bima ngirim pesan, terus dihapus. Sekar bales "ok".
+  en: 8:40 PM. Bima sends a message, then deletes it. Sekar replies "ok".
+narration
+  id: 20.50. Sekar nulis pesan buat gue. "Ka. Inget jam lima pagi itu? Gue masih di sana." Gagal kirim.
+  en: 8:50 PM. Sekar writes a message to me. "Ka. Remember five in the morning? I'm still there." It fails to send.
+narration
+  id: 21.00. Pamit ke Dinda. "Dijemput."
+  en: 9:00 PM. Says goodbye to Dinda. "Someone's picking me up."
+narration
+  id: 21.47. Foto pesisir_77 di TPI. Kapal Sri Rejeki di belakangnya.
+  en: 9:47 PM. pesisir_77's photo at the fish auction. The Sri Rejeki behind her.
+narration
+  id: 21.52. CCTV. Turun dari mobil perak.
+  en: 9:52 PM. The CCTV. Getting out of a silver car.
+narration
+  id: 22.40. HP utamanya mati, terakhir di sekitar Muara Angke.
+  en: 10:40 PM. Her main phone dies, last seen near Muara Angke.
+narration
+  id: 05.30. Kapal ke Pulau Pari. Dilingkarin dua kali.
+  en: 5:30 AM. The boat to Pulau Pari. Circled twice.
+
+stage
+  textbox adv
+
+raka:neutral
+  id: 22.40. Dia selalu bawa powerbank. Dulu dia ngamuk kalau baterainya di bawah lima puluh persen.
+  en: 10:40. She always carried a power bank. She used to freak out if her battery went under fifty percent.
+dinda:neutral
+  id: Powerbank-nya dibawa. Gue udah cek laci. Yang ketinggalan cuma HP cadangan.
+  en: She took the power bank. I checked the drawer. The only thing she left was the spare phone.
+raka:determined
+  id: Berarti HP-nya nggak mati sendiri, Din. Dia yang matiin.
+  en: Then her phone didn't die, Din. She switched it off.
+narration
+  id: "HP bisa dicari," kata Pak Hendra. Sekar tahu itu duluan. Dia matiin HP utamanya di laut, dan ninggalin HP cadangannya di laci, buat orang yang bisa nebak sandinya.
+  en: "Phones can be tracked," Pak Hendra said. Sekar knew that first. She switched her main phone off at sea, and left the spare one in a drawer, for whoever could guess its code.
+dinda:hopeful
+  id: Dia nggak ilang, Ka. Dia ngilang.
+  en: She didn't go missing, Ka. She went into hiding.
+
+narration
+  id: Ada satu kertas tempel yang masih kosong, di antara 21.00 dan 21.47. Dinda nulis tanda tanya gede di situ.
+  en: One sticky note is still blank, between 9:00 and 9:47. Dinda draws a big question mark on it.
+
+evidence WHO_PICKED by=dinda:neutral retries=1 label=who_picked
+  id: Siapa yang jemput Sekar jam sembilan? Tunjukkan buktinya.
+  en: Who picked Sekar up at nine? Show the proof.
+? bima_deleted
+  +trust_dinda 2
+  -> #picked_bima
+? cctv_still
+  +trust_dinda 2
+  -> #picked_bima
+? [retry]
+  -> #picked_retry
+? [fallback]
+  -> #picked_guess
+
+dinda:neutral label=picked_retry
+  id: Itu nggak ngejawab siapa yang nyetir, Ka. Mikir lagi.
+  en: That doesn't tell us who was driving, Ka. Think again.
+-> #who_picked
+
+dinda:angry label=picked_guess
+  id: Udahlah. Kita sama-sama tahu jawabannya.
+  en: Forget it. We both know the answer.
+-> #picked_name
+
+raka:determined label=picked_bima
+  id: Pesannya dihapus jam delapan empat puluh, Sekar bales "ok", dan dua jam kemudian dia nanya "udah sampe?". Mobilnya perak, hatchback.
+  en: The message is deleted at eight forty, Sekar replies "ok", and two hours later he asks "did you get there?". The car is silver, a hatchback.
+
+dinda:angry label=picked_name
+  id: Bima.
+  en: Bima.
+narration
+  id: Dinda nulis namanya di kertas tempel yang kosong. Tulisannya lebih tebel dari yang lain. Spidolnya hampir nembus.
+  en: Dinda writes his name on the blank note. Her letters are thicker than the others. The marker nearly goes through.
+dinda:crying
+  id: Dia duduk di ruang tamu kita, makan martabak sama Ibu, dan bilang dia lembur.
+  en: He sat in our living room, eating martabak with Mom, and said he was working late.
+
+# A threat Raka hid on Day 2 turns up here, on the phone Dinda is now reading too.
+narration [if hid_threat == true]
+  id: Dinda ngambil HP Sekar dari meja buat motret timeline-nya. Jempolnya berhenti.
+  en: Dinda picks up Sekar's phone from the desk to photograph the timeline. Her thumb stops.
+dinda:angry [if hid_threat == true]
+  id: "Berhenti nyari. Demi adiknya."{w} Ini masuk Kamis malem, Ka. Jumat pagi lo bilang "kurang tidur".
+  en: "Stop looking. For her sister's sake."{w} This came in Thursday night, Ka. Friday morning you said you "didn't sleep much".
+raka:sad [if hid_threat == true]
+  id: Gue nggak mau lo takut.
+  en: I didn't want you to be scared.
+dinda:angry [if hid_threat == true]
+  id: Gue udah takut dari Senin! Yang gue nggak mau itu dibohongin. Sama Bima, sama polisi, sama lo juga?
+  en: I've been scared since Monday! What I don't want is to be lied to. By Bima, by the police, and by you too?
+set [if hid_threat == true]
+  -trust_dinda 4
+  set dinda_found_threat true
+
+narration
+  id: Ada yang ngetok kusen pintu. Bu Wulan berdiri di situ bawa piring pisang goreng, matanya ke papan gabus. Ke foto kapal biru-putih yang kita tempel di tengah.
+  en: Someone knocks on the door frame. Mrs. Wulan is standing there with a plate of fried bananas, her eyes on the corkboard. On the photo of the blue and white boat we pinned in the middle.
+wulan [offstage]
+  id: Itu kapalnya Pak Karta.
+  en: That's Pak Karta's boat.
+dinda:neutral
+  id: Ibu kenal?
+  en: You know it, Mom?
+wulan [offstage]
+  id: Bapakmu dulu ikut melaut sama Pak Karta tiap Sabtu, sebelum sakit. Foto Sekar megang ikan di ruang tamu itu, diambil di kapal itu. Dia nangis dua jam karena ikannya mau dilepas lagi.
+  en: Your father used to go out with Pak Karta every Saturday, before he got sick. That photo of Sekar holding the fish, in the living room, was taken on that boat. She cried for two hours because they were going to throw the fish back.
+wulan [offstage]
+  id: Pak Karta itu orang baik. Kalau Sekar pergi ke kapal itu, dia pergi ke tempat yang aman.
+  en: Pak Karta is a good man. If Sekar went to that boat, she went somewhere safe.
+narration
+  id: Bu Wulan naruh piringnya di meja, ngelus foto kapal itu sekali pake ujung jari, terus keluar. Nggak nanya apa-apa soal kertas tempel yang tulisannya "Bima".
+  en: Mrs. Wulan sets the plate on the desk, touches the boat photo once with her fingertip, and leaves. She doesn't ask anything about the note that says "Bima".
+set
+  set wulan_knows_karta true
+
+dinda:neutral
+  id: Telepon dia. Sekarang. Gue mau denger dia ngomong.
+  en: Call him. Now. I want to hear him say it.
+
+-> d4_unsent_replay [if heard_unsent_01 != true]
+-> d4_bima_call
+
+
+@conversation d4_unsent_replay chapter="Hari 4" chapter.en="Day 4" title="Dua Puluh Detik" title.en="Twenty Seconds"
+@scene VN bg=bg_sekar_room_day.webp music=bgm_unsent.mp3 day=4 time=08:40
+
+stage
+  show raka:sad center
+
+narration
+  id: Sebelum nelpon Bima, gue turun ke tangga. Duduk di anak tangga yang paling bunyi.
+  en: Before I call Bima, I go out to the stairs. I sit on the step that creaks the loudest.
+narration
+  id: Voice note dua puluh detik itu masih di sana, di bawah semua draf. Gue bilang nanti, kalau udah siap. Gue nggak bakal pernah siap.
+  en: The twenty-second voice note is still there, under all the drafts. I said I'd listen later, when I was ready. I'm never going to be ready.
+
+sekar voice=vo_unsent_01.mp3 [offstage]
+  id: Ka. Ini konyol, gue ngomong ke HP yang nggak bakal ngirim apa-apa. Tapi gue butuh ngomong ke seseorang yang bukan Tasya, bukan Bima.
+  en: Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima.
+sekar voice=vo_unsent_02.mp3 [offstage]
+  id: Gue nemu sesuatu. Sesuatu yang gede. Dan gue rasa ada yang ngebocorin kalau gue punya itu.{w} Kalau gue ngilang, lo tahu harus mulai dari mana.
+  en: I found something. Something big. And I think someone leaked that I have it.{w} If I disappear, you'll know where to start.
+set
+  set heard_unsent_01 true
+  remember heard_unsent_01
+
+narration
+  id: "Bukan Tasya, bukan Bima." Dia ngomong ke gue karena gue satu-satunya orang yang nggak ada di sekitar dia.
+  en: "Isn't Tasya, isn't Bima." She talked to me because I was the one person who wasn't around her.
+narration
+  id: "Ada yang ngebocorin." Gue naik lagi ke kamar.
+  en: "Someone leaked it." I go back up to her room.
+
+-> d4_bima_call
+
+
+@conversation d4_bima_call chapter="Hari 4" chapter.en="Day 4" title="Telepon Bima" title.en="Calling Bima"
+@scene CALL channel=thread_bima day=4 time=09:05 bg=bg_sekar_room_day.webp music=bgm_tense_call.mp3 stay="Nggak. Dinda lagi denger. Dan Bima belum selesai." stay.en="No. Dinda is listening. And Bima isn't done."
+
+bima voice=vo_d4_bima_01.mp3 [if bima_on_edge == true]
+  id: Lo lagi. Mau nanya soal Senin malem lagi?
+  en: You again. Here to ask about Monday night again?
+  delivery: cold and tired, he's been expecting this
+bima voice=vo_d4_bima_02.mp3 [if bima_on_edge != true]
+  id: Raka. Gue udah nebak lo bakal nelpon.
+  en: Raka. I figured you'd call.
+  delivery: wary, forcing a calm voice
+player
+  id: Senin, jam sembilan. Lo yang jemput dia.
+  en: Monday, nine o'clock. You picked her up.
+bima voice=vo_d4_bima_03.mp3
+  id: ...Siapa yang bilang?
+  en: ...Who told you that?
+  delivery: too quiet, a beat too late
+player
+  id: CCTV TPI. Mobil perak, hatchback. Dan lo nanya ke dia "udah sampe?".
+  en: The fish auction CCTV. A silver hatchback. And you asked her "did you get there?".
+bima voice=vo_d4_bima_04.mp3
+  id: Oke. Iya. Gue yang jemput.
+  en: Okay. Yes. I picked her up.
+  delivery: after a long breath, giving up
+bima voice=vo_d4_bima_05.mp3
+  id: Dia minta dianter ke Angke. Katanya mau ketemu narsum. Gue nggak boleh ikut turun. Dia nyuruh gue pulang, dan gue pulang.
+  en: She asked me to drive her to Angke. Said she was meeting a source. I wasn't allowed to get out with her. She told me to go home, and I went.
+  delivery: fast, like he's rehearsed it alone many times
+bima voice=vo_d4_bima_06.mp3
+  id: Pesannya gue hapus karena kantor gue bilang jangan ikut campur urusan Sekar. Kalau ketahuan gue nganter dia, gue bisa dipecat.
+  en: I deleted the message because my office told me to stay out of Sekar's business. If they found out I drove her, I could be fired.
+  delivery: ashamed
+bima voice=vo_d4_bima_07.mp3
+  id: Jam sebelas gue nanya dia udah sampe belum. Maksudnya, udah ketemu orangnya belum. Dia nggak pernah bales.
+  en: At eleven I asked if she'd gotten there. I meant, had she met the guy yet. She never answered.
+  delivery: quiet, his voice catching
+player [if clue_didit_card == true]
+  id: Lo ngasih nomor HP Sekar ke Aditya. Bentang Pesisir.
+  en: You gave Sekar's number to Aditya. Bentang Pesisir.
+bima voice=vo_d4_bima_08.mp3 [if clue_didit_card == true]
+  id: Pak Didit? Dia klien kantor gue. Dia bilang mau bantu nyari. Dia punya pengacara, Ka. Gue kira...
+  en: Pak Didit? He's my office's client. He said he wanted to help look for her. He has lawyers, Ka. I thought...
+  delivery: defensive, then unsure of himself
+
+choice BIMA_PUSH by=bima timeout=10s
+  id: Dinda duduk di kasur Sekar, tangannya ngepal di pangkuan.
+  en: Dinda sits on Sekar's bed, her hands fists in her lap.
+? "Lo bohong ke polisi, Bim. Ke semua orang." | "You lied to the police, Bim. To everyone."
+  value push
+  -trust_bima 2
+? "Hari ini gue lapor ke Ipda Yusuf." | "I'm telling Inspector Yusuf today."
+  value threaten
+  -trust_bima 1
+  set threatened_bima true
+? (Biarin dia ngomong.) | (Let him talk.) [default] [silent]
+  value listen
+  +trust_bima 3
+  set bima_leak_planted true
+
+bima voice=vo_d4_bima_09.mp3 [if BIMA_PUSH == 'push']
+  id: Gue tahu! Lo pikir gue nggak tahu? Gue nggak tidur dari Senin!
+  en: I know! You think I don't know? I haven't slept since Monday!
+  delivery: shouting, then hanging up mid-breath
+system [if BIMA_PUSH == 'push']
+  id: Bima memutus panggilan
+  en: Bima hung up
+
+bima voice=vo_d4_bima_10.mp3 [if BIMA_PUSH == 'threaten']
+  id: Jangan. Ka, please. Kasih gue satu hari. Satu hari aja, gue yang ngomong sendiri ke polisi.
+  en: Don't. Ka, please. Give me one day. Just one day, and I'll tell the police myself.
+  delivery: panicked, begging
+system [if BIMA_PUSH == 'threaten']
+  id: Panggilan berakhir
+  en: Call ended
+
+bima voice=vo_d4_bima_11.mp3 [if BIMA_PUSH == 'listen']
+  id: Gue sayang dia, Ka. Gue cuma pengen dia aman. Makanya gue... pernah ngomong sesuatu ke bos gue. Soal Sekar.
+  en: I love her, Ka. I just wanted her safe. That's why I... once said something to my boss. About Sekar.
+  delivery: slow, confessing, then he catches himself
+bima voice=vo_d4_bima_12.mp3 [if BIMA_PUSH == 'listen']
+  id: Bukan apa-apa. Lupain. Gue harus pergi.
+  en: It's nothing. Forget it. I have to go.
+  delivery: shutting down fast, scared of what he almost said
+system [if BIMA_PUSH == 'listen']
+  id: Panggilan berakhir
+  en: Call ended
+
+-> d4_after_bima
+
+
+@conversation d4_after_bima chapter="Hari 4" chapter.en="Day 4" title="Malam Itu" title.en="That Night"
+@scene VN bg=bg_sekar_room_day.webp music=bgm_unease.mp3 day=4 time=09:20
+
+stage
+  show raka:neutral left
+  show dinda:neutral right
+
+dinda:angry [if BIMA_PUSH == 'push']
+  id: Dia nutup. Bagus. Sekarang dia tahu kita tahu, dan kita nggak dapet apa-apa lagi.
+  en: He hung up. Great. Now he knows we know, and we got nothing else out of him.
+dinda:neutral [if BIMA_PUSH == 'threaten']
+  id: Satu hari. Kita lihat dia beneran ngomong atau kabur.
+  en: One day. We'll see if he actually talks or runs.
+dinda:neutral [if BIMA_PUSH == 'listen']
+  id: "Pernah ngomong sesuatu ke bos gue." Lo denger itu, kan?
+  en: "Once said something to my boss." You heard that, right?
+raka:worried [if BIMA_PUSH == 'listen']
+  id: "Ada yang ngebocorin kalau gue punya itu."
+  en: "Someone leaked that I have it."
+
+dinda:neutral
+  id: Dia nganter Kak Sekar ke Angke, terus pulang. Jam sepuluh kurang tiga belas Kak Sekar jalan ke kapal Pak Karta.
+  en: He drove Sekar to Angke and went home. At thirteen to ten Sekar walked to Pak Karta's boat.
+dinda:hopeful
+  id: Berarti narsumnya bukan Bima. Dan bukan orang PT.{w} Dia ketemu seseorang di kapal itu.
+  en: So the source wasn't Bima. And it wasn't the company.{w} She met someone on that boat.
+
+stage
+  sound sfx_phone_ring.mp3
+
+narration
+  id: HP Sekar bunyi. Nomor yang sama yang ngechat kemarin malem. Bukan chat kali ini. Telepon.
+  en: Sekar's phone rings. The same number that messaged last night. Not a message this time. A call.
+
+-> d4_didit_call
+
+
+@conversation d4_didit_call chapter="Hari 4" chapter.en="Day 4" title="Suara Didit" title.en="Didit's Voice"
+@scene CALL channel=thread_didit day=4 time=09:24 bg=bg_sekar_room_day.webp music=bgm_tense_call.mp3 ring=sfx_phone_ring.mp3 stay="Kalau gue nggak angkat, dia bakal nyari cara lain buat ngomong. Mending sekarang, di sini, sama Dinda." stay.en="If I don't answer, he'll find another way to talk to me. Better now, here, with Dinda."
+
+choice RECORD by=didit silent
+  id: Di layar panggilan HP Sekar ada tombol merah kecil. Aplikasi perekam yang dia pasang sendiri.
+  en: On Sekar's call screen there's a small red button. A recorder app she installed herself.
+? Rekam teleponnya. | Record the call.
+  value record
+? Jangan. Dengerin aja. | Don't. Just listen.
+  value listen
+
+system [if RECORD == 'record']
+  id: Merekam
+  en: Recording
+
+didit voice=vo_d4_didit_01.mp3
+  id: Mas Raka. Selamat pagi. Aditya. Akhirnya kita bisa ngobrol langsung.
+  en: Good morning, Raka. Aditya here. At last we get to talk properly.
+  delivery: smooth and warm, a practiced public relations voice
+didit voice=vo_d4_didit_02.mp3 [if didit_slipped != true]
+  id: Tawaran saya kemarin masih berlaku. Saya orangnya sabar.
+  en: My offer from yesterday still stands. I'm a patient man.
+  delivery: friendly, unhurried
+didit voice=vo_d4_didit_03.mp3 [if didit_slipped == true]
+  id: Soal pesan yang Anda kirim kemarin. Saya harap Anda tidak salah paham dengan saran saya.
+  en: About the message you sent me yesterday. I hope you didn't misunderstand my advice.
+  delivery: smooth, but a little careful now
+didit voice=vo_d4_didit_04.mp3
+  id: Saya dengar Dik Dinda kuliah di Universitas Pesisir, ya. Semester lima. Kampusnya bagus. Lumayan jauh dari rumah.
+  en: I hear Dinda studies at Universitas Pesisir. Fifth semester. It's a good campus. Quite far from home.
+  delivery: pleasant small talk, which makes it worse
+player
+  id: Jangan sebut nama dia.
+  en: Don't say her name.
+didit voice=vo_d4_didit_05.mp3
+  id: Saya cuma ingin semua orang aman, Mas. Mbak Sekar sudah dewasa, dia pilih jalannya sendiri. Anda belum terlambat untuk pilih jalan yang lain.
+  en: I just want everyone to be safe. Ms. Sekar is an adult, she chose her own path. It isn't too late for you to choose a different one.
+  delivery: reasonable, almost kind
+didit voice=vo_d4_didit_06.mp3
+  id: Serahkan HP itu, pulang ke Bandung. Berhenti nyari. Demi adiknya.
+  en: Hand over the phone, go back to Bandung. Stop looking. For her sister's sake.
+  delivery: soft and final, the same words as the threat, said gently
+didit voice=vo_d4_didit_07.mp3
+  id: Saya tunggu kabar baiknya.
+  en: I'll wait for the good news.
+  delivery: cheerful, then the line goes dead
+
+system
+  id: Panggilan berakhir
+  en: Call ended
+system [if RECORD == 'record']
+  id: Rekaman disimpan, 01.12
+  en: Recording saved, 1:12
+  clue didit_call
+
+-> d4_after_didit
+
+
+@conversation d4_after_didit chapter="Hari 4" chapter.en="Day 4" title="Demi Adiknya" title.en="For Her Sister's Sake"
+@scene VN bg=bg_sekar_room_day.webp music=bgm_unease.mp3 day=4 time=09:30
+
+stage
+  show raka:angry left
+  show dinda:neutral right
+
+narration
+  id: "Demi adiknya." Kata yang sama. Pesan tengah malem itu nggak ditulis orang suruhan. Ditulis orang yang barusan nanya kabar kampus Dinda.
+  en: "For her sister's sake." The same words. That midnight message wasn't written by some hired thug. It was written by the man who just asked after Dinda's campus.
+dinda:neutral [if RECORD == 'record']
+  id: Lo rekam?
+  en: Did you record it?
+raka:determined [if RECORD == 'record']
+  id: Satu menit dua belas detik. Suaranya sendiri.
+  en: One minute twelve seconds. In his own voice.
+dinda:hopeful [if RECORD == 'record']
+  id: Kak Sekar pasti bangga. Itu kerjaan jurnalis.
+  en: Sekar would be proud. That's a journalist's work.
+raka:sad [if RECORD == 'listen']
+  id: Harusnya gue rekam.
+  en: I should have recorded it.
+dinda:neutral [if RECORD == 'listen']
+  id: Iya. Harusnya.
+  en: Yeah. You should have.
+
+dinda:neutral
+  id: Semester lima. Dia tahu semester gue, Ka.
+  en: Fifth semester. He knows what semester I'm in, Ka.
+dinda:crying
+  id: Gue nggak bakal ke kampus minggu ini.
+  en: I'm not going to campus this week.
+
+narration
+  id: Dinda ngambil laptop Sekar dari meja dan mulai ngetik cepet, kayak orang yang butuh tangannya sibuk.
+  en: Dinda pulls Sekar's laptop off the desk and starts typing fast, like someone who needs her hands busy.
+dinda:neutral
+  id: Kalau Kak Sekar takut HP-nya diambil, dia pasti backup. Dasbor podcast-nya bisa dibuka, berarti akun cloud-nya juga. Sandinya sama polanya.
+  en: If Sekar was scared of losing her phone, she'd have backed it up. Her podcast dashboard opened, so her cloud account will too. Same password pattern.
+narration
+  id: Sementara Dinda ngetik, gue inget satu kalimat lain dari kemarin siang. "Kalau ada yang menghubungi Anda soal HP itu, siapa pun, kabari saya dulu."
+  en: While Dinda types, I remember something else from yesterday afternoon. "If anyone contacts you about that phone, anyone at all, tell me first."
+
+-> d4_yusuf_report
+
+
+@conversation d4_yusuf_report chapter="Hari 4" chapter.en="Day 4" title="Lapor" title.en="Reporting In"
+@scene CHAT channel=thread_yusuf day=4 time=10:05 music=bgm_unease.mp3
+
+choice REPORT_DIDIT silent
+  id: Ipda Yusuf minta dikabari duluan.
+  en: Inspector Yusuf asked to be told first.
+? Ceritain soal Didit. Kirim rekamannya. | Tell him about Didit. Send the recording. [if clue_didit_call == true]
+  value recording
+  +trust_yusuf 4
+  set yusuf_knows_didit true
+? Ceritain soal Didit. | Tell him about Didit.
+  value tell
+  +trust_yusuf 2
+  set yusuf_knows_didit true
+? Belum. Polisi juga bisa bocor. | Not yet. The police can leak too.
+  value keep
+
+player sfx=sfx_msg_send.mp3 [if REPORT_DIDIT != 'keep']
+  id: Pak, ada orang dari PT Bentang Pesisir, Aditya, minta HP cadangan Sekar dikirim lewat kurir. Barusan dia nelpon. Dia tahu Dinda kuliah di mana dan semester berapa.
+  en: Sir, a man from PT Bentang Pesisir, Aditya, asked for Sekar's spare phone to be sent by courier. He just called. He knows where Dinda studies and what semester she's in.
+player sfx=sfx_msg_send.mp3 [if REPORT_DIDIT == 'recording']
+  id: Teleponnya saya rekam. Di akhir dia bilang "demi adiknya". Sama persis kayak pesan ancaman Kamis malem.
+  en: I recorded the call. At the end he said "for her sister's sake". Exactly like the threat on Thursday night.
+yusuf typing=4s sfx=sfx_msg_receive.mp3 [if REPORT_DIDIT != 'keep' && lied_to_yusuf == true]
+  id: Anda sekarang mau jujur ke saya, Mas. Baik. Saya terima.
+  en: So now you want to be honest with me. All right. I'll take it.
+yusuf typing=5s sfx=sfx_msg_receive.mp3 [if REPORT_DIDIT == 'recording']
+  id: Simpan rekamannya di dua tempat. Jangan kirim lewat chat. Saya ambil sendiri.
+  en: Keep the recording in two places. Don't send it over chat. I'll come for it myself.
+yusuf typing=5s sfx=sfx_msg_receive.mp3 [if REPORT_DIDIT != 'keep']
+  id: Ancaman ke keluarga itu bisa saya kerjakan, walaupun kasus hilangnya belum. Dik Dinda jangan ke kampus dulu.
+  en: A threat against the family is something I can act on, even if the missing person case isn't yet. Dinda should stay away from campus for now.
+narration [if REPORT_DIDIT == 'keep']
+  id: Gue ketik, gue hapus, gue ketik lagi. Bima bilang dia kenal orang di Polda. Didit dapet nomornya dari Bima. Gue nggak tahu lagi pintu mana yang nggak bocor.
+  en: I type, delete, type again. Bima says he knows people at the regional police. Didit got this number from Bima. I don't know anymore which doors don't leak.
+narration [if REPORT_DIDIT == 'keep']
+  id: Gue kunci layarnya.
+  en: I lock the screen.
+
+-> d4_notebook
+
+
+@conversation d4_notebook chapter="Hari 4" chapter.en="Day 4" title="Catatan" title.en="Notes"
+@scene CHAT channel=sekar_notes day=4 time=11:15 music=bgm_unsent.mp3 status=none
+
+narration
+  id: Akun cloud-nya kebuka di percobaan ketiga. Isinya foto-foto liputan, ratusan. Dan satu aplikasi catatan yang Sekar pake kayak chat sama dirinya sendiri.
+  en: Her cloud account opens on the third try. Hundreds of reporting photos. And a notes app that Sekar used like a chat with herself.
+
+timestamp
+  id: Tiga minggu lalu
+  en: Three weeks ago
+sekar
+  id: patok baru di depan angke. 14 titik. nggak ada papan
+  en: new stakes off angke. 14 of them. no sign
+sekar
+  id: izinnya keluar 2019. survei lingkungannya tanggal berapa??
+  en: the permit came out in 2019. when was the environmental survey??
+
+timestamp
+  id: Dua minggu lalu
+  en: Two weeks ago
+sekar
+  id: narsum mau ngomong. tapi cuma di laut. katanya darat banyak kuping
+  en: the source will talk. but only out at sea. says the land has too many ears
+sekar
+  id: rekaman udah 2x backup. satu di laptop. satu yang gue bawa ke mana2
+  en: recording backed up twice. one on the laptop. one i carry everywhere
+
+timestamp
+  id: Senin lalu
+  en: Last Monday
+media IMAGE photo_notebook_page.webp by=sekar unlock=photo_notebook_page [if clue_sekar_notebook == true]
+  id: buat jaga2 kalau halamannya gue sobek
+  en: just in case i tear the page out
+  clue notebook_page
+
+narration [if clue_sekar_notebook == true]
+  id: Halaman yang disobek itu. Kertas yang sama yang gue gosok pake pensil hari pertama. Sekarang kebaca semuanya.
+  en: The torn-out page. The same page I rubbed with a pencil on the first day. Now all of it is readable.
+narration [if clue_sekar_notebook == true]
+  id: "Jangan percaya Tasya soal sponsor. Dia bukan jahat, dia butuh uang."
+  en: "Don't trust Tasya on the sponsor. She isn't bad, she needs the money."
+narration [if clue_sekar_notebook == true]
+  id: Bukan "jangan percaya Tasya". Jangan percaya Tasya soal satu hal. Sekar masih belain dia, bahkan di catatan yang cuma buat dirinya sendiri.
+  en: Not "don't trust Tasya". Don't trust Tasya about one thing. Sekar was still defending her, even in notes meant only for herself.
+
+narration [if clue_sekar_notebook != true]
+  id: Ada satu foto halaman buku catatan, tapi buram, kefoto miring. Dinda ngegedein layarnya, nyipitin mata.
+  en: There's one photo of a notebook page, but it's blurry, taken at an angle. Dinda zooms in, squinting.
+narration [if clue_sekar_notebook != true]
+  id: "Kak Sekar pernah bilang ke gue soal Tasya," katanya pelan. "Tasya bukan orang jahat. Dia cuma lagi butuh duit banget. Nyokapnya sakit."
+  en: "Sekar told me something about Tasya once," she says quietly. "Tasya isn't a bad person. She just really needs money. Her mom's sick."
+
+narration
+  id: "Satu yang gue bawa ke mana-mana."{w} Perekam Zoom-nya. Kartu memorinya. Dia bawa buktinya bareng dia.
+  en: "One I carry everywhere."{w} Her Zoom recorder. Its memory card. She took the proof with her.
+
+-> d4_choice
+
+
+@conversation d4_choice chapter="Hari 4" chapter.en="Day 4" title="Atap" title.en="The Roof"
+@scene VN bg=bg_sekar_roof_dusk.webp music=bgm_low_tide.mp3 ambience=amb_kampung_day.mp3 day=4 time=18:10
+
+stage
+  show raka:neutral left
+  show dinda:neutral right
+
+narration
+  id: Magrib lagi dari tiga masjid. Crane-crane reklamasi udah nyalain lampu merahnya, satu-satu, kayak mata.
+  en: The call to prayer again, from three mosques. The reclamation cranes have switched on their red lights, one by one, like eyes.
+
+dinda:neutral [right] [if heard_silent_call == true]
+  id: Telepon semalem. Lo bilang ada bunyi klik dua kali. Itu apa?
+  en: Last night's call. You said there were two clicks. What were they?
+raka:sad [left] [if heard_silent_call == true]
+  id: Waktu gue masih jadi editornya, kita rekaman di tempat-tempat berisik. Pasar, dermaga, demo. Nggak bisa ngomong, nggak bisa teriak.
+  en: Back when I was still her editor, we recorded in loud places. Markets, piers, protests. You couldn't talk, couldn't shout.
+raka:sad [if heard_silent_call == true]
+  id: Jadi kita bikin kode. Klik tombol rekam sekali artinya "tunggu". Dua kali artinya "gue aman, lanjut rekam".
+  en: So we made up a code. One click of the record button meant "wait". Two clicks meant "I'm okay, keep rolling".
+dinda:crying [if heard_silent_call == true]
+  id: Dia aman.
+  en: She's okay.
+raka:sad [if heard_silent_call == true]
+  id: Dia pake kode yang cuma gue yang ngerti. Setahun gue nggak ngomong sama dia, dan dia masih pake kode kita.
+  en: She used a code only I would understand. A year I didn't speak to her, and she still used our code.
+narration [if heard_silent_call == true]
+  id: Dinda nangis tanpa suara, mukanya ditutupin lengan sweater Sekar. Gue biarin. Gue juga.
+  en: Dinda cries without a sound, her face hidden in the sleeve of Sekar's sweater. I let her. I do too.
+
+dinda:neutral [right]
+  id: Oke. Kita punya dua jalan.
+  en: Okay. We have two ways in.
+dinda:neutral
+  id: Satu, dermaga. Pak Hendra tahu sesuatu. Kapalnya, telepon tanpa suara itu, ombak sama genset.
+  en: One, the pier. Pak Hendra knows something. His boat, that silent call, the waves and the generator.
+dinda:neutral
+  id: Dua, orang-orangnya. Tasya ditelepon orang PT. Bima ngomong sesuatu ke bosnya. Didit dapet nomor HP ini dari Bima. Ada yang nyambung di situ.
+  en: Two, the people. Tasya got a call from the company. Bima said something to his boss. Didit got this phone's number from Bima. Something connects there.
+raka:neutral [left]
+  id: Kita bisa dua-duanya.
+  en: We could do both.
+dinda:angry
+  id: Didit tahu semester gue, Ka. Kita nggak punya waktu buat dua-duanya.
+  en: Didit knows what semester I'm in, Ka. We don't have time for both.
+
+choice ROUTE_LEAN by=dinda:neutral
+  id: Ke mana dulu?
+  en: Where first?
+? Ke dermaga. Cari Pak Hendra lagi. | The pier. Find Pak Hendra again.
+  value harbor
+  set route_lean "harbor"
+? Ke orang-orangnya. Tasya dan Bima. | The people. Tasya and Bima.
+  value network
+  set route_lean "network"
+
+dinda:hopeful [if ROUTE_LEAN == 'harbor']
+  id: Dermaga. Kalau Kak Sekar ketemu narsumnya di laut, jawabannya ada di laut.
+  en: The pier. If Sekar met her source at sea, the answer is at sea.
+raka:determined [if ROUTE_LEAN == 'harbor' && trust_hendra > 0]
+  id: Dia bilang "jaga adiknya". Dia nggak bakal bilang gitu kalau dia nggak peduli.
+  en: He said "look after her sister". He wouldn't say that if he didn't care.
+raka:worried [if ROUTE_LEAN == 'harbor' && trust_hendra <= 0]
+  id: Dia nutup pintu waktu itu. Kali ini gue harus ngetok dengan cara yang bener.
+  en: He shut me out last time. This time I have to knock the right way.
+dinda:neutral [if ROUTE_LEAN == 'network']
+  id: Orang-orangnya. Tasya bukan jahat, Bima bukan jahat. Tapi salah satu dari mereka yang bikin Didit tahu.
+  en: The people. Tasya isn't bad, Bima isn't bad. But one of them is how Didit found out.
+raka:determined [if ROUTE_LEAN == 'network']
+  id: Dan orang yang ngerasa bersalah biasanya pengen ngaku. Mereka cuma butuh orang yang mau dengerin.
+  en: And people who feel guilty usually want to confess. They just need someone who'll listen.
+
+narration
+  id: Kita duduk di dak sampai gelap. Dinda nyenderin kepalanya ke bahu gue, cuma sebentar, kayak lupa.
+  en: We sit on the roof until it's dark. Dinda leans her head on my shoulder, just for a moment, like she forgot not to.
+
+-> d4_sunrise
+
+
+@conversation d4_sunrise chapter="Hari 4" chapter.en="Day 4" title="Subuh" title.en="Dawn"
+@scene CHAT channel=thread_dawn day=5 time=04:58 music=amb_sea_night.mp3
+
+timestamp
+  id: Senin, 04.58
+  en: Monday, 4:58 AM
+narration
+  id: HP Sekar geter di bawah bantal. Gue ketiduran di sofa lagi. Langit di jendela masih item.
+  en: Sekar's phone buzzes under my pillow. I fell asleep on the sofa again. The sky in the window is still black.
+media IMAGE photo_sunrise_pier.webp by=dawn unlock=photo_sunrise_pier typing=2.5s sfx=sfx_msg_receive.mp3
+  clue sunrise_photo
+dawn typing=1.8s sfx=sfx_msg_receive.mp3
+  id: masih di sana.
+  en: still there.
+
+narration
+  id: Dermaga kayu, langit oranye, laut yang masih abu-abu. Kapal biru-putih diiket di ujungnya. Persis wallpaper HP Sekar.
+  en: A wooden jetty, an orange sky, a sea still grey. A blue and white boat tied at the end. Exactly like the wallpaper on Sekar's phone.
+narration
+  id: Bedanya, di pinggir foto ini ada bakau. Muara Angke nggak punya bakau lagi dari sebelum gue lahir.
+  en: Except at the edge of this photo there are mangroves. Muara Angke hasn't had mangroves since before I was born.
+
+choice DAWN_REPLY silent
+  id: Bales?
+  en: Reply?
+? Ketik "kar?" | Type "kar?"
+  value ask
+? Jangan. Simpen fotonya. | Don't. Save the photo.
+  value quiet
+
+player sfx=sfx_msg_send.mp3 [if DAWN_REPLY == 'ask']
+  id: kar?
+  en: kar?
+system [if DAWN_REPLY == 'ask']
+  id: Dibaca 04.59
+  en: Read 4:59 AM
+narration [if DAWN_REPLY == 'ask']
+  id: Dibaca. Nggak dibales. Kali ini, buat pertama kalinya, "dibaca" kerasa kayak jawaban.
+  en: Read. No reply. This time, for the first time, "read" feels like an answer.
+narration [if DAWN_REPLY == 'quiet']
+  id: Gue simpen fotonya dan nggak ngetik apa-apa. Kalau dia di sana, dia tahu gue nerima. Kalau bukan dia, gue nggak ngasih apa-apa.
+  en: I save the photo and don't type anything. If it's her, she knows I got it. If it isn't, I've given them nothing.
+
+-> d5_stub
+
+
+# Day 5: Retak. M3 placeholder until the routes are written, which replaces this stub and its ending.
+
+@conversation d5_stub chapter="Hari 5" chapter.en="Day 5" title="Retak" title.en="Cracks" checkpoint
+@scene VN bg=bg_sekar_living_day.webp music=bgm_quiet_house.mp3 day=5 time=07:00
+
+narration
+  id: Hari 5 belum ditulis. Ceritanya berlanjut di versi berikutnya.
+  en: Day 5 isn't written yet. The story continues in the next build.
+
+ending end_00_preview NORMAL
+  id: Bersambung
+  en: To Be Continued
+  summary id: Raka tahu siapa yang mengantar Sekar dan siapa yang mengancamnya. Jam lima pagi, seseorang mengirim foto dermaga yang bukan Muara Angke.
+  summary en: Raka knows who drove Sekar and who threatened her. At five in the morning, someone sent a photo of a jetty that isn't Muara Angke.

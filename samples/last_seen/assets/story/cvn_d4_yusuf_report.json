@@ -1,0 +1,150 @@
+{
+  "conversation_id": "cvn_d4_yusuf_report",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Lapor",
+    "en": "Reporting In"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_yusuf",
+    "day": 4,
+    "time": "10:05",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Ipda Yusuf minta dikabari duluan.",
+        "en": "Inspector Yusuf asked to be told first."
+      },
+      "variable": "REPORT_DIDIT",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Ceritain soal Didit. Kirim rekamannya.",
+            "en": "Tell him about Didit. Send the recording."
+          },
+          "value": "recording",
+          "condition": "clue_didit_call == true",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 4
+            },
+            {
+              "variable": "yusuf_knows_didit",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Ceritain soal Didit.",
+            "en": "Tell him about Didit."
+          },
+          "value": "tell",
+          "effects": [
+            {
+              "variable": "trust_yusuf",
+              "op": "add",
+              "value": 2
+            },
+            {
+              "variable": "yusuf_knows_didit",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "Belum. Polisi juga bisa bocor.",
+            "en": "Not yet. The police can leak too."
+          },
+          "value": "keep"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "REPORT_DIDIT != 'keep'",
+      "text": {
+        "id": "Pak, ada orang dari PT Bentang Pesisir, Aditya, minta HP cadangan Sekar dikirim lewat kurir. Barusan dia nelpon. Dia tahu Dinda kuliah di mana dan semester berapa.",
+        "en": "Sir, a man from PT Bentang Pesisir, Aditya, asked for Sekar's spare phone to be sent by courier. He just called. He knows where Dinda studies and what semester she's in."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REPORT_DIDIT == 'recording'",
+      "text": {
+        "id": "Teleponnya saya rekam. Di akhir dia bilang \"demi adiknya\". Sama persis kayak pesan ancaman Kamis malem.",
+        "en": "I recorded the call. At the end he said \"for her sister's sake\". Exactly like the threat on Thursday night."
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REPORT_DIDIT != 'keep' && lied_to_yusuf == true",
+      "text": {
+        "id": "Anda sekarang mau jujur ke saya, Mas. Baik. Saya terima.",
+        "en": "So now you want to be honest with me. All right. I'll take it."
+      },
+      "profile": "yusuf:0",
+      "typing_delay_ms": 4000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REPORT_DIDIT == 'recording'",
+      "text": {
+        "id": "Simpan rekamannya di dua tempat. Jangan kirim lewat chat. Saya ambil sendiri.",
+        "en": "Keep the recording in two places. Don't send it over chat. I'll come for it myself."
+      },
+      "profile": "yusuf:0",
+      "typing_delay_ms": 5000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "REPORT_DIDIT != 'keep'",
+      "text": {
+        "id": "Ancaman ke keluarga itu bisa saya kerjakan, walaupun kasus hilangnya belum. Dik Dinda jangan ke kampus dulu.",
+        "en": "A threat against the family is something I can act on, even if the missing person case isn't yet. Dinda should stay away from campus for now."
+      },
+      "profile": "yusuf:0",
+      "typing_delay_ms": 5000,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "REPORT_DIDIT == 'keep'",
+      "text": {
+        "id": "Gue ketik, gue hapus, gue ketik lagi. Bima bilang dia kenal orang di Polda. Didit dapet nomornya dari Bima. Gue nggak tahu lagi pintu mana yang nggak bocor.",
+        "en": "I type, delete, type again. Bima says he knows people at the regional police. Didit got this number from Bima. I don't know anymore which doors don't leak."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "REPORT_DIDIT == 'keep'",
+      "text": {
+        "id": "Gue kunci layarnya.",
+        "en": "I lock the screen."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_notebook"
+    }
+  ]
+}

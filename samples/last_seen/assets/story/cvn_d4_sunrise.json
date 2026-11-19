@@ -1,0 +1,139 @@
+{
+  "conversation_id": "cvn_d4_sunrise",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Subuh",
+    "en": "Dawn"
+  },
+  "scene": {
+    "mode": "CHAT",
+    "channel_id": "thread_dawn",
+    "day": 5,
+    "time": "04:58",
+    "music": "amb_sea_night.mp3"
+  },
+  "conversations": [
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": {
+        "id": "Senin, 04.58",
+        "en": "Monday, 4:58 AM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP Sekar geter di bawah bantal. Gue ketiduran di sofa lagi. Langit di jendela masih item.",
+        "en": "Sekar's phone buzzes under my pillow. I fell asleep on the sofa again. The sky in the window is still black."
+      }
+    },
+    {
+      "type": "MEDIA",
+      "media_type": "IMAGE",
+      "uri": "photo_sunrise_pier.webp",
+      "profile": "dawn",
+      "unlock_id": "photo_sunrise_pier",
+      "typing_delay_ms": 2500,
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_sunrise_photo",
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "masih di sana.",
+        "en": "still there."
+      },
+      "profile": "dawn",
+      "typing_delay_ms": 1800,
+      "sfx": "sfx_msg_receive.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Dermaga kayu, langit oranye, laut yang masih abu-abu. Kapal biru-putih diiket di ujungnya. Persis wallpaper HP Sekar.",
+        "en": "A wooden jetty, an orange sky, a sea still grey. A blue and white boat tied at the end. Exactly like the wallpaper on Sekar's phone."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "Bedanya, di pinggir foto ini ada bakau. Muara Angke nggak punya bakau lagi dari sebelum gue lahir.",
+        "en": "Except at the edge of this photo there are mangroves. Muara Angke hasn't had mangroves since before I was born."
+      }
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Bales?",
+        "en": "Reply?"
+      },
+      "variable": "DAWN_REPLY",
+      "silent": true,
+      "choices": [
+        {
+          "text": {
+            "id": "Ketik \"kar?\"",
+            "en": "Type \"kar?\""
+          },
+          "value": "ask"
+        },
+        {
+          "text": {
+            "id": "Jangan. Simpen fotonya.",
+            "en": "Don't. Save the photo."
+          },
+          "value": "quiet"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "DAWN_REPLY == 'ask'",
+      "text": {
+        "id": "kar?",
+        "en": "kar?"
+      },
+      "profile": "player",
+      "sfx": "sfx_msg_send.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "DAWN_REPLY == 'ask'",
+      "style": "system",
+      "text": {
+        "id": "Dibaca 04.59",
+        "en": "Read 4:59 AM"
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "DAWN_REPLY == 'ask'",
+      "text": {
+        "id": "Dibaca. Nggak dibales. Kali ini, buat pertama kalinya, \"dibaca\" kerasa kayak jawaban.",
+        "en": "Read. No reply. This time, for the first time, \"read\" feels like an answer."
+      }
+    },
+    {
+      "type": "NARRATION",
+      "condition": "DAWN_REPLY == 'quiet'",
+      "text": {
+        "id": "Gue simpen fotonya dan nggak ngetik apa-apa. Kalau dia di sana, dia tahu gue nerima. Kalau bukan dia, gue nggak ngasih apa-apa.",
+        "en": "I save the photo and don't type anything. If it's her, she knows I got it. If it isn't, I've given them nothing."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d5_stub"
+    }
+  ]
+}

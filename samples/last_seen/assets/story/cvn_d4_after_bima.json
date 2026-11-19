@@ -1,0 +1,107 @@
+{
+  "conversation_id": "cvn_d4_after_bima",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Malam Itu",
+    "en": "That Night"
+  },
+  "scene": {
+    "mode": "VN",
+    "day": 4,
+    "time": "09:20",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_unease.mp3"
+  },
+  "conversations": [
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "show",
+          "profile": "raka:0",
+          "position": "left"
+        },
+        {
+          "action": "show",
+          "profile": "dinda:0",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'push'",
+      "text": {
+        "id": "Dia nutup. Bagus. Sekarang dia tahu kita tahu, dan kita nggak dapet apa-apa lagi.",
+        "en": "He hung up. Great. Now he knows we know, and we got nothing else out of him."
+      },
+      "profile": "dinda:3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'threaten'",
+      "text": {
+        "id": "Satu hari. Kita lihat dia beneran ngomong atau kabur.",
+        "en": "One day. We'll see if he actually talks or runs."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'listen'",
+      "text": {
+        "id": "\"Pernah ngomong sesuatu ke bos gue.\" Lo denger itu, kan?",
+        "en": "\"Once said something to my boss.\" You heard that, right?"
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'listen'",
+      "text": {
+        "id": "\"Ada yang ngebocorin kalau gue punya itu.\"",
+        "en": "\"Someone leaked that I have it.\""
+      },
+      "profile": "raka:2"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia nganter Kak Sekar ke Angke, terus pulang. Jam sepuluh kurang tiga belas Kak Sekar jalan ke kapal Pak Karta.",
+        "en": "He drove Sekar to Angke and went home. At thirteen to ten Sekar walked to Pak Karta's boat."
+      },
+      "profile": "dinda:0"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Berarti narsumnya bukan Bima. Dan bukan orang PT.{w} Dia ketemu seseorang di kapal itu.",
+        "en": "So the source wasn't Bima. And it wasn't the company.{w} She met someone on that boat."
+      },
+      "profile": "dinda:4"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "sound",
+          "file": "sfx_phone_ring.mp3"
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
+        "id": "HP Sekar bunyi. Nomor yang sama yang ngechat kemarin malem. Bukan chat kali ini. Telepon.",
+        "en": "Sekar's phone rings. The same number that messaged last night. Not a message this time. A call."
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_didit_call"
+    }
+  ]
+}

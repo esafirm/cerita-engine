@@ -1,0 +1,262 @@
+{
+  "conversation_id": "cvn_d4_bima_call",
+  "chapter": {
+    "id": "Hari 4",
+    "en": "Day 4"
+  },
+  "title": {
+    "id": "Telepon Bima",
+    "en": "Calling Bima"
+  },
+  "scene": {
+    "mode": "CALL",
+    "channel_id": "thread_bima",
+    "day": 4,
+    "time": "09:05",
+    "background": "bg_sekar_room_day.webp",
+    "music": "bgm_tense_call.mp3",
+    "stay": {
+      "id": "Nggak. Dinda lagi denger. Dan Bima belum selesai.",
+      "en": "No. Dinda is listening. And Bima isn't done."
+    }
+  },
+  "conversations": [
+    {
+      "type": "TEXT",
+      "condition": "bima_on_edge == true",
+      "text": {
+        "id": "Lo lagi. Mau nanya soal Senin malem lagi?",
+        "en": "You again. Here to ask about Monday night again?"
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_01.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "bima_on_edge != true",
+      "text": {
+        "id": "Raka. Gue udah nebak lo bakal nelpon.",
+        "en": "Raka. I figured you'd call."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_02.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Senin, jam sembilan. Lo yang jemput dia.",
+        "en": "Monday, nine o'clock. You picked her up."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "...Siapa yang bilang?",
+        "en": "...Who told you that?"
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_03.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "CCTV TPI. Mobil perak, hatchback. Dan lo nanya ke dia \"udah sampe?\".",
+        "en": "The fish auction CCTV. A silver hatchback. And you asked her \"did you get there?\"."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Oke. Iya. Gue yang jemput.",
+        "en": "Okay. Yes. I picked her up."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_04.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Dia minta dianter ke Angke. Katanya mau ketemu narsum. Gue nggak boleh ikut turun. Dia nyuruh gue pulang, dan gue pulang.",
+        "en": "She asked me to drive her to Angke. Said she was meeting a source. I wasn't allowed to get out with her. She told me to go home, and I went."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_05.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Pesannya gue hapus karena kantor gue bilang jangan ikut campur urusan Sekar. Kalau ketahuan gue nganter dia, gue bisa dipecat.",
+        "en": "I deleted the message because my office told me to stay out of Sekar's business. If they found out I drove her, I could be fired."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_06.mp3"
+    },
+    {
+      "type": "TEXT",
+      "text": {
+        "id": "Jam sebelas gue nanya dia udah sampe belum. Maksudnya, udah ketemu orangnya belum. Dia nggak pernah bales.",
+        "en": "At eleven I asked if she'd gotten there. I meant, had she met the guy yet. She never answered."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_07.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "clue_didit_card == true",
+      "text": {
+        "id": "Lo ngasih nomor HP Sekar ke Aditya. Bentang Pesisir.",
+        "en": "You gave Sekar's number to Aditya. Bentang Pesisir."
+      },
+      "profile": "player"
+    },
+    {
+      "type": "TEXT",
+      "condition": "clue_didit_card == true",
+      "text": {
+        "id": "Pak Didit? Dia klien kantor gue. Dia bilang mau bantu nyari. Dia punya pengacara, Ka. Gue kira...",
+        "en": "Pak Didit? He's my office's client. He said he wanted to help look for her. He has lawyers, Ka. I thought..."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_08.mp3"
+    },
+    {
+      "type": "CHOICE",
+      "text": {
+        "id": "Dinda duduk di kasur Sekar, tangannya ngepal di pangkuan.",
+        "en": "Dinda sits on Sekar's bed, her hands fists in her lap."
+      },
+      "variable": "BIMA_PUSH",
+      "profile": "bima:0",
+      "timeout_ms": 10000,
+      "default_choice": 2,
+      "choices": [
+        {
+          "text": {
+            "id": "\"Lo bohong ke polisi, Bim. Ke semua orang.\"",
+            "en": "\"You lied to the police, Bim. To everyone.\""
+          },
+          "value": "push",
+          "effects": [
+            {
+              "variable": "trust_bima",
+              "op": "subtract",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "\"Hari ini gue lapor ke Ipda Yusuf.\"",
+            "en": "\"I'm telling Inspector Yusuf today.\""
+          },
+          "value": "threaten",
+          "effects": [
+            {
+              "variable": "trust_bima",
+              "op": "subtract",
+              "value": 1
+            },
+            {
+              "variable": "threatened_bima",
+              "op": "set",
+              "value": true
+            }
+          ]
+        },
+        {
+          "text": {
+            "id": "(Biarin dia ngomong.)",
+            "en": "(Let him talk.)"
+          },
+          "value": "listen",
+          "silent": true,
+          "effects": [
+            {
+              "variable": "trust_bima",
+              "op": "add",
+              "value": 3
+            },
+            {
+              "variable": "bima_leak_planted",
+              "op": "set",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'push'",
+      "text": {
+        "id": "Gue tahu! Lo pikir gue nggak tahu? Gue nggak tidur dari Senin!",
+        "en": "I know! You think I don't know? I haven't slept since Monday!"
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_09.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "BIMA_PUSH == 'push'",
+      "style": "system",
+      "text": {
+        "id": "Bima memutus panggilan",
+        "en": "Bima hung up"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'threaten'",
+      "text": {
+        "id": "Jangan. Ka, please. Kasih gue satu hari. Satu hari aja, gue yang ngomong sendiri ke polisi.",
+        "en": "Don't. Ka, please. Give me one day. Just one day, and I'll tell the police myself."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_10.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "BIMA_PUSH == 'threaten'",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'listen'",
+      "text": {
+        "id": "Gue sayang dia, Ka. Gue cuma pengen dia aman. Makanya gue... pernah ngomong sesuatu ke bos gue. Soal Sekar.",
+        "en": "I love her, Ka. I just wanted her safe. That's why I... once said something to my boss. About Sekar."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_11.mp3"
+    },
+    {
+      "type": "TEXT",
+      "condition": "BIMA_PUSH == 'listen'",
+      "text": {
+        "id": "Bukan apa-apa. Lupain. Gue harus pergi.",
+        "en": "It's nothing. Forget it. I have to go."
+      },
+      "profile": "bima:0",
+      "voice": "vo_d4_bima_12.mp3"
+    },
+    {
+      "type": "NARRATION",
+      "condition": "BIMA_PUSH == 'listen'",
+      "style": "system",
+      "text": {
+        "id": "Panggilan berakhir",
+        "en": "Call ended"
+      }
+    },
+    {
+      "type": "JUMP",
+      "target": "d4_after_bima"
+    }
+  ]
+}
