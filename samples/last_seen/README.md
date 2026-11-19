@@ -40,24 +40,20 @@ samples/last_seen/tools/codex-image.sh bg/bg_seawall_night.webp
 
 ## Release builds
 
-`make release-last-seen` builds the Play Store bundle and per-ABI release APKs. Store builds need an upload key,
-which stays out of git. Make one once and keep it safe: a Play listing can only ever be updated with the same key.
+`make release-last-seen` builds the Play Store bundle and per-ABI release APKs, signed with the upload key. The key
+is committed encrypted as `android/upload-key.tar.enc` (AES-256, PBKDF2). Its passphrase is in the owner's password
+manager and nowhere in the repo. Restore it once per checkout:
 
 ```bash
-keytool -genkey -v -keystore ~/last-seen-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+samples/last_seen/tools/upload-key.sh decrypt    # asks for the passphrase
 ```
 
-Then write `samples/last_seen/android/key.properties` (git-ignored):
+That writes `android/key.properties` and `android/app/upload-keystore.jks`, both git-ignored. For a script or CI,
+set `LAST_SEEN_KEY_PASSPHRASE` (or `LAST_SEEN_KEY_PASSFILE`) instead of typing it. After rotating the key, run
+`upload-key.sh encrypt` and commit the new blob. A Play listing can only be updated with the key it started with.
 
-```properties
-storeFile=/Users/you/last-seen-upload.jks
-storePassword=...
-keyAlias=upload
-keyPassword=...
-```
-
-Without it, release builds are signed with the debug key, which installs fine for testing but can't go to a store.
-iOS builds need a team set in Xcode (`ios/Runner.xcworkspace`).
+Without `key.properties`, release builds are signed with the debug key, which installs fine for testing but can't go
+to a store. iOS builds need a team set in Xcode (`ios/Runner.xcworkspace`).
 
 ## Status
 

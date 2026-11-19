@@ -193,7 +193,7 @@ dinda voice=vo_p_dinda_11.mp3 [if ANSWER == 'tomorrow']
   en: Okay. I'll be at home, waiting. Don't not show up.
   delivery: wary, half joking
 dinda voice=vo_p_dinda_12.mp3 [if ANSWER == 'silent']
-  id: Ka? Halo? ...Dia selalu bilang lo kabur kalau ada yang berat. Jangan kali ini.
+  id: Ka? Halo? ...Kak Sekar selalu bilang lo suka kabur kalau keadaan lagi berat. Kali ini jangan, ya.
   en: Ka? Hello? ...She always said you run when things get heavy. Not this time.
   delivery: frustrated, almost crying
 

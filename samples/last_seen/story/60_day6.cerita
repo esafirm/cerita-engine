@@ -303,7 +303,7 @@ didit voice=vo_d6_didit_07.mp3 [if DIDIT_DEAL == 'yusuf']
   en: Ah. Good morning, Inspector. There seems to be a misunderstanding. Excuse me.
   delivery: the smoothness cracks for a second, then he's gone
 didit voice=vo_d6_didit_08.mp3 [if DIDIT_DEAL != 'yusuf']
-  id: Saya juga ke Pari hari ini, begitu lautnya buka. Sampai bertemu di sana.
+  id: Saya juga akan ke Pari hari ini, begitu kapal diizinkan berangkat. Sampai bertemu di sana.
   en: I'm going to Pari today too, as soon as the sea opens. See you there.
   delivery: friendly, final
 
@@ -423,7 +423,7 @@ sekar voice=vo_unsent_03_01.mp3 [offstage] [if PLAY_OFFMIC == 'play']
   en: ...This is off, right? Okay. Ka. Episode nine. Is it good? You'd say the wind's too loud at minute twelve.
   delivery: tired after a long session, talking to herself, fond, a little teasing
 sekar voice=vo_unsent_03_02.mp3 [offstage] [if PLAY_OFFMIC == 'play']
-  id: Gue nggak pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Ke ruangan kosong.
+  id: Gue belum pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Sepi amat, ya.
   en: I never said thanks for teaching me to edit. So. Thanks. To an empty room.
   delivery: a small laugh at herself, then sincere and quiet
 set [if PLAY_OFFMIC == 'play']

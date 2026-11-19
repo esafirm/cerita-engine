@@ -158,7 +158,7 @@
       "type": "TEXT",
       "condition": "PLAY_OFFMIC == 'play'",
       "text": {
-        "id": "Gue nggak pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Ke ruangan kosong.",
+        "id": "Gue belum pernah bilang makasih udah ngajarin gue ngedit. Ya udah. Makasih. Sepi amat, ya.",
         "en": "I never said thanks for teaching me to edit. So. Thanks. To an empty room."
       },
       "profile": "sekar:0",

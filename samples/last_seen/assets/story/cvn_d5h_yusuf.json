@@ -43,7 +43,7 @@
     {
       "type": "TEXT",
       "text": {
-        "id": "Besok pagi ada tim ke Pulau Pari. Polisi, dan \"pengamanan\" dari pihak pelapor. Itu bukan prosedur yang saya suka.",
+        "id": "Besok pagi ada tim ke Pulau Pari. Polisi, sama petugas \"pengamanan\" dari pihak pelapor. Saya keberatan dengan cara ini.",
         "en": "Tomorrow morning a team goes to Pulau Pari. Police, and \"security\" from the complainant's side. That isn't a procedure I like."
       },
       "profile": "yusuf:0",
@@ -73,7 +73,7 @@
       "type": "TEXT",
       "condition": "yusuf_knows_boat == true",
       "text": {
-        "id": "Satu lagi. Nama kapal itu saya catat tiga hari lalu, dari Anda. Sekarang orang Bentang tahu nama itu sama baiknya dengan saya. Saya tidak tahu dari mana.",
+        "id": "Satu lagi. Nama kapal itu saya dapat dari Anda dan sudah saya catat tiga hari lalu. Sekarang pihak Bentang juga tahu namanya. Saya tidak tahu mereka dapat dari mana.",
         "en": "One more thing. I wrote that boat's name down three days ago, from you. Now Bentang knows it as well as I do. I don't know how."
       },
       "profile": "yusuf:0",

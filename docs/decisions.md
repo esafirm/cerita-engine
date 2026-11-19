@@ -1042,6 +1042,31 @@ Day 4 quotes it. The rest were dropped.
 - **Revisit if** the owner's own review wants another model pass. Give it the owner's marked lines as examples
   rather than a general style brief.
 
+The same pass suggested new wording for eight voiced lines. The owner took all eight, and their Indonesian takes
+were re-recorded (r2). The English takes are unchanged. Raka's voice note in *Unsent* echoes Sekar's first note, so
+its opening changed to match ("Aneh juga, ya, ngomong sendiri gini").
+
+## The phone sounds are synthesized
+
+The five phone sounds (`sfx_msg_receive`, `sfx_msg_send`, `sfx_notification`, `sfx_phone_ring`, `sfx_wrong_code`)
+came over from `example/` with no recorded source. `tools/phone-sounds.sh` now makes them with ffmpeg from sine
+tones, the way `ui-sounds.sh` makes the menu blips, and the credits list them as made for the game.
+
+- **Why:** a store release can't ship sounds of unknown origin, and simple phone tones are easy to synthesize.
+- **Cost:** they sound cleaner and more synthetic than recorded ones. Peaks match the old files, so mixer
+  volumes stay the same. `example/` still has the old copies.
+
+## The upload key is committed, encrypted
+
+The repo is public, so the Play upload key is committed only as `android/upload-key.tar.enc`: `key.properties` and
+the keystore in a tar, encrypted with openssl (AES-256-CBC, PBKDF2 with 600,000 iterations). `tools/upload-key.sh
+decrypt` restores both, git-ignored. The passphrase is in the owner's password manager.
+
+- **Why:** the key survives a lost machine or a removed worktree, and a new checkout can sign without a copy sent
+  around by hand.
+- **Cost:** the passphrase is the only protection, and git history keeps every version of the blob. If the
+  passphrase leaks, rotate the key (Play Console can reset an upload key) rather than just re-encrypting.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

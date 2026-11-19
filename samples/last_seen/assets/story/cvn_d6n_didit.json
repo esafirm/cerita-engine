@@ -159,7 +159,7 @@
       "type": "TEXT",
       "condition": "DIDIT_DEAL != 'yusuf'",
       "text": {
-        "id": "Saya juga ke Pari hari ini, begitu lautnya buka. Sampai bertemu di sana.",
+        "id": "Saya juga akan ke Pari hari ini, begitu kapal diizinkan berangkat. Sampai bertemu di sana.",
         "en": "I'm going to Pari today too, as soon as the sea opens. See you there."
       },
       "profile": "didit",

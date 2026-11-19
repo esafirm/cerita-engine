@@ -840,7 +840,7 @@ player
   id: Gue Raka. Temennya Sekar.
   en: It's Raka. Sekar's friend.
 tasya voice=vo_d2_tasya_02.mp3
-  id: Raka... Raka yang editor? The Raka? Oh my god. Sekar ngomongin lo terus, literally tiap abis rekaman.
+  id: Raka... Raka yang ngedit itu? Serius? Sekar ngomongin lo terus, literally tiap abis rekaman.
   en: Raka... Raka the editor? The Raka? Oh my god. Sekar talked about you all the time, literally after every recording.
   delivery: surprised, a little too chatty, covering nerves
 tasya voice=vo_d2_tasya_03.mp3
@@ -862,7 +862,7 @@ tasya voice=vo_d2_tasya_04.mp3 [if TASYA_OPEN == 'warm']
   en: Yeah. Yeah, I'll come by. Promise.
   delivery: relieved, a little teary
 tasya voice=vo_d2_tasya_05.mp3 [if TASYA_OPEN == 'blunt']
-  id: Lo... apa? Itu privat, Ka. Lo nggak berhak.
+  id: Lo... apa? Itu chat pribadi, Ka. Lo nggak berhak baca.
   en: You... what? That's private, Ka. You had no right.
   delivery: sharp, caught off guard
 tasya voice=vo_d2_tasya_06.mp3 [if group_alerted == true]

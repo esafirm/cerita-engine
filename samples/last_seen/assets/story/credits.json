@@ -126,6 +126,13 @@
       "note": { "id": "Badai", "en": "The storm" }
     },
     {
+      "title": "Phone sounds",
+      "author": "Made for Last Seen with ffmpeg, from sine tones",
+      "source": "samples/last_seen/tools/phone-sounds.sh",
+      "license": "CC0 1.0",
+      "note": { "id": "Chat, notifikasi, nada dering dan kode salah", "en": "Chat, notifications, ringtone and wrong code" }
+    },
+    {
       "title": "DotGothic16",
       "author": "The DotGothic16 Project Authors (Fontworks)",
       "source": "github.com/fontworks-fonts/DotGothic16",

@@ -90,8 +90,12 @@ async function main() {
   const lines = loadManifest(opts).lines.filter((l) => (!opts.only || opts.only.includes(l.id)) && (!opts.locale || l.locale === opts.locale));
 
   const todo = [];
+  const seen = new Set();
   for (const line of lines) {
     const base = `${line.id}.${line.locale}`;
+    // A clip played in two scenes (vo_unsent_01 on Days 1 and 4) is one take, not two.
+    if (seen.has(base)) continue;
+    seen.add(base);
     const out = join(outDir, line.file);
     const text = line.tts_text ?? line.text;
     const { voice, style } = resolveVoice(voices, line);

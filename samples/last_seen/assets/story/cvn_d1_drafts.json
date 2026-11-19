@@ -137,7 +137,7 @@
       "type": "TEXT",
       "condition": "PLAY_VN == 'play'",
       "text": {
-        "id": "Ka. Ini konyol, gue ngomong ke HP yang nggak bakal ngirim apa-apa. Tapi gue butuh ngomong ke seseorang yang bukan Tasya, bukan Bima.",
+        "id": "Ka. Aneh juga, ya, ngomong sendiri gini. Ini juga nggak bakal kekirim. Tapi gue perlu cerita. Ke orang selain Tasya sama Bima.",
         "en": "Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima."
       },
       "profile": "sekar:0",

@@ -41,7 +41,7 @@
     {
       "type": "TEXT",
       "text": {
-        "id": "Raka... Raka yang editor? The Raka? Oh my god. Sekar ngomongin lo terus, literally tiap abis rekaman.",
+        "id": "Raka... Raka yang ngedit itu? Serius? Sekar ngomongin lo terus, literally tiap abis rekaman.",
         "en": "Raka... Raka the editor? The Raka? Oh my god. Sekar talked about you all the time, literally after every recording."
       },
       "profile": "tasya:0",
@@ -102,7 +102,7 @@
       "type": "TEXT",
       "condition": "TASYA_OPEN == 'blunt'",
       "text": {
-        "id": "Lo... apa? Itu privat, Ka. Lo nggak berhak.",
+        "id": "Lo... apa? Itu chat pribadi, Ka. Lo nggak berhak baca.",
         "en": "You... what? That's private, Ka. You had no right."
       },
       "profile": "tasya:0",

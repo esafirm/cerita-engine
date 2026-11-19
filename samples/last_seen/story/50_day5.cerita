@@ -299,7 +299,7 @@ yusuf voice=vo_d5_yusuf_02.mp3
   en: PT Bentang Pesisir Makmur filed a report at noon. They say a fisherman, Hendra, is suspected of taking Ms. Sekar away. They have a witness who saw her board his boat.
   delivery: reading from a report, distaste under the formality
 yusuf voice=vo_d5_yusuf_03.mp3
-  id: Besok pagi ada tim ke Pulau Pari. Polisi, dan "pengamanan" dari pihak pelapor. Itu bukan prosedur yang saya suka.
+  id: Besok pagi ada tim ke Pulau Pari. Polisi, sama petugas "pengamanan" dari pihak pelapor. Saya keberatan dengan cara ini.
   en: Tomorrow morning a team goes to Pulau Pari. Police, and "security" from the complainant's side. That isn't a procedure I like.
   delivery: dry, the quotation marks audible
 yusuf voice=vo_d5_yusuf_04.mp3 [if yusuf_knows_didit == true]
@@ -311,7 +311,7 @@ yusuf voice=vo_d5_yusuf_05.mp3 [if yusuf_knows_didit != true]
   en: I can't hold anything back. My advice is to stay away from Pulau Pari. Don't get yourself dragged into this.
   delivery: tired, honest about his limits
 yusuf voice=vo_d5_yusuf_06.mp3 [if yusuf_knows_boat == true]
-  id: Satu lagi. Nama kapal itu saya catat tiga hari lalu, dari Anda. Sekarang orang Bentang tahu nama itu sama baiknya dengan saya. Saya tidak tahu dari mana.
+  id: Satu lagi. Nama kapal itu saya dapat dari Anda dan sudah saya catat tiga hari lalu. Sekarang pihak Bentang juga tahu namanya. Saya tidak tahu mereka dapat dari mana.
   en: One more thing. I wrote that boat's name down three days ago, from you. Now Bentang knows it as well as I do. I don't know how.
   delivery: troubled, half to himself
 

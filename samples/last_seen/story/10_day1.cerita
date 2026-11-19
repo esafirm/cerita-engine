@@ -776,7 +776,7 @@ choice PLAY_VN by=raka:sad silent
   value later
 
 sekar voice=vo_unsent_01.mp3 [offstage] [if PLAY_VN == 'play']
-  id: Ka. Ini konyol, gue ngomong ke HP yang nggak bakal ngirim apa-apa. Tapi gue butuh ngomong ke seseorang yang bukan Tasya, bukan Bima.
+  id: Ka. Aneh juga, ya, ngomong sendiri gini. Ini juga nggak bakal kekirim. Tapi gue perlu cerita. Ke orang selain Tasya sama Bima.
   en: Ka. This is stupid, talking to a phone that won't send anything. But I need to talk to someone who isn't Tasya, isn't Bima.
   delivery: tired, half laughing at herself, late at night, quiet so no one hears
 sekar voice=vo_unsent_02.mp3 [offstage] [if PLAY_VN == 'play']
