@@ -1,8 +1,11 @@
-# Last Seen
+# Seawall
 
 A full-length mystery built on Cerita Engine: Raka has seven days to rebuild the last week of Sekar, a podcaster
 who vanished on the North Jakarta coast. Indonesian first, with English alongside. The plan is
 [`specs/last-seen.md`](../../specs/last-seen.md).
+
+Players see the name Seawall. It was called Last Seen until 1.1.0, and the code still is: this folder, the `last_seen`
+Dart package, the `*-last-seen` make targets and the package ID `id.twk.lastseen`.
 
 ## Layout
 

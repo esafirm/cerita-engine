@@ -18,7 +18,7 @@ class LastSeenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Last Seen",
+      title: "Seawall",
       debugShowCheckedModeBanner: false,
       theme: Retro.theme(),
       builder: (context, child) => StoryLanguageScope(

@@ -1107,6 +1107,21 @@ the title menu while the game is locked. Restore is on the paywall.
 - **Revisit if** the free part converts badly or reviews call it a demo. Moving the gate is one constant in
   `FullGame`.
 
+## Last Seen is called Seawall
+
+*2026-11-20.*
+
+Players see the name Seawall: the launcher label, the title logo, the web title. "Last Seen" is already a Steam
+investigation game, and "Last Seen Online" is another, so store search would bury it. The story opens on the Pluit
+seawall, and the seawall stands for the reclamation plot at the heart of the mystery. One name for both languages.
+
+- **Code keeps the old name:** the `samples/last_seen` folder, the `last_seen` package, the make targets and
+  `id.twk.lastseen`. Players never see them, and the package ID can't change on Play anyway.
+- **Story text keeps "last seen":** those lines are the chat app's status and Sekar's missing-person notice, not the
+  title.
+- **Not yet renamed:** the iOS display name (`ios/Runner/Info.plist`), left to the thread getting iOS to build, and
+  the "LS" app icon, which is being redrawn.
+
 ## The engine gates conversations, the app decides why
 
 *2026-11-20. Engine and state §8.1.*

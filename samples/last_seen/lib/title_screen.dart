@@ -267,7 +267,7 @@ class _Logo extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "LAST SEEN",
+          "SEAWALL",
           textAlign: TextAlign.center,
           style: Retro.text.copyWith(
             fontSize: 50,
