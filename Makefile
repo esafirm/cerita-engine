@@ -7,6 +7,9 @@ LAST_SEEN_ID := id.twk.lastseen
 # (playtest APKs only, never a store upload).
 LAST_SEEN_KEYS := $(if $(wildcard $(LAST_SEEN)/revenuecat.json),--dart-define-from-file=revenuecat.json,)
 LAST_SEEN_DEFINES := $(LAST_SEEN_KEYS) $(if $(TESTER),--dart-define=LAST_SEEN_TESTER=true,)
+# A RevenueCat Test Store key (test_...) works in debug builds only. The SDK crashes on purpose in any other build
+# that uses one, so the store bundle refuses it. Other non-debug builds ignore it and keep the store off.
+LAST_SEEN_TEST_KEY := $(shell grep -s '"test_' $(LAST_SEEN)/revenuecat.json)
 # Target device for run/install, e.g. `make install DEVICE=emulator-5554`. Empty picks the only one.
 DEVICE ?=
 DEVICE_FLAG := $(if $(DEVICE),-d $(DEVICE),)
@@ -89,6 +92,7 @@ install-last-seen: get ## Last Seen: build a profile APK, install it and launch 
 	$(ADB) shell am start -n $(LAST_SEEN_ID)/.MainActivity
 
 release-last-seen: get ## Last Seen: build the store bundle and a release APK (signed with android/key.properties if present, TESTER=1 for playtest APKs only)
+	$(if $(and $(LAST_SEEN_TEST_KEY),$(if $(TESTER),,1)),$(error revenuecat.json holds a RevenueCat Test Store key. Put the production keys in for a store build or use TESTER=1 for a playtest APK))
 	$(if $(TESTER),@echo "TESTER=1 skips the store bundle: playtest APKs only",cd $(LAST_SEEN) && flutter build appbundle --release $(LAST_SEEN_KEYS))
 	cd $(LAST_SEEN) && flutter build apk --release --split-per-abi $(LAST_SEEN_DEFINES)
 	ls -lh $(if $(TESTER),,$(LAST_SEEN)/build/app/outputs/bundle/release/*.aab) $(LAST_SEEN)/build/app/outputs/flutter-apk/*-release.apk

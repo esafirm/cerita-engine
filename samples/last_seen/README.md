@@ -65,12 +65,18 @@ menu's *Unlock full game* entry. Players who reached Day 3 in 1.0.0, before the 
 
 RevenueCat setup, in the dashboard:
 
-- One non-consumable product per store (App Store Connect, Play Console), attached to the entitlement `full_game`.
+- One non-consumable product per store (App Store Connect, Play Console), attached to the entitlement `complete_content_bonus`.
 - A package for it in the current offering, preferably the Lifetime package. The paywall shows its store price.
 
 The public SDK keys stay out of git. Put them in `revenuecat.json` next to this README (git-ignored, copy
 `revenuecat.example.json`), and the `make` targets pass it with `--dart-define-from-file`. Without a key for the
 platform, and on the web, the store is off: Day 3 stays closed and the paywall says the store isn't available.
+
+For testing, the key can be RevenueCat's Test Store key (`test_…`), one key for both platforms. Purchases then show
+a RevenueCat dialog to pass, fail or cancel, with no store account needed. It works in debug builds only: the SDK
+crashes on purpose in any other build that uses one. So `make release-last-seen` refuses it (except with
+`TESTER=1`), and other non-debug builds ignore it and keep the store off. Put the production keys in before a store
+build.
 
 | Build | Paid days |
 | :--- | :--- |

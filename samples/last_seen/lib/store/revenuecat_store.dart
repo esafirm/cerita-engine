@@ -10,7 +10,9 @@ import 'store.dart';
 /// the current offering (the Lifetime package if there is one). The public SDK keys come in with `--dart-define`
 /// (`REVENUECAT_ANDROID_KEY`, `REVENUECAT_IOS_KEY`), usually from the git-ignored `revenuecat.json`, see the README.
 class RevenueCatStore implements GameStore {
-  static const entitlement = "full_game";
+  /// The entitlement's identifier in the RevenueCat dashboard. It can't be renamed there, so it keeps the name it
+  /// was created with.
+  static const entitlement = "complete_content_bonus";
 
   static const _androidKey = String.fromEnvironment("REVENUECAT_ANDROID_KEY");
   static const _iosKey = String.fromEnvironment("REVENUECAT_IOS_KEY");
@@ -19,12 +21,19 @@ class RevenueCatStore implements GameStore {
 
   String get _key {
     if (kIsWeb) return "";
-    return switch (defaultTargetPlatform) {
+    final key = switch (defaultTargetPlatform) {
       TargetPlatform.android => _androidKey,
       TargetPlatform.iOS => _iosKey,
       _ => "",
     };
+    return usable(key, debug: kDebugMode) ? key : "";
   }
+
+  /// Whether [key] can configure the SDK in this build. A Test Store key (`test_…`) works in debug builds only: the
+  /// SDK shows an alert and crashes on purpose in any other build that uses one. The Makefile refuses to build those
+  /// with it, and this keeps a build made some other way running, with the store off.
+  @visibleForTesting
+  static bool usable(String key, {required bool debug}) => key.isNotEmpty && (debug || !key.startsWith("test_"));
 
   @override
   bool get available => _key.isNotEmpty;

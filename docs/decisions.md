@@ -1094,6 +1094,14 @@ the title menu while the game is locked. Restore is on the paywall.
   either free or one of Days 3 to 7, so renaming a chapter fails the tests.
 - **Keys:** the public SDK keys come in with `--dart-define-from-file=revenuecat.json`, git-ignored. Without a key,
   and on the web, the store is off and Day 3 stays closed.
+- **Entitlement name:** the dashboard's entitlement is `complete_content_bonus`, and the code follows it. RevenueCat
+  can't rename an entitlement's identifier, and a new one would mean moving the product over.
+- **Test Store key for testing:** RevenueCat's Test Store (`test_…` key) sells the dashboard's `lifetime` product
+  through a dialog that passes, fails or cancels, with no Play account or Play track needed. The SDK crashes any
+  non-debug build that uses one, and Flutter can't turn that off. So `make release-last-seen` refuses the key
+  (except with `TESTER=1`), and `RevenueCatStore` ignores it outside debug builds, which keeps a build made by hand
+  running with the store off. Checked on an Android 37 emulator: price, cancel, failure, restore with nothing owned,
+  purchase, offline restart, and the Day 3 gate resuming after a purchase.
 - **SDK version:** `purchases_flutter` 11.0.1, pinned, the newest release at least two weeks old. It uses Swift
   Package Manager on iOS, so CocoaPods isn't needed.
 - **Revisit if** the free part converts badly or reviews call it a demo. Moving the gate is one constant in

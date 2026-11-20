@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:last_seen/store/full_game.dart';
 import 'package:last_seen/store/paywall.dart';
+import 'package:last_seen/store/revenuecat_store.dart';
 import 'package:last_seen/store/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -274,6 +275,22 @@ void main() {
       await pump(tester, _FakeStore(available: false), onUnlocked: () {});
       expect(find.text("Toko tidak tersedia di versi ini."), findsOneWidget);
       expect(find.textContaining("Rp"), findsNothing);
+    });
+  });
+
+  group('store keys', () {
+    test('a production key works in every build', () {
+      expect(RevenueCatStore.usable("goog_abc", debug: false), isTrue);
+      expect(RevenueCatStore.usable("goog_abc", debug: true), isTrue);
+    });
+
+    test('a Test Store key works in debug builds only, the SDK crashes any other build that uses one', () {
+      expect(RevenueCatStore.usable("test_abc", debug: true), isTrue);
+      expect(RevenueCatStore.usable("test_abc", debug: false), isFalse);
+    });
+
+    test('no key, no store', () {
+      expect(RevenueCatStore.usable("", debug: true), isFalse);
     });
   });
 }
