@@ -1,43 +1,69 @@
 #!/usr/bin/env bash
-# The app icon: "LS" as 5x7 pixel art in a framed navy window, with the logo's two hard shadows (pink, then night).
-# Drawn with ffmpeg drawbox only, so it needs no font tools. Writes art/icon/icon.png at 1024px, then every launcher
-# icon of the app (Android, iOS, web) at its own size.
+# The app icon: Sekar on the Pluit seawall at night (art/prompts/icon.txt, drawn with codex-image.sh).
+# Writes art/icon/icon.png at 1024px from a source image, then every launcher icon of the app at its own size:
+#   - Android legacy ic_launcher, iOS AppIcon (no alpha) and the web icons and favicon: the whole picture
+#   - Android adaptive icon (8.0+): the picture fills the 72dp a launcher can show of the 108dp foreground, over the
+#     sky colour, so any mask shape (circle, squircle) crops only the corners and never moves the subject
+#   - web maskable icons: the picture inside the 80% safe zone, over the sky colour
+#   - art/icon/play-store.png at 512px for the Play listing
 #
-# Usage: samples/last_seen/tools/make-icon.sh
+# Usage: samples/last_seen/tools/make-icon.sh [source.png]   (default: the current art/icon/icon.png)
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")/.." && pwd)
-src="$here/art/icon/icon.png"
+icon="$here/art/icon/icon.png"
+src=${1:-$icon}
+sky=0x05112F
+res="$here/android/app/src/main/res"
 
-L=(10000 10000 10000 10000 10000 10000 11111)
-S=(01111 10000 10000 01110 00001 00001 11110)
-cell=64
-x0=160
-y0=288
+[[ -f "$src" ]] || { echo "no source image: $src" >&2; exit 1; }
+work=$(mktemp -d -t make-icon)
+ffmpeg -hide_banner -loglevel error -y -i "$src" -vf "crop='min(iw,ih)':'min(iw,ih)',scale=1024:1024:flags=lanczos,format=rgb24" \
+  "$work/icon.png"
+mkdir -p "$(dirname "$icon")"
+cp "$work/icon.png" "$icon"
+echo "saved $icon"
 
-# One drawbox per lit cell of both letters, moved by $1 pixels, in colour $2.
-letters() {
-  local shift=$1 color=$2 out=""
-  for row in 0 1 2 3 4 5 6; do
-    for col in 0 1 2 3 4; do
-      local y=$((y0 + row * cell + shift))
-      [[ ${L[$row]:$col:1} == 1 ]] && out+=",drawbox=x=$((x0 + col * cell + shift)):y=$y:w=$cell:h=$cell:c=$color:t=fill"
-      [[ ${S[$row]:$col:1} == 1 ]] && out+=",drawbox=x=$((x0 + (6 + col) * cell + shift)):y=$y:w=$cell:h=$cell:c=$color:t=fill"
-    done
-  done
-  printf '%s' "$out"
+scaled() { ffmpeg -hide_banner -loglevel error -y -i "$icon" -vf "scale=$1:$1:flags=lanczos,format=rgb24" -frames:v 1 "$2"; }
+# The picture at $1 px, centred on a $2 px canvas filled with $3 (a colour, or "transparent").
+inset() {
+  local fill=$3 fmt=rgb24
+  [[ $fill == transparent ]] && { fill=0x00000000; fmt=rgba; }
+  ffmpeg -hide_banner -loglevel error -y -f lavfi -i "color=c=$fill:s=$2x$2,format=$fmt" -i "$icon" \
+    -filter_complex "[1]scale=$1:$1:flags=lanczos[a];[0][a]overlay=($2-$1)/2:($2-$1)/2:format=auto,format=$fmt" \
+    -frames:v 1 "$4"
 }
 
-frame="drawbox=x=72:y=72:w=880:h=880:c=0xF4F1E8:t=24,drawbox=x=112:y=112:w=800:h=800:c=0x6F7BC0:t=8"
-mkdir -p "$(dirname "$src")"
-ffmpeg -hide_banner -loglevel error -y -f lavfi -i "color=c=0x111737:s=1024x1024" \
-  -vf "$frame$(letters 32 0x0A0E1E)$(letters 16 0xFF8FB8)$(letters 0 0xF4F1E8)" -frames:v 1 "$src"
-echo "saved $src"
+scaled 512 "$here/art/icon/play-store.png"
+echo "  art/icon/play-store.png (512)"
 
-# Every existing launcher icon, kept at its size.
-while IFS= read -r icon; do
-  size=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$icon")
-  ffmpeg -hide_banner -loglevel error -y -i "$src" -vf "scale=${size/x/:}:flags=area" -frames:v 1 "$icon"
-  echo "  $icon ($size)"
-done < <(find "$here/android/app/src/main/res" "$here/ios/Runner/Assets.xcassets/AppIcon.appiconset" "$here/web" \
+# Every existing full-picture icon, kept at its size. Maskable web icons get the safe zone instead.
+while IFS= read -r file; do
+  size=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$file")
+  if [[ $file == *maskable* ]]; then
+    inset $((size * 8 / 10)) "$size" "$sky" "$file"
+  else
+    scaled "$size" "$file"
+  fi
+  echo "  ${file#"$here/"} ($size)"
+done < <(find "$res" "$here/ios/Runner/Assets.xcassets/AppIcon.appiconset" "$here/web" \
   \( -name 'ic_launcher.png' -o -name 'Icon-App-*.png' -o -name 'Icon-*.png' -o -name 'favicon.png' \) 2>/dev/null)
+
+# Adaptive icon: a 108dp foreground per density with the picture on its middle 72dp.
+for density in mdpi:1 hdpi:1.5 xhdpi:2 xxhdpi:3 xxxhdpi:4; do
+  name=${density%%:*}
+  scale=${density##*:}
+  canvas=$(awk "BEGIN { print int(108 * $scale) }")
+  inset $((canvas * 2 / 3)) "$canvas" transparent "$res/mipmap-$name/ic_launcher_foreground.png"
+  echo "  mipmap-$name/ic_launcher_foreground.png ($canvas)"
+done
+mkdir -p "$res/mipmap-anydpi-v26"
+cat > "$res/mipmap-anydpi-v26/ic_launcher.xml" <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Written by tools/make-icon.sh. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
+EOF
+echo "  mipmap-anydpi-v26/ic_launcher.xml"

@@ -1,0 +1,7 @@
+Mobile app icon, square 1:1, full-bleed artwork that fills the whole square, no rounded corners drawn in. One clear subject kept inside the central two thirds so it survives a circular crop, and it must still read at 48 pixels: bold silhouette, strong value contrast, very little detail at the edges.
+A lone young woman seen from behind, small, sitting on top of a long concrete seawall at night with her legs over the
+sea side, big over-ear headphones around her neck, wavy dark brown hair tied half up. The seawall runs diagonally
+across the square. One warm street lamp on the wall lights her. Dark navy sea below, a thin band of distant city
+tower lights on the horizon. A strong graphic silhouette, like a film poster reduced to three shapes: wall, figure,
+lamp.
+Style: 1990s TV anime cel look. Flat colors with two-tone cel shading and hard shadow edges, no gradients, no glow, no bloom, no rim light. Clean line art with varied line weight. Limited muted palette of deep navy night, warm lamp amber and one soft pink accent. Simplified shapes. No text, no letters, no logos, no watermark, no border.

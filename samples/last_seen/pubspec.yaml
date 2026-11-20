@@ -19,6 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   purchases_flutter: 11.0.1
+  gal: 2.3.3
   shared_preferences: ^2.5.6
 
 dev_dependencies:
@@ -36,6 +37,7 @@ flutter:
     - assets/story/media/
     - assets/story/music/
     - assets/story/sprites/
+    - assets/wallpapers/
 
   # DotGothic16 (SIL OFL 1.1, assets/fonts/OFL.txt): the dot font of the 90s PC look.
   fonts:

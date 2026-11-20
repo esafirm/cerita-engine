@@ -7,6 +7,7 @@ import 'package:last_seen/store/full_game.dart';
 import 'package:last_seen/store/paywall.dart';
 import 'package:last_seen/store/revenuecat_store.dart';
 import 'package:last_seen/store/store.dart';
+import 'package:last_seen/wallpapers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// The purchases layer, scripted. [owns] is what the store reports, and an unreachable store throws on every call.
@@ -72,21 +73,21 @@ class _FakeStore implements GameStore {
 }
 
 Conversation _conversation(String key, String? chapter) => Conversation(
-      key: key,
-      conversationId: key,
-      conversations: const [],
-      chapterText: chapter == null ? null : LocalizedText.fromJson({"id": chapter, "en": "?"}),
-    );
+  key: key,
+  conversationId: key,
+  conversations: const [],
+  chapterText: chapter == null ? null : LocalizedText.fromJson({"id": chapter, "en": "?"}),
+);
 
 final _day2 = _conversation("d2_morning", "Hari 2");
 final _day3 = _conversation("d3_angke", "Hari 3");
 
 Checkpoint _checkpoint(String key, String chapter) => Checkpoint(
-      conversationKey: key,
-      chapter: LocalizedText.fromJson({"id": chapter, "en": "?"}),
-      dataMap: const {},
-      unlockedAt: DateTime(2026),
-    );
+  conversationKey: key,
+  chapter: LocalizedText.fromJson({"id": chapter, "en": "?"}),
+  dataMap: const {},
+  unlockedAt: DateTime(2026),
+);
 
 /// A FullGame on a fresh install (or on [storage], the progress an older version left), loaded.
 Future<FullGame> _load(_FakeStore store, {StoryStorage? storage, bool tester = false}) async {
@@ -232,14 +233,16 @@ void main() {
   group('the paywall', () {
     Future<FullGame> pump(WidgetTester tester, _FakeStore store, {required VoidCallback onUnlocked}) async {
       final fullGame = await tester.runAsync(() => _load(store));
-      await tester.pumpWidget(MaterialApp(
-        home: StoryLanguageScope(
-          language: StoryLanguage(),
-          child: Scaffold(
-            body: Paywall(fullGame: fullGame!, chapter: "Day 3", onUnlocked: onUnlocked, onLeave: () {}),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StoryLanguageScope(
+            language: StoryLanguage(),
+            child: Scaffold(
+              body: Paywall(fullGame: fullGame!, chapter: "Day 3", onUnlocked: onUnlocked, onLeave: () {}),
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
       return fullGame;
     }
@@ -291,6 +294,67 @@ void main() {
 
     test('no key, no store', () {
       expect(RevenueCatStore.usable("", debug: true), isFalse);
+    });
+  });
+
+  group('wallpapers', () {
+    Future<void> pump(WidgetTester tester, {required bool owned, VoidCallback? onLocked, WallpaperSaver? save}) async {
+      final fullGame = await tester.runAsync(() => _load(_FakeStore(owns: owned)));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StoryLanguageScope(
+            language: StoryLanguage(),
+            child: WallpapersScreen(
+              fullGame: fullGame!,
+              onLocked: onLocked ?? () {},
+              save: save ?? (bytes, name) async {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('are part of the full game: a locked one opens the paywall', (tester) async {
+      var paywall = 0;
+      await pump(tester, owned: false, onLocked: () => paywall++);
+      expect(find.text("Game lengkap"), findsNWidgets(wallpapers.length));
+
+      await tester.tap(find.text("Tanggul"));
+      await tester.pumpAndSettle();
+      expect(paywall, 1);
+      expect(find.byType(WallpaperViewer), findsNothing);
+    });
+
+    testWidgets('an owner opens one and saves it to the photos', (tester) async {
+      final saved = <String, int>{};
+      await pump(tester, owned: true, save: (bytes, name) async => saved[name] = bytes.length);
+      expect(find.text("Game lengkap"), findsNothing);
+
+      await tester.tap(find.text("Menoleh"));
+      await tester.pumpAndSettle();
+      expect(find.byType(WallpaperViewer), findsOneWidget);
+
+      await tester.runAsync(() async {
+        await tester.tap(find.text("SIMPAN KE GALERI"));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pumpAndSettle();
+      expect(saved.keys, ["wallpaper_lookback"]);
+      expect(saved["wallpaper_lookback"], greaterThan(10000));
+      expect(find.textContaining("Tersimpan."), findsOneWidget);
+    });
+
+    testWidgets('says how to fix it when photo access is denied', (tester) async {
+      await pump(tester, owned: true, save: (bytes, name) async => throw const WallpaperSaveException(denied: true));
+      await tester.tap(find.text("Tak Terkirim"));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        await tester.tap(find.text("SIMPAN KE GALERI"));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pumpAndSettle();
+      expect(find.textContaining("Izinkan di pengaturan HP"), findsOneWidget);
     });
   });
 }

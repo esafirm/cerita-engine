@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="night">#FF0A0E1E</color>
+    <!-- The night sky of the app icon, behind its adaptive foreground. Written for tools/make-icon.sh. -->
+    <color name="ic_launcher_background">#FF05112F</color>
 </resources>

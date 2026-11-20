@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Saving a bonus wallpaper to the gallery (gal) on Android 10 and older. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
     <application
         android:label="Seawall"
         android:name="${applicationName}"

@@ -1120,7 +1120,28 @@ seawall, and the seawall stands for the reclamation plot at the heart of the mys
 - **Story text keeps "last seen":** those lines are the chat app's status and Sekar's missing-person notice, not the
   title.
 - **Not yet renamed:** the iOS display name (`ios/Runner/Info.plist`), left to the thread getting iOS to build, and
-  the "LS" app icon, which is being redrawn.
+  the "LS" app icon, which is being redrawn (see the next entry).
+
+## Seawall's icon and bonus wallpapers
+
+*2026-11-21.*
+
+The app icon is Sekar from behind, sitting on the seawall at night under one street lamp (`art/prompts/icon.txt`).
+It was picked over a close-up of her face and over her phone on the wall. Those two, and the icon's scene
+drawn tall, are three phone wallpapers in Extras.
+
+- **One picture, every icon:** `tools/make-icon.sh` writes every launcher size from `art/icon/icon.png`. On Android 8+
+  the icon is adaptive: the picture fills the 72dp a launcher can show, over the sky colour, so a circle or squircle
+  mask only trims the corners. The Play listing icon is `art/icon/play-store.png`.
+- **Off-model on purpose:** the icon's Sekar wears a pink shirt, not her olive jacket. It reads better at icon size,
+  and the user chose it knowing that.
+- **Wallpapers come with the full game:** they're bonus content, so a free player sees them dimmed under a lock, and
+  a tap opens the paywall. The paywall's pitch names them. Moving them out is the `fullGame.unlocked` check in
+  `WallpapersScreen`.
+- **Save, don't set:** *Save to photos* (`gal` 2.3.3, the newest release at least two weeks old) works the same on
+  Android and iOS, and the player sets the wallpaper from their photos. Setting it directly would be Android only.
+  It needs `WRITE_EXTERNAL_STORAGE` up to Android 10, and the photo library keys in `Info.plist`.
+- **JPEG, not WebP:** the files go to the player's photos as they are, and every gallery app opens a JPEG.
 
 ## The engine gates conversations, the app decides why
 

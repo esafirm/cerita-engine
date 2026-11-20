@@ -6,6 +6,10 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Saves the bonus wallpapers you pick to your photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Saves the bonus wallpapers you pick to your photos.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Last Seen</string>
 	<key>CFBundleExecutable</key>

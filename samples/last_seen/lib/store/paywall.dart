@@ -98,9 +98,9 @@ class _PaywallState extends State<Paywall> {
   }
 
   void _retry() => setState(() {
-        _message = null;
-        _offer = _fullGame.offer();
-      });
+    _message = null;
+    _offer = _fullGame.offer();
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -136,13 +136,14 @@ class _PaywallState extends State<Paywall> {
                     ],
                     Text(text.pitch, style: Retro.text.copyWith(fontSize: 15)),
                     const SizedBox(height: 16),
-                    FutureBuilder(
-                      future: _offer,
-                      builder: (context, snapshot) => _actions(context, snapshot),
-                    ),
+                    FutureBuilder(future: _offer, builder: (context, snapshot) => _actions(context, snapshot)),
                     if (_message case final message?) ...[
                       const SizedBox(height: 8),
-                      Text(message, textAlign: TextAlign.center, style: Retro.text.copyWith(color: Retro.narration)),
+                      Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: Retro.text.copyWith(color: Retro.narration),
+                      ),
                     ],
                     const SizedBox(height: 4),
                     TextButton(
@@ -176,7 +177,10 @@ class _PaywallState extends State<Paywall> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (snapshot.hasError)
-          TextButton(onPressed: _retry, child: Text(text.offline, textAlign: TextAlign.center))
+          TextButton(
+            onPressed: _retry,
+            child: Text(text.offline, textAlign: TextAlign.center),
+          )
         else if (offer == null)
           Text(text.notOnSale, textAlign: TextAlign.center, style: status)
         else
@@ -210,10 +214,10 @@ class _Text {
       en ? "$chapter is part of the full game." : "$chapter termasuk dalam game lengkap.";
 
   String get pitch => en
-      ? "The Prologue, Day 1 and Day 2 are free. One purchase opens Day 3 to Day 7 and all ten endings. "
-          "No ads, no subscription."
-      : "Prolog, Hari 1 dan Hari 2 gratis. Sekali beli, Hari 3 sampai Hari 7 dan kesepuluh ending terbuka. "
-          "Tanpa iklan, tanpa langganan.";
+      ? "The Prologue, Day 1 and Day 2 are free. One purchase opens Day 3 to Day 7, all ten endings and the bonus "
+            "wallpapers. No ads, no subscription."
+      : "Prolog, Hari 1 dan Hari 2 gratis. Sekali beli, Hari 3 sampai Hari 7, kesepuluh ending "
+            "dan wallpaper bonus terbuka. Tanpa iklan, tanpa langganan.";
 
   String unlock(String price) => en ? "UNLOCK · $price" : "BUKA · $price";
   String get restore => en ? "Restore purchase" : "Pulihkan pembelian";

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'store/full_game.dart';
 import 'store/paywall.dart';
 import 'ui/retro.dart';
+import 'wallpapers.dart';
 
 /// The Last Seen title screen: key art and logo with a blinking "tap to start", then a text menu with a cursor.
 class TitleScreen extends StatefulWidget {
@@ -65,7 +66,11 @@ class _TitleScreenState extends State<TitleScreen> {
 
   void _openPaywall() {
     void close() => Navigator.of(context).pop();
-    _push(Scaffold(body: Paywall(fullGame: widget.fullGame, onUnlocked: close, onLeave: close)));
+    _push(
+      Scaffold(
+        body: Paywall(fullGame: widget.fullGame, onUnlocked: close, onLeave: close),
+      ),
+    );
   }
 
   void _playMusic() {
@@ -122,6 +127,10 @@ class _TitleScreenState extends State<TitleScreen> {
     if (_extras) {
       return [
         (strings.gallery, () => _push(GalleryScreen(setup: setup))),
+        (
+          en ? "Wallpapers" : "Wallpaper",
+          () => _push(WallpapersScreen(fullGame: widget.fullGame, onLocked: _openPaywall)),
+        ),
         (strings.endings, () => _push(EndingsScreen(setup: setup))),
         if (_credits != null) (strings.credits, () => _push(CreditsScreen(setup: setup))),
         (strings.back, () => _showExtras(false)),
