@@ -25,6 +25,13 @@ const wallpapers = [
   Wallpaper("wallpaper_seawall", "Tanggul", "Seawall"),
   Wallpaper("wallpaper_lookback", "Menoleh", "Looking Back"),
   Wallpaper("wallpaper_undelivered", "Tak Terkirim", "Undelivered"),
+  Wallpaper("wallpaper_dawn", "Subuh", "Dawn"),
+  Wallpaper("wallpaper_studio", "Studio Kamar", "Bedroom Studio"),
+  Wallpaper("wallpaper_awake", "Belum Tidur", "Still Awake"),
+  Wallpaper("wallpaper_crossing", "Penyeberangan", "The Crossing"),
+  Wallpaper("wallpaper_warung", "Warung Malam", "Night Warung"),
+  Wallpaper("wallpaper_rooftop", "Di Atap", "Rooftop"),
+  Wallpaper("wallpaper_storm", "Badai", "Storm"),
 ];
 
 /// Puts an image into the device's photos. Throws [WallpaperSaveException] when it can't.

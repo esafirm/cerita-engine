@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
@@ -300,6 +301,14 @@ void main() {
   });
 
   group('wallpapers', () {
+    test('every one has its picture, and every picture is listed', () {
+      final listed = {for (final wallpaper in wallpapers) wallpaper.asset};
+      final files = Directory(
+        "assets/wallpapers",
+      ).listSync().map((file) => file.path).where((path) => path.endsWith(".jpg"));
+      expect(files.toSet(), listed);
+    });
+
     Future<void> pump(WidgetTester tester, {required bool owned, VoidCallback? onLocked, WallpaperSaver? save}) async {
       final fullGame = await tester.runAsync(() => _load(_FakeStore(owns: owned)));
       await tester.pumpWidget(
@@ -320,7 +329,8 @@ void main() {
     testWidgets('are part of the full game: a locked one opens the paywall', (tester) async {
       var paywall = 0;
       await pump(tester, owned: false, onLocked: () => paywall++);
-      expect(find.text("Game lengkap"), findsNWidgets(wallpapers.length));
+      expect(find.text("Game lengkap"), findsWidgets);
+      expect(find.text("Tak Terkirim"), findsOneWidget);
 
       await tester.tap(find.text("Tanggul"));
       await tester.pumpAndSettle();

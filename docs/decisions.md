@@ -1142,6 +1142,10 @@ drawn tall, are three phone wallpapers in Extras.
   Android and iOS, and the player sets the wallpaper from their photos. Setting it directly would be Android only.
   It needs `WRITE_EXTERNAL_STORAGE` up to Android 10, and the photo library keys in `Info.plist`.
 - **JPEG, not WebP:** the files go to the player's photos as they are, and every gallery app opens a JPEG.
+- **Ten wallpapers:** seven more joined on 2026-11-22, from places in the story: the Muara Angke harbor at dawn,
+  Sekar's desk, Raka awake on his bed, the ferry deck, a warung at night, Sekar on a rooftop and the storm. All at
+  night, dusk or dawn, so they share the palette. Nothing from Pulau Pari, which would give the true route away.
+  `codex-image.sh wallpapers/<name>.jpg` writes one straight to `assets/wallpapers/`.
 
 ## Seawall's alternate app icons
 

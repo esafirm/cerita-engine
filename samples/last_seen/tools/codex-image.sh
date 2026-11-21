@@ -7,7 +7,8 @@
 #   - this script copies the image out of ~/.codex/generated_images, not Codex
 #
 # Usage: samples/last_seen/tools/codex-image.sh <asset> [style-ref.png]
-#   <asset> is the asset path under assets/story, e.g. bg/bg_seawall_night.png. Its prompt is
+#   <asset> is the asset path under assets/story, e.g. bg/bg_seawall_night.png, or wallpapers/<name>.jpg for a bonus
+#   wallpaper in assets/wallpapers. Its prompt is
 #   art/prompts/<asset name>.txt, kept in git so any image can be regenerated. The image replaces the placeholder.
 # Prints the Codex token usage line. Exit 1 if no image was produced.
 set -euo pipefail
@@ -17,7 +18,6 @@ asset=$1
 ref=${2:-}
 name=$(basename "${asset%.*}")
 prompt_file="$here/art/prompts/$name.txt"
-out="$here/assets/story/$asset"
 
 [[ -f "$prompt_file" ]] || { echo "no prompt: $prompt_file" >&2; exit 1; }
 [[ -z "$ref" || -f "$ref" ]] || { echo "no style reference: $ref" >&2; exit 1; }
@@ -46,6 +46,6 @@ if [[ -z "$img" ]]; then
 fi
 # The untouched image goes to art/.raw/ (git-ignored), so it can be keyed or graded again without a new run.
 raw="$here/art/.raw/$name.png"
-mkdir -p "$(dirname "$out")" "$(dirname "$raw")"
+mkdir -p "$(dirname "$raw")"
 cp "$img" "$raw"
 "$(dirname "$0")/finish-image.sh" "$raw" "$asset"
