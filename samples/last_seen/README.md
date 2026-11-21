@@ -16,8 +16,9 @@ Dart package, the `*-last-seen` make targets and the package ID `id.twk.lastseen
 | `art/style-guide.md` | Look, framing, prompt templates and the cast sheet |
 | `art/prompts/` | One prompt per generated image, so any image can be made again |
 | `art/placeholders.txt` | Every placeholder made so far, for `tools/placeholders.sh --list` |
-| `tools/` | The image, voice and placeholder scripts, `make-icon.sh` for every app icon size from `art/icon/icon.png` and `ui-sounds.sh` for the menu blips |
+| `tools/` | The image, voice and placeholder scripts, `make-icon.sh` for every app icon size from `art/icon/icon.png` (and `--alt <name>` for the alternate icons) and `ui-sounds.sh` for the menu blips |
 | `assets/wallpapers/` | The bonus wallpapers in Extras, part of the full game. Prompts in `art/prompts/wallpaper_*.txt` |
+| `assets/icons/` | The previews in Extras → App icon, where players pick the launcher icon (Android). The alternates are part of the full game, see the decisions log |
 | `lib/ui/` | The 90s PC look: `RetroSkin` for the story, the framed `RetroWindow`, the theme and the menu blips |
 | `assets/fonts/` | DotGothic16, the dot font (SIL OFL 1.1) |
 

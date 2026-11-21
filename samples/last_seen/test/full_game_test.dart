@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:last_seen/app_icons.dart';
 import 'package:last_seen/store/full_game.dart';
 import 'package:last_seen/store/paywall.dart';
 import 'package:last_seen/store/revenuecat_store.dart';
@@ -355,6 +357,75 @@ void main() {
       });
       await tester.pumpAndSettle();
       expect(find.textContaining("Izinkan di pengaturan HP"), findsOneWidget);
+    });
+  });
+
+  group('app icons', () {
+    const channel = MethodChannel("seawall/app_icon");
+
+    /// The Android side: [current] is the icon in use, [calls] what Dart asked for.
+    Future<List<MethodCall>> pump(
+      WidgetTester tester, {
+      required bool owned,
+      String current = "seawall",
+      VoidCallback? onLocked,
+      bool fail = false,
+    }) async {
+      final calls = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        if (call.method == "set" && fail) throw PlatformException(code: "unknown_icon");
+        return call.method == "current" ? current : null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, null));
+      final fullGame = await tester.runAsync(() => _load(_FakeStore(owns: owned)));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StoryLanguageScope(
+            language: StoryLanguage(),
+            child: AppIconsScreen(fullGame: fullGame!, onLocked: onLocked ?? () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return calls;
+    }
+
+    testWidgets('the main icon is free, the others are part of the full game', (tester) async {
+      var paywall = 0;
+      final calls = await pump(tester, owned: false, onLocked: () => paywall++);
+      expect(find.text("Dipakai"), findsOneWidget);
+      expect(find.text("Game lengkap"), findsNWidgets(appIcons.length - 1));
+
+      await tester.tap(find.text("Menoleh"));
+      await tester.pumpAndSettle();
+      expect(paywall, 1);
+      expect(calls.map((call) => call.method), ["current"]);
+    });
+
+    testWidgets('an owner switches the icon', (tester) async {
+      final calls = await pump(tester, owned: true, current: "lookback");
+      expect(find.bySemanticsLabel("Menoleh, Dipakai"), findsOneWidget);
+
+      await tester.tap(find.text("Tak Terkirim"));
+      await tester.pumpAndSettle();
+      expect(calls.last.method, "set");
+      expect(calls.last.arguments, "undelivered");
+      expect(find.bySemanticsLabel("Tak Terkirim, Dipakai"), findsOneWidget);
+      expect(find.textContaining("Beres."), findsOneWidget);
+
+      // The one in use again: nothing to do.
+      await tester.tap(find.text("Tak Terkirim"));
+      await tester.pumpAndSettle();
+      expect(calls.where((call) => call.method == "set"), hasLength(1));
+    });
+
+    testWidgets('says so when the switch fails', (tester) async {
+      await pump(tester, owned: true, fail: true);
+      await tester.tap(find.text("Menoleh"));
+      await tester.pumpAndSettle();
+      expect(find.text("Gagal mengganti ikon."), findsOneWidget);
+      expect(find.bySemanticsLabel("Tanggul, Dipakai"), findsOneWidget);
     });
   });
 }

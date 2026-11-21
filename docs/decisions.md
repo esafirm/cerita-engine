@@ -1143,6 +1143,24 @@ drawn tall, are three phone wallpapers in Extras.
   It needs `WRITE_EXTERNAL_STORAGE` up to Android 10, and the photo library keys in `Info.plist`.
 - **JPEG, not WebP:** the files go to the player's photos as they are, and every gallery app opens a JPEG.
 
+## Seawall's alternate app icons
+
+*2026-11-22.*
+
+The close-up of Sekar and her phone on the wall are also app icons. Players pick one in Extras → App icon
+(`lib/app_icons.dart`). The main icon is free, the other two come with the full game, like the wallpapers.
+
+- **Android only for now:** each icon is a launcher entry in the manifest. MainActivity keeps its own entry for the
+  main icon, because `flutter run` only finds the app through an `<activity>` with a launcher entry. The others are
+  activity-aliases, off until picked. iOS needs alternate icons set up in the Xcode project, so the entry is hidden
+  there for now.
+- **The switch waits for the player to leave:** Android closed the game as soon as the entry it was opened through
+  went off, even with `DONT_KILL_APP`. So MainActivity keeps the pick and switches on Home, Recents, another app or
+  Back out of the game. Not when the screen turns off or a dialog opens on top, since the player didn't leave then. The pick survives a restart until it's applied.
+- **No plugin:** it's one component switch, about 60 lines in MainActivity, and the timing stays ours.
+- **A dev catch:** with an alternate icon on, MainActivity is off, so `flutter run` can't start it. Pick the main icon
+  again, or reinstall after `adb uninstall`.
+
 ## The engine gates conversations, the app decides why
 
 *2026-11-20. Engine and state §8.1.*

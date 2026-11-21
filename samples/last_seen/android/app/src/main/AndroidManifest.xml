@@ -27,6 +27,32 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- The alternate app icons players can pick in Extras (lib/app_icons.dart). Each is a launcher entry for
+             MainActivity, off until picked. MainActivity keeps its own launcher entry for the main icon, which
+             `flutter run` needs to find the app. MainActivity.kt turns the picked one on and the others off once the
+             player leaves the game. -->
+        <activity-alias
+            android:name=".IconLookback"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_lookback"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".IconUndelivered"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_undelivered"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

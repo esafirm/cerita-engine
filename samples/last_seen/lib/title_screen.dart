@@ -1,6 +1,7 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
 
+import 'app_icons.dart';
 import 'store/full_game.dart';
 import 'store/paywall.dart';
 import 'ui/retro.dart';
@@ -131,6 +132,11 @@ class _TitleScreenState extends State<TitleScreen> {
           en ? "Wallpapers" : "Wallpaper",
           () => _push(WallpapersScreen(fullGame: widget.fullGame, onLocked: _openPaywall)),
         ),
+        if (const AppIconSwitch().supported)
+          (
+            en ? "App icon" : "Ikon aplikasi",
+            () => _push(AppIconsScreen(fullGame: widget.fullGame, onLocked: _openPaywall)),
+          ),
         (strings.endings, () => _push(EndingsScreen(setup: setup))),
         if (_credits != null) (strings.credits, () => _push(CreditsScreen(setup: setup))),
         (strings.back, () => _showExtras(false)),

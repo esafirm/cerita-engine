@@ -1,0 +1,6 @@
+Mobile app icon, square 1:1, full-bleed artwork that fills the whole square, no rounded corners drawn in. One clear subject kept inside the central two thirds so it survives a circular crop, and it must still read at 48 pixels: bold silhouette, strong value contrast, very little detail at the edges.
+A smartphone lying face up on the rough concrete top of a seawall at night, slightly angled, its screen glowing softly
+and showing only one chat bubble with a single grey check mark (sent, never delivered). A small claw hair clip lies
+next to the phone. Dark navy sea at the top edge of the frame, one warm lamp light falling across the concrete.
+Simple, iconic, the phone screen is the brightest shape.
+Style: 1990s TV anime cel look. Flat colors with two-tone cel shading and hard shadow edges, no gradients, no glow, no bloom, no rim light. Clean line art with varied line weight. Limited muted palette of deep navy night, warm lamp amber and one soft pink accent. Simplified shapes. No text, no letters, no logos, no watermark, no border.
