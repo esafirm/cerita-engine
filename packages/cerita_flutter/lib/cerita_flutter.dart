@@ -38,6 +38,7 @@ export 'src/skin/story_skin.dart';
 export 'src/story_controller.dart';
 export 'src/story_screen.dart';
 export 'src/story_setup.dart';
+export 'src/vn/cg_layer.dart';
 export 'src/vn/dialogue_box.dart';
 export 'src/vn/nvl_page.dart';
 export 'src/vn/poi.dart';

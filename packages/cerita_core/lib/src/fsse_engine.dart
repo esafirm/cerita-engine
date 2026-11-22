@@ -753,9 +753,15 @@ class RealFsseEngine extends FsseEngine {
   }
 
   Future<void> _registerUnlocks(ItemType item) async {
-    if (item is MediaItemType && item.unlockId != null && meta.unlockedMediaIds.add(item.unlockId!)) {
+    final unlocks = [
+      if (item is MediaItemType) item,
+      if (item is StageItemType)
+        for (final action in item.actions.whereType<CgAction>()) ?action.galleryItem,
+    ];
+    for (final media in unlocks) {
+      if (media.unlockId == null || !meta.unlockedMediaIds.add(media.unlockId!)) continue;
       await storage?.saveMeta(meta);
-      listener?.onMediaUnlocked(item);
+      listener?.onMediaUnlocked(media);
     }
     if (item is EndingItemType) {
       meta.unlockedEndingIds.add(item.endingId);

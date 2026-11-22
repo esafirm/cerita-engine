@@ -250,6 +250,18 @@ ending end GOOD
     ]);
   });
 
+  test('broken cg and cg_move lines are reported', () {
+    final result = compileStory(story({
+      "a.cerita": "@conversation index\nstage\n  cg none unlock=x\n  cg storm.png zoom=0.8 focus=up\n  cg_move duration=2s\n",
+    }));
+    expect(result.diagnostics.sorted().map((d) => d.format()), [
+      "a.cerita:3: error: cg none has nothing to unlock",
+      "a.cerita:4: error: Unknown focus 'up'. Use center, left, right, top, bottom, top_left, top_right, bottom_left, bottom_right",
+      "a.cerita:4: error: zoom must be 1 or more: below 1 the CG no longer fills the screen",
+      "a.cerita:5: error: cg_move needs zoom= or focus=, e.g. cg_move zoom=1.3 focus=top duration=8s",
+    ]);
+  });
+
   test('statements under a broken @conversation belong to no conversation', () {
     final project = story({"a.cerita": "@conversation index\nending end GOOD\n  en: E\n@conversation bad-key\nnarration\n  en: Lost\n"});
     expect(project.conversations.single.items, hasLength(1));

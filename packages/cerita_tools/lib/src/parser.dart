@@ -20,6 +20,9 @@ const _mediaTypes = {"IMAGE", "AUDIO", "VIDEO", "CG"};
 const _positions = ["far_left", "left", "center", "right", "far_right"];
 const _textboxStyles = {"adv", "nvl"};
 const _weathers = {"rain", "snow", "sakura"};
+const _cgFocuses = [
+  "center", "left", "right", "top", "bottom", "top_left", "top_right", "bottom_left", "bottom_right", //
+];
 const _transitions = {
   "fade", "dissolve", "fade_black", "slide_left", "slide_right", "slide_up", "zoom", "wipe_left", "wipe_right", //
   "none",
@@ -628,6 +631,20 @@ class ScriptParser {
       return null;
     }
 
+    /// `zoom=` and `focus=` of a CG camera.
+    void cgCamera() {
+      final zoom = number("zoom");
+      if (zoom != null) {
+        zoom >= 1 ? fields["zoom"] = zoom : _error(span, "zoom must be 1 or more: below 1 the CG no longer fills the screen");
+      }
+      final focus = st.take("focus");
+      if (focus != null) {
+        _cgFocuses.contains(focus)
+            ? fields["focus"] = focus
+            : _error(span, "Unknown focus '$focus'. Use ${_cgFocuses.join(", ")}");
+      }
+    }
+
     switch (name) {
       case "show":
         profile(idOnly: false);
@@ -641,6 +658,20 @@ class ScriptParser {
         position(isRequired: true);
       case "background":
         nullable("image", "an image or none");
+      case "cg":
+        nullable("image", "an image or none");
+        if (fields["image"] == null) {
+          if (st.take("unlock") != null) _error(span, "cg none has nothing to unlock");
+        } else {
+          final unlock = st.take("unlock");
+          if (unlock != null) fields["unlock_id"] = unlock;
+        }
+        cgCamera();
+      case "cg_move":
+        cgCamera();
+        if (!fields.containsKey("zoom") && !fields.containsKey("focus")) {
+          _error(span, "cg_move needs zoom= or focus=, e.g. cg_move zoom=1.3 focus=top duration=8s");
+        }
       case "music" || "ambience":
         nullable("file", "a file or none");
       case "sound":

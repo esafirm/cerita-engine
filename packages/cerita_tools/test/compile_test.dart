@@ -136,6 +136,9 @@ stage wait=0
   shake intensity=8 duration=400
   flash color=#E05050
   zoom 1.2 focus=left
+  cg cg_storm.png unlock=cg_storm focus=left transition=dissolve
+  cg_move zoom=1.3 focus=top_right duration=8s
+  cg none
   textbox adv
   page
   +staged
@@ -191,6 +194,9 @@ return
         {"action": "shake", "intensity": 8, "duration_ms": 400},
         {"action": "flash", "color": "#E05050"},
         {"action": "zoom", "scale": 1.2, "focus": "left"},
+        {"action": "cg", "image": "cg_storm.png", "unlock_id": "cg_storm", "focus": "left", "transition": "dissolve"},
+        {"action": "cg_move", "zoom": 1.3, "focus": "top_right", "duration_ms": 8000},
+        {"action": "cg", "image": null},
         {"action": "textbox", "style": "adv"},
         {"action": "page"},
       ],

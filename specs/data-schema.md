@@ -468,6 +468,8 @@ Runs a list of `actions` on the VN stage at once, then continues by itself once 
 | `clear` | `transition`? | Removes every character. |
 | `move` | `profile` (`<id>`), `position` | Slides a character to another slot. |
 | `background` | `image` (null for black), `transition`? | Changes the background without starting a new conversation. |
+| `cg` | `image` (null hides it), `unlock_id`?, `zoom`?, `focus`?, `transition`? | Holds a full-screen CG (a file in `bg/`) over the stage while the lines after it play, until the next `cg`, a `cg` with a null `image`, or a new conversation with its own `scene`. A new `image` cross-fades over the one shown: a variant of the same moment keeps the camera, so the two line up. A CG shown over none starts at `zoom` (default `1`, at least `1`) towards `focus` (default `"center"`). `unlock_id` adds it to the Gallery, like a `MEDIA` CG. |
+| `cg_move` | `zoom`?, `focus`?, `duration_ms` | Eases the camera on the CG to `zoom` and `focus` over `duration_ms`: a slow push-in or a pan. The story doesn't wait for it, so it plays on under the next lines. With a `cg` in the same `STAGE`, the move starts from that `cg`'s framing. |
 | `music` | `file` (null stops), `fade_ms`? | Changes the looping BGM. The old track fades out and the new one fades in, over `fade_ms` (default `1000`, `0` cuts). |
 | `ambience` | `file` (null stops), `fade_ms`? | Changes the looping background sound, faded like `music`. |
 | `sound` | `file` | Plays a one-shot sound effect. Sounds can overlap. |
@@ -480,9 +482,11 @@ Runs a list of `actions` on the VN stage at once, then continues by itself once 
 
 Every action takes an optional `duration_ms`. `transition` is one of `"fade"` (default), `"dissolve"`, `"fade_black"` (backgrounds), `"slide_left"`, `"slide_right"`, `"slide_up"`, `"zoom"`, `"wipe_left"`, `"wipe_right"` or `"none"`.
 
+A CG `focus` is `"center"`, `"left"`, `"right"`, `"top"`, `"bottom"`, `"top_left"`, `"top_right"`, `"bottom_left"` or `"bottom_right"`: the part of the image kept in view. The CG covers the screen, cropped like a background, so `focus` alone pans across the part that doesn't fit (a portrait CG on a taller phone, a landscape one anywhere), and `zoom` pushes in towards it. A `MEDIA` CG (§4.3) shows for its own line only.
+
 Characters come on stage through `show` and through a `TEXT` speaker who isn't there yet (§4.1). A `CHOICE`, `INPUT` or `MEDIA` `profile` and an `offstage` line don't add anyone.
 
-The stage (background, characters, music, ambience, weather, zoom, text box and NVL page) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene.
+The stage (background, characters, CG and its camera, music, ambience, weather, zoom, text box and NVL page) is part of the playthrough and is saved. Starting a conversation whose `scene` has another background or mode resets it to that scene. A CG is taken away by any new `scene`.
 
 ---
 

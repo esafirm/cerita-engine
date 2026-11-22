@@ -4,6 +4,7 @@ import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../skin/story_skin.dart';
+import 'cg_layer.dart';
 import 'stage_transitions.dart';
 import 'weather_layer.dart';
 
@@ -80,8 +81,8 @@ class PoiCast {
   ({double top, double bottom}) _spanOf(PoiActor actor) => span(actor.height ?? tallest, actor.head);
 }
 
-/// [Poi] draws the VN stage: background, up to five characters, weather and the camera
-/// (zoom, shake, flash). The active speaker is full opacity and slightly larger; others are dimmed.
+/// [Poi] draws the VN stage: background, up to five characters, weather, a held CG ([CgLayer]) and the camera
+/// (zoom, shake, flash). The CG covers the rest of the stage but still shakes and flashes with it. The active speaker is full opacity and slightly larger; others are dimmed.
 ///
 /// [direction] is the `STAGE` item being played. Its transitions are used for the changes it
 /// makes, and its shake / flash play once when it arrives.
@@ -95,6 +96,11 @@ class Poi extends StatefulWidget {
   final double zoom;
   final SpritePosition zoomFocus;
   final String? weather;
+
+  /// Asset path of the CG held over the stage, and its camera. See [CgLayer].
+  final String? cg;
+  final double cgZoom;
+  final CgFocus cgFocus;
 
   /// Applies every change without animating, e.g. while skipping.
   final bool instant;
@@ -112,6 +118,9 @@ class Poi extends StatefulWidget {
     this.zoom = 1,
     this.zoomFocus = SpritePosition.center,
     this.weather,
+    this.cg,
+    this.cgZoom = 1,
+    this.cgFocus = CgFocus.center,
     this.instant = false,
     this.cast,
   });
@@ -320,6 +329,13 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
             children: [
               stage,
               if (widget.weather != null) WeatherLayer(weather: widget.weather!),
+              CgLayer(
+                image: widget.cg,
+                zoom: widget.cgZoom,
+                focus: widget.cgFocus,
+                direction: widget.direction,
+                instant: widget.instant,
+              ),
             ],
           ),
           builder: (context, child) {

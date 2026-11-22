@@ -317,9 +317,11 @@ stage wait=0
 | `weather rain\|snow\|sakura\|none` | `weather` |
 | `shake intensity=<px>` / `flash color=#RRGGBB` | `shake` / `flash` |
 | `zoom [<scale>] [focus=<position>]` | `zoom` |
+| `cg <image>\|none [unlock=<id>] [zoom=<scale>] [focus=<focus>]` | `cg` |
+| `cg_move [zoom=<scale>] [focus=<focus>] duration=<time>` | `cg_move` |
 | `textbox adv\|nvl` / `page` | `textbox` / `page` |
 
-Positions are `far_left`, `left`, `center`, `right` and `far_right`. A `stage` body can also hold effect lines.
+Positions are `far_left`, `left`, `center`, `right` and `far_right`. A CG focus is `center`, `left`, `right`, `top`, `bottom`, `top_left`, `top_right`, `bottom_left` or `bottom_right`. A `stage` body can also hold effect lines.
 
 ### 2.7 Locales (CE-01)
 

@@ -362,6 +362,8 @@ class StoryLinter {
                   character(key, index, profile, at);
                 case BackgroundAction(:final image):
                   asset(key, index, image, config.bg, "background", at);
+                case CgAction(:final image):
+                  asset(key, index, image, config.bg, "cg", at);
                 case MusicAction(:final file) || AmbienceAction(:final file):
                   asset(key, index, file, config.music, "music", at);
                 case SoundAction(:final file):

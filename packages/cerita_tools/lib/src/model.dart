@@ -298,13 +298,16 @@ class StageAction {
   StageAction(this.action, this.span);
 
   /// How long the action runs, counted like the engine: an explicit `duration_ms`, else 0 with the `none`
-  /// transition, 400 for `shake` and `flash`, and 500 otherwise.
+  /// transition, 400 for `shake` and `flash`, and 500 otherwise. See [blockingMs] for how long the story waits.
   int get durationMs {
     final explicit = fields["duration_ms"];
     if (explicit is int) return explicit;
     if (fields["transition"] == "none") return 0;
     return action == "shake" || action == "flash" ? 400 : 500;
   }
+
+  /// How long the story waits for the action: a `cg_move` plays on under the lines after it.
+  int get blockingMs => action == "cg_move" ? 0 : durationMs;
 }
 
 class StageItem extends ItemNode {
@@ -313,9 +316,9 @@ class StageItem extends ItemNode {
 
   StageItem(super.span);
 
-  /// [waitMs], or the longest action.
+  /// [waitMs], or the longest [StageAction.blockingMs].
   int get effectiveWaitMs =>
-      waitMs ?? actions.fold(0, (longest, action) => action.durationMs > longest ? action.durationMs : longest);
+      waitMs ?? actions.fold(0, (longest, action) => action.blockingMs > longest ? action.blockingMs : longest);
 
   @override
   String get type => "STAGE";

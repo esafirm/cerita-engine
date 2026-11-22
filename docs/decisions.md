@@ -1195,6 +1195,33 @@ runtime or CoreSimulator can't fix that.
   iOS 26 simulator runtime. Not done yet: the owner chose to leave iOS for now.
 - **Signing:** a team still has to be set in `ios/Runner.xcworkspace` before a device or App Store build.
 
+## Held CGs and the CG camera
+
+*2026-11-22.*
+
+A `MEDIA` CG shows for its own line only, so a VN-style CG scene (an illustration that stays while several lines
+play over it, maybe stepping through variants) wasn't possible. The `cg` stage action holds one, and `cg_move`
+pans or pushes in on it.
+
+- **A stage action, not a `MEDIA` flag:** a held CG is stage state, like the background. It saves, rolls back and
+  clears with the scene for free, and `cg none` reads like `background none`. `MEDIA` CG keeps its one-line
+  behavior, so Seawall's ten CGs look the same until they're moved over.
+- **A variant keeps the camera:** a `cg` swapped in for the one shown keeps its zoom and focus unless given, so
+  the two line up while they cross-fade. Only a CG over none starts fresh.
+- **`cg_move` doesn't block:** a Ken Burns move is 5 to 10 seconds. Waiting for it would freeze the story, so
+  `blockingMs` is 0 and the move runs on under the next lines. Rollback and skip show where it ends.
+- **One move, two framings:** `cg x focus=left` with `cg_move focus=right` in one `stage` starts the move from the
+  `cg`'s framing. Otherwise the state already holds the end framing and the move would have nowhere to start.
+- **Any new scene clears it:** unlike characters and weather, which carry over when the background stays. A CG
+  belongs to the moment it shows, and one leaking into the next scene would cover it.
+- **Pan room depends on the art:** focus moves the crop of a cover-fit image. Seawall's CGs are 9:16, so a
+  taller phone leaves about 18% of the width to pan, and push-ins work anywhere. A wider CG pans further.
+- **Seawall's held CGs:** Handed Over (Day 3) and The Storm (Day 6) each get a `_b` variant drawn from the first
+  frame. Handed Over was redrawn for it: the first version put the courier and Dinda at the edges, which a tall
+  phone crops off. The new one looks down the alley from behind them, with both characters and the tail light
+  in the middle 70% of the width, so a CG prompt that will be pushed in on should say where its subject sits.
+- **Not done:** layered parallax CGs and full-screen video cutscenes. Revisit if a story needs them.
+
 ## Deferred
 
 - **Crossfade music.** On Android, only the music player may request audio focus. Another player that does

@@ -348,6 +348,49 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('a CG covers the stage and its camera pans on under the lines that follow', (tester) async {
+    Transform camera() => tester.widget<Transform>(
+          find.descendant(of: find.byType(CgLayer), matching: find.byType(Transform)).first,
+        );
+    double zoom() => camera().transform.getMaxScaleOnAxis();
+    // The image never loads: only the camera is under test.
+    final bundle = _SlowBundle();
+    Widget wrap(Poi poi) => DefaultAssetBundle(bundle: bundle, child: _wrap(poi));
+
+    await tester.pumpWidget(wrap(const Poi()));
+    await tester.pumpWidget(wrap(Poi(
+      cg: "cg.png",
+      cgZoom: 1.5,
+      cgFocus: CgFocus.right,
+      direction: _direction([
+        {"action": "cg", "image": "cg.png", "focus": "left", "duration_ms": 500},
+        {"action": "cg_move", "zoom": 1.5, "focus": "right", "duration_ms": 4000},
+      ]),
+    )));
+    expect(find.descendant(of: find.byType(CgLayer), matching: find.byType(Image)), findsOneWidget);
+    expect(zoom(), 1, reason: "the move starts from the framing the cg action gave");
+    expect(camera().alignment, Alignment.centerLeft);
+
+    await tester.pump(const Duration(seconds: 2));
+    // The next line: the direction is gone, the move carries on.
+    await tester.pumpWidget(wrap(const Poi(cg: "cg.png", cgZoom: 1.5, cgFocus: CgFocus.right)));
+    expect(zoom(), allOf(greaterThan(1), lessThan(1.5)));
+
+    await tester.pump(const Duration(seconds: 3));
+    expect(zoom(), 1.5);
+    expect(camera().alignment, Alignment.centerRight);
+
+    await tester.pumpWidget(wrap(Poi(
+      direction: _direction([
+        {"action": "cg", "image": null, "transition": "fade_black", "duration_ms": 400},
+      ]),
+    )));
+    expect(zoom(), 1.5, reason: "a leaving CG keeps its camera");
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: find.byType(CgLayer), matching: find.byType(Image)), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 /// Serves a 1×1 PNG for any asset, each only once [release] lets it through.

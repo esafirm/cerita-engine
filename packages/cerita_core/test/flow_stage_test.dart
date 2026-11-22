@@ -356,6 +356,75 @@ void main() {
     test('unknown actions and transitions throw', () {
       expect(() => StageAction.fromJson({"action": "dance"}), throwsException);
       expect(() => StageAction.fromJson({"action": "background", "transition": "spin"}), throwsException);
+      expect(() => StageAction.fromJson({"action": "cg_move", "focus": "up"}), throwsException);
+    });
+
+    test('a CG stays over the lines after it, a variant keeps its camera, and a new scene takes it away', () async {
+      final storage = InMemoryStoryStorage();
+      final loader = _FakeEngineLoader({
+        "index": _conversation([
+          {
+            "type": "STAGE",
+            "actions": [
+              {"action": "cg", "image": "cg_storm.png", "unlock_id": "cg_storm", "focus": "left", "duration_ms": 800},
+              {"action": "cg_move", "zoom": 1.3, "focus": "right", "duration_ms": 8000},
+            ],
+          },
+          _text("one"),
+          {"type": "STAGE", "actions": [{"action": "cg", "image": "cg_storm_b.png"}]},
+          _text("two"),
+          {"type": "STAGE", "actions": [{"action": "cg", "image": null}]},
+          _text("three"),
+          {"type": "STAGE", "actions": [{"action": "cg", "image": "cg_storm.png"}]},
+          {"type": "JUMP", "target": "elsewhere"},
+        ]),
+        "elsewhere": _conversation([_text("four")]),
+      });
+      final engine = RealFsseEngine(loader, storage: storage);
+
+      final shown = await engine.next() as StageItemType;
+      expect(shown.effectiveWaitMs, 800, reason: "the story doesn't wait for a cg_move");
+      expect((engine.stage.cg, engine.stage.cgZoom, engine.stage.cgFocus), ("cg_storm.png", 1.3, CgFocus.right));
+      expect(engine.meta.unlockedMediaIds, {"cg_storm"});
+
+      expect(await _nextText(engine), "one");
+      expect(engine.stage.cg, "cg_storm.png");
+      await engine.saveTo(1);
+
+      await engine.next();
+      expect((engine.stage.cg, engine.stage.cgZoom, engine.stage.cgFocus), ("cg_storm_b.png", 1.3, CgFocus.right));
+      expect(await _nextText(engine), "two");
+
+      await engine.next();
+      expect((engine.stage.cg, engine.stage.cgZoom, engine.stage.cgFocus), (null, 1.0, CgFocus.center));
+      expect(await _nextText(engine), "three");
+
+      await engine.next();
+      expect(engine.stage.cg, "cg_storm.png");
+      expect(await _nextText(engine), "four");
+      expect(engine.stage.cg, isNull, reason: "a CG never carries into the next scene, even with the same background");
+
+      final restored = RealFsseEngine(loader, storage: storage);
+      await restored.start(save: await storage.loadSlot(1));
+      expect((restored.stage.cg, restored.stage.cgZoom, restored.stage.cgFocus), ("cg_storm.png", 1.3, CgFocus.right));
+    });
+
+    test('a cg action with an unlock id is a Gallery entry', () async {
+      final catalog = StoryCatalog([
+        Conversation.fromJson(
+          _conversation([
+            {"type": "MEDIA", "media_type": "CG", "uri": "cg_a.png", "unlock_id": "cg_a"},
+            {"type": "STAGE", "actions": [{"action": "cg", "image": "cg_b.png", "unlock_id": "cg_b"}]},
+            {"type": "STAGE", "actions": [{"action": "cg", "image": "cg_b2.png"}]},
+            {"type": "STAGE", "actions": [{"action": "cg", "image": "cg_b_again.png", "unlock_id": "cg_b"}]},
+          ]),
+          key: "index",
+        ),
+      ]);
+      expect([for (final entry in catalog.media) (entry.item.unlockId, entry.item.mediaType, entry.item.uri)], [
+        ("cg_a", MediaType.cg, "cg_a.png"),
+        ("cg_b", MediaType.cg, "cg_b.png"),
+      ]);
     });
   });
 }

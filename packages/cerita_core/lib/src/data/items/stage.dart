@@ -1,9 +1,10 @@
 import '../scene.dart';
 import 'base.dart';
+import 'media.dart';
 import 'profile_info.dart';
 import 'sprite_position.dart';
 
-/// VN stage direction: shows / moves characters, changes the background, music, weather and camera.
+/// VN stage direction: shows / moves characters, changes the background, CG, music, weather and camera.
 class StageItemType extends ItemType {
   static const type = "STAGE";
 
@@ -18,8 +19,9 @@ class StageItemType extends ItemType {
             .toList(),
         waitMs = (json["wait_ms"] as num?)?.toInt();
 
-  /// [waitMs], or the duration of the longest action.
-  int get effectiveWaitMs => waitMs ?? actions.fold(0, (longest, action) => action.durationMs > longest ? action.durationMs : longest);
+  /// [waitMs], or the longest [StageAction.blockingMs].
+  int get effectiveWaitMs =>
+      waitMs ?? actions.fold(0, (longest, action) => action.blockingMs > longest ? action.blockingMs : longest);
 
   @override
   String getType() => type;
@@ -57,6 +59,9 @@ sealed class StageAction {
 
   const StageAction({this.transition, this.durationMs = defaultDurationMs});
 
+  /// How long the story waits for this action. A [CgMoveAction] plays on under the lines that follow it.
+  int get blockingMs => durationMs;
+
   factory StageAction.fromJson(Map<String, dynamic> json) {
     final transition = StageTransition.fromName(json["transition"] as String?);
     final duration = (json["duration_ms"] as num?)?.toInt();
@@ -84,6 +89,19 @@ sealed class StageAction {
       "clear" => HideAction(null, transition: transition, durationMs: durationMs),
       "move" => MoveAction(profileId(), position()!, durationMs: durationMs),
       "background" => BackgroundAction(json["image"] as String?, transition: transition, durationMs: durationMs),
+      "cg" => CgAction(
+          json["image"] as String?,
+          unlockId: json["unlock_id"] as String?,
+          zoom: (json["zoom"] as num?)?.toDouble(),
+          focus: CgFocus.fromName(json["focus"] as String?),
+          transition: transition,
+          durationMs: durationMs,
+        ),
+      "cg_move" => CgMoveAction(
+          zoom: (json["zoom"] as num?)?.toDouble(),
+          focus: CgFocus.fromName(json["focus"] as String?),
+          durationMs: durationMs,
+        ),
       "music" => MusicAction(json["file"] as String?, fadeMs: (json["fade_ms"] as num?)?.toInt()),
       "ambience" => AmbienceAction(json["file"] as String?, fadeMs: (json["fade_ms"] as num?)?.toInt()),
       "textbox" => TextboxAction(
@@ -196,4 +214,65 @@ class ZoomAction extends StageAction {
   final SpritePosition focus;
 
   const ZoomAction({this.scale = 1, this.focus = SpritePosition.center, super.durationMs});
+}
+
+/// Where a CG's camera points: the part of the image kept in view when the CG is cropped to the screen or zoomed.
+enum CgFocus {
+  center(0, 0),
+  left(-1, 0),
+  right(1, 0),
+  top(0, -1),
+  bottom(0, 1),
+  topLeft(-1, -1),
+  topRight(1, -1),
+  bottomLeft(-1, 1),
+  bottomRight(1, 1);
+
+  /// Alignment from -1 (left / top) to 1 (right / bottom).
+  final double x;
+  final double y;
+
+  const CgFocus(this.x, this.y);
+
+  /// `snake_case` name, as in the story JSON.
+  String get key => name.replaceAllMapped(RegExp(r"[A-Z]"), (m) => "_${m.group(0)!.toLowerCase()}");
+
+  static CgFocus? fromName(String? name) =>
+      name == null ? null : values.where((e) => e.key == name).firstOrNull ?? (throw Exception("Unknown focus '$name'"));
+}
+
+/// Shows a full-screen CG over the stage, or swaps it for another (a variant of the same moment), or with a null
+/// [image] takes it away. Unlike a `MEDIA` CG it stays while the lines after it play, until the next `cg`, a
+/// `cg` with no image, or a new scene.
+class CgAction extends StageAction {
+  /// File in `bg/`. Null hides the CG.
+  final String? image;
+
+  /// Registers the CG in the Gallery.
+  final String? unlockId;
+
+  /// Camera the CG starts with: [zoom] (default `1`) towards [focus] (default [CgFocus.center]). A variant swapped
+  /// in for the CG shown keeps the camera where it is unless these are given.
+  final double? zoom;
+  final CgFocus? focus;
+
+  const CgAction(this.image, {this.unlockId, this.zoom, this.focus, super.transition, super.durationMs});
+
+  /// The CG as a Gallery entry, when it has an [unlockId].
+  MediaItemType? get galleryItem => unlockId == null || image == null
+      ? null
+      : MediaItemType.fromJson({"type": MediaItemType.type, "media_type": MediaType.cg.key, "uri": image, "unlock_id": unlockId});
+}
+
+/// Moves the camera on the CG shown: zooms to [zoom] and pans to [focus] over [durationMs], a slow pan or push-in.
+/// The story doesn't wait for it, so the move plays on under the lines that follow.
+class CgMoveAction extends StageAction {
+  /// Null keeps the current zoom / focus.
+  final double? zoom;
+  final CgFocus? focus;
+
+  const CgMoveAction({this.zoom, this.focus, super.durationMs});
+
+  @override
+  int get blockingMs => 0;
 }

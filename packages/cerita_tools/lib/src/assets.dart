@@ -80,6 +80,8 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
             switch (action.action) {
               case "background":
                 add("background", "bg", action.fields["image"], action.span);
+              case "cg":
+                add("cg", "bg", action.fields["image"], action.span);
               case "music" || "ambience":
                 add(action.action, "music", file, action.span);
               case "sound":

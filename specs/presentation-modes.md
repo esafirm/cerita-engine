@@ -53,6 +53,8 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 - **Background Layer (`Poi`)**:
   - Full-screen scene background (`scene.background`) with cross-fade transitions when changing scenes.
   - Full-screen overlay support for `MEDIA` items of type `"CG"`.
+  - **Held CGs** (the `cg` stage action): a full-screen CG over the background and characters, under the dialogue box, that stays while the lines after it play. Swapping in another image cross-fades under the same camera, so a scene can step through variants of one CG. Shake and flash still hit it. Weather is drawn under it.
+  - **CG camera** (`cg_move`): a slow push-in or pan on the held CG, eased in and out, that keeps going while the player reads on. Rolled-back or skipped lines show the camera where it ends.
 - **Character Sprite Stage (`Poi`)**:
   - Supports up to 5 simultaneous character slots (`far_left`, `left`, `center`, `right`, `far_right`). The 3 inner slots keep their wide spacing until a `far_*` slot is used.
   - Characters are tracked by profile id, so moving one to another slot slides it across instead of fading it out and in.

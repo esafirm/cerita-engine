@@ -17,7 +17,8 @@ class StoryCatalog {
     return StoryCatalog([for (final key in keys) await loader.loadConversation(key)]);
   }
 
-  List<CatalogEntry<MediaItemType>> get media => _collect<MediaItemType>((item) => item.unlockId != null)
+  /// Gallery entries: `MEDIA` items and `cg` stage actions with an unlock id, the first of each id in file order.
+  List<CatalogEntry<MediaItemType>> get media => _media
       .fold(<String, CatalogEntry<MediaItemType>>{}, (map, entry) => map..putIfAbsent(entry.item.unlockId!, () => entry))
       .values
       .toList();
@@ -46,6 +47,21 @@ class StoryCatalog {
 
   List<Conversation> get checkpoints => conversations.where((conversation) => conversation.checkpoint).toList()
     ..sort((a, b) => (a.scene.day ?? 0).compareTo(b.scene.day ?? 0));
+
+  Iterable<CatalogEntry<MediaItemType>> get _media sync* {
+    for (final conversation in conversations) {
+      for (final item in conversation.conversations) {
+        final found = switch (item) {
+          MediaItemType() => [item],
+          StageItemType(:final actions) => [for (final action in actions.whereType<CgAction>()) ?action.galleryItem],
+          _ => const <MediaItemType>[],
+        };
+        for (final media in found) {
+          if (media.unlockId != null) yield CatalogEntry(media, conversation);
+        }
+      }
+    }
+  }
 
   Iterable<CatalogEntry<T>> _collect<T>(bool Function(T item) where) sync* {
     for (final conversation in conversations) {

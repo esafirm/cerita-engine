@@ -18,7 +18,7 @@ import 'dialogue_box.dart';
 import 'nvl_page.dart';
 import 'poi.dart';
 
-/// Visual Novel stage: background, sprite slots, dialogue box or NVL page, CG overlays,
+/// Visual Novel stage: background, sprite slots, held CGs, dialogue box or NVL page, CG overlays,
 /// choice / input overlays and quick controls (backlog, auto, skip, menu, back, quick save / load, hide).
 /// A mouse wheel scroll up rolls back.
 class VnStage extends StatefulWidget {
@@ -174,6 +174,9 @@ class _VnStageState extends State<VnStage> {
                 zoom: stage.zoom,
                 zoomFocus: stage.zoomFocus,
                 weather: stage.weather,
+                cg: stage.cg == null ? null : config.bg(stage.cg!),
+                cgZoom: stage.cgZoom,
+                cgFocus: stage.cgFocus,
                 instant: instant,
                 cast: PoiCast.ofProfiles(controller.profiles),
               ),
