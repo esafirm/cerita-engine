@@ -643,13 +643,23 @@ narration
   id: HP Sekar masuk ke amplop cokelat. Amplopnya masuk ke tas. Motornya pergi.
   en: Sekar's phone goes into a brown envelope. The envelope goes into a bag. The motorbike leaves.
 
-media CG cg_handed_over.webp unlock=cg_handed_over
+stage
+  cg cg_handed_over.webp unlock=cg_handed_over zoom=2.2 focus=top transition=fade_black duration=1.2s
+
+narration
   id: Lampu belakangnya merah kecil di ujung gang, terus belok, terus nggak ada.
   en: Its tail light is a small red dot at the end of the alley, then it turns, then it's gone.
+
+stage
+  cg cg_handed_over_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1 focus=center duration=6s
 
 narration
   id: Dinda nggak ngomong apa-apa malem itu.
   en: Dinda doesn't say anything that night.
+
+stage
+  cg none transition=fade_black duration=1s
 narration
   id: Paginya, akun cloud Sekar kosong. Foto, catatan, draf, semuanya. Halaman dasbor podcast-nya bilang "akun tidak ditemukan".
   en: In the morning, Sekar's cloud account is empty. Photos, notes, drafts, all of it. Her podcast dashboard says "account not found".

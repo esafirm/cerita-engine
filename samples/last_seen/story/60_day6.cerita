@@ -489,9 +489,24 @@ stage
   sound sfx_thunder.mp3
   shake intensity=8
 
-media CG cg_the_storm.webp unlock=cg_the_storm
-  id: Gue inget dingin. Gue inget nggak bisa bedain atas sama bawah.
-  en: I remember cold. I remember not knowing up from down.
+stage
+  cg cg_the_storm.webp unlock=cg_the_storm transition=fade_black duration=800
+  cg_move zoom=1.3 duration=10s
+
+narration
+  id: Gue inget dingin.
+  en: I remember cold.
+
+stage
+  cg cg_the_storm_b.webp transition=dissolve duration=500
+  shake intensity=6
+
+narration
+  id: Gue inget nggak bisa bedain atas sama bawah.
+  en: I remember not knowing up from down.
+
+stage
+  cg none transition=fade_black duration=1.2s
 
 narration
   id: Kapal nelayan nemu kita tiga jam kemudian, nempel di patok bambu. Gue bangun di rumah sakit di Pluit dengan dua rusuk retak dan Dinda yang nggak mau ngomong sama gue.

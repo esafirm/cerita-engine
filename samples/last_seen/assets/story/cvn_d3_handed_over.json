@@ -41,14 +41,42 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_handed_over.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_handed_over.webp",
+          "unlock_id": "cg_handed_over",
+          "zoom": 2.2,
+          "focus": "top",
+          "transition": "fade_black",
+          "duration_ms": 1200
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Lampu belakangnya merah kecil di ujung gang, terus belok, terus nggak ada.",
         "en": "Its tail light is a small red dot at the end of the alley, then it turns, then it's gone."
-      },
-      "unlock_id": "cg_handed_over"
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_handed_over_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 6000
+        }
+      ]
     },
     {
       "type": "NARRATION",
@@ -56,6 +84,17 @@
         "id": "Dinda nggak ngomong apa-apa malem itu.",
         "en": "Dinda doesn't say anything that night."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": null,
+          "transition": "fade_black",
+          "duration_ms": 1000
+        }
+      ]
     },
     {
       "type": "NARRATION",
