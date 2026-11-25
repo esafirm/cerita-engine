@@ -644,7 +644,7 @@ narration
   en: Sekar's phone goes into a brown envelope. The envelope goes into a bag. The motorbike leaves.
 
 stage
-  cg cg_handed_over.webp unlock=cg_handed_over zoom=2.2 focus=top transition=fade_black duration=1.2s
+  cg cg_handed_over.webp unlock=cg_handed_over title="Diserahkan" title.en="Handed Over" zoom=2.2 focus=top transition=fade_black duration=1.2s
 
 narration
   id: Lampu belakangnya merah kecil di ujung gang, terus belok, terus nggak ada.

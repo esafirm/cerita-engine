@@ -13,5 +13,5 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 ## Later features
 
 - **Achievements.** Declared in the story, unlocked by effects or endings, kept in the meta-state, with a screen next to the gallery.
-- **Accessibility.** Screen reader labels for the stage, dialogue and controls, a larger text option, a dyslexia-friendly font option, and reduced motion for stage shake and flash (moving letters already stop when the platform asks).
+- **Accessibility.** Screen reader labels across the remaining screens, a larger text option, and a dyslexia-friendly font option. Reduced motion (moving letters, stage shake, flash tint, still weather, instant camera zooms/pans) and core dialogue/call labels are in.
 - **Gallery unlock conditions.** Unlock gallery items from conditions, not only from viewing a `MEDIA` item.

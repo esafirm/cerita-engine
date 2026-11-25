@@ -69,6 +69,10 @@
           "action": "cg",
           "image": "cg_the_storm.webp",
           "unlock_id": "cg_the_storm",
+          "title": {
+            "id": "Badai",
+            "en": "The Storm"
+          },
           "transition": "fade_black",
           "duration_ms": 800
         },

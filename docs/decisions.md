@@ -1119,8 +1119,7 @@ seawall, and the seawall stands for the reclamation plot at the heart of the mys
   `id.twk.lastseen`. Players never see them, and the package ID can't change on Play anyway.
 - **Story text keeps "last seen":** those lines are the chat app's status and Sekar's missing-person notice, not the
   title.
-- **Not yet renamed:** the iOS display name (`ios/Runner/Info.plist`), left to the thread getting iOS to build, and
-  the "LS" app icon, which is being redrawn (see the next entry).
+- **Renamed on iOS too (2026-11-25):** `ios/Runner/Info.plist` now uses `Seawall`, and the "LS" app icon has been replaced (see the next entry).
 
 ## Seawall's icon and bonus wallpapers
 
@@ -1154,10 +1153,12 @@ drawn tall, are three phone wallpapers in Extras.
 The close-up of Sekar and her phone on the wall are also app icons. Players pick one in Extras → App icon
 (`lib/app_icons.dart`). The main icon is free, the other two come with the full game, like the wallpapers.
 
-- **Android only for now:** each icon is a launcher entry in the manifest. MainActivity keeps its own entry for the
-  main icon, because `flutter run` only finds the app through an `<activity>` with a launcher entry. The others are
-  activity-aliases, off until picked. iOS needs alternate icons set up in the Xcode project, so the entry is hidden
-  there for now.
+- **Android and iOS (updated 2026-11-25):** on Android, each icon is a launcher entry in the manifest. MainActivity
+  keeps its own entry for the main icon, because `flutter run` only finds the app through an `<activity>` with a
+  launcher entry. The others are activity-aliases, off until picked. On iOS, `make-icon.sh --alt` writes
+  `AppIcon<Name>.appiconset` sets, `project.pbxproj` lists them in `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES`,
+  and `AppDelegate.swift` handles `seawall/app_icon` via `setAlternateIconName` (which switches immediately with the
+  system alert).
 - **The switch waits for the player to leave:** Android closed the game as soon as the entry it was opened through
   went off, even with `DONT_KILL_APP`. So MainActivity keeps the pick and switches on Home, Recents, another app or
   Back out of the game. Not when the screen turns off or a dialog opens on top, since the player didn't leave then. The pick survives a restart until it's applied.

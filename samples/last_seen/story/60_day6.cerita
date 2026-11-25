@@ -490,7 +490,7 @@ stage
   shake intensity=8
 
 stage
-  cg cg_the_storm.webp unlock=cg_the_storm transition=fade_black duration=800
+  cg cg_the_storm.webp unlock=cg_the_storm title="Badai" title.en="The Storm" transition=fade_black duration=800
   cg_move zoom=1.3 duration=10s
 
 narration

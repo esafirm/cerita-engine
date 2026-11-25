@@ -47,6 +47,10 @@
           "action": "cg",
           "image": "cg_handed_over.webp",
           "unlock_id": "cg_handed_over",
+          "title": {
+            "id": "Diserahkan",
+            "en": "Handed Over"
+          },
           "zoom": 2.2,
           "focus": "top",
           "transition": "fade_black",
