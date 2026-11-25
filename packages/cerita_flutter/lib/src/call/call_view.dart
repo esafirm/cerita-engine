@@ -136,6 +136,7 @@ class _CallViewState extends State<CallView> {
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
+                    tooltip: strings.menu,
                     onPressed: widget.onMenu,
                     icon: const Icon(Icons.more_vert, color: Colors.white),
                   ),
@@ -270,7 +271,12 @@ class _CallViewState extends State<CallView> {
                         Row(
                           children: [
                             const Expanded(child: SizedBox()),
-                            _CallButton(icon: Icons.call_end, color: Colors.redAccent, onTap: _end),
+                            _CallButton(
+                              icon: Icons.call_end,
+                              color: Colors.redAccent,
+                              semanticLabel: strings.endCall,
+                              onTap: _end,
+                            ),
                             Expanded(
                               child: _keypad
                                   ? TextButton(
@@ -298,17 +304,28 @@ class _CallViewState extends State<CallView> {
 class _CallButton extends StatelessWidget {
   final IconData icon;
   final String? label;
+
+  /// What a screen reader calls a button without a [label].
+  final String? semanticLabel;
   final bool active;
   final Color? color;
   final VoidCallback onTap;
 
-  const _CallButton({required this.icon, required this.onTap, this.label, this.active = false, this.color});
+  const _CallButton({
+    required this.icon,
+    required this.onTap,
+    this.label,
+    this.semanticLabel,
+    this.active = false,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     final background = color ?? (active ? Colors.white : Colors.white24);
-    // The label takes taps too, so a finger a little low doesn't miss the button.
-    return GestureDetector(
+    // The label takes taps too, so a finger a little low doesn't miss the button. A screen reader reads it as one
+    // button, selected while on.
+    final button = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Column(
@@ -331,6 +348,14 @@ class _CallButton extends StatelessWidget {
             Text(label!, style: const TextStyle(color: Colors.white70, fontSize: 13)),
           ],
         ],
+      ),
+    );
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        label: label == null ? semanticLabel : null,
+        selected: active ? true : null,
+        child: button,
       ),
     );
   }

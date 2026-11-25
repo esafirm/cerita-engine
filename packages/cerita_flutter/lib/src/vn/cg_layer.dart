@@ -3,6 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../common/motion.dart';
 import '../skin/story_skin.dart';
 import 'stage_transitions.dart';
 
@@ -78,7 +79,8 @@ class _CgLayerState extends State<CgLayer> with SingleTickerProviderStateMixin {
   void _aim({required bool appeared}) {
     final move = _moveAction;
     final target = _target;
-    if (widget.instant || move == null || move.durationMs <= 0) {
+    // With reduced motion the camera cuts to its framing instead of panning.
+    if (widget.instant || reduceMotion || move == null || move.durationMs <= 0) {
       // A move from an earlier direction plays on unless the camera has somewhere else to be.
       if (target == _to && !appeared) return;
       _from = _to = target;

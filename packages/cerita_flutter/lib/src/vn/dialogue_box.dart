@@ -1,6 +1,8 @@
+import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
 import '../common/tagged_text.dart';
+import '../l10n/story_language.dart';
 import '../skin/chapter_card_overlay.dart';
 import '../skin/story_skin.dart';
 
@@ -50,7 +52,9 @@ class DialogueBoxState extends State<DialogueBox> {
   Widget build(BuildContext context) {
     // A chapter card is up: the box stays hidden and the line waits for it.
     final held = ChapterCardOverlay.holdsDialogue(context);
-    return AnimatedOpacity(
+    final name = widget.speaker ?? StoryLanguage.of(context).strings.dialogue;
+    // A screen reader reads the whole line once, with who says it, not each letter as it types.
+    final box = AnimatedOpacity(
       opacity: held ? 0 : 1,
       duration: const Duration(milliseconds: 250),
       child: TypewriterText(
@@ -66,6 +70,13 @@ class DialogueBoxState extends State<DialogueBox> {
           DialogueFrame(speaker: widget.speaker, done: done, body: text),
         ),
       ),
+    );
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: "$name: ${TextMarkup.plain(widget.text)}",
+      excludeSemantics: true,
+      child: box,
     );
   }
 }

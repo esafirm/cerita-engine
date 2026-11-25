@@ -235,7 +235,11 @@ class _InteractionTray extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(onPressed: null, icon: const Icon(Icons.send)),
+            IconButton.filled(
+              tooltip: StoryLanguage.of(context).strings.send,
+              onPressed: null,
+              icon: const Icon(Icons.send),
+            ),
           ],
         ),
     };

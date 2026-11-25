@@ -76,6 +76,11 @@ abstract class CeritaStrings {
   String get keypad;
   String get hold;
   String get hideKeypad;
+  String get endCall;
+  String get send;
+
+  /// Screen-reader label of the VN dialogue box, read before the line.
+  String get dialogue;
 
   /// Shown when the player tries to end a call the story can't do without, and the scene sets no `stay` line.
   String get cantHangUp;
@@ -112,6 +117,13 @@ abstract class CeritaStrings {
   String get autosave;
   String slot(int id);
   String get emptySlot;
+  String get cancel;
+  String get deleteSave;
+  String deleteSaveBody(String slot);
+  String get delete;
+  String get overwriteSave;
+  String overwriteSaveBody(String slot);
+  String get overwrite;
   String get notReachedYet;
 
   // Chapters flowchart.
@@ -188,6 +200,9 @@ abstract class CeritaStrings {
   String get videos;
   String galleryProgress(int unlocked, int total);
   String unlockedIn(String chapter);
+
+  /// The Gallery of a story with nothing to collect.
+  String get galleryEmpty;
 
   // Case Board and evidence questions.
   String get caseBoard;
@@ -296,6 +311,12 @@ class EnglishCeritaStrings extends CeritaStrings {
   @override
   String get hideKeypad => "Hide";
   @override
+  String get endCall => "End call";
+  @override
+  String get send => "Send";
+  @override
+  String get dialogue => "Dialogue";
+  @override
   String get cantHangUp => "Not now. I need to hear this.";
   @override
   String get tapToContinue => "Tap to continue";
@@ -340,6 +361,20 @@ class EnglishCeritaStrings extends CeritaStrings {
   @override
   String get emptySlot => "Empty";
   @override
+  String get cancel => "Cancel";
+  @override
+  String get deleteSave => "Delete save";
+  @override
+  String deleteSaveBody(String slot) => "Delete the save in $slot? This can't be undone.";
+  @override
+  String get delete => "Delete";
+  @override
+  String get overwriteSave => "Overwrite save?";
+  @override
+  String overwriteSaveBody(String slot) => "$slot already holds a save. Saving here replaces it.";
+  @override
+  String get overwrite => "Overwrite";
+  @override
   String get notReachedYet => "Not reached yet";
   @override
   String get showFlowchart => "Show flowchart";
@@ -361,6 +396,8 @@ class EnglishCeritaStrings extends CeritaStrings {
   String galleryProgress(int unlocked, int total) => "$unlocked / $total unlocked";
   @override
   String unlockedIn(String chapter) => "Unlocked in $chapter";
+  @override
+  String get galleryEmpty => "Nothing to collect in this story yet";
   @override
   String get caseBoard => "Case Board";
   @override
@@ -549,6 +586,12 @@ class IndonesianCeritaStrings extends CeritaStrings {
   @override
   String get hideKeypad => "Tutup";
   @override
+  String get endCall => "Akhiri panggilan";
+  @override
+  String get send => "Kirim";
+  @override
+  String get dialogue => "Dialog";
+  @override
   String get cantHangUp => "Jangan sekarang. Aku harus dengar ini.";
   @override
   String get tapToContinue => "Ketuk untuk lanjut";
@@ -599,6 +642,20 @@ class IndonesianCeritaStrings extends CeritaStrings {
   @override
   String get emptySlot => "Kosong";
   @override
+  String get cancel => "Batal";
+  @override
+  String get deleteSave => "Hapus simpanan";
+  @override
+  String deleteSaveBody(String slot) => "Hapus simpanan di $slot? Ini tidak bisa dibatalkan.";
+  @override
+  String get delete => "Hapus";
+  @override
+  String get overwriteSave => "Timpa simpanan?";
+  @override
+  String overwriteSaveBody(String slot) => "$slot sudah berisi simpanan. Menyimpan di sini akan menggantinya.";
+  @override
+  String get overwrite => "Timpa";
+  @override
   String get notReachedYet => "Belum tercapai";
   @override
   String get showFlowchart => "Tampilkan diagram alur";
@@ -620,6 +677,8 @@ class IndonesianCeritaStrings extends CeritaStrings {
   String galleryProgress(int unlocked, int total) => "$unlocked / $total terbuka";
   @override
   String unlockedIn(String chapter) => "Terbuka di $chapter";
+  @override
+  String get galleryEmpty => "Belum ada koleksi di cerita ini";
   @override
   String get caseBoard => "Papan Kasus";
   @override

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../skin/chapter_card_overlay.dart';
+import 'motion.dart';
 
 /// A line with its text tags (`{b}`, `{color=...}`, `{shake}`...) applied, fully shown.
 /// Pauses are ignored. Inherits the surrounding [DefaultTextStyle], merged with [style].
@@ -314,8 +315,7 @@ class _GlyphLineState extends State<_GlyphLine> with SingleTickerProviderStateMi
   }
 
   void _updateMotion() {
-    final reduce = WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
-    if (_moves && !reduce) {
+    if (_moves && !reduceMotion) {
       if (!_motion.isAnimating) _motion.repeat();
     } else {
       _motion.stop();

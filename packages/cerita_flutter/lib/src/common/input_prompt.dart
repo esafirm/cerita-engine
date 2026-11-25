@@ -80,7 +80,11 @@ class _InputPromptState extends State<InputPrompt> {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(onPressed: _canSubmit ? _submit : null, icon: const Icon(Icons.send)),
+            IconButton.filled(
+              tooltip: StoryLanguage.of(context).strings.send,
+              onPressed: _canSubmit ? _submit : null,
+              icon: const Icon(Icons.send),
+            ),
           ],
         ),
       ],

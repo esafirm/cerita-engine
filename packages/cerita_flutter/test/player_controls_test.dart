@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cerita_flutter/cerita_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support.dart';
@@ -135,6 +138,41 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(controller.current?.getText(), "Two");
+  });
+
+  testWidgets('keyboard: Space advances, Arrow Up rolls back, H hides, Escape opens the menu over the story', (
+    tester,
+  ) async {
+    final (controller, _) = await pumpStory(tester);
+    Future<void> press(LogicalKeyboardKey key) async {
+      await tester.sendKeyEvent(key);
+      await tester.pumpAndSettle();
+    }
+
+    await press(LogicalKeyboardKey.space);
+    expect(controller.current?.getText(), "Two");
+    await press(LogicalKeyboardKey.arrowUp);
+    expect(controller.current?.getText(), "One");
+
+    await press(LogicalKeyboardKey.keyH);
+    expect(find.text("One"), findsNothing);
+    await press(LogicalKeyboardKey.enter);
+    expect(find.text("One"), findsOneWidget);
+    expect(controller.current?.getText(), "One", reason: "the key that shows the UI doesn't advance");
+
+    await press(LogicalKeyboardKey.escape);
+    expect(find.text("Load game"), findsOneWidget);
+    await press(LogicalKeyboardKey.space);
+    expect(controller.current?.getText(), "One", reason: "keys go to the open menu, not the story behind it");
+    await press(LogicalKeyboardKey.escape);
+    expect(find.text("Load game"), findsNothing);
+    await press(LogicalKeyboardKey.enter);
+    expect(controller.current?.getText(), "Two");
+
+    await press(LogicalKeyboardKey.enter);
+    expect(controller.phase, StoryPhase.choice);
+    await press(LogicalKeyboardKey.space);
+    expect(controller.phase, StoryPhase.choice, reason: "a choice waits for a pick");
   });
 
   testWidgets('skip stops at the first unread line, and at choices even when skipping unread text', (tester) async {
@@ -308,4 +346,90 @@ void main() {
     expect(poi.actors.single.sprite, endsWith("nora.png"));
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
   });
+
+  testWidgets('a save made under a held CG shows the CG and the weather in its thumbnail', (tester) async {
+    final storage = InMemoryStoryStorage();
+    await storage.saveSlot(SaveSlot(
+      slotId: 2,
+      conversationKey: "index",
+      dialogIndex: 1,
+      dataMap: const {},
+      history: const [],
+      updatedAt: DateTime(2026),
+      scene: const Scene(),
+      stage: StageState(weather: "rain", cg: "cg_storm.png", cgZoom: 1.3, cgFocus: CgFocus.right),
+    ));
+    final setup = StorySetup(config: const LoaderConfig(), loader: FakeEngineLoader(_story), storage: storage);
+
+    await tester.pumpWidget(
+      DefaultAssetBundle(
+        bundle: _PixelBundle(),
+        child: MaterialApp(home: SaveSlotsScreen(setup: setup, onLoad: (_) {})),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final poi = tester.widget<Poi>(find.byType(Poi));
+    expect(
+      (poi.cg, poi.cgZoom, poi.cgFocus, poi.weather),
+      ("assets/story/bg/cg_storm.png", 1.3, CgFocus.right, "rain"),
+    );
+    expect(find.byType(WeatherLayer), findsOneWidget);
+  });
+
+  testWidgets('saving over a slot in use asks first, and a save can be deleted', (tester) async {
+    final storage = InMemoryStoryStorage();
+    final setup = StorySetup(config: const LoaderConfig(), loader: FakeEngineLoader(_story), storage: storage);
+    var saves = 0;
+    Future<void> save(int id) => storage.saveSlot(SaveSlot(
+          slotId: id,
+          conversationKey: "index",
+          dialogIndex: ++saves,
+          dataMap: const {},
+          history: const [],
+          updatedAt: DateTime(2026),
+        ));
+    await tester.pumpWidget(MaterialApp(home: SaveSlotsScreen(setup: setup, onSave: save, slots: const [1, 2])));
+    await tester.pumpAndSettle();
+    expect(find.text("Slot 3"), findsNothing);
+
+    await tester.tap(find.text("Slot 1"));
+    await tester.pumpAndSettle();
+    expect(find.text("Overwrite save?"), findsNothing, reason: "an empty slot saves at once");
+    expect(saves, 1);
+
+    await tester.tap(find.text("Slot 1"));
+    await tester.pumpAndSettle();
+    expect(find.text("Overwrite save?"), findsOneWidget);
+    await tester.tap(find.text("Cancel"));
+    await tester.pumpAndSettle();
+    expect(saves, 1);
+
+    await tester.tap(find.text("Slot 1"));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("Overwrite"));
+    await tester.pumpAndSettle();
+    expect((await storage.loadSlot(1))!.dialogIndex, 2);
+
+    await tester.tap(find.byTooltip("Delete save"));
+    await tester.pumpAndSettle();
+    expect(find.text("Delete the save in Slot 1? This can't be undone."), findsOneWidget);
+    await tester.tap(find.text("Delete"));
+    await tester.pumpAndSettle();
+    expect(await storage.loadSlot(1), isNull);
+    expect(find.byTooltip("Delete save"), findsNothing);
+  });
+}
+
+/// Serves a 1×1 PNG for any asset.
+class _PixelBundle extends CachingAssetBundle {
+  static final _pixel = base64Decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+  );
+
+  @override
+  Future<ByteData> load(String key) async {
+    if (key == "AssetManifest.bin") return const StandardMessageCodec().encodeMessage(<String, Object?>{})!;
+    return ByteData.sublistView(_pixel);
+  }
 }

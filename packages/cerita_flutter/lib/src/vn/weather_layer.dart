@@ -7,7 +7,10 @@ import 'package:flutter/scheduler.dart';
 class WeatherLayer extends StatefulWidget {
   final String weather;
 
-  const WeatherLayer({super.key, required this.weather});
+  /// Draws the particles where they are without falling: in a save thumbnail, or with reduced motion.
+  final bool still;
+
+  const WeatherLayer({super.key, required this.weather, this.still = false});
 
   @override
   State<WeatherLayer> createState() => _WeatherLayerState();
@@ -23,7 +26,8 @@ class _WeatherLayerState extends State<WeatherLayer> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _particles = _spawn();
-    _ticker = createTicker((elapsed) => _elapsed.value = elapsed)..start();
+    _ticker = createTicker((elapsed) => _elapsed.value = elapsed);
+    if (!widget.still) _ticker.start();
   }
 
   List<_Particle> _spawn() {
@@ -39,6 +43,8 @@ class _WeatherLayerState extends State<WeatherLayer> with SingleTickerProviderSt
   void didUpdateWidget(WeatherLayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.weather != widget.weather) _particles = _spawn();
+    if (widget.still && _ticker.isActive) _ticker.stop();
+    if (!widget.still && !_ticker.isActive) _ticker.start();
   }
 
   @override

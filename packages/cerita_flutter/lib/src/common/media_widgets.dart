@@ -261,11 +261,23 @@ class _FlightState extends State<_Flight> {
 class VoiceNotePlayer extends StatefulWidget {
   final String asset;
   final String? transcript;
+  /// Ducked while the note plays. Its voice volume is the note's volume.
   final AudioHelper? audio;
+
+  /// The volume without an [audio], e.g. the player's voice volume in the Gallery.
+  final double? volume;
   final LocalizedAssets? assets;
   final Color? color;
 
-  const VoiceNotePlayer({super.key, required this.asset, this.transcript, this.audio, this.assets, this.color});
+  const VoiceNotePlayer({
+    super.key,
+    required this.asset,
+    this.transcript,
+    this.audio,
+    this.volume,
+    this.assets,
+    this.color,
+  });
 
   @override
   State<VoiceNotePlayer> createState() => _VoiceNotePlayerState();
@@ -283,7 +295,7 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
   @override
   void initState() {
     super.initState();
-    _player.setVolume(widget.audio?.voiceVolume ?? 1);
+    _player.setVolume(widget.audio?.voiceVolume ?? widget.volume ?? 1);
     _subscriptions.addAll([
       _player.onPositionChanged.listen((position) => setState(() => _position = position)),
       _player.onDurationChanged.listen((duration) => setState(() => _duration = duration)),

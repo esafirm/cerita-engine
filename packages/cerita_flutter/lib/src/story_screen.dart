@@ -99,7 +99,8 @@ class _StoryScreenState extends State<StoryScreen> {
     super.dispose();
   }
 
-  void _openGallery() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GalleryScreen(setup: widget.setup)));
+  void _openGallery() => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => GalleryScreen(setup: widget.setup, audio: _controller.audio)));
 
   void _openMenu() {
     final strings = StoryLanguage.of(context).strings;

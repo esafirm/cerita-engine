@@ -349,6 +349,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('with reduced motion the stage holds still: no shake, a soft flash, still weather, a cut camera', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final bundle = _SlowBundle();
+    Widget wrap(Poi poi) => DefaultAssetBundle(bundle: bundle, child: _wrap(poi));
+
+    await tester.pumpWidget(wrap(const Poi()));
+    await tester.pumpWidget(wrap(Poi(
+      weather: "snow",
+      cg: "cg.png",
+      cgZoom: 1.5,
+      cgFocus: CgFocus.right,
+      direction: _direction([
+        {"action": "shake", "intensity": 8},
+        {"action": "flash", "color": "#FF0000"},
+        {"action": "cg", "image": "cg.png", "focus": "left"},
+        {"action": "cg_move", "zoom": 1.5, "focus": "right", "duration_ms": 4000},
+      ]),
+    )));
+    // Flutter already cuts animation times to a twentieth with reduced motion, so the flash is over in 20 ms.
+    await tester.pump(const Duration(milliseconds: 5));
+    final shake = find.descendant(of: find.byType(Poi), matching: find.byType(Transform)).first;
+    expect(tester.widget<Transform>(shake).transform.getTranslation().x, 0);
+    final flash =
+        tester.widget<ColoredBox>(find.byWidgetPredicate((w) => w is ColoredBox && w.color.r == 1 && w.color.a > 0));
+    expect(flash.color.a, lessThanOrEqualTo(0.3));
+    final camera =
+        tester.widget<Transform>(find.descendant(of: find.byType(CgLayer), matching: find.byType(Transform)).first);
+    expect((camera.transform.getMaxScaleOnAxis(), camera.alignment), (1.5, Alignment.centerRight));
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.binding.hasScheduledFrame, isFalse, reason: "the weather doesn't fall");
+  });
+
   testWidgets('a CG covers the stage and its camera pans on under the lines that follow', (tester) async {
     Transform camera() => tester.widget<Transform>(
           find.descendant(of: find.byType(CgLayer), matching: find.byType(Transform)).first,

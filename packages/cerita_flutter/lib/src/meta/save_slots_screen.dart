@@ -7,6 +7,7 @@ import '../story_setup.dart';
 import '../vn/poi.dart';
 
 /// Lists the autosave, quick save and manual slots. Saves when [onSave] is set, loads via [onLoad] otherwise.
+/// Saving over a slot in use asks first. The quick save and manual saves can be deleted, also after asking.
 class SaveSlotsScreen extends StatefulWidget {
   static const manualSlots = [1, 2, 3];
 
@@ -14,7 +15,11 @@ class SaveSlotsScreen extends StatefulWidget {
   final Future<void> Function(int slotId)? onSave;
   final ValueChanged<SaveSlot>? onLoad;
 
-  const SaveSlotsScreen({super.key, required this.setup, this.onSave, this.onLoad});
+  /// The manual slot ids offered, in order. The autosave and quick save have their own ids and are always listed
+  /// when loading.
+  final List<int> slots;
+
+  const SaveSlotsScreen({super.key, required this.setup, this.onSave, this.onLoad, this.slots = manualSlots});
 
   @override
   State<SaveSlotsScreen> createState() => _SaveSlotsScreenState();
@@ -44,6 +49,42 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
         _ => strings.slot(id),
       };
 
+  void _reload() => setState(() {
+        _slots = widget.setup.storage.listSlots();
+      });
+
+  /// Asks before [action] replaces or removes the save in a slot. True when the player agrees.
+  Future<bool> _confirm(String title, String body, String action) async {
+    final strings = StoryLanguage.of(context).strings;
+    final agreed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: Text(strings.cancel)),
+          FilledButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: Text(action)),
+        ],
+      ),
+    );
+    return agreed ?? false;
+  }
+
+  Future<void> _save(int id, {required bool occupied}) async {
+    final strings = StoryLanguage.of(context).strings;
+    final name = _name(id, strings);
+    if (occupied && !await _confirm(strings.overwriteSave, strings.overwriteSaveBody(name), strings.overwrite)) return;
+    await widget.onSave!(id);
+    if (mounted) _reload();
+  }
+
+  Future<void> _delete(int id) async {
+    final strings = StoryLanguage.of(context).strings;
+    if (!await _confirm(strings.deleteSave, strings.deleteSaveBody(_name(id, strings)), strings.delete)) return;
+    await widget.setup.storage.deleteSlot(id);
+    if (mounted) _reload();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -57,7 +98,7 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
           final data = snapshot.data;
           final slots = {for (final slot in data?[0] as List<SaveSlot>? ?? const <SaveSlot>[]) slot.slotId: slot};
           final profiles = data?[1] as ProfileData?;
-          final ids = [if (!_saving) ...[SaveSlot.autoSlotId, SaveSlot.quickSlotId], ...SaveSlotsScreen.manualSlots];
+          final ids = [if (!_saving) ...[SaveSlot.autoSlotId, SaveSlot.quickSlotId], ...widget.slots];
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
@@ -66,14 +107,7 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: _saving || slots[id] != null
-                        ? () async {
-                            if (_saving) {
-                              await widget.onSave!(id);
-                              setState(() => _slots = widget.setup.storage.listSlots());
-                            } else {
-                              widget.onLoad?.call(slots[id]!);
-                            }
-                          }
+                        ? () => _saving ? _save(id, occupied: slots[id] != null) : widget.onLoad?.call(slots[id]!)
                         : null,
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -94,6 +128,13 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
                               ],
                             ),
                           ),
+                          // The autosave is the engine's own: the next scene would write it again anyway.
+                          if (slots[id] != null && id != SaveSlot.autoSlotId)
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: strings.deleteSave,
+                              onPressed: () => _delete(id),
+                            ),
                         ],
                       ),
                     ),
@@ -107,7 +148,7 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
   }
 }
 
-/// A save slot's stage in miniature: background and characters as they were saved.
+/// A save slot's stage in miniature: background, characters, weather and any CG held over them, as they were saved.
 /// Chat and call saves, and saves without a stage, show the mode instead.
 class SaveThumbnail extends StatelessWidget {
   static const size = Size(64, 96);
@@ -154,6 +195,10 @@ class SaveThumbnail extends StatelessWidget {
           speakerId: stage.speakerId,
           zoom: stage.zoom,
           zoomFocus: stage.zoomFocus,
+          weather: stage.weather,
+          cg: stage.cg == null ? null : config.bg(stage.cg!),
+          cgZoom: stage.cgZoom,
+          cgFocus: stage.cgFocus,
           instant: true,
         ),
       );

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/material.dart';
 
+import '../common/motion.dart';
 import '../skin/story_skin.dart';
 import 'cg_layer.dart';
 import 'stage_transitions.dart';
@@ -180,6 +181,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
   late final AnimationController _flash = AnimationController(vsync: this, value: 1);
   double _shakeIntensity = 0;
   Color _flashColor = Colors.white;
+  double _flashPeak = 1;
 
   /// Characters on stage that size the sprites, 1 to 3. See [Poi.heightShare].
   int _crowd = 1;
@@ -266,10 +268,12 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
 
   void _remove(String id) => _entries.remove(id)?.controller.dispose();
 
+  /// Plays the shake and flash of [Poi.direction]. With reduced motion the stage doesn't shake and the flash is a
+  /// soft tint instead of a full-screen strobe.
   void _playCues() {
     if (widget.instant) return;
     final shake = _action<ShakeAction>();
-    if (shake != null) {
+    if (shake != null && !reduceMotion) {
       _shakeIntensity = shake.intensity;
       _shake.duration = Duration(milliseconds: shake.durationMs);
       _shake.forward(from: 0);
@@ -277,6 +281,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     final flash = _action<FlashAction>();
     if (flash != null) {
       _flashColor = _parseColor(flash.color);
+      _flashPeak = reduceMotion ? 0.3 : 1;
       _flash.duration = Duration(milliseconds: flash.durationMs);
       _flash.forward(from: 0);
     }
@@ -298,7 +303,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     final stage = AnimatedScale(
       scale: widget.zoom,
       alignment: Alignment((Poi._fiveX[widget.zoomFocus]! / 1.5).clamp(-1.0, 1.0), 0),
-      duration: _duration(zoom, const Duration(milliseconds: 500)),
+      duration: reduceMotion ? Duration.zero : _duration(zoom, const Duration(milliseconds: 500)),
       curve: Curves.easeInOut,
       child: Stack(
         fit: StackFit.expand,
@@ -328,7 +333,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
             fit: StackFit.expand,
             children: [
               stage,
-              if (widget.weather != null) WeatherLayer(weather: widget.weather!),
+              if (widget.weather != null) WeatherLayer(weather: widget.weather!, still: widget.instant || reduceMotion),
               CgLayer(
                 image: widget.cg,
                 zoom: widget.cgZoom,
@@ -349,7 +354,9 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
             animation: _flash,
             builder: (context, _) => _flash.value >= 1
                 ? const SizedBox.shrink()
-                : ColoredBox(color: _flashColor.withValues(alpha: 1 - Curves.easeOut.transform(_flash.value))),
+                : ColoredBox(
+                    color: _flashColor.withValues(alpha: _flashPeak * (1 - Curves.easeOut.transform(_flash.value))),
+                  ),
           ),
         ),
       ],

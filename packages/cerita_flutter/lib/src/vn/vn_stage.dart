@@ -1,6 +1,7 @@
 import 'package:cerita_core/cerita_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../clues/case_board.dart';
 import '../common/backlog_sheet.dart';
@@ -20,7 +21,8 @@ import 'poi.dart';
 
 /// Visual Novel stage: background, sprite slots, held CGs, dialogue box or NVL page, CG overlays,
 /// choice / input overlays and quick controls (backlog, auto, skip, menu, back, quick save / load, hide).
-/// A mouse wheel scroll up rolls back.
+/// A mouse wheel scroll up rolls back. On a keyboard, Space / Enter advance, Escape opens the menu, Page Up / Arrow Up
+/// roll back and H hides the UI, see [_VnStageState._onKey].
 class VnStage extends StatefulWidget {
   final StoryController controller;
   final StorySetup setup;
@@ -46,7 +48,19 @@ class _VnStageState extends State<VnStage> {
   /// [_hidden] by holding the stage, not by the hide button.
   bool _peeking = false;
 
+  /// Takes the keys, see [_onKey].
+  final _focus = FocusNode(debugLabel: "VnStage");
+
   StoryController get controller => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Not autofocus: on a scene change the outgoing stage still holds the focus while this one is built.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && (ModalRoute.of(context)?.isCurrent ?? true) && !_typing) _focus.requestFocus();
+    });
+  }
 
   LoaderConfig get config => widget.setup.config;
 
@@ -83,7 +97,39 @@ class _VnStageState extends State<VnStage> {
   void dispose() {
     // A scene change can take the stage away while the UI is hidden.
     if (_hidden) controller.setUiHidden(false);
+    _focus.dispose();
     super.dispose();
+  }
+
+  /// Desktop keys. They reach the stage only while it has focus: a dialog, a sheet or another route takes focus
+  /// away, and a text field keeps the keys it types. Over choices and the input prompt only Escape and H work.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) return KeyEventResult.ignored;
+    if (!(ModalRoute.of(context)?.isCurrent ?? true) || _typing) return KeyEventResult.ignored;
+    final key = event.logicalKey;
+    final repeat = event is KeyRepeatEvent;
+    final asking = controller.phase == StoryPhase.choice || controller.phase == StoryPhase.input;
+    if (key == LogicalKeyboardKey.escape) {
+      if (!repeat) _hidden ? _setHidden(false) : widget.onMenu();
+    } else if (key == LogicalKeyboardKey.keyH) {
+      if (!repeat) _setHidden(!_hidden);
+    } else if (_advanceKeys.contains(key) && (_hidden || !asking)) {
+      _onTap();
+    } else if ((key == LogicalKeyboardKey.pageUp || key == LogicalKeyboardKey.arrowUp) && !_hidden) {
+      controller.rollback();
+    } else {
+      return KeyEventResult.ignored;
+    }
+    return KeyEventResult.handled;
+  }
+
+  static final _advanceKeys = {LogicalKeyboardKey.space, LogicalKeyboardKey.enter, LogicalKeyboardKey.numpadEnter};
+
+  /// Whether a text field has focus, like the input prompt's.
+  bool get _typing {
+    final focused = FocusManager.instance.primaryFocus?.context;
+    return focused != null &&
+        (focused.widget is EditableText || focused.findAncestorWidgetOfExactType<EditableText>() != null);
   }
 
   void _onPointerSignal(PointerSignalEvent event) {
@@ -155,7 +201,7 @@ class _VnStageState extends State<VnStage> {
       ),
     );
 
-    return Listener(
+    final view = Listener(
       onPointerSignal: _onPointerSignal,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -273,6 +319,8 @@ class _VnStageState extends State<VnStage> {
         ),
       ),
     );
+    // Keys reach the stage while nothing in front of it has focus.
+    return Focus(focusNode: _focus, onKeyEvent: _onKey, child: view);
   }
 }
 
