@@ -53,7 +53,7 @@ class StoryCatalog {
       for (final item in conversation.conversations) {
         final found = switch (item) {
           MediaItemType() => [item],
-          StageItemType(:final actions) => [for (final action in actions.whereType<CgAction>()) ?action.galleryItem],
+          StageItemType(:final actions) => [for (final action in actions.whereType<CgAction>()) ?action.galleryItem()],
           _ => const <MediaItemType>[],
         };
         for (final media in found) {

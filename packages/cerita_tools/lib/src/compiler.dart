@@ -225,7 +225,11 @@ class _Compiler {
   Map<String, Object?> _stageAction(StageAction action) {
     final json = <String, Object?>{"action": action.action};
     action.fields.forEach((key, value) {
-      json[key] = value is ProfileRef ? _stageProfile(value, idOnly: action.idOnly) : value;
+      json[key] = switch (value) {
+        ProfileRef() => _stageProfile(value, idOnly: action.idOnly),
+        Localized() => _text(value),
+        _ => value,
+      };
     });
     return json;
   }

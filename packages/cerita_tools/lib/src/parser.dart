@@ -662,9 +662,17 @@ class ScriptParser {
         nullable("image", "an image or none");
         if (fields["image"] == null) {
           if (st.take("unlock") != null) _error(span, "cg none has nothing to unlock");
+          for (final key in const ["title", "caption"]) {
+            if (st.localized(key) != null) _error(span, "cg none has no $key");
+          }
         } else {
           final unlock = st.take("unlock");
           if (unlock != null) fields["unlock_id"] = unlock;
+          for (final key in const ["title", "caption"]) {
+            final text = st.localized(key);
+            if (text == null) continue;
+            unlock == null ? _error(span, "cg $key= names a Gallery entry, so it needs unlock=") : fields[key] = text;
+          }
         }
         cgCamera();
       case "cg_move":

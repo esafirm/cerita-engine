@@ -756,7 +756,7 @@ class RealFsseEngine extends FsseEngine {
     final unlocks = [
       if (item is MediaItemType) item,
       if (item is StageItemType)
-        for (final action in item.actions.whereType<CgAction>()) ?action.galleryItem,
+        for (final action in item.actions.whereType<CgAction>()) ?action.galleryItem(localizer: localizer),
     ];
     for (final media in unlocks) {
       if (media.unlockId == null || !meta.unlockedMediaIds.add(media.unlockId!)) continue;

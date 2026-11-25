@@ -63,6 +63,26 @@ choice
     expect(choice["choices"][1]["text"], {"id": "Tidak"});
   });
 
+  test('a held cg compiles its Gallery title and caption per locale', () {
+    final json = _compileOne(story({
+      "a.cerita": """
+@conversation index
+stage
+  cg cg_storm.png unlock=cg_storm title="Badai" title.en="The Storm" caption.en="Pluit, 2 AM"
+""",
+    }, config: _bilingual));
+    final [stage] = json["conversations"] as List;
+    expect(stage["actions"], [
+      {
+        "action": "cg",
+        "image": "cg_storm.png",
+        "unlock_id": "cg_storm",
+        "title": {"id": "Badai", "en": "The Storm"},
+        "caption": {"en": "Pluit, 2 AM"},
+      },
+    ]);
+  });
+
   test('expressions by name compile to <id>:<index> and the cast to profiles.json', () {
     final result = compileStory(story({
       "a.cerita": "@conversation index\nnora:smile\n  en: Hi\nnora\n  en: Yo\nplayer\n  en: Hey\n",

@@ -288,7 +288,8 @@ class SetItem extends ItemNode {
 }
 
 /// One stage action (data schema §4.12). [fields] are the JSON fields after `action`, in output order. A
-/// [ProfileRef] value is resolved when compiling: to `<id>:<sprite>`, or to `<id>` when [idOnly].
+/// [ProfileRef] value is resolved when compiling: to `<id>:<sprite>`, or to `<id>` when [idOnly]. A
+/// [Localized] value (a `cg` title or caption) compiles like any localized field.
 class StageAction {
   final String action;
   final SourceSpan span;

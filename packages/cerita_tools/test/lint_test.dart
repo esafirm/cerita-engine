@@ -262,6 +262,19 @@ ending end GOOD
     ]);
   });
 
+  test('a held cg title needs an unlock and a translation', () async {
+    const script = "@conversation index\nstage\n  cg none title=x\n  cg a.png title=Badai\n";
+    expect(await _lint(story({"a.cerita": script}, config: _bilingual)), containsAll([
+      "a.cerita:3: error: cg none has no title",
+      "a.cerita:4: error: cg title= names a Gallery entry, so it needs unlock=",
+    ]));
+    const valid = "@conversation index\nstage\n  cg b.png unlock=b title=Badai\n";
+    expect(
+      await _lint(story({"a.cerita": valid}, config: _bilingual)),
+      contains("a.cerita:3: warning: Missing 'en' text"),
+    );
+  });
+
   test('statements under a broken @conversation belong to no conversation', () {
     final project = story({"a.cerita": "@conversation index\nending end GOOD\n  en: E\n@conversation bad-key\nnarration\n  en: Lost\n"});
     expect(project.conversations.single.items, hasLength(1));

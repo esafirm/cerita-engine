@@ -221,6 +221,11 @@ class _ScriptLinter {
         checkFields(item);
         if (item is InputItem) check(item.defaultValue);
         if (item is ChoiceItem) item.options.forEach(checkFields);
+        if (item is StageItem) {
+          for (final action in item.actions) {
+            action.fields.values.whereType<Localized>().forEach(check);
+          }
+        }
       }
     }
   }

@@ -426,6 +426,35 @@ void main() {
         ("cg_b", MediaType.cg, "cg_b.png"),
       ]);
     });
+
+    test('a held CG names its Gallery entry and unlock toast in the player\'s language', () async {
+      final loader = _FakeEngineLoader({
+        "index": _conversation([
+          {
+            "type": "STAGE",
+            "actions": [
+              {
+                "action": "cg",
+                "image": "cg_storm.png",
+                "unlock_id": "cg_storm",
+                "title": {"id": "Badai", "en": "The Storm"},
+                "caption": "Pluit, 2 AM",
+              },
+            ],
+          },
+          _text("one"),
+        ]),
+      });
+      final unlocked = <MediaItemType>[];
+      final engine = RealFsseEngine(loader, storage: InMemoryStoryStorage(), listener: _Unlocks(unlocked))
+        ..locale = "en";
+      await engine.next();
+      expect((unlocked.single.title, unlocked.single.caption), ("The Storm", "Pluit, 2 AM"));
+
+      final entry = StoryCatalog([(await loader.initialLoad()).conversation]).media.single.item;
+      expect(entry.title, "Badai");
+      expect(entry.localized(const Localizer(locale: "en")).title, "The Storm");
+    });
   });
 }
 
@@ -500,4 +529,16 @@ void _peekExitTests() {
       expect(exit!.next, isNull);
     });
   });
+}
+
+class _Unlocks with EngineListener {
+  final List<MediaItemType> unlocked;
+
+  _Unlocks(this.unlocked);
+
+  @override
+  void onNewScene(Scene scene) {}
+
+  @override
+  void onMediaUnlocked(MediaItemType item) => unlocked.add(item);
 }

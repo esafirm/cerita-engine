@@ -1,3 +1,4 @@
+import 'package:cerita_core/src/l10n/localized_text.dart';
 import '../scene.dart';
 import 'base.dart';
 import 'media.dart';
@@ -92,6 +93,8 @@ sealed class StageAction {
       "cg" => CgAction(
           json["image"] as String?,
           unlockId: json["unlock_id"] as String?,
+          title: LocalizedText.fromJson(json["title"]),
+          caption: LocalizedText.fromJson(json["caption"]),
           zoom: (json["zoom"] as num?)?.toDouble(),
           focus: CgFocus.fromName(json["focus"] as String?),
           transition: transition,
@@ -251,17 +254,38 @@ class CgAction extends StageAction {
   /// Registers the CG in the Gallery.
   final String? unlockId;
 
+  /// Gallery name and caption of an unlockable CG, like a `MEDIA` CG's `title` and `caption`.
+  final LocalizedText? title;
+  final LocalizedText? caption;
+
   /// Camera the CG starts with: [zoom] (default `1`) towards [focus] (default [CgFocus.center]). A variant swapped
   /// in for the CG shown keeps the camera where it is unless these are given.
   final double? zoom;
   final CgFocus? focus;
 
-  const CgAction(this.image, {this.unlockId, this.zoom, this.focus, super.transition, super.durationMs});
+  const CgAction(
+    this.image, {
+    this.unlockId,
+    this.title,
+    this.caption,
+    this.zoom,
+    this.focus,
+    super.transition,
+    super.durationMs,
+  });
 
-  /// The CG as a Gallery entry, when it has an [unlockId].
-  MediaItemType? get galleryItem => unlockId == null || image == null
+  /// The CG as a Gallery entry, when it has an [unlockId], with its text in [localizer]'s language. It keeps the
+  /// raw text, so [MediaItemType.localized] shows it in another language.
+  MediaItemType? galleryItem({Localizer localizer = const Localizer()}) => unlockId == null || image == null
       ? null
-      : MediaItemType.fromJson({"type": MediaItemType.type, "media_type": MediaType.cg.key, "uri": image, "unlock_id": unlockId});
+      : MediaItemType.fromJson({
+          "type": MediaItemType.type,
+          "media_type": MediaType.cg.key,
+          "uri": image,
+          "unlock_id": unlockId,
+          "title": ?title?.toJson(),
+          "caption": ?caption?.toJson(),
+        }, localizer: localizer);
 }
 
 /// Moves the camera on the CG shown: zooms to [zoom] and pans to [focus] over [durationMs], a slow pan or push-in.
