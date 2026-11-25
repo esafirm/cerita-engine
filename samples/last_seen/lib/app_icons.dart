@@ -9,7 +9,7 @@ import 'ui/retro.dart';
 /// An app icon players can pick in Extras. The art is `art/icon/icon_<name>.png` (the main one `art/icon/icon.png`),
 /// drawn from `art/prompts/icon_<name>.txt`, and `tools/make-icon.sh` writes the launcher icons and the preview.
 class AppIcon {
-  /// What Android's MainActivity calls it, and the preview's file name.
+  /// What Android's MainActivity and iOS's AppDelegate call it, and the preview's file name.
   final String name;
   final String titleId;
   final String titleEn;
@@ -28,17 +28,19 @@ const appIcons = [
   AppIcon("undelivered", "Tak Terkirim", "Undelivered"),
 ];
 
-/// Switches the launcher icon. Android only for now: each icon is a launcher entry in the manifest and MainActivity
-/// turns the picked one on once the player leaves the game, since Android closes the game when the entry it was opened
-/// through goes off. iOS needs alternate icons in the Xcode project first.
+/// Switches the launcher icon. On Android each icon is a launcher entry in the manifest and MainActivity turns the
+/// picked one on once the player leaves the game, since Android closes the game when the entry it was opened through
+/// goes off. On iOS each is an alternate icon set in Assets.xcassets and AppDelegate switches it at once, with a
+/// system alert.
 class AppIconSwitch {
   static const _channel = MethodChannel("seawall/app_icon");
 
   const AppIconSwitch();
 
-  bool get supported => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  bool get supported =>
+      !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
-  /// The [AppIcon.name] in use, or picked and waiting for the player to leave the game.
+  /// The [AppIcon.name] in use, or on Android picked and waiting for the player to leave the game.
   Future<String> current() async => await _channel.invokeMethod<String>("current") ?? appIcons.first.name;
 
   Future<void> set(String name) => _channel.invokeMethod<void>("set", name);
@@ -80,7 +82,7 @@ class _AppIconsScreenState extends State<AppIconsScreen> {
     try {
       await widget.icons.set(icon.name);
       _current = icon.name;
-      message = text.changed;
+      message = defaultTargetPlatform == TargetPlatform.iOS ? text.changedNow : text.changed;
     } on PlatformException {
       message = text.failed;
     }
@@ -217,5 +219,7 @@ class _Text {
   String get changed => en
       ? "Done. The new icon shows on your home screen once you leave the game."
       : "Beres. Ikon baru muncul di layar utama setelah kamu keluar dari game.";
+  String get changedNow =>
+      en ? "Done. The new icon is on your home screen." : "Beres. Ikon baru sudah ada di layar utama.";
   String get failed => en ? "Couldn't change the icon." : "Gagal mengganti ikon.";
 }

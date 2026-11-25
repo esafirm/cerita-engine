@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cerita_flutter/cerita_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -436,6 +437,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text("Gagal mengganti ikon."), findsOneWidget);
       expect(find.bySemanticsLabel("Tanggul, Dipakai"), findsOneWidget);
+    });
+
+    test('Android and iOS switch icons, desktop doesn\'t', () {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      for (final (platform, supported) in [
+        (TargetPlatform.android, true),
+        (TargetPlatform.iOS, true),
+        (TargetPlatform.macOS, false),
+      ]) {
+        debugDefaultTargetPlatformOverride = platform;
+        expect(const AppIconSwitch().supported, supported, reason: "$platform");
+      }
+    });
+
+    testWidgets('on iOS the new icon is there at once', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final calls = await pump(tester, owned: true);
+      await tester.tap(find.text("Menoleh"));
+      await tester.pumpAndSettle();
+      debugDefaultTargetPlatformOverride = null;
+      expect(calls.last.arguments, "lookback");
+      expect(find.text("Beres. Ikon baru sudah ada di layar utama."), findsOneWidget);
     });
   });
 }

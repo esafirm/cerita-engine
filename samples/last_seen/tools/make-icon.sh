@@ -10,7 +10,8 @@
 #   - art/icon/play-store.png at 512px for the Play listing
 #
 # An alternate icon, one players can pick in Extras (art/prompts/icon_<name>.txt): writes art/icon/icon_<name>.png and
-# the Android ic_launcher_<name> icons, legacy and adaptive, for the activity-alias of the same name in the manifest.
+# the Android ic_launcher_<name> icons, legacy and adaptive, for the activity-alias of the same name in the manifest,
+# and the iOS alternate icon AppIcon<Name> (ios/Runner/Assets.xcassets/AppIcon<Name>.appiconset).
 #
 # Both also write the preview the app shows in Extras → App icon, assets/icons/<name>.png (the main one is seawall).
 #
@@ -75,12 +76,39 @@ EOF
   echo "  mipmap-anydpi-v26/$name.xml"
 }
 
+# The iOS alternate icon AppIcon<Name> ($1 the icon's name): one 1024px picture, Xcode draws the other sizes. The
+# project lists it in ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES, and AppDelegate switches to it.
+ios_icon() {
+  local set
+  set="$here/ios/Runner/Assets.xcassets/AppIcon$(tr '[:lower:]' '[:upper:]' <<< "${1:0:1}")${1:1}.appiconset"
+  mkdir -p "$set"
+  scaled 1024 "$set/Icon-App-1024x1024@1x.png"
+  cat > "$set/Contents.json" <<EOF
+{
+  "images" : [
+    {
+      "filename" : "Icon-App-1024x1024@1x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
+EOF
+  echo "  ${set#"$here/"} (1024)"
+}
+
 mkdir -p "$here/assets/icons"
 scaled 192 "$here/assets/icons/${alt:-seawall}.png"
 echo "  assets/icons/${alt:-seawall}.png (192)"
 
 if [[ -n $alt ]]; then
   android_icon "ic_launcher_$alt" legacy
+  ios_icon "$alt"
   exit
 fi
 
