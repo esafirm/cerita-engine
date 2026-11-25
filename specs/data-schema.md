@@ -468,7 +468,7 @@ Runs a list of `actions` on the VN stage at once, then continues by itself once 
 | `clear` | `transition`? | Removes every character. |
 | `move` | `profile` (`<id>`), `position` | Slides a character to another slot. |
 | `background` | `image` (null for black), `transition`? | Changes the background without starting a new conversation. |
-| `cg` | `image` (null hides it), `unlock_id`?, `zoom`?, `focus`?, `transition`? | Holds a full-screen CG (a file in `bg/`) over the stage while the lines after it play, until the next `cg`, a `cg` with a null `image`, or a new conversation with its own `scene`. A new `image` cross-fades over the one shown: a variant of the same moment keeps the camera, so the two line up. A CG shown over none starts at `zoom` (default `1`, at least `1`) towards `focus` (default `"center"`). `unlock_id` adds it to the Gallery, like a `MEDIA` CG. |
+| `cg` | `image` (null hides it), `unlock_id`?, `title`?, `caption`?, `zoom`?, `focus`?, `transition`? | Holds a full-screen CG (a file in `bg/`) over the stage while the lines after it play, until the next `cg`, a `cg` with a null `image`, or a new conversation with its own `scene`. A new `image` cross-fades over the one shown: a variant of the same moment keeps the camera, so the two line up. A CG shown over none starts at `zoom` (default `1`, at least `1`) towards `focus` (default `"center"`). `unlock_id` adds it to the Gallery like a `MEDIA` CG, and `title` and `caption` (localizable, §7.1) name it there and in the unlock toast. |
 | `cg_move` | `zoom`?, `focus`?, `duration_ms` | Eases the camera on the CG to `zoom` and `focus` over `duration_ms`: a slow push-in or a pan. The story doesn't wait for it, so it plays on under the next lines. With a `cg` in the same `STAGE`, the move starts from that `cg`'s framing. |
 | `music` | `file` (null stops), `fade_ms`? | Changes the looping BGM. The old track fades out and the new one fades in, over `fade_ms` (default `1000`, `0` cuts). |
 | `ambience` | `file` (null stops), `fade_ms`? | Changes the looping background sound, faded like `music`. |
@@ -562,6 +562,7 @@ A plain string is the same text in every language, so single-language stories ne
 | Conversation file | `chapter`, `title`, `scene.status` |
 | `TEXT`, `NARRATION` | `text` |
 | `MEDIA` | `title`, `caption`, `transcript` |
+| `STAGE` | a `cg` action's `title` and `caption` |
 | `CHOICE` | `text` (the prompt) and each option's `text` |
 | `INPUT` | `text` (the prompt), `default_value` |
 | `WAIT` | `notification_text` |

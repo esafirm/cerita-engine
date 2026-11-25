@@ -317,11 +317,16 @@ stage wait=0
 | `weather rain\|snow\|sakura\|none` | `weather` |
 | `shake intensity=<px>` / `flash color=#RRGGBB` | `shake` / `flash` |
 | `zoom [<scale>] [focus=<position>]` | `zoom` |
-| `cg <image>\|none [unlock=<id>] [zoom=<scale>] [focus=<focus>]` | `cg` |
+| `cg <image>\|none [unlock=<id> [title=<text>] [caption=<text>]] [zoom=<scale>] [focus=<focus>]` | `cg` |
 | `cg_move [zoom=<scale>] [focus=<focus>] duration=<time>` | `cg_move` |
 | `textbox adv\|nvl` / `page` | `textbox` / `page` |
 
 Positions are `far_left`, `left`, `center`, `right` and `far_right`. A CG focus is `center`, `left`, `right`, `top`, `bottom`, `top_left`, `top_right`, `bottom_left` or `bottom_right`. A `stage` body can also hold effect lines.
+
+A `cg` with `unlock=` can name its Gallery entry and unlock toast with `title=` and `caption=`, like a `media CG`
+body's `title` and `caption`. They take a translation per locale like other attributes:
+`cg cg_storm.png unlock=cg_storm title="Badai" title.en="The Storm"`. Without `unlock=` there is no Gallery entry to
+name, so they are an error, and so is either on `cg none`.
 
 ### 2.7 Locales (CE-01)
 
@@ -369,7 +374,7 @@ It checks in two layers and reports both together:
    | Syntax | An unknown statement, stage action or attribute, a body line outside a statement, an option outside a `choice`, a missing prompt or option text |
    | Unknown speaker or expression | `hendra:smirk` when `smirk` isn't in `profiles.yaml` |
    | Unused cast | A character or expression in `profiles.yaml` that no script uses (warning) |
-   | Missing translation | A localized field without one of the `locales` (warning) |
+   | Missing translation | A localized field without one of the `locales`, also a `stage cg` `title=` or `caption=` (warning) |
    | Structure | No `index` conversation, two conversations with one key |
    | `silent` read as a variable | A `choice silent` without a variable while the story reads a variable named `silent` (§2.2) |
 
@@ -441,7 +446,7 @@ and audio pipelines. It always exits with `0`: it's a report, and `lint` is the 
 | Kind | Folder | Referenced by |
 | :--- | :--- | :--- |
 | `background` | `bg/` | `@scene bg=`, `stage background` |
-| `cg` | `bg/` | `media CG` |
+| `cg` | `bg/` | `media CG`, `stage cg` |
 | `sprite` | `sprites/` | `profiles.yaml` expressions |
 | `avatar` | `sprites/` or under `asset_prefix` | `profiles.yaml`, `channels.yaml` avatars |
 | `image`, `video`, `voice_note` | `media/` | `media IMAGE`, `media VIDEO`, `media AUDIO` |

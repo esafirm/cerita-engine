@@ -1,4 +1,3 @@
-| `developer_tools` | `false` | Shows the developer panel in the in-game menu in any build. Turned on from the admin tools (authoring tools §5). Written only when on. |
 # Engine, State & Persistence Specification
 
 This document specifies how `FsseEngine` manages runtime state, evaluates conditions and effects, interpolates variables, and persists progress across sessions.
@@ -185,7 +184,7 @@ erDiagram
 ```
 
 ### 5.1 Global Meta-State (Cross-Playthrough)
-Persisted immediately whenever a player encounters a `MEDIA` item with an `unlock_id`, reaches an `ENDING` item, or enters a conversation marked `"checkpoint": true`:
+Persisted immediately whenever a player encounters a `MEDIA` item or a `STAGE` `cg` action with an `unlock_id`, reaches an `ENDING` item, or enters a conversation marked `"checkpoint": true`:
 - **Unlocked Media (`unlocked_media_ids`)**: Powers the Gallery (photos, CGs, voice notes, videos). Once unlocked, remains viewable even if the player starts a new game.
 - **Unlocked Endings (`unlocked_ending_ids`)**: Tracks completion across all 20+ endings.
 - **Unlocked Checkpoints (`unlocked_checkpoints`)**: Stores variable snapshots at major Day/Chapter boundaries so players can jump back to a specific Day to explore alternate branches.
@@ -207,7 +206,7 @@ Persisted immediately whenever a player encounters a `MEDIA` item with an `unloc
 
 **Reset progress** calls `StoryStorage.clear()`, which wipes the whole meta-state (gallery, endings, checkpoints, chosen choices, persistent variables, remembered facts) and every save slot.
 
-Slot ids: `0` is the autosave, written after every delivered item and deleted when the playthrough reaches an `ENDING` (or runs out of items), so a finished story offers no Continue. `-1` is the quick save slot. `1` and up are manual slots.
+Slot ids: `0` is the autosave, written after every delivered item and deleted when the playthrough reaches an `ENDING` (or runs out of items), so a finished story offers no Continue. `-1` is the quick save slot. `1` and up are manual slots. `StoryStorage.deleteSlot` removes one: the Save and Load screens offer it for the quick save and manual slots (presentation modes §4).
 
 ### 5.3 Player Settings
 Preferences live outside both scopes, so resetting progress keeps them. `StoryStorage.loadSettings` / `saveSettings` store them; storages that don't override them keep the defaults in memory.
@@ -221,6 +220,7 @@ Preferences live outside both scopes, so resetting progress keeps them. `StorySt
 | `music_volume`, `sound_volume`, `voice_volume` | `1.0` | Volume of each audio channel, `0.0` to `1.0`. Ambience follows `sound_volume`. |
 | `voice_volumes` | `{}` | Per-character voice volume by profile id, `0.0` to `1.0`, on top of `voice_volume`. Missing characters play at `1.0`. |
 | `locale` | none | The player's language (§9.4). Unset until the player or the device picks one. |
+| `developer_tools` | `false` | Shows the developer panel in the in-game menu in any build. Turned on from the admin tools (authoring tools §5). Written only when on. |
 
 ---
 
@@ -320,7 +320,8 @@ follow a language switch (PRD D3). `entry.itemType` keeps resolving to the sourc
 ### 9.5 Listener
 
 `EngineListener.onMediaUnlocked(MediaItemType item)` receives the unlocked item in the active language, so the
-UI can name it by its `title` (or `caption`) instead of its `unlock_id`.
+UI can name it by its `title` (or `caption`) instead of its `unlock_id`. A CG held by a `STAGE` `cg` action arrives as a
+`MEDIA` CG item (`CgAction.galleryItem`) with that action's `title` and `caption`.
 
 ---
 

@@ -1,4 +1,3 @@
-| Bad credits | `credits.json` fails to load (a section without `title`, a person without `name`, an asset without `title`, `author`, `source` or `license`), or `roll_after` names an `ending_id` no `ENDING` has. |
 # Authoring Tools Specification
 
 Tools for writers working on a story: a linter that finds mistakes before a player does, a graph of how the story flows, and a developer panel inside the running story.

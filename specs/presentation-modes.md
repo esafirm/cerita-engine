@@ -90,6 +90,17 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
   - **Hide**: Hides the dialogue box, overlays and controls to look at the stage or a CG. Any tap brings them back. Holding the stage anywhere but a control does the same until the finger lifts (`HoldToPeek`: a hold that starts on a button, a choice or a menu entry does nothing). Anything with a `MouseRegion`, which every `InkWell` and Material button has, counts as a control, so a skin's own buttons made of a plain `GestureDetector` wrap it in one. Auto and skip wait while the UI is hidden and carry on when it comes back.
   - **Case Board**: Opens the board (§6) in stories with clues, with a badge counting new clues.
   - **End of a scene**: a stage direction or wait that ends a scene leaves a pulsing **Tap to continue** over the stage, and the next scene waits for the tap (§7).
+  - **Keyboard** (desktop and web): Space or Enter advances (or finishes the line typing out, like a tap), Escape opens
+    the in-game menu (or brings a hidden UI back), Page Up or Arrow Up rolls back, and H hides or shows the UI. The
+    keys reach the stage only while it has focus: a text field (the input prompt) keeps the keys it types, and an
+    open menu, sheet or dialog takes them. Over a choice or the input prompt only Escape and H work, so Enter never
+    picks for the player.
+  - **Reduced motion**: with the platform's reduce-motion setting (`disableAnimations`) the stage doesn't shake,
+    a flash is a soft tint instead of a full-screen strobe, weather particles hang still, a zoom or `cg_move` cuts
+    to its framing instead of panning, and `{shake}` / `{wave}` text (data schema §6) stays still. Fades stay.
+  - **Screen readers**: the dialogue box reads the whole line once with its speaker, not each letter as it types.
+    Call buttons read as buttons with their label (**End call** for the red one), and the send buttons and the call
+    menu have tooltips.
 
 ---
 
@@ -116,6 +127,10 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
 
 1. **Collectibles Gallery**:
    - Grid view categorized into **Photos / CGs**, **Voice Notes**, and **Videos**.
+   - Only the kinds the story has get a tab. A story with a single kind shows its grid without tabs, under the
+     kind's name, and a story with nothing to collect says so instead of showing empty tabs.
+   - A CG held with the `stage` `cg` action is listed like a `MEDIA` CG, by its `title` (data schema §4.12).
+   - A voice note plays at the player's voice volume and, opened from a running story, ducks the music.
    - Locked items display a silhouette/placeholder with a hint (e.g., *"Unlocked in Day 3"*); unlocked items (matched against `unlocked_media_ids`) can be viewed or replayed at any time.
 2. **Endings Collection**:
    - Displays all story endings (`unlocked_ending_ids` vs. total endings), showing the ending badge (`TRUE`, `GOOD`, `BAD`, `SECRET`), title, and summary for completed routes.
@@ -139,7 +154,12 @@ Activated when `scene.mode == "VN"` (default). Evolves `SimpleConversation`, `Po
    - **Replay** plays only that chapter (engine §8) and returns when it ends, without touching the saves.
 4. **Save / Load Slots**:
    - Autosave, quick save and manual slots with chapter, title and time.
-   - Each slot has a thumbnail drawn from its saved stage (background and characters). Chat and call saves show the mode instead.
+   - Each slot has a thumbnail drawn from its saved stage: background, characters, weather (still) and a CG held
+     over them, so a save made during a held CG shows the CG, not the scene behind it. Chat and call saves show the
+     mode instead.
+   - Saving over a slot in use asks first (**Overwrite save?**). The quick save and manual saves have a delete
+     button that also asks first. The autosave can't be deleted: the next scene writes it again.
+   - Manual slots default to 1, 2 and 3. Apps pick others with `SaveSlotsScreen(slots:)`.
 5. **Music Room**:
    - Every track of the story, in story order. Tracks in `heard_music` can be played, the rest are locked.
 6. **Settings**:
