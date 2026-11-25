@@ -214,15 +214,15 @@ class _Text {
       en ? "$chapter is part of the full game." : "$chapter termasuk dalam game lengkap.";
 
   String get pitch => en
-      ? "The Prologue, Day 1 and Day 2 are free. One purchase opens Day 3 to Day 7, all ten endings and the bonus "
-            "wallpapers. No ads, no subscription."
-      : "Prolog, Hari 1 dan Hari 2 gratis. Sekali beli, Hari 3 sampai Hari 7, kesepuluh ending "
-            "dan wallpaper bonus terbuka. Tanpa iklan, tanpa langganan.";
+      ? "The Prologue, Day 1 and Day 2 are free. One purchase opens Day 3 to Day 7, all ten endings, the bonus "
+            "wallpapers and alternate app icons. No ads, no subscription."
+      : "Prolog, Hari 1 dan Hari 2 gratis. Sekali beli, Hari 3 sampai Hari 7, kesepuluh ending, "
+            "wallpaper bonus dan ikon aplikasi alternatif terbuka. Tanpa iklan, tanpa langganan.";
 
   String unlock(String price) => en ? "UNLOCK · $price" : "BUKA · $price";
   String get restore => en ? "Restore purchase" : "Pulihkan pembelian";
   String get back => en ? "Back" : "Kembali";
-  String get backToTitle => en ? "Back to title" : "Kembali ke judul";
+  String get backToTitle => en ? "Back to title" : "Kembali ke menu utama";
   String get checking => en ? "Checking the store..." : "Mengecek toko...";
   String get noStore => en ? "The store isn't available in this version." : "Toko tidak tersedia di versi ini.";
   String get notOnSale => en ? "The full game isn't on sale right now." : "Game lengkap belum dijual saat ini.";

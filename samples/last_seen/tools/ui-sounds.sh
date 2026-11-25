@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Synthesizes the menu blips that RetroSounds plays (lib/ui/retro.dart): decaying square-wave notes, written to
-# assets/story/music/sfx_ui_<name>.mp3. No samples, so nothing to credit.
+# assets/story/music/sfx_ui_<name>.mp3. No samples, credited in assets/story/credits.json as our own.
 #
 #   samples/last_seen/tools/ui-sounds.sh            all of them
 #   samples/last_seen/tools/ui-sounds.sh cursor     just one (cursor, confirm, cancel or start)
