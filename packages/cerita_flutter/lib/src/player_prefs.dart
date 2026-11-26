@@ -6,13 +6,17 @@ import 'package:flutter/foundation.dart';
 class PlayerPrefs extends ValueNotifier<PlayerSettings> {
   final StoryStorage storage;
   Future<void>? _loading;
+  bool _updated = false;
 
   PlayerPrefs(this.storage) : super(const PlayerSettings());
 
   /// Loads the stored settings once. Later calls return the same future.
-  Future<void> load() => _loading ??= storage.loadSettings().then((settings) => value = settings);
+  Future<void> load() => _loading ??= storage.loadSettings().then((settings) {
+        if (!_updated) value = settings;
+      });
 
   Future<void> update(PlayerSettings settings) async {
+    _updated = true;
     value = settings;
     await storage.saveSettings(settings);
   }

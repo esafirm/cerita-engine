@@ -46,6 +46,14 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
 
   final _hold = ValueNotifier(false);
   Timer? _delay;
+  Animation<double>? _route;
+  AnimationStatusListener? _routeListener;
+
+  void _detachRoute() {
+    if (_routeListener case final listener?) _route?.removeStatusListener(listener);
+    _route = null;
+    _routeListener = null;
+  }
 
   @override
   void didChangeDependencies() {
@@ -71,6 +79,7 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
     _delay?.cancel();
     _hold.value = true;
     // Wait for the page transition into the story, so the card isn't spent behind it.
+    _detachRoute();
     final route = ModalRoute.of(context)?.animation;
     if (route == null || route.isCompleted) {
       if (entering) {
@@ -82,10 +91,12 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
     } else {
       void start(AnimationStatus status) {
         if (!status.isCompleted) return;
-        route.removeStatusListener(start);
+        _detachRoute();
         if (mounted) _controller.forward();
       }
 
+      _route = route;
+      _routeListener = start;
       route.addStatusListener(start);
     }
   }
@@ -96,6 +107,7 @@ class _ChapterCardOverlayState extends State<ChapterCardOverlay> with SingleTick
 
   @override
   void dispose() {
+    _detachRoute();
     _delay?.cancel();
     _controller.dispose();
     _hold.dispose();

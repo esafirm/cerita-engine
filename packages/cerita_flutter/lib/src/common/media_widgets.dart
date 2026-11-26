@@ -284,18 +284,21 @@ class VoiceNotePlayer extends StatefulWidget {
   State<VoiceNotePlayer> createState() => _VoiceNotePlayerState();
 }
 
-class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
+class _VoiceNotePlayerState extends State<VoiceNotePlayer> with WidgetsBindingObserver {
   final AudioPlayer _player = AudioHelper.createPlayer();
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
   bool _playing = false;
+  bool _appPaused = false;
+  int _playGeneration = 0;
   bool _showTranscript = false;
   String? _source;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _player.setVolume(widget.audio?.voiceVolume ?? widget.volume ?? 1);
     _subscriptions.addAll([
       _player.onPositionChanged.listen((position) {
@@ -356,16 +359,34 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
 
   Future<void> _toggle() async {
     if (_playing) {
+      _playGeneration++;
       await _player.pause();
       _setPlaying(false);
     } else {
+      if (_appPaused) return;
+      final gen = ++_playGeneration;
       await _player.resume();
+      if (!mounted || gen != _playGeneration || _appPaused) {
+        await _player.pause();
+        return;
+      }
       _setPlaying(true);
     }
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appPaused = state == AppLifecycleState.paused;
+    if (_appPaused) {
+      _playGeneration++;
+      _player.pause();
+      _setPlaying(false);
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     for (final subscription in _subscriptions) {
       subscription.cancel();
     }
@@ -515,23 +536,33 @@ class VideoPlayerPage extends StatefulWidget {
   State<VideoPlayerPage> createState() => _VideoPlayerPageState();
 }
 
-class _VideoPlayerPageState extends State<VideoPlayerPage> {
+class _VideoPlayerPageState extends State<VideoPlayerPage> with WidgetsBindingObserver {
   late final VideoPlayerController _controller = VideoPlayerController.asset(
     widget.asset,
     // Without this the video takes audio focus and the BGM pauses for good (see AudioHelper.createPlayer).
     videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
   );
+  Object? _error;
+  bool _appPaused = false;
+  bool _wasPlayingBeforePause = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     widget.audio?.duck();
-    _controller.initialize().then((_) {
+    _controller.initialize().then((_) async {
       if (!mounted) return;
       setState(() {});
-      _controller
-        ..setVolume(widget.audio?.voiceVolume ?? 1)
-        ..play();
+      await _controller.setVolume(widget.audio?.voiceVolume ?? 1);
+      if (!mounted) return;
+      if (_appPaused) {
+        _wasPlayingBeforePause = true;
+      } else {
+        await _controller.play();
+      }
+    }).catchError((Object error) {
+      if (mounted) setState(() => _error = error);
     });
     _controller.addListener(() {
       if (mounted) setState(() {});
@@ -539,7 +570,25 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _appPaused = true;
+      if (_controller.value.isInitialized && _controller.value.isPlaying) {
+        _wasPlayingBeforePause = true;
+        _controller.pause();
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      _appPaused = false;
+      if (_wasPlayingBeforePause && _controller.value.isInitialized && !_controller.value.hasError) {
+        _wasPlayingBeforePause = false;
+        _controller.play();
+      }
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     widget.audio?.unduck();
     _controller.dispose();
     super.dispose();
@@ -555,12 +604,14 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         children: [
           Expanded(
             child: Center(
-              child: value.isInitialized
-                  ? GestureDetector(
-                      onTap: () => value.isPlaying ? _controller.pause() : _controller.play(),
-                      child: AspectRatio(aspectRatio: value.aspectRatio, child: VideoPlayer(_controller)),
-                    )
-                  : const CircularProgressIndicator(),
+              child: _error != null || value.hasError
+                  ? const Icon(Icons.broken_image_outlined, color: Colors.white54, size: 48)
+                  : value.isInitialized
+                      ? GestureDetector(
+                          onTap: () => value.isPlaying ? _controller.pause() : _controller.play(),
+                          child: AspectRatio(aspectRatio: value.aspectRatio, child: VideoPlayer(_controller)),
+                        )
+                      : const CircularProgressIndicator(),
             ),
           ),
           if (value.isInitialized) VideoProgressIndicator(_controller, allowScrubbing: true),

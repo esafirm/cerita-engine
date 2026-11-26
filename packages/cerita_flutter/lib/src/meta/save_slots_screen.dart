@@ -205,6 +205,7 @@ class SaveThumbnail extends StatelessWidget {
           cgZoom: stage.cgZoom,
           cgFocus: stage.cgFocus,
           instant: true,
+          imageCacheHeight: (size.height * MediaQuery.devicePixelRatioOf(context)).ceil().clamp(64, 512),
         ),
       );
     }

@@ -33,7 +33,7 @@ class ChatView extends StatelessWidget {
     final memberId = controller.channel?.members.firstOrNull;
     if (memberId != null) return controller.profileById(memberId);
     for (final entry in entries.reversed) {
-      final item = entry.itemType;
+      final item = controller.itemOf(entry);
       final profile = item == null ? null : controller.profileOf(item);
       if (profile != null && !controller.isOutgoing(profile)) return profile;
     }
@@ -51,7 +51,7 @@ class ChatView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scene = controller.scene;
-    final entries = controller.channelHistory(scene.channelId).where(MessageBubble.isVisible).toList();
+    final entries = controller.visibleChannelHistory(scene.channelId);
     final contact = _contact(entries);
     final channel = controller.channel;
     final config = setup.config;
@@ -142,7 +142,7 @@ class ChatView extends StatelessWidget {
                       entry: entry,
                       controller: controller,
                       setup: setup,
-                      showSender: entryIndex == 0 || !MessageBubble.sameSender(entries[entryIndex - 1], entry),
+                      showSender: entryIndex == 0 || !MessageBubble.sameSenderIn(entries[entryIndex - 1], entry, controller),
                     );
                   },
                 ),
@@ -270,15 +270,32 @@ class _PacingGate extends StatefulWidget {
 }
 
 class _PacingGateState extends State<_PacingGate> {
+  bool _holding = false;
+
+  void _setHolding(bool held) {
+    if (_holding == held) return;
+    _holding = held;
+    widget.controller.holdPacing(held);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget.controller.holdPacing(ChapterCardOverlay.holdsDialogue(context));
+    _setHolding(ChapterCardOverlay.holdsDialogue(context));
+  }
+
+  @override
+  void didUpdateWidget(_PacingGate oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller && _holding) {
+      oldWidget.controller.holdPacing(false);
+      widget.controller.holdPacing(true);
+    }
   }
 
   @override
   void dispose() {
-    widget.controller.holdPacing(false);
+    _setHolding(false);
     super.dispose();
   }
 

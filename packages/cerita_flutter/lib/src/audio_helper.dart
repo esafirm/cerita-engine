@@ -103,12 +103,19 @@ class AudioHelper with WidgetsBindingObserver {
 
   /// Plays [path] on loop, fading out the old track and in the new one over [fadeMs] ([defaultFadeMs]
   /// when null, 0 cuts). Does nothing if the same track is already playing. Null stops the music.
-  Future<void> playBgm(String? path, {int? fadeMs}) => _bgmChannel.play(path, fadeMs ?? defaultFadeMs);
+  Future<void> playBgm(String? path, {int? fadeMs}) {
+    if (_disposed) return Future.value();
+    return _bgmChannel.play(path, fadeMs ?? defaultFadeMs);
+  }
 
   /// Plays a looping background sound under the music, faded like [playBgm]. Null stops it.
-  Future<void> playAmbience(String? path, {int? fadeMs}) => _ambienceChannel.play(path, fadeMs ?? defaultFadeMs);
+  Future<void> playAmbience(String? path, {int? fadeMs}) {
+    if (_disposed) return Future.value();
+    return _ambienceChannel.play(path, fadeMs ?? defaultFadeMs);
+  }
 
   Future<void> playSfx(String path) {
+    if (_disposed) return Future.value();
     final player = _sfx[_nextSfx];
     _nextSfx = (_nextSfx + 1) % _sfx.length;
     return _safePlay(player, path, _soundVolume);
@@ -118,7 +125,7 @@ class AudioHelper with WidgetsBindingObserver {
   Future<void> playVoice(String path, {double character = 1}) async {
     if (_disposed) return;
     final generation = ++_voiceGeneration;
-    await stopVoice();
+    await _stopVoiceInternal();
     if (_disposed || generation != _voiceGeneration) return;
     _voiceCharacter = character;
     if (!_voiceDucked) {
@@ -129,43 +136,52 @@ class AudioHelper with WidgetsBindingObserver {
     if (!ok && generation == _voiceGeneration) _unduckVoice();
   }
 
-  Future<void> stopVoice() async {
+  Future<void> _stopVoiceInternal() async {
     _unduckVoice();
     if (_disposed) return;
     await _voice.stop();
   }
 
+  Future<void> stopVoice() async {
+    _voiceGeneration++;
+    await _stopVoiceInternal();
+  }
+
   /// Rings [path] on loop at the sound volume until [stopRing].
   Future<void> startRing(String path) {
+    if (_disposed) return Future.value();
     _ringing = true;
     return _safePlay(_ring, path, _soundVolume);
   }
 
   Future<void> stopRing() {
     _ringing = false;
+    if (_disposed) return Future.value();
     return _ring.stop();
   }
 
   /// Lowers the BGM while another channel (voice-over, voice note, video) is audible.
   void duck() {
+    if (_disposed) return;
     _duckCount++;
     _bgmChannel.applyVolume();
   }
 
   void unduck() {
-    if (_duckCount == 0) return;
+    if (_disposed || _duckCount == 0) return;
     _duckCount--;
     if (_duckCount == 0) _bgmChannel.applyVolume();
   }
 
   Future<void> stopAll() async {
     if (_disposed) return;
+    _voiceGeneration++;
     _duckCount = 0;
     _voiceDucked = false;
     _ringing = false;
     await Future.wait([
-      _bgmChannel.play(null, 0),
-      _ambienceChannel.play(null, 0),
+      _bgmChannel.stopNow(),
+      _ambienceChannel.stopNow(),
       for (final player in _sfx) player.stop(),
       _voice.stop(),
       _ring.stop(),
@@ -174,6 +190,7 @@ class AudioHelper with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_disposed) return;
     if (state == AppLifecycleState.resumed) {
       _bgmChannel.resume();
       _ambienceChannel.resume();
@@ -274,6 +291,14 @@ class _LoopChannel {
   void cancel() {
     _generation++;
     _stopFade();
+  }
+
+  /// Stops the channel immediately, including any fade-out already in progress.
+  Future<void> stopNow() {
+    _current = null;
+    _generation++;
+    _stopFade();
+    return player.stop();
   }
 
   void resume() {

@@ -23,17 +23,22 @@ class MessageBubble extends StatelessWidget {
     this.showSender = true,
   });
 
-  static bool isVisible(TranscriptEntry entry) {
-    final item = entry.itemType;
-    return entry.isPlayer || item is TextItemType || item is NarrationItemType || item is MediaItemType;
+  static bool isVisibleItem(TranscriptEntry entry, ItemType? item) =>
+      entry.isPlayer || item is TextItemType || item is NarrationItemType || item is MediaItemType;
+
+  static bool isVisible(TranscriptEntry entry) => isVisibleItem(entry, entry.itemType);
+
+  static String? _senderIdOf(TranscriptEntry entry, ItemType? item) =>
+      entry.isPlayer ? ProfileInfo.playerId : item?.getProfileInfo()?.id;
+
+  static bool sameSenderIn(TranscriptEntry a, TranscriptEntry b, StoryController controller) {
+    final id = _senderIdOf(a, controller.itemOf(a));
+    return id != null && id == _senderIdOf(b, controller.itemOf(b));
   }
 
-  static String? _senderId(TranscriptEntry entry) =>
-      entry.isPlayer ? ProfileInfo.playerId : entry.itemType?.getProfileInfo()?.id;
-
   static bool sameSender(TranscriptEntry a, TranscriptEntry b) {
-    final id = _senderId(a);
-    return id != null && id == _senderId(b);
+    final id = _senderIdOf(a, a.itemType);
+    return id != null && id == _senderIdOf(b, b.itemType);
   }
 
   @override

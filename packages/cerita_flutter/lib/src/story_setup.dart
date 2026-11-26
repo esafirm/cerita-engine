@@ -48,6 +48,8 @@ class StorySetup {
   factory StorySetup.assets({
     LoaderConfig config = const LoaderConfig(),
     StoryStorage? storage,
+    PlayerPrefs? settings,
+    AudioHelper Function() audio = AudioHelper.new,
     bool developer = false,
     AssetBundle? bundle,
     StoryGate? gate,
@@ -57,6 +59,8 @@ class StorySetup {
       config: config,
       loader: AssetEngineLoader(config, bundle: bundle),
       storage: storage ?? SharedPrefsStoryStorage(),
+      settings: settings,
+      audio: audio,
       developer: developer,
       assets: LocalizedAssets(bundle),
       gate: gate,

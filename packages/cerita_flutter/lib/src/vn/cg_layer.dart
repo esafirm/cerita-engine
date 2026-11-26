@@ -25,6 +25,9 @@ class CgLayer extends StatefulWidget {
   /// Applies every change without animating, e.g. while skipping.
   final bool instant;
 
+  /// Optional decoded pixel height for thumbnail rendering.
+  final int? imageCacheHeight;
+
   const CgLayer({
     super.key,
     required this.image,
@@ -32,6 +35,7 @@ class CgLayer extends StatefulWidget {
     this.focus = CgFocus.center,
     this.direction,
     this.instant = false,
+    this.imageCacheHeight,
   });
 
   @override
@@ -134,7 +138,7 @@ class _CgLayerState extends State<CgLayer> with SingleTickerProviderStateMixin {
           layoutBuilder: (current, previous) => Stack(fit: StackFit.expand, children: [...previous, ?current]),
           child: widget.image == null
               ? const SizedBox.expand(key: ValueKey("no-cg"))
-              : _CgImage(widget.image!, key: ValueKey(widget.image)),
+              : _CgImage(widget.image!, cacheHeight: widget.imageCacheHeight, key: ValueKey(widget.image)),
         ),
       ),
     );
@@ -157,12 +161,19 @@ class _Framed extends InheritedWidget {
 /// The CG covering the screen. On a screen narrower than the image, the focus picks which part of it shows.
 class _CgImage extends StatelessWidget {
   final String path;
+  final int? cacheHeight;
 
-  const _CgImage(this.path, {super.key});
+  const _CgImage(this.path, {this.cacheHeight, super.key});
 
   @override
   Widget build(BuildContext context) => ColoredBox(
         color: Colors.black,
-        child: Image.asset(path, fit: BoxFit.cover, alignment: _Framed.of(context), gaplessPlayback: true),
+        child: Image.asset(
+          path,
+          fit: BoxFit.cover,
+          alignment: _Framed.of(context),
+          gaplessPlayback: true,
+          cacheHeight: cacheHeight,
+        ),
       );
 }

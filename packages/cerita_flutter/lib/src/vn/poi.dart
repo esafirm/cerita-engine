@@ -110,6 +110,9 @@ class Poi extends StatefulWidget {
   /// [actors] on stage.
   final PoiCast? cast;
 
+  /// Optional decoded pixel height for background, sprites and CGs (e.g. for small save thumbnails).
+  final int? imageCacheHeight;
+
   const Poi({
     super.key,
     this.background,
@@ -124,6 +127,7 @@ class Poi extends StatefulWidget {
     this.cgFocus = CgFocus.center,
     this.instant = false,
     this.cast,
+    this.imageCacheHeight,
   });
 
   /// Slot x positions while only the three inner slots are used: wide apart. See [_PoiState._slotCenter].
@@ -316,7 +320,13 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
             layoutBuilder: (current, previous) => Stack(fit: StackFit.expand, children: [...previous, ?current]),
             child: widget.background == null
                 ? Container(key: const ValueKey("no-bg"), color: Colors.black)
-                : Image.asset(widget.background!, key: ValueKey(widget.background), fit: BoxFit.cover, gaplessPlayback: true),
+                : Image.asset(
+                    widget.background!,
+                    key: ValueKey(widget.background),
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                    cacheHeight: widget.imageCacheHeight,
+                  ),
           ),
           LayoutBuilder(builder: (context, box) => _characters(skin, box)),
         ],
@@ -340,6 +350,7 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
                 focus: widget.cgFocus,
                 direction: widget.direction,
                 instant: widget.instant,
+                imageCacheHeight: widget.imageCacheHeight,
               ),
             ],
           ),
@@ -465,8 +476,11 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
     }
   }
 
-  Widget _sprite(_ActorEntry entry, String? speaker) =>
-      _SpriteSlot(sprite: entry.actor.sprite, active: speaker == null || speaker == entry.actor.id);
+  Widget _sprite(_ActorEntry entry, String? speaker) => _SpriteSlot(
+        sprite: entry.actor.sprite,
+        active: speaker == null || speaker == entry.actor.id,
+        imageCacheHeight: widget.imageCacheHeight,
+      );
 }
 
 /// One character. Cross-fades expression changes and dims when someone else speaks.
@@ -477,8 +491,9 @@ class _PoiState extends State<Poi> with TickerProviderStateMixin {
 class _SpriteSlot extends StatefulWidget {
   final String sprite;
   final bool active;
+  final int? imageCacheHeight;
 
-  const _SpriteSlot({required this.sprite, required this.active});
+  const _SpriteSlot({required this.sprite, required this.active, this.imageCacheHeight});
 
   @override
   State<_SpriteSlot> createState() => _SpriteSlotState();
@@ -515,7 +530,8 @@ class _SpriteSlotState extends State<_SpriteSlot> {
       onError: (error, stackTrace) => ready(false),
     );
     _listener = listener;
-    _loading = AssetImage(sprite).resolve(createLocalImageConfiguration(context))..addListener(listener);
+    final provider = ResizeImage.resizeIfNeeded(null, widget.imageCacheHeight, AssetImage(sprite));
+    _loading = provider.resolve(createLocalImageConfiguration(context))..addListener(listener);
   }
 
   void _stopLoading() {
@@ -564,6 +580,7 @@ class _SpriteSlotState extends State<_SpriteSlot> {
             fit: BoxFit.contain,
             alignment: Alignment.bottomCenter,
             gaplessPlayback: true,
+            cacheHeight: widget.imageCacheHeight,
             // A missing sprite should not break the scene.
             // As tall as the slot, however small the image file is.
             height: double.infinity,

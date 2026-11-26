@@ -100,6 +100,7 @@ class _CallViewState extends State<CallView> {
         caller = current;
       } else {
         for (final entry in controller.history.reversed) {
+          if (entry.conversationKey != controller.conversation?.key) continue;
           final entryItem = controller.itemOf(entry);
           final profile = entryItem == null ? null : controller.profileOf(entryItem);
           if (profile != null && !profile.isPlayer) {

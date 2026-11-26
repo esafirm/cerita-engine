@@ -169,6 +169,20 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// Cached localized [ItemType] per [TranscriptEntry] for the active language, cleared on locale switch or reset.
   final Map<TranscriptEntry, ItemType> _itemCache = Map.identity();
 
+  /// Incremental cache of visible entries for the active chat thread, avoiding a full-history scan on every rebuild.
+  int _historyEpoch = 0;
+  String? _cachedChannelId;
+  int _cachedChannelEpoch = -1;
+  int _cachedChannelLen = 0;
+  TranscriptEntry? _cachedChannelTyping;
+  List<TranscriptEntry> _cachedVisibleChannel = const [];
+
+  /// Clean post-delivery autosave snapshot buffered during fast skip or transient waits, plus a write/delete queue
+  /// so deferred autosaves never race with ending deletion or snapshot half-completed async gate jumps.
+  SaveSlot? _pendingAutoSave;
+  Future<void> _saveQueue = Future.value();
+  bool _waitAdvancePending = false;
+
   final StreamController<Clue> _cluesFound = StreamController.broadcast();
 
   /// Clues as the story finds them, for the clue notification.
@@ -198,16 +212,16 @@ class StoryController extends ChangeNotifier with EngineListener {
   /// The scene that just started rings: [_next] holds its first item until the player answers.
   bool _ringPending = false;
 
-  /// The first item of a ringing scene, delivered once the player answers.
-  ItemType? _ringingItem;
   Timer? _hangUp;
 
   bool _busy = false;
   bool _disposed = false;
-  bool _pacingHeld = false;
+  int _pacingHoldCount = 0;
   bool _uiHidden = false;
-  bool _storyHeld = false;
+  int _storyHoldCount = 0;
   Timer? _autoTimer;
+
+  bool get _pacingHeld => _pacingHoldCount > 0;
 
   /// Bumped when a load or rollback replaces the state, so pending waits of the old state stop.
   int _epoch = 0;
@@ -262,6 +276,43 @@ class StoryController extends ChangeNotifier with EngineListener {
       history
           .where((entry) => entry.channelId == channelId && entry.mode != SceneMode.vn && !identical(entry, _typingEntry))
           .toList();
+
+  /// Visible transcript entries of a messenger thread, cached incrementally across rebuilds.
+  List<TranscriptEntry> visibleChannelHistory(String? channelId) {
+    final all = history;
+    final len = all.length;
+    if (channelId == _cachedChannelId &&
+        _cachedChannelEpoch == _historyEpoch &&
+        identical(_cachedChannelTyping, _typingEntry)) {
+      if (len == _cachedChannelLen) return _cachedVisibleChannel;
+      if (_typingEntry == null && len > _cachedChannelLen) {
+        final next = List<TranscriptEntry>.of(_cachedVisibleChannel);
+        for (var i = _cachedChannelLen; i < len; i++) {
+          final entry = all[i];
+          if (_isVisibleInChannel(entry, channelId)) next.add(entry);
+        }
+        _cachedChannelLen = len;
+        return _cachedVisibleChannel = List.unmodifiable(next);
+      }
+    }
+    final visible = <TranscriptEntry>[];
+    for (var i = 0; i < len; i++) {
+      final entry = all[i];
+      if (_isVisibleInChannel(entry, channelId)) visible.add(entry);
+    }
+    _cachedChannelId = channelId;
+    _cachedChannelEpoch = _historyEpoch;
+    _cachedChannelLen = len;
+    _cachedChannelTyping = _typingEntry;
+    return _cachedVisibleChannel = List.unmodifiable(visible);
+  }
+
+  bool _isVisibleInChannel(TranscriptEntry entry, String? channelId) {
+    if (entry.channelId != channelId || entry.mode == SceneMode.vn || identical(entry, _typingEntry)) return false;
+    if (entry.isPlayer) return true;
+    final item = itemOf(entry);
+    return item is TextItemType || item is NarrationItemType || item is MediaItemType;
+  }
 
   Channel? get channel => engine.getChannel(scene.channelId);
 
@@ -329,9 +380,10 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (_busy) return;
     _epoch++;
     _autoTimer?.cancel();
+    _waitAdvancePending = false;
     autoMode = false;
     skipMode = false;
-    _pacingHeld = false;
+    _pacingHoldCount = 0;
     notification = null;
     rolledBack = false;
     _resetCall();
@@ -340,8 +392,17 @@ class StoryController extends ChangeNotifier with EngineListener {
     try {
       await engine.jumpTo(target);
     } on StoryGateException catch (gated) {
+      await flushPendingAutoSave();
       return _closeMidStory(gated);
     }
+    _pendingAutoSave = null;
+    if (_ringPending && !skipMode) {
+      _ringPending = false;
+      _ring();
+      await _saveRingingAutoSave();
+      return;
+    }
+    _ringPending = false;
     await _next();
   }
 
@@ -358,9 +419,10 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (_busy || phase == StoryPhase.idle) return;
     engine.loader.clearCache();
     assets.clearCache();
-    _itemCache.clear();
     final item = await engine.reloadCurrent();
     if (item == null || _disposed) return;
+    _itemCache.clear();
+    _historyEpoch++;
     _epoch++;
     if (item is StageItemType) {
       _notify();
@@ -379,9 +441,13 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (item == null) return;
     _epoch++;
     _autoTimer?.cancel();
+    _itemCache.clear();
+    _historyEpoch++;
+    _pendingAutoSave = null;
+    _waitAdvancePending = false;
     autoMode = false;
     skipMode = false;
-    _pacingHeld = false;
+    _pacingHoldCount = 0;
     notification = null;
     direction = null;
     await audio.stopVoice();
@@ -389,17 +455,24 @@ class StoryController extends ChangeNotifier with EngineListener {
     _playAmbience();
     rolledBack = true;
     _show(item);
-    if (!replay) await engine.saveTo(SaveSlot.autoSlotId);
+    if (!replay) {
+      final slot = engine.snapshot(slotId: SaveSlot.autoSlotId);
+      await _enqueueSave(() async {
+        await engine.storage?.saveSlot(slot);
+        await engine.flushMeta();
+      });
+    }
   }
 
   Future<void> _begin({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     _epoch++;
     _autoTimer?.cancel();
-    _itemCache.clear();
+    _pendingAutoSave = null;
+    _waitAdvancePending = false;
     this.replay = replay;
     autoMode = false;
     skipMode = false;
-    _pacingHeld = false;
+    _pacingHoldCount = 0;
     rolledBack = false;
     notification = null;
     direction = null;
@@ -417,21 +490,35 @@ class StoryController extends ChangeNotifier with EngineListener {
       _close(gated, () => _begin(save: save, checkpoint: checkpoint, replay: replay));
       return;
     }
+    _itemCache.clear();
+    _historyEpoch++;
     _playMusic();
     _playAmbience();
 
     if (save == null) {
+      if (_ringPending && !skipMode) {
+        _ringPending = false;
+        _ring();
+        await _saveRingingAutoSave();
+        return;
+      }
+      _ringPending = false;
       await advance();
       return;
     }
-    // A restored call is already answered.
-    _ringPending = false;
     // Restore: show the last delivered line of the active conversation.
     final last = history.lastWhere(
       (entry) => !entry.isPlayer && entry.conversationKey == conversation?.key,
       orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.vn),
     );
     final item = itemOf(last);
+    // A save made while an incoming call was still ringing (before item 0) must stay ringing on load.
+    if (item == null && scene.mode == SceneMode.call && scene.ring != null && engine.dialogIndex == 0) {
+      _ringPending = false;
+      _ring();
+      return;
+    }
+    _ringPending = false;
     if (item == null || item is WaitItemType) {
       await advance();
     } else {
@@ -493,26 +580,26 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Future<void> choose(Choice choice) async {
     final item = current;
-    if (phase != StoryPhase.choice || item is! ChoiceItemType || choice.locked) return;
+    if (_busy || phase != StoryPhase.choice || item is! ChoiceItemType || choice.locked) return;
     await _next(ItemResult.choice(item.variable, choice));
   }
 
   /// Presents [clue] to the pending evidence question.
   Future<void> present(Clue clue) async {
     final item = current;
-    if (phase != StoryPhase.choice || item is! EvidenceItemType) return;
+    if (_busy || phase != StoryPhase.choice || item is! EvidenceItemType) return;
     await _next(ItemResult.present(item, clue));
   }
 
   /// The pending evidence question's countdown ran out.
   Future<void> evidenceTimedOut() async {
-    if (phase != StoryPhase.choice || current is! EvidenceItemType) return;
+    if (_busy || phase != StoryPhase.choice || current is! EvidenceItemType) return;
     await _next(const ItemResult.evidenceTimeout());
   }
 
   Future<void> submitInput(String value) async {
     final item = current;
-    if (phase != StoryPhase.input || item is! InputItemType) return;
+    if (_busy || phase != StoryPhase.input || item is! InputItemType) return;
     // Too short, too long or not digits for a digits input: not sent, the prompt stays.
     if (!item.accepts(value.trim())) return;
     final text = value.trim().isEmpty ? (item.defaultValue ?? "") : value.trim();
@@ -529,13 +616,45 @@ class StoryController extends ChangeNotifier with EngineListener {
   void toggleSkip() {
     skipMode = !skipMode;
     autoMode = false;
+    if (!skipMode) unawaited(flushPendingAutoSave());
     _scheduleAutoAdvance();
     _notify();
   }
 
+  Future<void> _enqueueSave(Future<void> Function() action) {
+    final next = _saveQueue.then((_) => action(), onError: (_) => action());
+    _saveQueue = next.catchError((Object _) {});
+    return next;
+  }
+
+  Future<void> _saveRingingAutoSave() async {
+    _pendingAutoSave = null;
+    if (replay || engine.currentConversation == null) return;
+    final slot = engine.snapshot(slotId: SaveSlot.autoSlotId);
+    await _enqueueSave(() async {
+      await engine.storage?.saveSlot(slot);
+      await engine.flushMeta();
+    });
+  }
+
+  /// Flushes any autosave or seen-item meta write deferred during rapid skip mode or transient waits.
+  /// Always persists the clean post-delivery snapshot captured when the save was deferred, never a mid-transition state.
+  Future<void> flushPendingAutoSave() {
+    final slot = _pendingAutoSave;
+    _pendingAutoSave = null;
+    if (slot != null && !replay) {
+      return _enqueueSave(() async {
+        await engine.storage?.saveSlot(slot);
+        await engine.flushMeta();
+      });
+    }
+    return _enqueueSave(engine.flushMeta);
+  }
+
   Future<void> saveTo(int slotId) async {
     if (replay || phase == StoryPhase.gated) return;
-    await engine.saveTo(slotId);
+    if (slotId == SaveSlot.autoSlotId) _pendingAutoSave = null;
+    await _enqueueSave(() => engine.saveTo(slotId));
     switch (slotId) {
       case SaveSlot.autoSlotId:
         break;
@@ -547,28 +666,37 @@ class StoryController extends ChangeNotifier with EngineListener {
   }
 
   Future<void> _next([ItemResult? result]) async {
+    if (_busy || _disposed) return;
     _busy = true;
+    _waitAdvancePending = false;
     sceneEndHeld = false;
     _autoTimer?.cancel();
     final epoch = _epoch;
     ItemType? item;
+    var ended = false;
     try {
       if (result?.text != null && scene.mode == SceneMode.chat) audio.playSfx(config.music("sfx_msg_send.mp3"));
-      item = await engine.next(prevResult: result);
+      item = await engine.nextOrPause(
+        prevResult: result,
+        stopAtScene: (scene) => !skipMode && scene.mode == SceneMode.call && scene.ring != null,
+        deferSeenFlush: skipMode,
+      );
     } on EndOfStoryException {
+      ended = true;
       phase = StoryPhase.finished;
       _notify();
     } on StoryGateException catch (gated) {
+      await flushPendingAutoSave();
       return _closeMidStory(gated);
     } finally {
       _busy = false;
     }
-    if (item == null) return _afterDelivery(epoch);
-    if (_ringPending && !skipMode) {
-      // An incoming call: the scene shows the phone ringing, and its first line waits for the player to answer.
+    if (ended) return _afterDelivery(epoch);
+    if (item == null) {
+      // An incoming call: the scene shows the phone ringing, and its first item waits for the player to answer.
       _ringPending = false;
-      _ringingItem = item;
       _ring();
+      await _saveRingingAutoSave();
       return;
     }
     _ringPending = false;
@@ -593,9 +721,21 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (!replay) {
       // A finished playthrough leaves no autosave, so the title screen doesn't offer Continue into it.
       if (phase == StoryPhase.ending || phase == StoryPhase.finished) {
-        await engine.storage?.deleteSlot(SaveSlot.autoSlotId);
+        _pendingAutoSave = null;
+        await _enqueueSave(() async {
+          await engine.storage?.deleteSlot(SaveSlot.autoSlotId);
+          await engine.flushMeta();
+        });
+      } else if (phase == StoryPhase.waiting || (skipMode && phase == StoryPhase.showing)) {
+        // Capture a clean snapshot now and coalesce the write during fast skip or transient STAGE/WAIT steps.
+        _pendingAutoSave = engine.snapshot(slotId: SaveSlot.autoSlotId);
       } else if (phase != StoryPhase.typing) {
-        await engine.saveTo(SaveSlot.autoSlotId);
+        _pendingAutoSave = null;
+        final slot = engine.snapshot(slotId: SaveSlot.autoSlotId);
+        await _enqueueSave(() async {
+          await engine.storage?.saveSlot(slot);
+          await engine.flushMeta();
+        });
       }
     }
     if (phase == StoryPhase.waiting) {
@@ -608,7 +748,17 @@ class StoryController extends ChangeNotifier with EngineListener {
       if (_disposed || epoch != _epoch) return;
       notification = null;
       phase = StoryPhase.showing;
-      if (await _holdsAtSceneEnd(epoch)) return _notify();
+      if (await _holdsAtSceneEnd(epoch)) {
+        await flushPendingAutoSave();
+        if (!_disposed && epoch == _epoch) _notify();
+        return;
+      }
+      if (storyHeld) {
+        _waitAdvancePending = true;
+        await flushPendingAutoSave();
+        if (!_disposed && epoch == _epoch) _notify();
+        return;
+      }
       await advance();
       return;
     }
@@ -742,21 +892,30 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   /// Pauses chat pacing, e.g. while a chapter card covers the thread.
   void holdPacing(bool held) {
-    if (_pacingHeld == held) return;
-    _pacingHeld = held;
-    _scheduleAutoAdvance();
+    if (_disposed) return;
+    final wasHeld = _pacingHeld;
+    _pacingHoldCount = held ? _pacingHoldCount + 1 : (_pacingHoldCount > 0 ? _pacingHoldCount - 1 : 0);
+    if (_pacingHeld != wasHeld) _scheduleAutoAdvance();
   }
 
   /// Holds the story while a screen covers it, like the Case Board: chat pacing, auto, skip and a timed choice's
   /// countdown wait until it is released.
   void holdStory(bool held) {
-    if (_storyHeld == held) return;
-    _storyHeld = held;
-    _scheduleAutoAdvance();
-    _notify();
+    if (_disposed) return;
+    final wasHeld = storyHeld;
+    _storyHoldCount = held ? _storyHoldCount + 1 : (_storyHoldCount > 0 ? _storyHoldCount - 1 : 0);
+    if (storyHeld != wasHeld) {
+      if (!storyHeld && _waitAdvancePending) {
+        _waitAdvancePending = false;
+        unawaited(advance());
+      } else {
+        _scheduleAutoAdvance();
+      }
+      _notify();
+    }
   }
 
-  bool get storyHeld => _storyHeld;
+  bool get storyHeld => _storyHoldCount > 0;
 
   /// Rings the phone: the scene's `ring` sound, or the phone on silent when it has none.
   void _ring() {
@@ -769,13 +928,11 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   /// Picks up the ringing phone and delivers the scene's first line.
   Future<void> answerCall() async {
-    if (callState != CallState.ringing) return;
+    if (callState != CallState.ringing || _busy) return;
     audio.stopRing();
     _clearRefusal();
     callState = CallState.connected;
-    final item = _ringingItem;
-    _ringingItem = null;
-    if (item != null) await _deliver(item);
+    await _next();
   }
 
   /// Declines the ringing phone or hangs up. A scene with a `hangup` target ends the call and goes there after
@@ -840,7 +997,6 @@ class StoryController extends ChangeNotifier with EngineListener {
     _refusalTimer?.cancel();
     refusal = null;
     _ringPending = false;
-    _ringingItem = null;
     if (callState == CallState.ringing) audio.stopRing();
     callState = CallState.connected;
     onHold = false;
@@ -855,9 +1011,10 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   void _scheduleAutoAdvance() {
     _autoTimer?.cancel();
+    if (_disposed) return;
     if (phase != StoryPhase.showing) return;
     if (_callPaused) return;
-    if (_storyHeld) return;
+    if (storyHeld) return;
     if (scene.mode == SceneMode.chat && !skipMode && !sceneEndHeld) {
       if (_pacingHeld) return;
       final pause = current is MediaItemType ? _chatMediaPauseMs : _chatPauseMs;
@@ -870,6 +1027,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     if (skipMode && !engine.lastItemPreviouslySeen && !settings.value.skipUnread) {
       // Skip only fast-forwards text read in an earlier playthrough, unless the player skips unread text too.
       skipMode = false;
+      unawaited(flushPendingAutoSave());
       _notify();
       return;
     }
@@ -913,10 +1071,13 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   @override
   void dispose() {
+    unawaited(flushPendingAutoSave());
     _disposed = true;
     _autoTimer?.cancel();
     _hangUp?.cancel();
     _refusalTimer?.cancel();
+    _itemCache.clear();
+    _cachedVisibleChannel = const [];
     settings.removeListener(_applySettings);
     _toasts.close();
     _cluesFound.close();

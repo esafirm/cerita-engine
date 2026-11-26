@@ -35,7 +35,7 @@ class StoryScreen extends StatefulWidget {
   State<StoryScreen> createState() => _StoryScreenState();
 }
 
-class _StoryScreenState extends State<StoryScreen> {
+class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
   late final StoryController _controller = StoryController(
     loader: widget.setup.loader,
     storage: widget.setup.storage,
@@ -55,6 +55,7 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     widget.setup.loader.loadCredits().then((credits) {
       if (mounted) setState(() => _credits = credits);
     }, onError: (Object _) {});
@@ -92,32 +93,48 @@ class _StoryScreenState extends State<StoryScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      unawaited(_controller.flushPendingAutoSave());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _toasts?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  void _openGallery() => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => GalleryScreen(setup: widget.setup, audio: _controller.audio)));
+  Future<void> _openGallery() async {
+    _controller.holdStory(true);
+    try {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => GalleryScreen(setup: widget.setup, audio: _controller.audio)),
+      );
+    } finally {
+      _controller.holdStory(false);
+    }
+  }
 
   Future<void> _openMenu() async {
     final strings = StoryLanguage.of(context).strings;
     _controller.holdStory(true);
-    VoidCallback? next;
+    Future<void> Function()? next;
     try {
       await StorySheet.show<void>(
         context,
         title: strings.menu,
         icon: Icons.menu,
         builder: (sheetContext) {
-          void close(VoidCallback action) {
+          void close(Future<void> Function() action) {
             next = action;
             Navigator.of(sheetContext).pop();
           }
 
           void push(WidgetBuilder builder) =>
-              close(() => Navigator.of(context).push(MaterialPageRoute(builder: builder)));
+              close(() => Navigator.of(context).push(MaterialPageRoute<void>(builder: builder)));
 
           // The main actions as big buttons, the rest as a list, and leaving the story set apart at the end.
           final actions = [
@@ -196,7 +213,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 ListTile(
                   leading: const Icon(Icons.home_outlined),
                   title: Text(strings.backToTitle),
-                  onTap: () => close(() => Navigator.of(context).pop()),
+                  onTap: () => close(() async => Navigator.of(context).pop()),
                 ),
               ],
             ),
@@ -204,19 +221,23 @@ class _StoryScreenState extends State<StoryScreen> {
         },
       );
     } finally {
-      // Release after the modal sheet finishes deactivating its focus scope.
-      Future<void>.microtask(() {
-        if (mounted) _controller.holdStory(false);
-        if (mounted) next?.call();
+      // Release after the modal sheet finishes deactivating its focus scope, keeping the hold across any pushed route.
+      final followUp = next;
+      Future<void>.microtask(() async {
+        try {
+          if (mounted && followUp != null) await followUp();
+        } finally {
+          _controller.holdStory(false);
+        }
       });
     }
   }
 
   /// Debug view of the typed state store, handy to see effects at work.
-  void _showVariables() {
+  Future<void> _showVariables() {
     final data = _controller.dataMap;
     final strings = StoryLanguage.of(context).strings;
-    showDialog<void>(
+    return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(strings.storyVariables),
