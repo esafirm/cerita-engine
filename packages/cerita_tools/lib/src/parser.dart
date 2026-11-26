@@ -14,6 +14,13 @@ final _durationPattern = RegExp(r"^(\d+(?:\.\d+)?)(ms|s)?$");
 final _numberPattern = RegExp(r"^-?\d+(\.\d+)?$");
 final _effectLinePattern = RegExp(r"^([+-][A-Za-z_]|set\s|toggle\s|remember\s|clue\s)");
 final _setBlockPattern = RegExp(r"^set(\s*$|\s+\[|\s+label=)");
+final _evidenceOutcomePattern = RegExp(r"^\[(retry|fallback|timeout)\]$");
+final _computedEffectPattern = RegExp(r"^(set\s+|[+-])(\S+?)\s*=\s*(.+)$");
+final _stepEffectPattern = RegExp(r"^([+-])(\S+?)(?:\s+(\d+(?:\.\d+)?))?$");
+final _setEffectPattern = RegExp(r"^set\s+(\S+)\s+(.+)$");
+final _clueEffectPattern = RegExp(r"^clue\s+(\S+)$");
+final _singleEffectPattern = RegExp(r"^(toggle|remember)\s+(\S+)$");
+final _unescapePattern = RegExp(r"\\([n|\\])");
 
 const _modes = {"VN", "CHAT", "CALL"};
 const _mediaTypes = {"IMAGE", "AUDIO", "VIDEO", "CG"};
@@ -58,6 +65,7 @@ class ScriptParser {
     _body = null;
     _choice = null;
     _inlineSet = null;
+    _stagesWithActions.clear();
     final script = ScriptFile(path);
     final lines = source.replaceFirst("﻿", "").split("\n");
     for (var i = 0; i < lines.length; i++) {
@@ -428,7 +436,7 @@ class ScriptParser {
   /// A `?` line under `evidence`: a clue id for a response, or `[retry]`, `[fallback]` or `[timeout]`.
   void _evidenceOption(EvidenceItem evidence, String text, SourceSpan span) {
     final option = OptionNode(span);
-    final outcome = RegExp(r"^\[(retry|fallback|timeout)\]$").firstMatch(text)?.group(1);
+    final outcome = _evidenceOutcomePattern.firstMatch(text)?.group(1);
     if (outcome != null) {
       if (evidence.outcome(outcome) != null) _error(span, "An evidence question has only one [$outcome]");
       option.outcome = outcome;
@@ -445,9 +453,18 @@ class ScriptParser {
 
   int _openingBracket(String text) {
     var depth = 0;
+    String? quote;
     for (var i = text.length - 1; i >= 0; i--) {
-      if (text[i] == "]") depth++;
-      if (text[i] == "[") {
+      final char = text[i];
+      if (quote != null) {
+        if (char == quote) quote = null;
+        continue;
+      }
+      if (char == "'" || char == '"') {
+        quote = char;
+      } else if (char == "]") {
+        depth++;
+      } else if (char == "[") {
         depth--;
         if (depth == 0) return i;
       }
@@ -459,8 +476,9 @@ class ScriptParser {
     final parts = <String>[];
     final buffer = StringBuffer();
     for (var i = 0; i < text.length; i++) {
-      if (text[i] == "\\" && i + 1 < text.length && text[i + 1] == "|") {
-        buffer.write("\\|");
+      if (text[i] == "\\" && i + 1 < text.length && (text[i + 1] == "|" || text[i + 1] == "\\")) {
+        buffer.write("\\");
+        buffer.write(text[i + 1]);
         i++;
       } else if (text[i] == "|") {
         parts.add(buffer.toString());
@@ -729,25 +747,25 @@ class ScriptParser {
   }
 
   EffectNode? _effect(String content, SourceSpan span) {
-    final computed = RegExp(r"^(set\s+|[+-])(\S+?)\s*=\s*(.+)$").firstMatch(content);
+    final computed = _computedEffectPattern.firstMatch(content);
     if (computed != null) {
       final head = computed.group(1)!.trim();
       final op = switch (head) { "set" => "set", "+" => "add", _ => "subtract" };
       if (!_checkVariable(computed.group(2)!, span)) return null;
       return EffectNode(computed.group(2)!, op, span, expr: computed.group(3)!.trim());
     }
-    final step = RegExp(r"^([+-])(\S+?)(?:\s+(\d+(?:\.\d+)?))?$").firstMatch(content);
+    final step = _stepEffectPattern.firstMatch(content);
     if (step != null) {
       if (!_checkVariable(step.group(2)!, span)) return null;
       final amount = step.group(3) == null ? 1 : parseLiteral(step.group(3)!);
       return EffectNode(step.group(2)!, step.group(1) == "+" ? "add" : "subtract", span, value: amount, hasValue: true);
     }
-    final set = RegExp(r"^set\s+(\S+)\s+(.+)$").firstMatch(content);
+    final set = _setEffectPattern.firstMatch(content);
     if (set != null) {
       if (!_checkVariable(set.group(1)!, span)) return null;
       return EffectNode(set.group(1)!, "set", span, value: parseLiteral(set.group(2)!.trim()), hasValue: true);
     }
-    final clue = RegExp(r"^clue\s+(\S+)$").firstMatch(content);
+    final clue = _clueEffectPattern.firstMatch(content);
     if (clue != null) {
       final id = clue.group(1)!;
       if (!_keyPattern.hasMatch(id)) {
@@ -756,7 +774,7 @@ class ScriptParser {
       }
       return EffectNode("${EffectNode.cluePrefix}$id", "set", span, value: true, hasValue: true, isClue: true);
     }
-    final single = RegExp(r"^(toggle|remember)\s+(\S+)$").firstMatch(content);
+    final single = _singleEffectPattern.firstMatch(content);
     if (single != null) {
       if (!_checkVariable(single.group(2)!, span)) return null;
       return EffectNode(single.group(2)!, single.group(1) == "toggle" ? "toggle" : EffectNode.metaSet, span);
@@ -827,7 +845,13 @@ class ScriptParser {
           i++;
           while (i < line.length && line[i] != '"') {
             if (line[i] == "\\" && i + 1 < line.length) {
-              buffer.write(line[i + 1]);
+              if (line[i + 1] == '"') {
+                buffer.write('"');
+              } else {
+                // Keep `\n`, `\\`, `\|` intact so `unescapeText` interprets them once.
+                buffer.write("\\");
+                buffer.write(line[i + 1]);
+              }
               i += 2;
             } else {
               buffer.write(line[i]);
@@ -897,7 +921,7 @@ Object parseLiteral(String raw) {
 }
 
 /// `\n` is a line break, `\|` a literal bar in option text and `\\` a backslash.
-String unescapeText(String text) => text.replaceAllMapped(RegExp(r"\\([n|\\])"), (match) {
+String unescapeText(String text) => text.replaceAllMapped(_unescapePattern, (match) {
   return switch (match.group(1)) {
     "n" => "\n",
     final other => other!,

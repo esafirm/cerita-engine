@@ -11,7 +11,7 @@ import 'project.dart';
 Map<String, Object?> buildTtsManifest(StoryProject project, Diagnostics diagnostics) {
   final config = project.config;
   final lines = <Map<String, Object?>>[];
-  final firstUse = <String, (String, SourceSpan)>{};
+  final firstUse = <(String, String), (String, SourceSpan)>{};
 
   void add({
     required String kind,
@@ -32,7 +32,7 @@ Map<String, Object?> buildTtsManifest(StoryProject project, Diagnostics diagnost
         continue;
       }
       final file = localeVariant(clip, locale);
-      final (firstText, firstSpan) = firstUse.putIfAbsent(file, () => (value, item.span));
+      final (firstText, firstSpan) = firstUse.putIfAbsent((kind, file), () => (value, item.span));
       if (firstText != value) {
         diagnostics.warning(item.span, "'$file' is also voiced at $firstSpan with other text, so one of them won't match");
       }

@@ -217,6 +217,8 @@ class _ScriptLinter {
     for (final conversation in project.conversations) {
       check(conversation.chapter);
       check(conversation.title);
+      check(conversation.scene?.stay);
+      check(conversation.scene?.status);
       for (final item in conversation.items) {
         checkFields(item);
         if (item is InputItem) check(item.defaultValue);

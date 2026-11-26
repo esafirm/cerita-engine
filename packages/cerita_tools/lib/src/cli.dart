@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -58,24 +57,28 @@ abstract class _StoryCommand extends Command<int> {
     return rest.first;
   }
 
-  StoryProject load(String root, {String? assets}) => StoryProject.load(root, assetsOverride: assets);
+  StoryProject load(String root, {String? assets, bool loadAssets = true}) =>
+      StoryProject.load(root, assetsOverride: assets, loadAssets: loadAssets);
 
   String display(String root, String file) => p.normalize(p.join(root, file));
 
   /// Prints [diagnostics] and a summary. Returns whether there were errors.
   bool report(String root, Diagnostics diagnostics, {bool summary = true}) {
-    for (final diagnostic in diagnostics.sorted()) {
+    final sorted = diagnostics.sorted();
+    var errors = 0, warnings = 0;
+    for (final diagnostic in sorted) {
       err.writeln(diagnostic.format((file) => display(root, file)));
+      if (diagnostic.severity == Severity.error) errors++;
+      if (diagnostic.severity == Severity.warning) warnings++;
     }
     if (summary) {
-      final errors = diagnostics.count(Severity.error), warnings = diagnostics.count(Severity.warning);
       final total = errors + warnings;
       err.writeln(total == 0
           ? "No problems"
           : "$total ${total == 1 ? "problem" : "problems"} "
               "($errors ${errors == 1 ? "error" : "errors"}, $warnings ${warnings == 1 ? "warning" : "warnings"})");
     }
-    return diagnostics.hasErrors;
+    return errors > 0;
   }
 }
 
@@ -94,7 +97,11 @@ class _CompileCommand extends _StoryCommand {
   @override
   int run() {
     final root = storyDir();
-    final project = load(root);
+    final project = load(root, loadAssets: false);
+    if (project.diagnostics.hasErrors && args.rest.length <= 1 && project.config.out == null) {
+      report(root, project.diagnostics);
+      return exitProblems;
+    }
     final outDir = args.rest.length > 1
         ? args.rest[1]
         : (project.config.out == null ? null : p.join(root, project.config.out));
@@ -106,25 +113,33 @@ class _CompileCommand extends _StoryCommand {
       return exitProblems;
     }
     final dir = Directory(outDir);
+    bool isManagedJson(String name) =>
+        (name.startsWith("cvn_") && name.endsWith(".json")) || name == "channels.json" || name == "clues.json";
     final stale = dir.existsSync()
         ? (dir
             .listSync()
             .whereType<File>()
             .map((file) => p.basename(file.path))
-            .where((name) => name.startsWith("cvn_") && name.endsWith(".json") && !result.files.containsKey(name))
+            .where((name) => isManagedJson(name) && !result.files.containsKey(name))
             .toList()
           ..sort())
         : <String>[];
 
     if (args.flag("check")) {
-      final problems = <String>[
-        for (final MapEntry(key: name, value: json) in result.files.entries)
-          if (!File(p.join(outDir, name)).existsSync())
-            "${p.join(outDir, name)} is missing"
-          else if (File(p.join(outDir, name)).readAsStringSync() != json)
-            "${p.join(outDir, name)} doesn't match the scripts",
-        for (final name in stale) "${p.join(outDir, name)} has no conversation in the scripts",
-      ];
+      final problems = <String>[];
+      for (final MapEntry(key: name, value: json) in result.files.entries) {
+        final path = p.join(outDir, name);
+        final file = File(path);
+        if (!file.existsSync()) {
+          problems.add("$path is missing");
+        } else if (file.readAsStringSync() != json) {
+          problems.add("$path doesn't match the scripts");
+        }
+      }
+      for (final name in stale) {
+        final what = name.startsWith("cvn_") ? "conversation" : "source";
+        problems.add("${p.join(outDir, name)} has no $what in the scripts");
+      }
       for (final problem in problems) {
         err.writeln("error: $problem");
       }
@@ -193,7 +208,7 @@ class _StatsCommand extends _StoryCommand {
   @override
   int run() {
     final root = storyDir();
-    final project = load(root);
+    final project = load(root, loadAssets: false);
     if (project.diagnostics.hasErrors) {
       report(root, project.diagnostics);
       return exitProblems;
@@ -226,20 +241,23 @@ class _TtsManifestCommand extends _StoryCommand {
   @override
   int run() {
     final root = storyDir();
-    final project = load(root);
+    final project = load(root, loadAssets: false);
     if (project.diagnostics.hasErrors) {
       report(root, project.diagnostics);
       return exitProblems;
     }
     final warnings = Diagnostics();
-    final json = encodeJson(buildTtsManifest(project, warnings));
+    final manifest = buildTtsManifest(project, warnings);
+    final json = encodeJson(manifest);
     report(root, warnings, summary: false);
     final target = args.option("out");
     if (target == null) {
       out.write(json);
     } else {
-      File(target).writeAsStringSync(json);
-      final count = (jsonDecode(json)["lines"] as List).length;
+      final file = File(target);
+      file.parent.createSync(recursive: true);
+      file.writeAsStringSync(json);
+      final count = (manifest["lines"] as List).length;
       err.writeln("Wrote $count lines to $target");
     }
     return exitOk;
@@ -273,10 +291,11 @@ class _AssetsCommand extends _StoryCommand {
       err.writeln("error: ${project.assetsError ?? "No asset folder: set 'assets' in cerita.yaml or pass --assets"}");
       return exitProblems;
     }
-    final byKind = {
-      for (final kind in assetKinds)
-        if (missing.any((ref) => ref.kind == kind)) kind: missing.where((ref) => ref.kind == kind).toList(),
-    };
+    final grouped = <String, List<AssetRef>>{};
+    for (final ref in missing) {
+      grouped.putIfAbsent(ref.kind, () => []).add(ref);
+    }
+    final byKind = {for (final kind in assetKinds) kind: ?grouped[kind]};
     if (args.flag("json")) {
       out.write(encodeJson({
         for (final MapEntry(key: kind, value: refs) in byKind.entries) kind: [for (final ref in refs) ref.path],

@@ -298,13 +298,17 @@ class StageAction {
 
   StageAction(this.action, this.span);
 
-  /// How long the action runs, counted like the engine: an explicit `duration_ms`, else 0 with the `none`
-  /// transition, 400 for `shake` and `flash`, and 500 otherwise. See [blockingMs] for how long the story waits.
+  static const _instantActions = {"music", "ambience", "textbox", "page", "sound", "weather"};
+
+  /// How long the action runs, counted like the engine (`StageAction.fromJson`): instant actions are 0, `shake` and
+  /// `flash` default to 400, and other actions default to 0 with `transition: none` or 500 otherwise.
   int get durationMs {
+    if (_instantActions.contains(action)) return 0;
     final explicit = fields["duration_ms"];
     if (explicit is int) return explicit;
+    if (action == "shake" || action == "flash") return 400;
     if (fields["transition"] == "none") return 0;
-    return action == "shake" || action == "flash" ? 400 : 500;
+    return 500;
   }
 
   /// How long the story waits for the action: a `cg_move` plays on under the lines after it.

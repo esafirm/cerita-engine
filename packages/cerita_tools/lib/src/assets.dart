@@ -25,8 +25,9 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
   final refs = <AssetRef>[];
   final config = project.config;
 
+  final prefix = config.assetPrefix.endsWith("/") ? config.assetPrefix : "${config.assetPrefix}/";
   String avatarPath(String avatar) {
-    if (avatar.startsWith(config.assetPrefix)) return avatar.substring(config.assetPrefix.length);
+    if (avatar.startsWith(prefix)) return avatar.substring(prefix.length);
     return avatar.contains("/") ? avatar : "sprites/$avatar";
   }
 
@@ -56,7 +57,7 @@ List<AssetRef> collectAssetRefs(StoryProject project) {
       add("background", "bg", scene.background, scene.span);
       add("music", "music", scene.music, scene.span);
       add("ambience", "music", scene.ambience, scene.span);
-      add("sound", "music", scene.ring, scene.span);
+      add("sfx", "music", scene.ring, scene.span);
     }
     for (final item in conversation.items) {
       switch (item) {

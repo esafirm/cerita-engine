@@ -52,11 +52,13 @@ class CompiledStoryLoader extends core.EngineLoader {
 /// Fields that hold localized text (CE-01, data schema §5.1).
 const _localizedFields = {
   "chapter", "title", "text", "caption", "transcript", "default_value", "notification_text", "summary", "name", //
-  "bio", "status", "description",
+  "bio", "status", "stay", "description",
 };
 
+final _quotedPattern = RegExp(r"'([^']+)'");
+
 /// [json] with every localized text object replaced by its text in [locale], falling back to [source], the way
-/// the engine shows it. Lets the core linter read a multi-language story one language at a time.
+/// the engine shows it. Lets tools inspect a multi-language story one language at a time.
 Object? flattenLocale(Object? json, String locale, String source) {
   if (json is List) return [for (final item in json) flattenLocale(item, locale, source)];
   if (json is! Map) return json;
@@ -68,31 +70,25 @@ Object? flattenLocale(Object? json, String locale, String source) {
   };
 }
 
-/// Runs cerita_core's `StoryLinter` (authoring tools spec §1) on the compiled story, once per locale, and maps
+/// Runs cerita_core's `StoryLinter` (authoring tools spec §1) on the compiled story and maps
 /// each issue back to the script line its item came from.
 Future<Diagnostics> lintCompiled(StoryProject project, Map<String, String> compiled) async {
-  final config = project.config;
   final decoded = {for (final MapEntry(:key, :value) in compiled.entries) key: jsonDecode(value)};
   final files = project.assetFiles;
   final diagnostics = Diagnostics();
-  final seen = <String>{};
-  for (final locale in config.locales) {
-    final loader = CompiledStoryLoader({
-      for (final MapEntry(:key, :value) in decoded.entries) key: flattenLocale(value, locale, config.sourceLocale),
-    });
-    final linter = core.StoryLinter(
-      loader,
-      config: const core.LoaderConfig(storyDir: ".", musicDir: "music", spritesDir: "sprites", bgDir: "bg", mediaDir: "media"),
-      assetExists: files == null ? null : (path) => _assetExists(project, files, path),
-    );
-    for (final issue in await linter.lint()) {
-      final id = [issue.severity, issue.conversationKey, issue.itemIndex, issue.part, issue.message].join("|");
-      if (!seen.add(id)) continue;
-      final span = _locate(project, issue);
-      // Script authors write clues.yaml, which compiles to clues.json.
-      final message = issue.message.replaceAll("clues.json", ClueFile.fileName);
-      issue.isError ? diagnostics.error(span, message) : diagnostics.warning(span, message);
-    }
+  final loader = CompiledStoryLoader(decoded);
+  final linter = core.StoryLinter(
+    loader,
+    config: const core.LoaderConfig(storyDir: ".", musicDir: "music", spritesDir: "sprites", bgDir: "bg", mediaDir: "media"),
+    assetExists: files == null ? null : (path) => _assetExists(project, files, path),
+  );
+  for (final issue in await linter.lint()) {
+    final span = _locate(project, issue);
+    // Script authors write clues.yaml / channels.yaml, which compile to .json.
+    final message = issue.message
+        .replaceAll("clues.json", ClueFile.fileName)
+        .replaceAll("channels.json", ChannelDef.fileName);
+    issue.isError ? diagnostics.error(span, message) : diagnostics.warning(span, message);
   }
   return diagnostics;
 }
@@ -100,7 +96,8 @@ Future<Diagnostics> lintCompiled(StoryProject project, Map<String, String> compi
 /// Whether [path] (relative to the asset folder, or under `asset_prefix`) exists. The core linter also tries the
 /// per-locale files of voice clips and voice notes (CE-01, data schema §7.4).
 bool _assetExists(StoryProject project, Set<String> files, String path) {
-  final prefix = project.config.assetPrefix;
+  final rawPrefix = project.config.assetPrefix;
+  final prefix = rawPrefix.endsWith("/") ? rawPrefix : "$rawPrefix/";
   return files.contains(path.startsWith(prefix) ? path.substring(prefix.length) : path);
 }
 
@@ -109,6 +106,7 @@ bool _assetExists(StoryProject project, Set<String> files, String path) {
 SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
   final key = issue.conversationKey;
   if (issue.fileName == "clues.json") return _locateClue(project.clues, issue.message);
+  if (issue.fileName == "channels.json") return _locateChannel(project.channels, issue.message);
   if (key == null) return _locateProfile(project.cast, issue.message);
   final conversation = project.conversationsByKey[key];
   if (conversation == null) return null;
@@ -123,9 +121,21 @@ SourceSpan? _locate(StoryProject project, core.LintIssue issue) {
   return aboutScene ? conversation.scene?.span ?? conversation.span : conversation.span;
 }
 
+/// The `channels.yaml` entry a `channels.json` issue names, by its thread id or avatar file.
+SourceSpan _locateChannel(List<ChannelDef>? channels, String message) {
+  final named = _quotedPattern.firstMatch(message)?.group(1);
+  for (final channel in channels ?? const <ChannelDef>[]) {
+    if (channel.id == named) return channel.span;
+    if (channel.avatar != null && named != null && (named == channel.avatar || named.endsWith("/${channel.avatar}"))) {
+      return channel.avatarSpan ?? channel.span;
+    }
+  }
+  return const SourceSpan(ChannelDef.fileName, 1);
+}
+
 /// The `clues.yaml` entry a `clues.json` issue names, by its clue id or image file.
 SourceSpan _locateClue(ClueFile? clues, String message) {
-  final named = RegExp(r"'([^']+)'").firstMatch(message)?.group(1);
+  final named = _quotedPattern.firstMatch(message)?.group(1);
   for (final clue in clues?.clues ?? const <ClueDef>[]) {
     if (clue.id == named) return clue.span;
     if (clue.image != null && named != null && named.endsWith("/${clue.image}")) return clue.imageSpan ?? clue.span;
@@ -134,10 +144,14 @@ SourceSpan _locateClue(ClueFile? clues, String message) {
 }
 
 SourceSpan _locateProfile(Cast cast, String message) {
-  final file = RegExp(r"'([^']+)'").firstMatch(message)?.group(1)?.split("/").last;
+  final named = _quotedPattern.firstMatch(message)?.group(1);
+  final file = named?.split("/").last;
   for (final profile in cast.profiles.values) {
     for (var i = 0; i < profile.sprites.length; i++) {
-      if (profile.sprites[i] == file) return profile.spriteSpans[i];
+      final sprite = profile.sprites[i];
+      if (sprite == file || (named != null && (named == sprite || named.endsWith("/$sprite")))) {
+        return profile.spriteSpans[i];
+      }
     }
     if (file != null && profile.avatar?.split("/").last == file) return profile.avatarSpan ?? profile.span;
   }

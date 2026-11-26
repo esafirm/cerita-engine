@@ -1,3 +1,5 @@
+import 'package:cerita_core/cerita_core.dart' show TextMarkup;
+
 import 'flow.dart';
 import 'model.dart';
 import 'project.dart';
@@ -118,11 +120,15 @@ class StoryStats {
 
 double _round(double value) => (value * 10).round() / 10;
 
-/// Words in [text]. `{{VAR}}` counts as one word.
-int countWords(String text) =>
-    text.replaceAll(RegExp(r"{{[a-zA-Z0-9_]+}}"), "X").split(RegExp(r"\s+")).where((word) {
-      return word.contains(RegExp(r"[\p{L}\p{N}]", unicode: true));
-    }).length;
+final _wordVarPattern = RegExp(r"{{[a-zA-Z0-9_.]+}}");
+final _whitespacePattern = RegExp(r"\s+");
+final _wordCharPattern = RegExp(r"[\p{L}\p{N}]", unicode: true);
+
+/// Words in [text]. `{{VAR}}` counts as one word, and text tags like `{w=400}` or `{i}` are not counted.
+int countWords(String text) => TextMarkup.plain(text.replaceAll(_wordVarPattern, "X"))
+    .split(_whitespacePattern)
+    .where(_wordCharPattern.hasMatch)
+    .length;
 
 /// Builds the playtime report in [locale] (default: the source locale) at [wpm] words per minute (default:
 /// the story's setting for that locale).
@@ -165,7 +171,8 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
     return Measure(count, count / speed * 60 + extra);
   }
 
-  final conversations = project.conversationsByKey.values.toList();
+  final byKey = project.conversationsByKey;
+  final conversations = byKey.values.toList();
   final graph = FlowGraph(conversations);
   final itemMeasures = List<Measure?>.generate(graph.length, (node) {
     final item = graph.itemAt(node);
@@ -174,15 +181,17 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 
   // A CALL takes as long as the section it calls: every item from its target to a RETURN or the end of that
   // conversation. Nested calls are followed a few levels deep.
+  final calledCache = <int, Measure>{};
   Measure called(int node, int depth) {
     final item = graph.itemAt(node);
     if (item is! JumpItem || !item.isCall || depth > 8) return const Measure(0, 0);
+    if (calledCache[node] case final cached?) return cached;
     final target = graph.resolve(item.target, graph.conversationOf(node).key);
     var total = const Measure(0, 0);
     for (var next = target; next != null && graph.itemAt(next) != null && graph.itemAt(next) is! ReturnItem; next++) {
       total = total + itemMeasures[next]! + called(next, depth + 1);
     }
-    return total;
+    return calledCache[node] = total;
   }
 
   final measures = [
@@ -193,28 +202,36 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 
   // Conversations in the order a reader meets them: breadth first from index, then the unreachable ones by key.
   final ordered = <ConversationNode>[];
+  final seen = <String>{};
   final start = graph.start(ConversationNode.indexKey);
   if (start != null) {
-    final seen = <String>{};
     final queue = [graph.conversationOf(start)];
     seen.add(queue.first.key);
-    while (queue.isNotEmpty) {
-      final conversation = queue.removeAt(0);
+    for (var head = 0; head < queue.length; head++) {
+      final conversation = queue[head];
       ordered.add(conversation);
       for (final key in _targets(conversation)) {
-        final next = project.conversationsByKey[key];
+        final next = byKey[key];
         if (next != null && seen.add(key)) queue.add(next);
       }
     }
   }
-  ordered.addAll(conversations.where((c) => !ordered.contains(c)).toList()..sort((a, b) => a.key.compareTo(b.key)));
+  ordered.addAll(conversations.where((c) => !seen.contains(c.key)).toList()..sort((a, b) => a.key.compareTo(b.key)));
+
+  final totalByKey = <String, Measure>{};
+  for (var node = 0; node < graph.length; node++) {
+    final m = itemMeasures[node];
+    if (m == null) continue;
+    final key = graph.conversationOf(node).key;
+    totalByKey[key] = (totalByKey[key] ?? const Measure(0, 0)) + m;
+  }
 
   final conversationStats = [
     for (final conversation in ordered)
       ConversationStats(
         conversation.key,
         conversation.chapter?.textFor(activeLocale, config.sourceLocale),
-        conversation.items.map(measure).fold(const Measure(0, 0), (a, b) => a + b),
+        totalByKey[conversation.key] ?? const Measure(0, 0),
       ),
   ];
   final chapterTotals = <String, Measure>{};
@@ -276,6 +293,7 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 
 Iterable<String> _targets(ConversationNode conversation) sync* {
   final from = conversation.key;
+  if (conversation.scene?.hangUp case final hangUp?) yield hangUp.conversation(from);
   for (final item in conversation.items) {
     switch (item) {
       case ChoiceItem():

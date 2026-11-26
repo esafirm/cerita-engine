@@ -151,6 +151,7 @@ class _Compiler {
       case MediaItem():
         json["media_type"] = item.mediaType;
         json["uri"] = item.uri;
+        _put(json, "title", _text(item.texts["title"]));
         _put(json, "caption", _text(item.texts["caption"]));
         _put(json, "transcript", _text(item.texts["transcript"]));
         _put(json, "profile", _profile(item.by));

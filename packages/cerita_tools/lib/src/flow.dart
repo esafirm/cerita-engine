@@ -19,6 +19,7 @@ class FlowEdge {
 class FlowGraph {
   final List<ConversationNode> conversations;
   final Map<String, int> _indexByKey = {};
+  final List<Map<String, int>> _labelsByConv = [];
   final List<int> _base = [];
   final List<List<FlowEdge>> edges = [];
   final List<int> _conversationOf = [];
@@ -26,16 +27,27 @@ class FlowGraph {
   FlowGraph(this.conversations) {
     for (var c = 0; c < conversations.length; c++) {
       _indexByKey.putIfAbsent(conversations[c].key, () => c);
+      final labels = <String, int>{};
+      final items = conversations[c].items;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].label case final label?) labels.putIfAbsent(label, () => i);
+      }
+      _labelsByConv.add(labels);
       _base.add(edges.length);
-      for (var i = 0; i <= conversations[c].items.length; i++) {
+      for (var i = 0; i <= items.length; i++) {
         edges.add([]);
         _conversationOf.add(c);
       }
     }
     for (var c = 0; c < conversations.length; c++) {
-      final items = conversations[c].items;
+      final conversation = conversations[c];
+      final items = conversation.items;
+      final hangUp = conversation.scene?.hangUp;
+      final hangUpTarget = hangUp == null ? null : resolve(hangUp, conversation.key);
       for (var i = 0; i < items.length; i++) {
-        _link(_base[c] + i, items[i], _base[c] + i + 1);
+        final node = _base[c] + i;
+        _link(node, items[i], node + 1);
+        if (hangUpTarget != null) edges[node].add(FlowEdge(hangUpTarget, false));
       }
     }
   }
@@ -66,8 +78,8 @@ class FlowGraph {
     if (index == null) return null;
     final label = target.label;
     if (label == null) return _base[index];
-    final item = conversations[index].items.indexWhere((item) => item.label == label);
-    return item < 0 ? null : _base[index] + item;
+    final item = _labelsByConv[index][label];
+    return item == null ? null : _base[index] + item;
   }
 
   void _link(int node, ItemNode item, int next) {
@@ -100,7 +112,7 @@ class FlowGraph {
         if (item.outcome("timeout") case final timeout?) to(timeout.target);
       case ChoiceItem():
         // The engine skips a choice whose options are all hidden.
-        if (item.options.every((option) => option.condition != null || option.once)) to(null);
+        if (item.options.every((option) => option.condition != null || option.once)) out.add(FlowEdge(next, false));
         for (final option in item.options) {
           to(option.target);
         }

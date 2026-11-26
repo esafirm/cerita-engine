@@ -46,16 +46,17 @@ class StoryProject {
   });
 
   /// Every conversation in script path order, then file order.
-  List<ConversationNode> get conversations => [for (final script in scripts) ...script.conversations];
+  late final List<ConversationNode> conversations =
+      List.unmodifiable([for (final script in scripts) ...script.conversations]);
 
   /// Conversations by key. The first one wins when a key is used twice (the linter reports it).
-  Map<String, ConversationNode> get conversationsByKey {
+  late final Map<String, ConversationNode> conversationsByKey = () {
     final result = <String, ConversationNode>{};
     for (final conversation in conversations) {
       result.putIfAbsent(conversation.key, () => conversation);
     }
-    return result;
-  }
+    return Map<String, ConversationNode>.unmodifiable(result);
+  }();
 
   /// Builds a project from sources in memory, e.g. in tests. [scripts] maps paths to script text.
   factory StoryProject.fromSources({
@@ -83,8 +84,9 @@ class StoryProject {
     );
   }
 
-  /// Loads the story folder at [root]. [assetsOverride] replaces the `assets` setting.
-  factory StoryProject.load(String root, {String? assetsOverride}) {
+  /// Loads the story folder at [root]. [assetsOverride] replaces the `assets` setting. Pass `loadAssets: false`
+  /// when the caller doesn't inspect [assetFiles], to skip walking the asset directory.
+  factory StoryProject.load(String root, {String? assetsOverride, bool loadAssets = true}) {
     final diagnostics = Diagnostics();
     String? read(String name) {
       final file = File(p.join(root, name));
@@ -123,7 +125,7 @@ class StoryProject {
     } else if (config.assets != null) {
       assetsDir = p.join(root, config.assets);
     }
-    if (assetsDir != null) {
+    if (loadAssets && assetsDir != null) {
       final assets = Directory(assetsDir);
       if (assets.existsSync()) {
         assetFiles = assets

@@ -64,6 +64,7 @@ class StoryConfig {
       node.nodes.forEach((key, value) {
         final locale = (key as YamlNode).value.toString();
         if (!locales.contains(locale)) diagnostics.error(yamlSpan(file, key), "Unknown locale '$locale' in $what");
+        if (value.value == null) return;
         result.set(locale, value.value.toString(), yamlSpan(file, value));
       });
       return result;
