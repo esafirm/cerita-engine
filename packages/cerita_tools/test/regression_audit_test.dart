@@ -133,4 +133,63 @@ media AUDIO clip.mp3 by=nora
     expect((manifest["lines"] as List).length, 2);
     expect(warnings.items, isEmpty);
   });
+
+  test('blank or whitespace-only YAML locale maps for required profile name are reported as missing', () {
+    for (final profiles in [
+      "nora:\n  name:\n    id:\n    en:\n",
+      "nora:\n  name:\n    id: \"\"\n    en: \"   \"\n",
+      "nora:\n  name: \"   \"\n",
+    ]) {
+      final project = story(
+        {
+          "a.cerita": """
+@conversation index
+nora
+  id: Halo
+  en: Hi
+""",
+        },
+        config: _bilingual,
+        profiles: profiles,
+      );
+      expect(project.diagnostics.hasErrors, isTrue);
+      expect(project.diagnostics.items.any((d) => d.message.contains("has no name")), isTrue);
+    }
+  });
+
+  test('storyStats CALL cache does not poison shared calls reached at different depths', () {
+    final buffer = StringBuffer("""
+@conversation index
+choice
+  en: Pick
+? Deep
+  -> c0
+? Direct
+  -> c8
+
+@conversation shared
+nora
+  en: one two three four five
+return
+""");
+    for (var i = 0; i < 8; i++) {
+      buffer.writeln("""
+@conversation c$i
+call c${i + 1}
+ending e$i GOOD
+  en: End $i
+""");
+    }
+    buffer.writeln("""
+@conversation c8
+call shared
+ending e8 GOOD
+  en: End 8
+""");
+    final project = story({"a.cerita": buffer.toString()});
+    final stats = storyStats(project);
+    final direct = stats.endings.firstWhere((e) => e.id == "e8");
+    // Direct path reaches c8 at depth 0, so `shared` (5 words) must be counted.
+    expect(direct.shortest.measure.words, greaterThanOrEqualTo(5));
+  });
 }

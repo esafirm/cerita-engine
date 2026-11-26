@@ -181,17 +181,17 @@ StoryStats storyStats(StoryProject project, {String? locale, num? wpm}) {
 
   // A CALL takes as long as the section it calls: every item from its target to a RETURN or the end of that
   // conversation. Nested calls are followed a few levels deep.
-  final calledCache = <int, Measure>{};
+  final calledCache = <(int, int), Measure>{};
   Measure called(int node, int depth) {
     final item = graph.itemAt(node);
     if (item is! JumpItem || !item.isCall || depth > 8) return const Measure(0, 0);
-    if (calledCache[node] case final cached?) return cached;
+    if (calledCache[(node, depth)] case final cached?) return cached;
     final target = graph.resolve(item.target, graph.conversationOf(node).key);
     var total = const Measure(0, 0);
     for (var next = target; next != null && graph.itemAt(next) != null && graph.itemAt(next) is! ReturnItem; next++) {
       total = total + itemMeasures[next]! + called(next, depth + 1);
     }
-    return calledCache[node] = total;
+    return calledCache[(node, depth)] = total;
   }
 
   final measures = [

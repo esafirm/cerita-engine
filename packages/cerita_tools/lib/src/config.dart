@@ -65,15 +65,19 @@ class StoryConfig {
         final locale = (key as YamlNode).value.toString();
         if (!locales.contains(locale)) diagnostics.error(yamlSpan(file, key), "Unknown locale '$locale' in $what");
         if (value.value == null) return;
-        result.set(locale, value.value.toString(), yamlSpan(file, value));
+        final text = value.value.toString();
+        if (text.trim().isEmpty) return;
+        result.set(locale, text, yamlSpan(file, value));
       });
-      return result;
+      return result.values.isEmpty ? null : result;
     }
     if (node is YamlList) {
       diagnostics.error(span, "Expected text for $what");
       return null;
     }
-    return Localized.single(span, sourceLocale, node.value.toString())..isPlain = true;
+    final text = node.value.toString();
+    if (text.trim().isEmpty) return null;
+    return Localized.single(span, sourceLocale, text)..isPlain = true;
   }
 
   static StoryConfig parse(String? source, Diagnostics diagnostics) {
