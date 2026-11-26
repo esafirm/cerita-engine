@@ -1,6 +1,9 @@
-Anime visual novel background, portrait 9:16, no people. A small tidy Indonesian living room in a modest house,
-daytime: a worn brown sofa with a crocheted cover, a low glass table with a jar of crackers, a framed family photo, a
-wall clock, a ceiling fan, lace curtains. Flat daylight. Quiet and too tidy. Style: 1990s TV anime cel look. Flat
-colors with two-tone cel shading and hard shadow edges, no gradients, no glow, no bloom, no rim light. Clean line art
-with varied line weight. Limited muted palette. Simplified shapes. Painted flat background like a hand-painted anime
-backdrop, gouache texture, broad simple shapes. Leave the lower third calm enough for a text box.
+Anime visual novel background, portrait 9:16, no people. Redraw the attached image keeping the exact same room,
+camera, framing, worn brown sofa with crocheted cover, glass coffee table with cracker jar and red flowers, cabinet,
+wall clock, ceiling fan, lace curtains, green tiled floor, doorway, palette and gouache line style, and change ONLY the
+framed family photo hanging on the wall above the sofa. In that framed family photo, the parents (father and mother)
+stand behind TWO YOUNG SISTERS (two girls, NO boy): the slightly taller older sister has wavy dark-brown shoulder-length
+hair, and the slightly shorter younger sister has a short black bob. Everything else in the living room stays identical
+to the attached reference. Style: 1990s TV anime cel look. Flat colors with two-tone cel shading and hard shadow edges,
+no gradients, no glow, no bloom, no rim light. Clean line art with varied line weight. Limited muted palette.
+Simplified shapes. Painted flat background like a hand-painted anime backdrop, gouache texture.
