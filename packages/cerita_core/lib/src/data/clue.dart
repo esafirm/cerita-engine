@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../l10n/localized_text.dart';
 
 /// A piece of evidence declared in `clues.json`. The player finds it when the playthrough variable
@@ -97,19 +95,19 @@ class ClueCatalog {
   /// The clues grouped by chapter in board order: newest chapter first (the reverse of the order in which each
   /// chapter's first clue is declared), then the clues without a chapter.
   List<ClueGroup> get groups {
-    final byChapter = <String, List<Clue>>{};
-    final headings = <String, LocalizedText?>{};
+    final byChapter = <LocalizedText, List<Clue>>{};
+    List<Clue>? loose;
     for (final clue in clues) {
-      // Grouped by every language of the heading, so the groups are the same whichever language is shown.
-      final key = clue.chapter == null ? "" : jsonEncode(clue.chapter!.toJson());
-      byChapter.putIfAbsent(key, () => []).add(clue);
-      headings[key] = clue.chapter;
+      final chapter = clue.chapter;
+      if (chapter == null) {
+        (loose ??= []).add(clue);
+      } else {
+        byChapter.putIfAbsent(chapter, () => []).add(clue);
+      }
     }
     final groups = [
-      for (final MapEntry(:key, :value) in byChapter.entries)
-        if (key.isNotEmpty) ClueGroup(headings[key], value),
+      for (final MapEntry(:key, :value) in byChapter.entries) ClueGroup(key, value),
     ];
-    final loose = byChapter[""];
     return [...groups.reversed, if (loose != null) ClueGroup(null, loose)];
   }
 }

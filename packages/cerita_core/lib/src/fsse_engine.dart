@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'data/channel.dart';
@@ -125,11 +124,13 @@ class RealFsseEngine extends FsseEngine {
   ProfileData profileData = const ProfileData([]);
   List<Channel> channels = const [];
   ClueCatalog clues = ClueCatalog.empty;
+  Map<String, Clue> _cluesById = const {};
 
   /// The story's languages, from `index.json`.
   StoryLocales storyLocales = const StoryLocales();
   String? _locale;
-  ProfileData? _localizedProfiles;
+  Map<String, Profile>? _localizedProfilesById;
+  Map<String, Channel>? _localizedChannelsById;
 
   /// Name of the player profile until `NAME` is set.
   String playerFallbackName = "You";
@@ -170,7 +171,7 @@ class RealFsseEngine extends FsseEngine {
   bool _replay = false;
 
   /// The chapter being replayed. Entering a conversation of another chapter ends the replay.
-  String? _replayChapter;
+  LocalizedText? _replayChapter;
 
   /// Whether the last item returned by [next] had been delivered in an earlier playthrough.
   bool lastItemPreviouslySeen = false;
@@ -198,7 +199,8 @@ class RealFsseEngine extends FsseEngine {
   set locale(String? locale) {
     if (locale == _locale) return;
     _locale = locale;
-    _localizedProfiles = null;
+    _localizedProfilesById = null;
+    _localizedChannelsById = null;
   }
 
   Localizer get localizer => Localizer(locale: _locale, sourceLocale: storyLocales.source);
@@ -212,8 +214,10 @@ class RealFsseEngine extends FsseEngine {
     profileData = package.profiles;
     channels = package.channels;
     clues = package.clues;
+    _cluesById = {for (final clue in clues.clues) clue.id: clue};
     storyLocales = package.conversation.locales;
-    _localizedProfiles = null;
+    _localizedProfilesById = null;
+    _localizedChannelsById = null;
     meta = await storage?.loadMeta() ?? meta;
 
     dataMap.clear();
@@ -263,7 +267,7 @@ class RealFsseEngine extends FsseEngine {
       final conversation = await loader.loadConversation(checkpoint.conversationKey);
       if (replay) {
         _replay = true;
-        _replayChapter = conversation.chapter;
+        _replayChapter = conversation.chapterText;
       }
       await _enterConversation(conversation);
     } else {
@@ -280,8 +284,8 @@ class RealFsseEngine extends FsseEngine {
     final found = _foundIds();
     await _handleResult(prevResult);
 
-    final item = await _resolveCurrentItem();
-    final executed = await _execute(item);
+    final (item, prePrepared) = await _resolveCurrentItem();
+    final executed = await _execute(item, prePrepared: prePrepared);
     _pushFrame(executed);
     await _flushMeta();
     for (final clue in clues.clues) {
@@ -368,7 +372,7 @@ class RealFsseEngine extends FsseEngine {
     Future<bool> enter(String key, int at) async {
       final entered = _conversations[key] ?? await loader.loadConversation(key);
       final chapter = _replayChapter;
-      if (chapter != null && entered.chapter != null && entered.chapter != chapter) return false;
+      if (chapter != null && entered.chapterText != null && entered.chapterText != chapter) return false;
       conversation = entered;
       index = at;
       if (entered.hasScene) scene = entered.scene;
@@ -470,8 +474,7 @@ class RealFsseEngine extends FsseEngine {
     _rolls.position = frame.roll;
   }
 
-  static bool _sameScene(Scene? a, Scene? b) =>
-      identical(a, b) || (a != null && b != null && jsonEncode(a.toJson()) == jsonEncode(b.toJson()));
+  static bool _sameScene(Scene? a, Scene? b) => identical(a, b) || a == b;
 
   /// Index in [_frames] of the newest line before the current one (or at [historyIndex]).
   int? _rollbackTarget(int? historyIndex) {
@@ -534,7 +537,8 @@ class RealFsseEngine extends FsseEngine {
   Future<ItemType> get() async {
     developer.log("Request get with index: $dialogIndex", name: _tag);
     await _ensureStarted();
-    final item = _prepare(await _resolveCurrentItem());
+    final (raw, prePrepared) = await _resolveCurrentItem();
+    final item = prePrepared ?? _prepare(raw);
     await _flushMeta();
     return item;
   }
@@ -552,10 +556,19 @@ class RealFsseEngine extends FsseEngine {
     if (id == ProfileInfo.playerId) {
       return Profile(id: ProfileInfo.playerId, name: dataMap["NAME"]?.toString() ?? playerFallbackName);
     }
-    return (_localizedProfiles ??= profileData.localized(localizer)).byId(id);
+    final byId = _localizedProfilesById ??= {
+      for (final profile in profileData.profiles) profile.id: profile.localized(localizer),
+    };
+    return byId[id];
   }
 
-  Channel? getChannel(String? id) => channels.where((channel) => channel.id == id).firstOrNull?.localized(localizer);
+  Channel? getChannel(String? id) {
+    if (id == null) return null;
+    final byId = _localizedChannelsById ??= {
+      for (final channel in channels) channel.id: channel.localized(localizer),
+    };
+    return byId[id];
+  }
 
   bool evaluate(String? condition) => _evaluator.evaluate(condition, state);
 
@@ -591,14 +604,18 @@ class RealFsseEngine extends FsseEngine {
     final storage = this.storage;
     if (storage == null) return;
     await storage.saveSlot(snapshot(slotId: slotId));
-    await storage.saveMeta(meta);
+    if (slotId == SaveSlot.autoSlotId) {
+      await _flushMeta();
+    } else {
+      await _saveMetaNow();
+    }
   }
 
   Future<void> _ensureStarted() async {
     if (!_started) await start();
   }
 
-  StageState _copyStage(StageState stage) => StageState.fromJson(stage.toJson());
+  StageState _copyStage(StageState stage) => stage.copy();
 
   /// Records the stage music for the music room.
   void _hearMusic() {
@@ -612,16 +629,20 @@ class RealFsseEngine extends FsseEngine {
     }
   }
 
-  Future<void> _flushMeta() async {
-    if (!_metaDirty && !state.persistentDirty) return;
+  Future<void> _saveMetaNow() async {
     _metaDirty = false;
     state.persistentDirty = false;
     await storage?.saveMeta(meta);
   }
 
+  Future<void> _flushMeta() async {
+    if (!_metaDirty && !state.persistentDirty) return;
+    await _saveMetaNow();
+  }
+
   /// Skips items whose condition fails or that have nothing to pick, and follows
   /// BRANCH / JUMP / CALL / RETURN / SET.
-  Future<ItemType> _resolveCurrentItem() async {
+  Future<(ItemType, ItemType?)> _resolveCurrentItem() async {
     for (var jumps = 0; jumps < _maxJumps;) {
       final conversation = currentConversation;
       if (conversation == null) {
@@ -642,6 +663,7 @@ class RealFsseEngine extends FsseEngine {
 
       switch (item) {
         case BranchItemType():
+          _applyEffects(item.effects);
           final target =
               item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
           if (target == null) {
@@ -669,18 +691,22 @@ class RealFsseEngine extends FsseEngine {
           }
           continue;
         // Nothing to present: the question isn't asked and its fallback plays.
-        case EvidenceItemType(:final fallback) when foundClues.isEmpty:
+        case EvidenceItemType(:final fallback) when !clues.clues.any(isClueFound):
           _evidenceTries.remove("${conversation.key}#$dialogIndex");
           dialogIndex += 1;
           if (await _playOutcome(fallback)) jumps++;
           continue;
         case EvidenceItemType():
           break;
-        case ChoiceItemType() when (_prepare(item) as ChoiceItemType).availableChoices.isEmpty:
-          dialogIndex += 1;
-          continue;
+        case ChoiceItemType():
+          final prepared = _prepare(item) as ChoiceItemType;
+          if (prepared.availableChoices.isEmpty) {
+            dialogIndex += 1;
+            continue;
+          }
+          return (item, item.effects.isEmpty ? prepared : null);
       }
-      return item;
+      return (item, null);
     }
     throw Exception("Too many jumps. Is there a loop in the story?");
   }
@@ -704,9 +730,9 @@ class RealFsseEngine extends FsseEngine {
     return cloned.withChoices(choices);
   }
 
-  Future<ItemType> _execute(ItemType item) async {
+  Future<ItemType> _execute(ItemType item, {ItemType? prePrepared}) async {
     _applyEffects(item.effects);
-    final prepared = _prepare(item);
+    final prepared = prePrepared ?? _prepare(item);
     final conversation = currentConversation!;
     _lastItemKey = "${conversation.key}#$dialogIndex";
 
@@ -725,7 +751,12 @@ class RealFsseEngine extends FsseEngine {
         item: prepared.toJson(),
       ));
     }
-    lastItemPreviouslySeen = !meta.seenItems.add(_lastItemKey!);
+    if (meta.seenItems.add(_lastItemKey!)) {
+      lastItemPreviouslySeen = false;
+      _metaDirty = true;
+    } else {
+      lastItemPreviouslySeen = true;
+    }
     _awaitingResult = prepared is ChoiceItemType || prepared is InputItemType;
     dialogIndex += 1;
 
@@ -760,12 +791,12 @@ class RealFsseEngine extends FsseEngine {
     ];
     for (final media in unlocks) {
       if (media.unlockId == null || !meta.unlockedMediaIds.add(media.unlockId!)) continue;
-      await storage?.saveMeta(meta);
+      await _saveMetaNow();
       listener?.onMediaUnlocked(media);
     }
     if (item is EndingItemType) {
       meta.unlockedEndingIds.add(item.endingId);
-      await storage?.saveMeta(meta);
+      await _saveMetaNow();
       listener?.onEndingUnlocked(item);
     }
   }
@@ -777,7 +808,7 @@ class RealFsseEngine extends FsseEngine {
 
     if (itemResult.variable != null) {
       if (itemResult.value == null) {
-        throw Exception("Variable exits but value is null");
+        throw Exception("Variable exists but value is null");
       }
       state[itemResult.variable!] = itemResult.value;
     }
@@ -828,7 +859,7 @@ class RealFsseEngine extends FsseEngine {
       _evidenceTries.remove(key);
       outcome = question.timeout ?? question.fallback;
     } else {
-      final clue = clues.byId(clueId) ?? (throw ArgumentError.value(clueId, "presentedClue", "No such clue"));
+      final clue = _cluesById[clueId] ?? (throw ArgumentError.value(clueId, "presentedClue", "No such clue"));
       if (result.variable != null) state[result.variable!] = clue.id;
       // The title in every language, so the reply follows a language switch like the rest of the history.
       _history.add(TranscriptEntry(
@@ -897,7 +928,7 @@ class RealFsseEngine extends FsseEngine {
   /// Called after initial load and after a new conversation is loaded.
   Future<void> _enterConversation(Conversation conversation, {int index = 0}) async {
     final chapter = _replayChapter;
-    if (chapter != null && conversation.chapter != null && conversation.chapter != chapter) {
+    if (chapter != null && conversation.chapterText != null && conversation.chapterText != chapter) {
       throw EndOfStoryException(conversation.key);
     }
     // Before anything changes, so a closed conversation is never current and its checkpoint stays locked.
@@ -926,7 +957,7 @@ class RealFsseEngine extends FsseEngine {
         unlockedAt: DateTime.now(),
       );
       meta.unlockedCheckpoints[conversation.key] = checkpoint;
-      await storage?.saveMeta(meta);
+      await _saveMetaNow();
       listener?.onCheckpointUnlocked(checkpoint);
     }
   }

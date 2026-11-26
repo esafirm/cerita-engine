@@ -96,6 +96,8 @@ class StoryLinter {
   /// Variables the engine reads by itself: the player's name.
   static const _engineReads = {"NAME"};
 
+  static final _unknownTag = RegExp(r"\{/?[a-z]+(=[^{}]*)?\}");
+
   Future<List<LintIssue>> lint() async {
     final issues = <LintIssue>[];
     void error(String? key, int? index, String message, [List<Object> path = const []]) =>
@@ -128,6 +130,13 @@ class StoryLinter {
       }
     }
     final byKey = {for (final conversation in conversations) conversation.key: conversation};
+    final profilesById = {for (final profile in profiles.profiles) profile.id: profile};
+    final channelIds = {for (final channel in channels) channel.id};
+    final linksByKey = {for (final conversation in conversations) conversation.key: StoryLink.of(conversation).toList()};
+    final idsByKey = {
+      for (final conversation in conversations)
+        conversation.key: {for (final item in conversation.conversations) ?item.id},
+    };
 
     void asset(
       String? key,
@@ -163,8 +172,20 @@ class StoryLinter {
     // Chat threads name their contacts and owner by profile id.
     if (profilesLoaded) {
       for (final channel in channels) {
+        final avatar = channel.avatar;
+        if (avatar != null && assetExists != null && !assetExists!(config.avatar(avatar))) {
+          issues.add(
+            LintIssue(
+              LintSeverity.error,
+              null,
+              null,
+              "Missing avatar file '${config.avatar(avatar)}'",
+              fileName: "channels.json",
+            ),
+          );
+        }
         for (final id in [...channel.members, ?channel.owner]) {
-          if (profiles.byId(id) == null) {
+          if (id != ProfileInfo.playerId && !profilesById.containsKey(id)) {
             issues.add(
               LintIssue(
                 LintSeverity.error,
@@ -196,11 +217,22 @@ class StoryLinter {
 
     void character(String key, int index, ProfileInfo? info, [List<Object> at = const []]) {
       if (info == null || info.isPlayer || !profilesLoaded) return;
-      final profile = profiles.byId(info.id);
+      final profile = profilesById[info.id];
       if (profile == null) {
         error(key, index, "Unknown character '${info.id}'", at);
-      } else if (profile.sprites.isNotEmpty && info.spriteIndex >= profile.sprites.length) {
+      } else if (profile.sprites.isNotEmpty && (info.spriteIndex < 0 || info.spriteIndex >= profile.sprites.length)) {
         error(key, index, "${profile.name} has no sprite ${info.spriteIndex} (${profile.sprites.length} sprites)", at);
+      }
+    }
+
+    void characterId(String key, int index, String? id, [List<Object> at = const []]) {
+      if (id == null || id == ProfileInfo.playerId || !profilesLoaded) return;
+      if (!profilesById.containsKey(id)) error(key, index, "Unknown character '$id'", at);
+    }
+
+    void writeTarget(String key, int index, String variable, [List<Object> at = const []]) {
+      if (StoryState.isMeta(variable)) {
+        error(key, index, "'$variable' is read-only. Remember facts with the meta_set op", at);
       }
     }
 
@@ -242,14 +274,27 @@ class StoryLinter {
 
     void text(String key, int index, Map<String, dynamic> json, [List<Object> at = const []]) {
       for (final MapEntry(key: field, :value) in json.entries) {
-        if (!_textKeys.contains(field) || value is! String) continue;
-        for (final match in variablePattern.allMatches(value)) {
-          reads.putIfAbsent(match.group(1)!, () => (key, index, at));
+        if (!_textKeys.contains(field)) continue;
+        final warnedTags = <String>{};
+        void check(String raw) {
+          for (final match in variablePattern.allMatches(raw)) {
+            reads.putIfAbsent(match.group(1)!, () => (key, index, at));
+          }
+          // `{{` is an escaped `{`, written on purpose.
+          final shown = TextMarkup.plain(raw.replaceAll(variablePattern, "").replaceAll("{{", ""));
+          final unknown = _unknownTag.firstMatch(shown);
+          if (unknown != null && warnedTags.add(unknown.group(0)!)) {
+            warn(key, index, "Unknown text tag '${unknown.group(0)}'", at);
+          }
         }
-        // `{{` is an escaped `{`, written on purpose.
-        final shown = TextMarkup.plain(value.replaceAll(variablePattern, "").replaceAll("{{", ""));
-        final unknown = RegExp(r"\{/?[a-z]+(=[^{}]*)?\}").firstMatch(shown);
-        if (unknown != null) warn(key, index, "Unknown text tag '${unknown.group(0)}'", at);
+
+        if (value is String) {
+          check(value);
+        } else if (value is Map) {
+          for (final entry in value.values) {
+            if (entry is String) check(entry);
+          }
+        }
       }
     }
 
@@ -262,7 +307,7 @@ class StoryLinter {
         return;
       }
       final label = link.targetLabel;
-      if (label != null && !conversation.conversations.any((item) => item.id == label)) {
+      if (label != null && !(idsByKey[link.targetKey]?.contains(label) ?? false)) {
         error(link.from, link.itemIndex, "Target '${link.target}' has no item with id '$label'", link.path);
       }
     }
@@ -278,7 +323,7 @@ class StoryLinter {
         if (scene.mode == SceneMode.chat) {
           if (scene.channelId == null) {
             error(key, null, "CHAT scene without a channel_id");
-          } else if (channels.isNotEmpty && !channels.any((channel) => channel.id == scene.channelId)) {
+          } else if (channels.isNotEmpty && !channelIds.contains(scene.channelId)) {
             warn(key, null, "Chat thread '${scene.channelId}' isn't in channels.json");
           }
         }
@@ -309,6 +354,7 @@ class StoryLinter {
             }
           case EvidenceItemType(:final responses, :final variable, :final retries):
             if (variable != null) {
+              writeTarget(key, index, variable);
               sets.putIfAbsent(variable, () => (key, index, const []));
               questionVariables.add(variable);
             }
@@ -334,6 +380,7 @@ class StoryLinter {
             questions.add((key, index, answered));
           case ChoiceItemType(:final choices, :final variable, :final defaultChoice):
             if (variable != null) {
+              writeTarget(key, index, variable);
               sets.putIfAbsent(variable, () => (key, index, const []));
               questionVariables.add(variable);
             }
@@ -349,6 +396,7 @@ class StoryLinter {
               text(key, index, Map<String, dynamic>.from(raw), at);
             }
           case InputItemType(:final variable):
+            writeTarget(key, index, variable);
             sets.putIfAbsent(variable, () => (key, index, const []));
           case BranchItemType(:final branches):
             for (final (branchIndex, branch) in branches.indexed) {
@@ -360,6 +408,10 @@ class StoryLinter {
               switch (action) {
                 case ShowAction(:final profile):
                   character(key, index, profile, at);
+                case HideAction(:final profileId):
+                  characterId(key, index, profileId, at);
+                case MoveAction(:final profileId):
+                  characterId(key, index, profileId, at);
                 case BackgroundAction(:final image):
                   asset(key, index, image, config.bg, "background", at);
                 case CgAction(:final image):
@@ -375,7 +427,7 @@ class StoryLinter {
         }
       }
 
-      StoryLink.of(conversation).forEach(target);
+      linksByKey[key]!.forEach(target);
       _deadItems(conversation, (index) => warn(key, index, "Never reached: it follows a JUMP or RETURN"));
     }
 

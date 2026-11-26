@@ -48,7 +48,7 @@ class TextMarkup {
       final value = match.group(3);
 
       if (closing) {
-        final at = open.lastIndexWhere((tag) => tag.$1 == name);
+        final at = value != null ? -1 : open.lastIndexWhere((tag) => tag.$1 == name);
         if (at < 0 || !_styleTags.contains(name)) {
           buffer.write(match.group(0));
           continue;
@@ -62,7 +62,7 @@ class TextMarkup {
       switch (name) {
         case "w":
           final ms = value == null ? null : int.tryParse(value.trim());
-          if (value != null && ms == null) {
+          if (value != null && (ms == null || ms < 0)) {
             buffer.write(match.group(0));
             continue;
           }
@@ -87,16 +87,17 @@ class TextMarkup {
   }
 
   /// [text] without its tags, as the player reads it.
-  static String plain(String text) => parse(text).text;
+  static String plain(String text) => text.contains("{") ? parse(text).text : text;
 
   /// [text] shown as written, with its `{` escaped, so tags in it are not applied.
   static String escape(String text) => text.replaceAll("{", "{{");
 
   static const _styleTags = {"b", "i", "u", "s", "color", "size", "shake", "wave", "speed"};
+  static final _hexColor = RegExp(r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$");
 
   /// [style] with the tag applied. Null when the tag is unknown or its value is invalid.
   static MarkupStyle? _apply(MarkupStyle style, String name, String? value) {
-    double? number() => value == null ? null : double.tryParse(value.trim());
+    final trimmed = value?.trim();
     return switch (name) {
       "b" when value == null => style.copyWith(bold: true),
       "i" when value == null => style.copyWith(italic: true),
@@ -104,10 +105,15 @@ class TextMarkup {
       "s" when value == null => style.copyWith(strike: true),
       "shake" when value == null => style.copyWith(effect: MarkupEffect.shake),
       "wave" when value == null => style.copyWith(effect: MarkupEffect.wave),
-      "color" when value != null && RegExp(r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$").hasMatch(value.trim()) =>
-        style.copyWith(color: value.trim()),
-      "size" when (number() ?? 0) > 0 => style.copyWith(size: number()),
-      "speed" when (number() ?? 0) > 0 => style.copyWith(speed: number()),
+      "color" when trimmed != null && _hexColor.hasMatch(trimmed) => style.copyWith(color: trimmed),
+      "size" when trimmed != null => switch (double.tryParse(trimmed)) {
+          final n? when n > 0 => style.copyWith(size: n),
+          _ => null,
+        },
+      "speed" when trimmed != null => switch (double.tryParse(trimmed)) {
+          final n? when n > 0 => style.copyWith(speed: n),
+          _ => null,
+        },
       _ => null,
     };
   }

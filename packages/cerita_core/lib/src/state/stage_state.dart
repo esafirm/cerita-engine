@@ -45,6 +45,22 @@ class StageState {
     Map<SpritePosition, ProfileInfo>? sprites,
   }) : sprites = sprites ?? {};
 
+  StageState copy() => StageState(
+        background: background,
+        music: music,
+        ambience: ambience,
+        weather: weather,
+        zoom: zoom,
+        zoomFocus: zoomFocus,
+        cg: cg,
+        cgZoom: cgZoom,
+        cgFocus: cgFocus,
+        speakerId: speakerId,
+        textbox: textbox,
+        pageStart: pageStart,
+        sprites: Map.of(sprites),
+      );
+
   SpritePosition? slotOf(String profileId) =>
       sprites.entries.where((entry) => entry.value.id == profileId).firstOrNull?.key;
 
@@ -52,7 +68,7 @@ class StageState {
   /// the moment it shows, so it never carries into the next scene.
   void enterScene(Scene scene, {Scene? previous}) {
     _showCg(null);
-    if (previous == null || scene.background != previous.background || scene.mode != previous.mode) {
+    if (previous == null || scene.background != background || scene.mode != previous.mode) {
       sprites.clear();
       weather = null;
       zoom = 1;
@@ -76,7 +92,10 @@ class StageState {
   void place(ProfileInfo info, [SpritePosition? position]) {
     final existing = slotOf(info.id);
     if (existing != null) sprites.remove(existing);
-    sprites[position ?? existing ?? SpritePosition.center] = info;
+    final slot = position ?? existing ?? SpritePosition.center;
+    final displaced = sprites[slot];
+    sprites[slot] = info;
+    if (displaced != null && displaced.id == speakerId && displaced.id != info.id) speakerId = null;
   }
 
   void apply(StageAction action) {
@@ -136,7 +155,7 @@ class StageState {
       zoomFocus: SpritePosition.fromName(json["zoom_focus"] as String?) ?? SpritePosition.center,
       cg: json["cg"] as String?,
       cgZoom: (json["cg_zoom"] as num? ?? 1).toDouble(),
-      cgFocus: CgFocus.fromName(json["cg_focus"] as String?) ?? CgFocus.center,
+      cgFocus: CgFocus.tryFromName(json["cg_focus"] as String?) ?? CgFocus.center,
       speakerId: json["speaker"] as String?,
       textbox: TextboxStyle.fromName(json["textbox"] as String?) ?? TextboxStyle.adv,
       pageStart: (json["page_start"] as num?)?.toInt() ?? 0,

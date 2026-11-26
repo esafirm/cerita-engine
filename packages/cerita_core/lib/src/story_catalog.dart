@@ -14,7 +14,7 @@ class StoryCatalog {
 
   static Future<StoryCatalog> load(EngineLoader loader) async {
     final keys = await loader.listConversationKeys();
-    return StoryCatalog([for (final key in keys) await loader.loadConversation(key)]);
+    return StoryCatalog(await Future.wait([for (final key in keys) loader.loadConversation(key)]));
   }
 
   /// Gallery entries: `MEDIA` items and `cg` stage actions with an unlock id, the first of each id in file order.

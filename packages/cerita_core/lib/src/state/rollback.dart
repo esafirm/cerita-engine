@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../data/items/base.dart';
 import '../data/items/choice.dart';
+import '../data/items/evidence.dart';
 import '../data/items/input.dart';
 import '../data/items/media.dart';
 import '../data/items/narration.dart';
@@ -80,7 +81,7 @@ class RollbackFrame {
   Map<String, dynamic> toJson() => {
         "item": item.toJson(),
         // The item JSON has every choice. These are the ones shown, with their runtime flags.
-        if (item case ChoiceItemType(:final choices))
+        if (item case ChoiceItemType(:final choices) when item is! EvidenceItemType)
           "choices": [
             for (final choice in choices)
               {"index": choice.index, if (choice.locked) "locked": true, if (choice.chosen) "chosen": true},
@@ -106,8 +107,8 @@ class RollbackFrame {
     if (item is! ChoiceItemType || shown is! List) return item;
     return item.withChoices([
       for (final raw in shown)
-        if (item.choices.elementAtOrNull((raw as Map)["index"] as int) case final choice?)
-          choice.copyWith(locked: raw["locked"] == true, chosen: raw["chosen"] == true),
+        if ((raw as Map)["index"] case final int idx when idx >= 0 && idx < item.choices.length)
+          item.choices[idx].copyWith(locked: raw["locked"] == true, chosen: raw["chosen"] == true),
     ]);
   }
 }
@@ -166,7 +167,7 @@ class RollLog implements Random {
   @override
   int nextInt(int max) {
     final index = position - _base;
-    if (index < _rolls.length) {
+    if (index >= 0 && index < _rolls.length) {
       final roll = _rolls[index];
       if (roll.max == max) {
         position++;
@@ -175,7 +176,7 @@ class RollLog implements Random {
       _rolls.removeRange(index, _rolls.length);
     }
     final value = _source.nextInt(max);
-    _rolls.add((max: max, value: value));
+    if (index >= 0) _rolls.add((max: max, value: value));
     position++;
     return value;
   }

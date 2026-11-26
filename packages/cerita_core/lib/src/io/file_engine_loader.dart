@@ -14,8 +14,16 @@ class FileEngineLoader extends EngineLoader {
   static const _prefix = "cvn_";
 
   final LoaderConfig config;
+  final Map<String, Conversation> _conversations = {};
+  final Map<String, bool> _existsCache = {};
 
   FileEngineLoader(this.config);
+
+  @override
+  void clearCache() {
+    _conversations.clear();
+    _existsCache.clear();
+  }
 
   /// The story in [directory], with its asset folders inside it.
   factory FileEngineLoader.directory(String directory) {
@@ -51,8 +59,10 @@ class FileEngineLoader extends EngineLoader {
   @override
   Future<Conversation> loadConversation(String conversationId) async {
     final key = conversationId.startsWith(_prefix) ? conversationId.substring(_prefix.length) : conversationId;
+    if (_conversations[key] case final cached?) return cached;
     final file = key == Conversation.indexKey ? "index.json" : "$_prefix$key.json";
-    return Conversation.fromJson(await _json(file), key: key);
+    final conversation = Conversation.fromJson(await _json(file), key: key);
+    return _conversations[key] = conversation;
   }
 
   @override
@@ -75,12 +85,12 @@ class FileEngineLoader extends EngineLoader {
 
   /// For [StoryLinter.assetExists]. App asset paths (`assets/...`, as avatars may use) are read from the
   /// app folder that holds [LoaderConfig.storyDir].
-  bool exists(String path) {
-    final storyDir = config.storyDir;
-    final assets = storyDir.startsWith("assets/") ? 0 : storyDir.indexOf("/assets/") + 1;
-    final appPath = path.startsWith("assets/") && assets > 0 && !path.startsWith(storyDir)
-        ? "${storyDir.substring(0, assets)}$path"
-        : path;
-    return File(appPath).existsSync();
-  }
+  bool exists(String path) => _existsCache.putIfAbsent(path, () {
+        final storyDir = config.storyDir;
+        final assets = storyDir.startsWith("assets/") ? 0 : storyDir.indexOf("/assets/") + 1;
+        final appPath = path.startsWith("assets/") && assets > 0 && !path.startsWith(storyDir)
+            ? "${storyDir.substring(0, assets)}$path"
+            : path;
+        return File(appPath).existsSync();
+      });
 }

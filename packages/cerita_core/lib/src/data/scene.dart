@@ -95,4 +95,24 @@ class Scene {
         "time": ?time,
         if (status != null) "status": status!.toJson(),
       };
+
+  @override
+  bool operator ==(Object other) =>
+      other is Scene &&
+      other.mode == mode &&
+      other.background == background &&
+      other.music == music &&
+      other.ambience == ambience &&
+      other.ring == ring &&
+      other.hangUp == hangUp &&
+      other.stay == stay &&
+      other.textbox == textbox &&
+      other.channelId == channelId &&
+      other.day == day &&
+      other.time == time &&
+      other.status == status;
+
+  @override
+  int get hashCode =>
+      Object.hash(mode, background, music, ambience, ring, hangUp, stay, textbox, channelId, day, time, status);
 }

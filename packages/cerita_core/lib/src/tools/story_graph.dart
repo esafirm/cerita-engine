@@ -116,9 +116,11 @@ class StoryGraph {
     return seen;
   }
 
+  static final _mermaidUnsafe = RegExp(r"[^A-Za-z0-9_]");
+
   /// A Mermaid flowchart: conversations as nodes (endings rounded), targets as edges. `CALL`s are dashed.
   String toMermaid() {
-    String id(String key) => key.replaceAll(RegExp(r"[^A-Za-z0-9_]"), "_");
+    String id(String key) => key.replaceAll(_mermaidUnsafe, "_");
     String quote(String text) => '"${text.replaceAll('"', "#quot;")}"';
 
     final lines = ["flowchart TD"];

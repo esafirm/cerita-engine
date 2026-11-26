@@ -46,37 +46,52 @@ class RouteMap {
     bool isCheckpoint(String key) => byKey[key]?.checkpoint ?? false;
     final endings = <String, (Conversation, EndingItemType)>{};
 
+    // Pre-index links per conversation by itemIndex (null = scene-level links like call hangup).
+    final linksByConv = <String, Map<int?, List<StoryLink>>>{};
+    for (final conversation in graph.conversations) {
+      final grouped = <int?, List<StoryLink>>{};
+      for (final link in StoryLink.of(conversation)) {
+        grouped.putIfAbsent(link.itemIndex, () => []).add(link);
+      }
+      linksByConv[conversation.key] = grouped;
+    }
+
     // Node ids: `c:<conversation key>` for checkpoints, `e:<ending_id>` for endings.
     List<String> successors(String start) {
-      final found = <String>[];
-      void add(String id) {
-        if (!found.contains(id)) found.add(id);
-      }
+      final found = <String>{};
 
       // Depth first in item order, so routes come out in the order their options are written.
       final seen = {start};
       void walk(String key) {
         final conversation = byKey[key];
         if (conversation == null) return;
-        final links = StoryLink.of(conversation).toList();
+        final grouped = linksByConv[key] ?? const {};
+
+        void follow(StoryLink link) {
+          final target = link.targetKey;
+          if (isCheckpoint(target)) {
+            if (target != start) found.add("c:$target");
+          } else if (seen.add(target)) {
+            walk(target);
+          }
+        }
+
+        for (final link in grouped[null] ?? const <StoryLink>[]) {
+          follow(link);
+        }
         for (final (index, item) in conversation.conversations.indexed) {
           if (item is EndingItemType) {
             endings.putIfAbsent(item.endingId, () => (conversation, item));
-            add("e:${item.endingId}");
+            found.add("e:${item.endingId}");
           }
-          for (final link in links.where((link) => link.itemIndex == index)) {
-            final target = link.targetKey;
-            if (isCheckpoint(target)) {
-              if (target != start) add("c:$target");
-            } else if (seen.add(target)) {
-              walk(target);
-            }
+          for (final link in grouped[index] ?? const <StoryLink>[]) {
+            follow(link);
           }
         }
       }
 
       walk(start);
-      return found;
+      return found.toList();
     }
 
     final roots =
@@ -84,13 +99,15 @@ class RouteMap {
     final next = <String, List<String>>{};
     final order = <String>[];
     final queue = [...roots];
-    while (queue.isNotEmpty) {
-      final id = queue.removeAt(0);
+    for (var head = 0; head < queue.length; head++) {
+      final id = queue[head];
       if (next.containsKey(id)) continue;
       order.add(id);
       next[id] = id.startsWith("c:") ? successors(id.substring(2)) : const [];
       queue.addAll(next[id]!);
     }
+
+    if (order.isEmpty) return const RouteMap._([], {}, []);
 
     // Edges back to a node still being visited close a loop. The rest form a DAG, laid out by longest path.
     final state = <String, bool>{};
@@ -119,13 +136,18 @@ class RouteMap {
 
     // Rows in story order, then each row below sorted by where the nodes leading to it sit.
     final parents = <String, List<String>>{};
-    for (final id in order) {
+    final orderIndex = <String, int>{};
+    for (final (i, id) in order.indexed) {
+      orderIndex[id] = i;
       for (final target in next[id]!) {
         if (!back.contains((id, target))) parents.putIfAbsent(target, () => []).add(id);
       }
     }
     final rowCount = layer.values.fold(0, max) + 1;
-    final rowIds = List.generate(rowCount, (row) => [for (final id in order) if (layer[id] == row) id]);
+    final rowIds = List.generate(rowCount, (_) => <String>[]);
+    for (final id in order) {
+      rowIds[layer[id]!].add(id);
+    }
     final position = <String, int>{};
     for (final row in rowIds) {
       double place(String id) {
@@ -136,7 +158,7 @@ class RouteMap {
       final placed = {for (final id in row) id: place(id)};
       row.sort((a, b) {
         final byPlace = placed[a]!.compareTo(placed[b]!);
-        return byPlace != 0 ? byPlace : order.indexOf(a).compareTo(order.indexOf(b));
+        return byPlace != 0 ? byPlace : orderIndex[a]!.compareTo(orderIndex[b]!);
       });
       for (final (index, id) in row.indexed) {
         position[id] = index;

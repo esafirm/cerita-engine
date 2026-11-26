@@ -44,10 +44,28 @@ enum StageTransition {
   wipeRight,
   none;
 
+  static const _byName = {
+    "fade": fade,
+    "dissolve": dissolve,
+    "fade_black": fadeBlack,
+    "fadeBlack": fadeBlack,
+    "slide_left": slideLeft,
+    "slideLeft": slideLeft,
+    "slide_right": slideRight,
+    "slideRight": slideRight,
+    "slide_up": slideUp,
+    "slideUp": slideUp,
+    "zoom": zoom,
+    "wipe_left": wipeLeft,
+    "wipeLeft": wipeLeft,
+    "wipe_right": wipeRight,
+    "wipeRight": wipeRight,
+    "none": none,
+  };
+
   static StageTransition? fromName(String? name) {
     if (name == null) return null;
-    final camel = name.replaceAllMapped(RegExp(r"_([a-z])"), (m) => m.group(1)!.toUpperCase());
-    return values.where((e) => e.name == camel).firstOrNull ?? (throw Exception("Unknown transition '$name'"));
+    return _byName[name] ?? (throw Exception("Unknown transition '$name'"));
   }
 }
 
@@ -221,27 +239,41 @@ class ZoomAction extends StageAction {
 
 /// Where a CG's camera points: the part of the image kept in view when the CG is cropped to the screen or zoomed.
 enum CgFocus {
-  center(0, 0),
-  left(-1, 0),
-  right(1, 0),
-  top(0, -1),
-  bottom(0, 1),
-  topLeft(-1, -1),
-  topRight(1, -1),
-  bottomLeft(-1, 1),
-  bottomRight(1, 1);
+  center(0, 0, "center"),
+  left(-1, 0, "left"),
+  right(1, 0, "right"),
+  top(0, -1, "top"),
+  bottom(0, 1, "bottom"),
+  topLeft(-1, -1, "top_left"),
+  topRight(1, -1, "top_right"),
+  bottomLeft(-1, 1, "bottom_left"),
+  bottomRight(1, 1, "bottom_right");
 
   /// Alignment from -1 (left / top) to 1 (right / bottom).
   final double x;
   final double y;
 
-  const CgFocus(this.x, this.y);
-
   /// `snake_case` name, as in the story JSON.
-  String get key => name.replaceAllMapped(RegExp(r"[A-Z]"), (m) => "_${m.group(0)!.toLowerCase()}");
+  final String key;
+
+  const CgFocus(this.x, this.y, this.key);
+
+  static const _byKey = {
+    "center": center,
+    "left": left,
+    "right": right,
+    "top": top,
+    "bottom": bottom,
+    "top_left": topLeft,
+    "top_right": topRight,
+    "bottom_left": bottomLeft,
+    "bottom_right": bottomRight,
+  };
+
+  static CgFocus? tryFromName(String? name) => name == null ? null : _byKey[name];
 
   static CgFocus? fromName(String? name) =>
-      name == null ? null : values.where((e) => e.key == name).firstOrNull ?? (throw Exception("Unknown focus '$name'"));
+      name == null ? null : _byKey[name] ?? (throw Exception("Unknown focus '$name'"));
 }
 
 /// Shows a full-screen CG over the stage, or swaps it for another (a variant of the same moment), or with a null
