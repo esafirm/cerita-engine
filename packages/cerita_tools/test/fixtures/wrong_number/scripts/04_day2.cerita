@@ -43,6 +43,25 @@ choice TOLD by=luna
 luna:frown [if TOLD == 'silent']
   en: ...I see. Excuse me.
 
+luna:frown [if TOLD != 'silent']
+  en: Anyone could say that. Show me something only Miki had.
+evidence PROOF by=luna retries=1 label=ask_proof [if TOLD != 'silent']
+  en: Present a clue from your Case Board
+? unsent_note
+  +luna_affection 5
+? luna_photo
+  +luna_affection 5
+? [retry]
+  -> #proof_retry
+? [fallback]
+
+luna:smile [if PROOF == 'unsent_note']
+  en: That's her handwriting... she never sent it.
+luna:smile [if PROOF == 'luna_photo']
+  en: That was in her desk drawer. Nobody else had that photo.
+luna:frown [if TOLD != 'silent' && PROOF != 'unsent_note' && PROOF != 'luna_photo']
+  en: That's not much to go on... still, it sounds like her.
+
 media CG cg_luna_cafe.png unlock=cg_luna_cafe [if TOLD != 'silent']
   en: For the first time in months, Luna smiles.
 luna:smile [if TOLD != 'silent']
@@ -65,3 +84,7 @@ branch
   if miki_trust >= 20 -> ending_true
   if miki_trust >= 10 -> ending_good
   -> ending_bad
+
+luna:frown label=proof_retry
+  en: That doesn't prove you heard from Miki. Do you have something she sent you?
+-> #ask_proof

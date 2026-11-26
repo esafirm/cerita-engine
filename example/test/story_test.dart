@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Plays the bundled demo story headlessly, so every route and JSON file is exercised.
 Future<(EndingItemType, RealFsseEngine)> _play({
   required String Function(ChoiceItemType item) pick,
+  String Function(EvidenceItemType item)? present,
   Map<String, String> inputs = const {},
   StoryStorage? storage,
 }) async {
@@ -15,6 +16,10 @@ Future<(EndingItemType, RealFsseEngine)> _play({
     switch (item) {
       case EndingItemType():
         return (item, engine);
+      case EvidenceItemType():
+        final id = present?.call(item) ??
+            item.responses.map((r) => r.clue).firstWhere((id) => engine.state["clue_$id"] == true);
+        result = ItemResult.present(item, engine.clues.byId(id)!);
       case ChoiceItemType():
         final text = pick(item);
         final choice = item.choices.firstWhere((c) => c.text.startsWith(text), orElse: () => item.availableChoices.first);
@@ -142,9 +147,31 @@ void main() {
   });
 
   test('catalog lists every collectible, ending and checkpoint', () async {
-    final catalog = await StoryCatalog.load(AssetEngineLoader(const LoaderConfig()));
+    final loader = AssetEngineLoader(const LoaderConfig());
+    final catalog = await StoryCatalog.load(loader);
     expect(catalog.media, hasLength(5));
     expect(catalog.endings.map((e) => e.item.category), unorderedEquals(EndingCategory.values.toSet()..remove(EndingCategory.normal)));
     expect(catalog.checkpoints.map((c) => c.chapter), ["Prologue", "Day 1", "Day 2"]);
+
+    final credits = await loader.loadCredits();
+    expect(credits, isNotNull);
+    expect(credits!.rollAfter, containsAll(["end_01_true", "end_04_secret"]));
+  });
+
+  test('Day 2 evidence question retries once on the wrong clue, then accepts proof', () async {
+    var attempts = 0;
+    final (ending, engine) = await _play(
+      pick: (item) => switch (item.text) {
+        "How do you reply?" => "Who is Luna",
+        "What now?" => "I'll find Luna",
+        "What do you tell Luna?" => "Miki is sorry",
+        _ => "",
+      },
+      present: (_) => ++attempts == 1 ? "miki_voicemail" : "unsent_note",
+    );
+    expect(engine.clues.clues.map((c) => c.id), ["luna_photo", "miki_voicemail", "unsent_note"]);
+    expect(attempts, 2);
+    expect(engine.dataMap["PROOF"], "unsent_note");
+    expect(ending.endingId, "end_02_good");
   });
 }

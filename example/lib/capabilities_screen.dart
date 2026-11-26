@@ -21,6 +21,7 @@ class CapabilitiesScreen extends StatelessWidget {
         ("NARRATION", "narration in VN, system and timestamp pills in chat."),
         ("MEDIA", "IMAGE, AUDIO (with transcript), VIDEO and CG, all with gallery unlock IDs."),
         ("CHOICE", "Effects, conditional locked options, and a 10s timed reply with default_choice on Day 1."),
+        ("EVIDENCE", "Day 2: Luna asks for proof; present a clue from the Case Board with a retry on the wrong one."),
         ("INPUT", "Player name with default_value, and the Day 2 passcode puzzle (hint: listen to the call)."),
         ("BRANCH", "Prologue fallback route and the Day 2 ending router."),
         ("WAIT", "Real-time pause with an in-app notification banner."),
@@ -71,8 +72,10 @@ class CapabilitiesScreen extends StatelessWidget {
         ("Gallery", "Locked silhouettes with unlock hints; photos, voice notes and videos replay any time."),
         ("Endings", "Collection with unlocked / total progress."),
         ("Chapters", "A flowchart of the routes: reached days show their title and endings found, the rest '???'. Tap one to play from there with the variables you had. The app bar switches to a list."),
+        ("Case Board", "Day 1 collects clues (photos and Miki's voice note) shown with chapter counts in Menu → Case Board."),
         ("Scene replay", "Chapters → replay button: plays only that chapter, then comes back. Saves are untouched."),
         ("Music room", "Title → Music: every track you have heard. The night track unlocks on Day 1."),
+        ("Credits", "Title → Credits, and rolls automatically after leaving the true or secret ending."),
       ],
     ),
     (

@@ -11,8 +11,16 @@
     "music": "night_ambience.mp3"
   },
   "conversations": [
-    { "type": "NARRATION", "style": "timestamp", "text": "Day 1 — 11:45 PM" },
-    { "type": "NARRATION", "style": "system", "text": "Unknown number added you to contacts." },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": "Day 1 — 11:45 PM"
+    },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": "Unknown number added you to contacts."
+    },
     {
       "type": "TEXT",
       "text": "hey... are you there?",
@@ -38,12 +46,24 @@
         {
           "text": "Who is Luna? Tell me everything.",
           "value": "curious",
-          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }]
+          "effects": [
+            {
+              "variable": "miki_trust",
+              "op": "add",
+              "value": 5
+            }
+          ]
         },
         {
           "text": "Wrong number. Who is this?",
           "value": "dismissive",
-          "effects": [{ "variable": "miki_trust", "op": "subtract", "value": 5 }]
+          "effects": [
+            {
+              "variable": "miki_trust",
+              "op": "subtract",
+              "value": 5
+            }
+          ]
         }
       ]
     },
@@ -79,7 +99,18 @@
       "unlock_id": "photo_luna_cafe",
       "typing_delay_ms": 2400,
       "sfx": "sfx_msg_receive.mp3",
-      "effects": [{ "variable": "has_cafe_photo", "op": "set", "value": true }]
+      "effects": [
+        {
+          "variable": "has_cafe_photo",
+          "op": "set",
+          "value": true
+        },
+        {
+          "variable": "clue_luna_photo",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "MEDIA",
@@ -89,15 +120,30 @@
       "profile": "123bbb:1",
       "unlock_id": "voice_miki_01",
       "typing_delay_ms": 1600,
-      "sfx": "sfx_msg_receive.mp3"
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_miki_voicemail",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
-    { "type": "NARRATION", "style": "system", "text": "Miki is offline" },
+    {
+      "type": "NARRATION",
+      "style": "system",
+      "text": "Miki is offline"
+    },
     {
       "type": "WAIT",
       "duration_ms": 3000,
       "notification_text": "Miki sent you a new message!"
     },
-    { "type": "NARRATION", "style": "timestamp", "text": "Day 1 — 11:58 PM" },
+    {
+      "type": "NARRATION",
+      "style": "timestamp",
+      "text": "Day 1 — 11:58 PM"
+    },
     {
       "type": "MEDIA",
       "media_type": "VIDEO",
@@ -117,7 +163,14 @@
       "profile": "123bbb:1",
       "unlock_id": "photo_unsent_note",
       "typing_delay_ms": 1900,
-      "sfx": "sfx_msg_receive.mp3"
+      "sfx": "sfx_msg_receive.mp3",
+      "effects": [
+        {
+          "variable": "clue_unsent_note",
+          "op": "set",
+          "value": true
+        }
+      ]
     },
     {
       "type": "CHOICE",
@@ -128,7 +181,13 @@
         {
           "text": "📞 Let me call you.",
           "value": "call",
-          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }],
+          "effects": [
+            {
+              "variable": "miki_trust",
+              "op": "add",
+              "value": 5
+            }
+          ],
           "target": "call_miki"
         },
         {
@@ -140,7 +199,13 @@
           "text": "Is that the café on 5th street? I know it.",
           "value": "knows_cafe",
           "condition": "curiosity >= 5 && miki_trust > 0",
-          "effects": [{ "variable": "miki_trust", "op": "add", "value": 5 }],
+          "effects": [
+            {
+              "variable": "miki_trust",
+              "op": "add",
+              "value": 5
+            }
+          ],
           "target": "day2"
         }
       ]

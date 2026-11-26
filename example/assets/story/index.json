@@ -13,15 +13,42 @@
     "textbox": "nvl"
   },
   "conversations": [
-    { "type": "SET", "effects": [{ "variable": "persistent.runs", "op": "add", "value": 1 }] },
-    { "type": "NARRATION", "text": "A quiet evening at Nora's place." },
-    { "type": "NARRATION", "text": "Your phone has been buzzing all day.{w=500} All of it to your {i}old{/i} number." },
-    { "type": "NARRATION", "text": "You switched numbers a week ago.{w} Whoever is texting doesn't know that." },
+    {
+      "type": "SET",
+      "effects": [
+        {
+          "variable": "persistent.runs",
+          "op": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": "A quiet evening at Nora's place."
+    },
+    {
+      "type": "NARRATION",
+      "text": "Your phone has been buzzing all day.{w=500} All of it to your {i}old{/i} number."
+    },
+    {
+      "type": "NARRATION",
+      "text": "You switched numbers a week ago.{w} Whoever is texting doesn't know that."
+    },
     {
       "type": "STAGE",
       "actions": [
-        { "action": "textbox", "style": "adv" },
-        { "action": "show", "profile": "123aaa:2", "position": "center", "transition": "slide_up", "duration_ms": 700 }
+        {
+          "action": "textbox",
+          "style": "adv"
+        },
+        {
+          "action": "show",
+          "profile": "123aaa:2",
+          "position": "center",
+          "transition": "slide_up",
+          "duration_ms": 700
+        }
       ]
     },
     {
@@ -64,7 +91,13 @@
         {
           "text": "Yeah, let me look.",
           "value": "eager",
-          "effects": [{ "variable": "curiosity", "op": "add", "value": 5 }],
+          "effects": [
+            {
+              "variable": "curiosity",
+              "op": "add",
+              "value": 5
+            }
+          ],
           "target": "day1"
         },
         {
@@ -83,10 +116,28 @@
       "type": "STAGE",
       "condition": "CURIOSITY == 'wary'",
       "actions": [
-        { "action": "background", "image": "bg_sitting_room_night.png", "transition": "fade_black", "duration_ms": 1400 },
-        { "action": "music", "file": null, "fade_ms": 2000 },
-        { "action": "ambience", "file": "night_ambience.mp3", "fade_ms": 3000 },
-        { "action": "move", "profile": "123aaa", "position": "left", "duration_ms": 800 }
+        {
+          "action": "background",
+          "image": "bg_sitting_room_night.png",
+          "transition": "fade_black",
+          "duration_ms": 1400
+        },
+        {
+          "action": "music",
+          "file": null,
+          "fade_ms": 2000
+        },
+        {
+          "action": "ambience",
+          "file": "night_ambience.mp3",
+          "fade_ms": 3000
+        },
+        {
+          "action": "move",
+          "profile": "123aaa",
+          "position": "left",
+          "duration_ms": 800
+        }
       ]
     },
     {
@@ -96,7 +147,10 @@
       "profile": "123aaa:1",
       "voice": "vo_nora_02.mp3"
     },
-    { "type": "CALL", "target": "shared#phone_buzz" },
+    {
+      "type": "CALL",
+      "target": "shared#phone_buzz"
+    },
     {
       "type": "WAIT",
       "duration_ms": 1500,
@@ -112,8 +166,18 @@
       "text": "No idea.{w} The shop said it was {i}\"recently freed up\"{/i}. {shake}Creepy{/shake}, right?",
       "profile": "123aaa:1"
     },
-    { "type": "CALL", "target": "shared#phone_buzz" },
-    { "type": "TEXT", "text": "...See? It's doing it again.", "profile": "123aaa:0" },
-    { "type": "JUMP", "target": "#ask" }
+    {
+      "type": "CALL",
+      "target": "shared#phone_buzz"
+    },
+    {
+      "type": "TEXT",
+      "text": "...See? It's doing it again.",
+      "profile": "123aaa:0"
+    },
+    {
+      "type": "JUMP",
+      "target": "#ask"
+    }
   ]
 }

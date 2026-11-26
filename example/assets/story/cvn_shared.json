@@ -6,11 +6,23 @@
       "id": "phone_buzz",
       "wait_ms": 400,
       "actions": [
-        { "action": "sound", "file": "sfx_notification.mp3" },
-        { "action": "shake", "intensity": 6, "duration_ms": 400 }
+        {
+          "action": "sound",
+          "file": "sfx_notification.mp3"
+        },
+        {
+          "action": "shake",
+          "intensity": 6,
+          "duration_ms": 400
+        }
       ]
     },
-    { "type": "NARRATION", "text": "Your phone buzzes against the table." },
-    { "type": "RETURN" }
+    {
+      "type": "NARRATION",
+      "text": "Your phone buzzes against the table."
+    },
+    {
+      "type": "RETURN"
+    }
   ]
 }

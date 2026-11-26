@@ -1,0 +1,26 @@
+{
+  "roll_after": ["end_01_true", "end_04_secret"],
+  "sections": [
+    {
+      "title": "Story & Demo",
+      "people": [
+        { "name": "Esa Firman", "role": "Writer & creator" }
+      ]
+    },
+    {
+      "title": "Engine",
+      "people": [
+        { "name": "Cerita Engine" }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "title": "Wrong Number demo art, audio & video",
+      "author": "Cerita Engine demo",
+      "source": "example/assets/story",
+      "license": "Bundled sample assets",
+      "note": "Backgrounds, sprites, music, sound effects, voice clips and media"
+    }
+  ]
+}

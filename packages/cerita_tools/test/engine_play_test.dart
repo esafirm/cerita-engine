@@ -25,6 +25,9 @@ Future<(String, List<Map<String, dynamic>>)> _play(
     switch (item) {
       case EndingItemType():
         return (item.endingId, transcript);
+      case EvidenceItemType():
+        final id = item.responses.map((r) => r.clue).firstWhere((id) => engine.state["clue_$id"] == true);
+        result = ItemResult.present(item, engine.clues.byId(id)!);
       case ChoiceItemType():
         final text = pick(item);
         final choice = item.choices.firstWhere((c) => c.text.startsWith(text), orElse: () => item.availableChoices.first);

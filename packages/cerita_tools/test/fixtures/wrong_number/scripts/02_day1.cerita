@@ -30,9 +30,11 @@ miki:frown typing=2.2s sfx=sfx_msg_receive.mp3 [if FIRST_REPLY == 'dismissive']
 media IMAGE photo_luna_cafe.png by=miki unlock=photo_luna_cafe typing=2.4s sfx=sfx_msg_receive.mp3
   en: this is Luna. found it in her old drawer...
   set has_cafe_photo true
+  clue luna_photo
 media AUDIO voice_miki_01.mp3 by=miki:frown unlock=voice_miki_01 typing=1.6s sfx=sfx_msg_receive.mp3
   en: If you're hearing this, please. Tell Luna I'm sorry. She'll know what it means. The café. Our table by the window.
   delivery: quiet, hesitant, a little out of breath
+  clue miki_voicemail
 
 system
   en: Miki is offline
@@ -45,6 +47,7 @@ media VIDEO clip_last_evening.mp4 by=miki unlock=video_last_evening typing=1.9s 
   en: the last evening i saw her
 media IMAGE photo_unsent_note.png by=miki:frown unlock=photo_unsent_note typing=1.9s sfx=sfx_msg_receive.mp3 [if miki_trust > 0]
   en: i never sent this.
+  clue unsent_note
 
 choice PLAN by=miki
   en: What now?

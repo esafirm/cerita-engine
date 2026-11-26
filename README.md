@@ -17,11 +17,12 @@ See [`specs/`](specs/README.md) for the full specification.
 | `STAGE` direction (show / hide / move, transitions, shake, flash, zoom, weather, music) | Prologue, Day 2, true ending |
 | Messenger (typing, system pills, photo / voice note / video) | Day 1, chat endings |
 | Call mode | Day 1 → "Let me call you" |
-| `TEXT` `NARRATION` `MEDIA` `CHOICE` `INPUT` `BRANCH` `WAIT` `ENDING` | All chapters |
+| `TEXT` `NARRATION` `MEDIA` `CHOICE` `EVIDENCE` `INPUT` `BRANCH` `WAIT` `ENDING` | All chapters |
+| Case Board clues & evidence deduction | Day 1 clues, Day 2 proof for Luna |
 | Labels, `JUMP`, `CALL` / `RETURN`, `SET`, `once` choices | Prologue question hub, shared phone buzz |
 | Conditions, effects, expressions (`random()`, arithmetic), `{{VAR}}` interpolation | Choices, Day 2 greeting and ending router |
 | `persistent.*` variables | Prologue run counter |
-| Autosave, save slots with thumbnails, gallery, endings, chapter checkpoints with a route flowchart | Title screen and in-game menu |
+| Autosave, save slots with thumbnails, gallery, endings, credits, chapter checkpoints with a route flowchart | Title screen and in-game menu |
 | Rollback (also from the backlog, kept in saves, stable `random()`), quick save / load, hide UI | VN quick controls |
 | Settings (text speed, auto delay, skip unread, chat typing pace, volumes), music room, chapter replay | Title screen and in-game menu |
 | Text tags (`{b}` `{i}` `{color}` `{shake}` `{wave}` `{speed}` `{w}` `{nw}`) in lines and choices, NVL page | Prologue opening and menu, Day 2, secret ending |
@@ -82,7 +83,7 @@ See [data schema section 5](specs/data-schema.md#5-localized-text) and
 A story can ship a `credits.json` with its people, roles and third-party assets (see
 [data schema section 9](specs/data-schema.md#9-credits-creditsjson)). `CreditsScreen` shows it with a link to the
 open-source licenses. Apps offer it from the title screen only when `setup.loader.loadCredits()` finds one. Endings
-listed in `roll_after` roll the credits when the player leaves the ending. Wrong Number has no credits file.
+listed in `roll_after` roll the credits when the player leaves the ending. Wrong Number ships a `credits.json` that rolls after its true and secret endings.
 
 ## Using the engine
 

@@ -23,7 +23,7 @@ void main() {
     final out = p.join(temp.path, "story");
     final (code, stdout, _) = await _run(["compile", wrongNumberDir, out]);
     expect(code, exitOk);
-    expect(stdout, contains("Compiled 11 files"));
+    expect(stdout, contains("Compiled 12 files"));
     expect(File(p.join(out, "cvn_day1.json")).readAsStringSync(), compileStory(loadWrongNumber()).files["cvn_day1.json"]);
 
     expect((await _run(["compile", "--check", wrongNumberDir, out])).$1, exitOk);

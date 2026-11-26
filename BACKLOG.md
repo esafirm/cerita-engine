@@ -8,8 +8,6 @@ Work that is known but not scheduled. Specs come first: update `specs/` before t
 - **Rollback in chat and call scenes.** Rollback stops at chat and call threads, which move on by themselves. It would need their pacing to pause and resume.
 - **Device check.** Rollback, text tags and HIDE were checked on an Android emulator (see the decisions log). Fades and volumes still need a listen on a device, and the mouse wheel rollback and story hot reload a run on a desktop and a device. The Chapters flowchart (layout on a narrow phone, sideways scroll of a wide row), rolling credits and chat typing pace haven't been seen on a device yet.
 
-- **Case Board in the demo.** Wrong Number has no clues, so the Case Board and evidence questions are only covered by tests. A short deduction (one clue, one evidence question) would show them on a device. The script syntax exists now, so it can go in both the script and the JSON, but it adds a question, a clue toast and a Case Board entry to every run that reaches it, which changes how the demo plays. It needs a decision on where it fits.
-
 ## Later features
 
 - **Achievements.** Declared in the story, unlocked by effects or endings, kept in the meta-state, with a screen next to the gallery.

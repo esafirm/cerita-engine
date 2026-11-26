@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StorySetup get setup => widget.setup;
 
-  /// Null hides the Credits entry: Wrong Number has no credits.json.
+  /// Shown on the title screen when the story ships a credits.json.
   Credits? _credits;
 
   @override

@@ -1,0 +1,18 @@
+show_counts: true
+clues:
+  luna_photo:
+    title: Luna's café photo
+    description: A photo Miki kept in her old drawer — Luna at their window table.
+    image: photo_luna_cafe.png
+    key: true
+    chapter: Day 1
+  miki_voicemail:
+    title: Miki's voice note
+    description: "Asks you to apologize to Luna at 'our table by the window'."
+    chapter: Day 1
+  unsent_note:
+    title: Unsent note
+    description: A handwritten apology Miki never sent to Luna.
+    image: photo_unsent_note.png
+    key: true
+    chapter: Day 1

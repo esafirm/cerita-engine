@@ -12,9 +12,12 @@ final exampleStoryDir = p.join("..", "..", "example", "assets", "story");
 
 StoryProject loadWrongNumber() => StoryProject.load(wrongNumberDir);
 
-/// The hand-written story files, parsed.
+/// The hand-written story files, parsed. `credits.json` is skipped: credits stay hand-written, not compiled.
 Map<String, Object?> exampleStoryJson() {
-  final files = Directory(exampleStoryDir).listSync().whereType<File>().where((f) => f.path.endsWith(".json"));
+  final files = Directory(exampleStoryDir)
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.endsWith(".json") && p.basename(f.path) != "credits.json");
   return {for (final file in files) p.basename(file.path): jsonDecode(file.readAsStringSync())};
 }
 

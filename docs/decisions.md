@@ -366,16 +366,13 @@ it only warns about stale `cvn_*.json` files.
 - **Revisit if** Last Seen's credits grow long enough to want comments, or authors forget to lint the output
   folder. Then add `credits.yaml` to the story folder and compile it like `channels.yaml`.
 
-## Wrong Number ships without credits
+## Wrong Number ships with sample credits
 
-*2026-11-15. Backlog CE-08.*
+*2026-11-15, updated 2026-11-26. Backlog CE-08.*
 
-The demo has no `credits.json`, so its title screen shows no Credits entry. The screen and rolling credits are
-covered by widget tests with a fixture instead.
+Wrong Number originally shipped without `credits.json` because the origins of its individual bundled sample assets were not recorded. It now ships a `credits.json` listing the story/engine credits, honest sample-asset attribution, and `roll_after` for `end_01_true` and `end_04_secret`, so the Credits screen and rolling credits can be exercised in the demo app.
 
-- **Why:** the sources and licenses of the demo's art, music and voices aren't recorded anywhere, and credits
-  that guess them would be wrong.
-- **Revisit when** the demo assets' sources are known: add a `credits.json` and a `roll_after` for the true ending.
+- **Revisit when** individual third-party demo asset sources are tracked: expand `assets` in `example/assets/story/credits.json` with per-file authors and licenses.
 
 ## The route map's nodes are checkpoints, not chapters
 
