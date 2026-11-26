@@ -60,14 +60,35 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_episode_12.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_episode_12.webp",
+          "unlock_id": "cg_episode_12",
+          "title": {
+            "id": "Episode 12",
+            "en": "Episode 12"
+          },
+          "zoom": 1.12,
+          "focus": "bottom",
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam segitu biasanya Sekar nayangin episodenya.",
         "en": "Tasya published Episode 12 on Friday, at eleven at night. The same hour Sekar always published."
-      },
-      "unlock_id": "cg_episode_12"
+      }
     },
     {
       "type": "NARRATION",
@@ -75,6 +96,23 @@
         "id": "Intro empat puluh satu detik dari Sekar. Terus Tasya, yang ngebacain email Bima, satu kata satu kata. Gue yang ngedit. Gue biarin anginnya.",
         "en": "Sekar's forty-one-second intro. Then Tasya, reading Bima's email word by word. I edited it. I left the wind in."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_episode_12_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.1,
+          "focus": "top",
+          "duration_ms": 9000
+        }
+      ]
     },
     {
       "type": "NARRATION",

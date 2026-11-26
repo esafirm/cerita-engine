@@ -651,9 +651,17 @@ narration
   id: Semuanya bener. Dan semuanya salah.
   en: All of it true. And all of it wrong.
 
-media CG cg_wrong_name.webp unlock=cg_wrong_name
+stage
+  cg cg_wrong_name.webp unlock=cg_wrong_name title="Nama yang Salah" title.en="Wrong Name" transition=fade_black duration=1s
+  cg_move zoom=1.18 focus=center duration=8s
+
+narration
   id: Dalam satu jam, screenshot-nya ada di mana-mana. Akun @carikaksekar nge-repost. Komentar-komentarnya nggak bisa dibaca sampai habis.
   en: Within an hour, the screenshot is everywhere. The @findkaksekar account reposts it. The comments can't be read to the end.
+
+stage
+  cg cg_wrong_name_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1 focus=center duration=8s
 
 narration
   id: Paginya, akun Tasya hilang. Podcast-nya di-private. Dia nggak pernah ngangkat telepon Dinda lagi.
@@ -661,6 +669,9 @@ narration
 narration
   id: Bima berhenti bales chat. Didit nggak perlu ngelakuin apa-apa. Orang-orang yang dia takutin udah saling bubar sendiri.
   en: Bima stops replying. Didit doesn't have to do anything. The people he was afraid of have scattered on their own.
+
+stage
+  cg none transition=fade_black duration=1.2s
 narration
   id: Dua minggu kemudian, gue balik ke Bandung. Kadang gue buka grup itu. Sepi. Pesan terakhir di sana masih punya gue.
   en: Two weeks later, I go back to Bandung. Sometimes I open that group. It's silent. The last message there is still mine.

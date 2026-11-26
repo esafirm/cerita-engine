@@ -104,14 +104,33 @@
       "voice": "vo_d7_ep0_03.mp3"
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_off_the_record.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_off_the_record.webp",
+          "unlock_id": "cg_off_the_record",
+          "title": {
+            "id": "Di Luar Rekaman",
+            "en": "Off the Record"
+          },
+          "transition": "fade_black",
+          "duration_ms": 1200
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.12,
+          "focus": "bottom",
+          "duration_ms": 10000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Satu headphone, dua kuping. Lampu merah kecil di alat rekamnya nyala.",
         "en": "One pair of headphones, two ears. The little red light on the recorder comes on."
-      },
-      "unlock_id": "cg_off_the_record"
+      }
     },
     {
       "type": "TEXT",
@@ -144,6 +163,23 @@
         "en": "No. This one I'm keeping."
       },
       "profile": "sekar:1"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_off_the_record_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 2000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
     },
     {
       "type": "NARRATION",

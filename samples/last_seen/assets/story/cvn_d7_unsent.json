@@ -57,14 +57,33 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_unsent.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_unsent.webp",
+          "unlock_id": "cg_unsent",
+          "title": {
+            "id": "Belum Terkirim",
+            "en": "Unsent"
+          },
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.15,
+          "focus": "center",
+          "duration_ms": 10000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Gue tahan tombol rekamnya.",
         "en": "I hold down the record button."
-      },
-      "unlock_id": "cg_unsent"
+      }
     },
     {
       "type": "TEXT",
@@ -96,6 +115,23 @@
         "id": "Satu centang abu-abu. Terkirim. Nggak nyampe.",
         "en": "One grey tick. Sent. Not delivered."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_unsent_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.08,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
     },
     {
       "type": "NARRATION",

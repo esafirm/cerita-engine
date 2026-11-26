@@ -1192,8 +1192,9 @@ but `launchd_sim` kills Xcode 15's `AssetCatalogSimulatorAgent` at exec (`OS_REA
 policy), so `actool` reports "Failed to launch AssetCatalogSimulatorAgent via CoreSimulator spawn". Repairing the
 runtime or CoreSimulator can't fix that.
 
-- **Fix:** the latest Xcode 26.x next to Xcode 15 (Xcode 27 needs macOS 26.6), selected with `xcode-select`, plus the
-  iOS 26 simulator runtime. Not done yet: the owner chose to leave iOS for now.
+- **Resolved (2026-11-26):** Xcode 27.2 is installed (`xcodebuild -runFirstLaunch` run) and `IPHONEOS_DEPLOYMENT_TARGET`
+  was bumped from `13.0` to `15.0` (the minimum Xcode 27.2 accepts). `flutter build ios --release --no-codesign` now
+  builds `Runner.app` cleanly with `Seawall` and both alternate app icons.
 - **Signing:** a team still has to be set in `ios/Runner.xcworkspace` before a device or App Store build.
 
 ## Held CGs and the CG camera
@@ -1217,10 +1218,11 @@ pans or pushes in on it.
   belongs to the moment it shows, and one leaking into the next scene would cover it.
 - **Pan room depends on the art:** focus moves the crop of a cover-fit image. Seawall's CGs are 9:16, so a
   taller phone leaves about 18% of the width to pan, and push-ins work anywhere. A wider CG pans further.
-- **Seawall's held CGs:** Handed Over (Day 3) and The Storm (Day 6) each get a `_b` variant drawn from the first
-  frame. Handed Over was redrawn for it: the first version put the courier and Dinda at the edges, which a tall
-  phone crops off. The new one looks down the alley from behind them, with both characters and the tail light
-  in the middle 70% of the width, so a CG prompt that will be pushed in on should say where its subject sits.
+- **Seawall's held CGs:** all ten CGs now use held `stage cg` with a `_b` second frame, camera motion and localized
+  Gallery titles (`Handed Over`, `The Storm`, `Wrong Name`, and all seven Day 7 endings). Handed Over was redrawn for
+  it: the first version put the courier and Dinda at the edges, which a tall phone crops off. The new one looks down
+  the alley from behind them, with both characters and the tail light in the middle 70% of the width, so a CG prompt
+  that will be pushed in on should say where its subject sits.
 - **Not done:** layered parallax CGs and full-screen video cutscenes. Revisit if a story needs them.
 
 ## Deferred

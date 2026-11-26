@@ -60,14 +60,35 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_low_tide.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_low_tide.webp",
+          "unlock_id": "cg_low_tide",
+          "title": {
+            "id": "Surut",
+            "en": "Low Tide"
+          },
+          "zoom": 1.15,
+          "focus": "top",
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 9000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Air surut di Muara Angke. Patok-patoknya kelihatan sampai ke ujung.",
         "en": "Low tide at Muara Angke. You can see the stakes all the way out."
-      },
-      "unlock_id": "cg_low_tide"
+      }
     },
     {
       "type": "NARRATION",
@@ -104,6 +125,23 @@
         "en": "You've talked more this week than in the last five years. Don't push it."
       },
       "profile": "sekar:0"
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_low_tide_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.1,
+          "focus": "bottom",
+          "duration_ms": 10000
+        }
+      ]
     },
     {
       "type": "NARRATION",

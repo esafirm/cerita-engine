@@ -68,14 +68,11 @@
       ]
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_undertow.webp",
-      "caption": {
+      "type": "NARRATION",
+      "text": {
         "id": "Episode 12 tayang sembilan hari kemudian.",
         "en": "Episode 12 aired nine days later."
-      },
-      "unlock_id": "cg_undertow"
+      }
     },
     {
       "type": "NARRATION",
@@ -138,11 +135,52 @@
       }
     },
     {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_undertow.webp",
+          "unlock_id": "cg_undertow",
+          "title": {
+            "id": "Arus Bawah",
+            "en": "Undertow"
+          },
+          "zoom": 1.15,
+          "focus": "bottom",
+          "transition": "fade_black",
+          "duration_ms": 1200
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 9000
+        }
+      ]
+    },
+    {
       "type": "NARRATION",
       "text": {
         "id": "Sabtu berikutnya, jam lima pagi, dermaga Muara Angke. Pak Karta di kursi roda, diantar Mbak Yanti, ngelambai pake tangan kanan. Sri Rejeki berangkat jam setengah enam. Tepat waktu.",
         "en": "The next Saturday, five in the morning, the Muara Angke pier. Pak Karta in a wheelchair, pushed by Yanti, waving with his right hand. The Sri Rejeki leaves at five thirty. Right on time."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_undertow_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.12,
+          "focus": "bottom",
+          "duration_ms": 8000
+        }
+      ]
     },
     {
       "type": "NARRATION",

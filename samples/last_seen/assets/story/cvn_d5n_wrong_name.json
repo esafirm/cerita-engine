@@ -38,14 +38,50 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_wrong_name.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_wrong_name.webp",
+          "unlock_id": "cg_wrong_name",
+          "title": {
+            "id": "Nama yang Salah",
+            "en": "Wrong Name"
+          },
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.18,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Dalam satu jam, screenshot-nya ada di mana-mana. Akun @carikaksekar nge-repost. Komentar-komentarnya nggak bisa dibaca sampai habis.",
         "en": "Within an hour, the screenshot is everywhere. The @findkaksekar account reposts it. The comments can't be read to the end."
-      },
-      "unlock_id": "cg_wrong_name"
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_wrong_name_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
     },
     {
       "type": "NARRATION",
@@ -60,6 +96,17 @@
         "id": "Bima berhenti bales chat. Didit nggak perlu ngelakuin apa-apa. Orang-orang yang dia takutin udah saling bubar sendiri.",
         "en": "Bima stops replying. Didit doesn't have to do anything. The people he was afraid of have scattered on their own."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": null,
+          "transition": "fade_black",
+          "duration_ms": 1200
+        }
+      ]
     },
     {
       "type": "NARRATION",

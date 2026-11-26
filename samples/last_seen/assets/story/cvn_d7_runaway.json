@@ -78,14 +78,35 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_runaway.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_runaway.webp",
+          "unlock_id": "cg_runaway",
+          "title": {
+            "id": "Kabur",
+            "en": "Runaway"
+          },
+          "zoom": 1.15,
+          "focus": "bottom",
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "top",
+          "duration_ms": 8000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Bus ke Bandung berangkat jam enam pagi. Gue dateng tepat waktu.",
         "en": "The bus to Bandung leaves at six in the morning. I'm right on time."
-      },
-      "unlock_id": "cg_runaway"
+      }
     },
     {
       "type": "NARRATION",
@@ -93,6 +114,23 @@
         "id": "Di tiang terminal ada poster orang hilang. Gue nggak tahu siapa yang nempel. Setengahnya udah sobek. Wajah Sekar tinggal mata sama senyumnya.",
         "en": "On a pillar in the terminal is a missing person poster. I don't know who put it up. Half of it is torn away. All that's left of Sekar's face is her eyes and her smile."
       }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_runaway_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.12,
+          "focus": "bottom",
+          "duration_ms": 9000
+        }
+      ]
     },
     {
       "type": "NARRATION",

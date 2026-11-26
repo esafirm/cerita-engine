@@ -28,6 +28,30 @@
       ]
     },
     {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_still_water.webp",
+          "unlock_id": "cg_still_water",
+          "title": {
+            "id": "Air Tenang",
+            "en": "Still Water"
+          },
+          "zoom": 1.15,
+          "focus": "center",
+          "transition": "fade_black",
+          "duration_ms": 1000
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1,
+          "focus": "center",
+          "duration_ms": 8000
+        }
+      ]
+    },
+    {
       "type": "NARRATION",
       "text": {
         "id": "Laut pagi itu rata kayak kaca. Sri Rejeki ninggalin dermaga pelan-pelan, dan jejak airnya panjang banget, kayak nggak mau putus.",
@@ -35,14 +59,39 @@
       }
     },
     {
-      "type": "MEDIA",
-      "media_type": "CG",
-      "uri": "cg_still_water.webp",
-      "caption": {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": "cg_still_water_b.webp",
+          "transition": "dissolve",
+          "duration_ms": 1500
+        },
+        {
+          "action": "cg_move",
+          "zoom": 1.12,
+          "focus": "top",
+          "duration_ms": 9000
+        }
+      ]
+    },
+    {
+      "type": "NARRATION",
+      "text": {
         "id": "Sekar berdiri di buritan. Dia ngangkat satu tangan. Gue juga.",
         "en": "Sekar stands at the stern. She raises one hand. So do I."
-      },
-      "unlock_id": "cg_still_water"
+      }
+    },
+    {
+      "type": "STAGE",
+      "actions": [
+        {
+          "action": "cg",
+          "image": null,
+          "transition": "fade_black",
+          "duration_ms": 1200
+        }
+      ]
     },
     {
       "type": "NARRATION",

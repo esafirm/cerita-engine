@@ -20,7 +20,7 @@ yusuf:polite
 stage
   hide yusuf transition=fade duration=600
 
-media CG cg_undertow.webp unlock=cg_undertow
+narration
   id: Episode 12 tayang sembilan hari kemudian.
   en: Episode 12 aired nine days later.
 
@@ -48,9 +48,19 @@ narration [if dinda_found_threat == true]
 narration
   id: Gue nggak balik ke Bandung. Kerjaan gue bisa dikerjain dari mana aja. Ternyata yang nggak bisa dikerjain dari mana aja itu yang lain.
   en: I didn't go back to Bandung. My work can be done from anywhere. It turns out the things that can't be done from anywhere are the other things.
+
+stage
+  cg cg_undertow.webp unlock=cg_undertow title="Arus Bawah" title.en="Undertow" zoom=1.15 focus=bottom transition=fade_black duration=1.2s
+  cg_move zoom=1 focus=center duration=9s
+
 narration
   id: Sabtu berikutnya, jam lima pagi, dermaga Muara Angke. Pak Karta di kursi roda, diantar Mbak Yanti, ngelambai pake tangan kanan. Sri Rejeki berangkat jam setengah enam. Tepat waktu.
   en: The next Saturday, five in the morning, the Muara Angke pier. Pak Karta in a wheelchair, pushed by Yanti, waving with his right hand. The Sri Rejeki leaves at five thirty. Right on time.
+
+stage
+  cg cg_undertow_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.12 focus=bottom duration=8s
+
 narration
   id: Kali ini gue di atasnya.
   en: This time I'm on it.
@@ -72,13 +82,24 @@ ending end_01_undertow TRUE
 stage
   show raka:sad left
 
+stage
+  cg cg_still_water.webp unlock=cg_still_water title="Air Tenang" title.en="Still Water" zoom=1.15 focus=center transition=fade_black duration=1s
+  cg_move zoom=1 focus=center duration=8s
+
 narration
   id: Laut pagi itu rata kayak kaca. Sri Rejeki ninggalin dermaga pelan-pelan, dan jejak airnya panjang banget, kayak nggak mau putus.
   en: The sea is flat as glass that morning. The Sri Rejeki pulls away from the jetty slowly, and its wake is so long, as if it doesn't want to break.
 
-media CG cg_still_water.webp unlock=cg_still_water
+stage
+  cg cg_still_water_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.12 focus=top duration=9s
+
+narration
   id: Sekar berdiri di buritan. Dia ngangkat satu tangan. Gue juga.
   en: Sekar stands at the stern. She raises one hand. So do I.
+
+stage
+  cg none transition=fade_black duration=1.2s
 
 narration
   id: Waktu polisi merapat, cuma ada gue di ujung dermaga. Didit senyum, kayak orang yang dateng ke pesta dan ternyata salah tanggal.
@@ -125,13 +146,22 @@ narration [if found_sekar != true]
   id: Kita pulang tanpa Sekar. Tapi kita pulang bawa email Bima, draf Episode 12, dan Tasya yang udah berhenti takut.
   en: We go home without Sekar. But we go home with Bima's email, the Episode 12 draft, and a Tasya who has stopped being afraid.
 
-media CG cg_episode_12.webp unlock=cg_episode_12
+stage
+  cg cg_episode_12.webp unlock=cg_episode_12 title="Episode 12" title.en="Episode 12" zoom=1.12 focus=bottom transition=fade_black duration=1s
+  cg_move zoom=1 focus=center duration=8s
+
+narration
   id: Tasya tayangin Episode 12 hari Jumat, jam sebelas malem. Jam segitu biasanya Sekar nayangin episodenya.
   en: Tasya published Episode 12 on Friday, at eleven at night. The same hour Sekar always published.
 
 narration
   id: Intro empat puluh satu detik dari Sekar. Terus Tasya, yang ngebacain email Bima, satu kata satu kata. Gue yang ngedit. Gue biarin anginnya.
   en: Sekar's forty-one-second intro. Then Tasya, reading Bima's email word by word. I edited it. I left the wind in.
+
+stage
+  cg cg_episode_12_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.1 focus=top duration=9s
+
 narration
   id: Dua ratus pendengar jadi dua ratus ribu dalam seminggu. Didit dipindah ke kantor Surabaya. Laporan penculikannya ditarik "demi kebaikan bersama".
   en: Two hundred listeners became two hundred thousand in a week. Didit was transferred to the Surabaya office. The kidnapping report was withdrawn "for the common good".
@@ -168,7 +198,11 @@ narration
   id: Terus gue buka HP gue sendiri. Chat dengan nama dia. Setahun kosong.
   en: Then I open my own phone. The chat with her name on it. A year of nothing.
 
-media CG cg_unsent.webp unlock=cg_unsent
+stage
+  cg cg_unsent.webp unlock=cg_unsent title="Belum Terkirim" title.en="Unsent" transition=fade_black duration=1s
+  cg_move zoom=1.15 focus=center duration=10s
+
+narration
   id: Gue tahan tombol rekamnya.
   en: I hold down the record button.
 
@@ -184,6 +218,11 @@ raka:neutral
 narration
   id: Satu centang abu-abu. Terkirim. Nggak nyampe.
   en: One grey tick. Sent. Not delivered.
+
+stage
+  cg cg_unsent_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.08 focus=center duration=8s
+
 narration
   id: Tiga hari kemudian, jam lima kurang dua pagi, centangnya jadi dua. Terus biru.
   en: Three days later, at two minutes to five in the morning, the tick becomes two. Then blue.
@@ -230,13 +269,22 @@ narration [if found_sekar != true]
   id: Bu Wulan nggak nangis waktu dengernya. Dia cuma masuk kamar dan nutup pintu, kayak hari pertama gue dateng.
   en: Mrs. Wulan doesn't cry when she hears. She just goes into her room and closes the door, like the first day I came.
 
-media CG cg_runaway.webp unlock=cg_runaway
+stage
+  cg cg_runaway.webp unlock=cg_runaway title="Kabur" title.en="Runaway" zoom=1.15 focus=bottom transition=fade_black duration=1s
+  cg_move zoom=1 focus=top duration=8s
+
+narration
   id: Bus ke Bandung berangkat jam enam pagi. Gue dateng tepat waktu.
   en: The bus to Bandung leaves at six in the morning. I'm right on time.
 
 narration
   id: Di tiang terminal ada poster orang hilang. Gue nggak tahu siapa yang nempel. Setengahnya udah sobek. Wajah Sekar tinggal mata sama senyumnya.
   en: On a pillar in the terminal is a missing person poster. I don't know who put it up. Half of it is torn away. All that's left of Sekar's face is her eyes and her smile.
+
+stage
+  cg cg_runaway_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.12 focus=bottom duration=9s
+
 narration
   id: Gue nggak nyopot posternya. Gue juga nggak ngerapihinnya. Gue cuma duduk di kursi deket jendela, dan busnya jalan.
   en: I don't take the poster down. I don't smooth it out either. I just sit in the window seat, and the bus pulls away.
@@ -270,7 +318,11 @@ narration [if found_sekar != true && hendra_cleared == true]
   id: Pak Hendra pulang ke Muara Angke dengan nama bersih. Sekar nggak pulang. Nggak ada yang tahu perahu nelayan pagi itu ke mana, dan Pak Hendra nggak mau bilang. Ke siapa pun. Termasuk gue.
   en: Pak Hendra goes home to Muara Angke with his name cleared. Sekar doesn't come home. Nobody knows where that fishing boat went that morning, and Pak Hendra won't say. To anyone. Including me.
 
-media CG cg_low_tide.webp unlock=cg_low_tide
+stage
+  cg cg_low_tide.webp unlock=cg_low_tide title="Surut" title.en="Low Tide" zoom=1.15 focus=top transition=fade_black duration=1s
+  cg_move zoom=1 focus=center duration=9s
+
+narration
   id: Air surut di Muara Angke. Patok-patoknya kelihatan sampai ke ujung.
   en: Low tide at Muara Angke. You can see the stakes all the way out.
 narration [if proof_threat == true]
@@ -286,6 +338,11 @@ raka:sad [if found_sekar == true]
 sekar:neutral [if found_sekar == true]
   id: Lo udah ngomong lebih banyak minggu ini daripada lima tahun kemarin. Jangan dipaksain.
   en: You've talked more this week than in the last five years. Don't push it.
+
+stage
+  cg cg_low_tide_b.webp transition=dissolve duration=1.5s
+  cg_move zoom=1.1 focus=bottom duration=10s
+
 narration [if found_sekar == true]
   id: Kita duduk di perahu terbalik, ngelihatin patok-patok sampai airnya naik lagi. Nggak ngomong apa-apa. Kali ini diemnya bukan kabur.
   en: We sit on an upturned boat, watching the stakes until the water comes back in. Saying nothing. This time the quiet isn't running away.
@@ -336,7 +393,11 @@ sekar voice=vo_d7_ep0_03.mp3 [offstage]
   en: If you ever hear this, the last segment is yours. I've left it empty.
   delivery: soft, certain, the end of an episode
 
-media CG cg_off_the_record.webp unlock=cg_off_the_record
+stage
+  cg cg_off_the_record.webp unlock=cg_off_the_record title="Di Luar Rekaman" title.en="Off the Record" transition=fade_black duration=1.2s
+  cg_move zoom=1.12 focus=bottom duration=10s
+
+narration
   id: Satu headphone, dua kuping. Lampu merah kecil di alat rekamnya nyala.
   en: One pair of headphones, two ears. The little red light on the recorder comes on.
 
@@ -352,6 +413,11 @@ raka:smirk
 sekar:smile
   id: Nggak. Yang ini nggak gue potong.
   en: No. This one I'm keeping.
+
+stage
+  cg cg_off_the_record_b.webp transition=dissolve duration=2s
+  cg_move zoom=1 focus=center duration=8s
+
 narration
   id: Kita ngerekam sampai lampu di tiang mati sendiri. Soal Didit, soal polisi, soal kapal yang dateng besok pagi. Itu episode lain.
   en: We record until the lamp on the post goes out by itself. About Didit, about the police, about the boats coming in the morning. That's another episode.
