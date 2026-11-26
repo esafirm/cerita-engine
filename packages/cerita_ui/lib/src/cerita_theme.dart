@@ -17,6 +17,7 @@ abstract final class CeritaTheme {
       onPrimary: CeritaColors.night,
       secondary: CeritaColors.lavender,
       surface: CeritaColors.surface,
+      surfaceContainerLow: CeritaColors.surface,
       surfaceContainerHighest: CeritaColors.surfaceHigh,
       onSurface: CeritaColors.moon,
     );
@@ -70,8 +71,8 @@ class CeritaPageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final enter = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
-    final exit = CurvedAnimation(parent: secondaryAnimation, curve: Curves.easeOutCubic);
+    final enter = animation.drive(CurveTween(curve: Curves.easeOutCubic));
+    final exit = secondaryAnimation.drive(CurveTween(curve: Curves.easeOutCubic));
     return FadeTransition(
       opacity: Tween(begin: 1.0, end: 0.4).animate(exit),
       child: ScaleTransition(

@@ -15,11 +15,7 @@ class AnimeVnSkin extends StorySkin {
   Widget sceneTransition(SceneMode mode, Animation<double> animation, Widget child) {
     // Every switch dips to black: the outgoing scene runs the reverse animation, so it is gone by
     // the midpoint and the incoming one only appears in the second half. The two never overlap.
-    final fadeThrough = CurvedAnimation(
-      parent: animation,
-      curve: const Interval(0.5, 1, curve: Curves.easeOutCubic),
-      reverseCurve: const Interval(0.5, 1, curve: Curves.easeInCubic),
-    );
+    final fadeThrough = animation.drive(CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeOutCubic)));
     return FadeTransition(
       opacity: fadeThrough,
       child: switch (mode) {
@@ -40,7 +36,7 @@ class AnimeVnSkin extends StorySkin {
 
   @override
   Widget backgroundTransition(Animation<double> animation, Widget child) {
-    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+    final curved = animation.drive(CurveTween(curve: Curves.easeOutCubic));
     return FadeTransition(
       opacity: curved,
       child: ScaleTransition(scale: Tween(begin: 1.08, end: 1.0).animate(curved), child: child),
@@ -52,9 +48,9 @@ class AnimeVnSkin extends StorySkin {
 
   @override
   Widget spriteTransition(Animation<double> animation, Widget child) {
-    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutBack, reverseCurve: Curves.easeIn);
+    final curved = animation.drive(CurveTween(curve: Curves.easeOutBack));
     return FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+      opacity: animation.drive(CurveTween(curve: Curves.easeOut)),
       child: SlideTransition(
         position: Tween(begin: const Offset(0, 0.06), end: Offset.zero).animate(curved),
         child: child,
@@ -111,7 +107,7 @@ class AnimeVnSkin extends StorySkin {
           child: AnimatedOpacity(
             opacity: frame.done ? 1 : 0,
             duration: const Duration(milliseconds: 200),
-            child: const _NextIndicator(),
+            child: _NextIndicator(active: frame.done),
           ),
         ),
       ],
@@ -221,30 +217,56 @@ class _NamePlate extends StatelessWidget {
 
 /// Bobbing chevron shown once the line is fully typed.
 class _NextIndicator extends StatefulWidget {
-  const _NextIndicator();
+  final bool active;
+
+  const _NextIndicator({required this.active});
 
   @override
   State<_NextIndicator> createState() => _NextIndicatorState();
 }
 
 class _NextIndicatorState extends State<_NextIndicator> with SingleTickerProviderStateMixin {
-  late final AnimationController _bob = AnimationController(vsync: this, duration: const Duration(milliseconds: 650))
-    ..repeat(reverse: true);
+  AnimationController? _bob;
+
+  @override
+  void initState() {
+    super.initState();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(_NextIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active != widget.active) _sync();
+  }
+
+  bool get _reduced => WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
+
+  void _sync() {
+    if (widget.active && !_reduced) {
+      final bob = _bob ??= AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
+      if (!bob.isAnimating) bob.repeat(reverse: true);
+    } else {
+      _bob?.stop();
+    }
+  }
 
   @override
   void dispose() {
-    _bob.dispose();
+    _bob?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    const icon = Icon(Icons.keyboard_arrow_down_rounded, color: CeritaColors.blossom, size: 22);
+    final bob = _bob;
+    if (!widget.active || bob == null || _reduced) return icon;
     return SlideTransition(
-      position: Tween(
-        begin: Offset.zero,
-        end: const Offset(0, 0.25),
-      ).animate(CurvedAnimation(parent: _bob, curve: Curves.easeInOut)),
-      child: const Icon(Icons.keyboard_arrow_down_rounded, color: CeritaColors.blossom, size: 22),
+      position: bob.drive(CurveTween(curve: Curves.easeInOut)).drive(
+        Tween(begin: Offset.zero, end: const Offset(0, 0.25)),
+      ),
+      child: icon,
     );
   }
 }

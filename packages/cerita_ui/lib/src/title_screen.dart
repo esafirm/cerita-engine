@@ -44,13 +44,18 @@ class _CeritaTitleScreenState extends State<CeritaTitleScreen> with TickerProvid
   late final AnimationController _intro = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))
     ..forward();
 
-  late final AnimationController _ambient = AnimationController(vsync: this, duration: const Duration(seconds: 24))
-    ..repeat(reverse: true);
+  late final AnimationController _ambient = AnimationController(vsync: this, duration: const Duration(seconds: 24));
 
-  Animation<double> _interval(double begin, double end) => CurvedAnimation(
-    parent: _intro,
-    curve: Interval(begin, end, curve: Curves.easeOutCubic),
-  );
+  @override
+  void initState() {
+    super.initState();
+    if (!WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations) {
+      _ambient.repeat(reverse: true);
+    }
+  }
+
+  Animation<double> _interval(double begin, double end) =>
+      _intro.drive(CurveTween(curve: Interval(begin.clamp(0, 0.9), end.clamp(0.1, 1), curve: Curves.easeOutCubic)));
 
   @override
   void dispose() {
@@ -76,7 +81,7 @@ class _CeritaTitleScreenState extends State<CeritaTitleScreen> with TickerProvid
               alignment: Alignment(0, -0.2 + 0.4 * _ambient.value),
               child: child,
             ),
-            child: FadeTransition(opacity: _interval(0, 0.5), child: widget.art),
+            child: RepaintBoundary(child: FadeTransition(opacity: _interval(0, 0.5), child: widget.art)),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -237,22 +242,28 @@ class _SecondaryRow extends StatelessWidget {
         runSpacing: 4,
         children: [
           for (final entry in entries)
-            InkWell(
-              onTap: entry.onTap,
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                width: 68,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    children: [
-                      Icon(entry.icon, color: CeritaColors.moon.withAlpha(220), size: 22),
-                      const SizedBox(height: 4),
-                      Text(
-                        entry.label,
-                        style: TextStyle(color: CeritaColors.moon.withAlpha(190), fontSize: 11, letterSpacing: 0.6),
-                      ),
-                    ],
+            Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: entry.onTap,
+                borderRadius: BorderRadius.circular(14),
+                child: SizedBox(
+                  width: 68,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      children: [
+                        Icon(entry.icon, color: CeritaColors.moon.withAlpha(220), size: 22),
+                        const SizedBox(height: 4),
+                        Text(
+                          entry.label,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: CeritaColors.moon.withAlpha(190), fontSize: 11, letterSpacing: 0.6),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
