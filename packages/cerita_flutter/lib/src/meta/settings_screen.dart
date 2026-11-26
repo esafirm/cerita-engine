@@ -91,9 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(strings.settings),
         actions: [
-          // The language is a setting too, but resetting the rest shouldn't switch it.
+          // The language and developer tools toggle shouldn't be wiped when resetting player preferences.
           TextButton(
-            onPressed: () => prefs.update(PlayerSettings(locale: prefs.value.locale)),
+            onPressed: () => prefs.update(
+              PlayerSettings(locale: prefs.value.locale, developerTools: prefs.value.developerTools),
+            ),
             child: Text(strings.reset),
           ),
         ],
@@ -183,8 +185,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       header(strings.characterVoices),
                       for (final profile in characters)
-                        volume(profile.name, Icons.person_outline, settings.voiceVolumes[profile.id] ?? 1,
-                            (value) => settings.copyWith(voiceVolumes: {...settings.voiceVolumes, profile.id: value})),
+                        volume(
+                          profile.localized(language.localizer).name,
+                          Icons.person_outline,
+                          settings.voiceVolumes[profile.id] ?? 1,
+                          (value) => settings.copyWith(voiceVolumes: {...settings.voiceVolumes, profile.id: value}),
+                        ),
                     ],
                   );
                 },
@@ -201,6 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 /// [maxWidth]. A longer value is scaled down to fit rather than wrapped, e.g. at a large text scale.
 class _SliderValue extends StatelessWidget {
   static const maxWidth = 120.0;
+  static final Map<Object, double> _widthCache = {};
 
   final String value;
   final List<String> options;
@@ -210,17 +217,24 @@ class _SliderValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = DefaultTextStyle.of(context).style;
-    var width = 0.0;
-    for (final option in {value, ...options}) {
-      final painter = TextPainter(
-        text: TextSpan(text: option, style: style),
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-        maxLines: 1,
-      )..layout();
-      width = max(width, painter.width);
-      painter.dispose();
-    }
+    final direction = Directionality.of(context);
+    final scaler = MediaQuery.textScalerOf(context);
+    final key = (options.join("\x00"), style.fontSize, style.fontFamily, style.fontWeight, direction, scaler);
+    final width = _widthCache.putIfAbsent(key, () {
+      if (_widthCache.length > 64) _widthCache.clear();
+      var widest = 0.0;
+      for (final option in options) {
+        final painter = TextPainter(
+          text: TextSpan(text: option, style: style),
+          textDirection: direction,
+          textScaler: scaler,
+          maxLines: 1,
+        )..layout();
+        widest = max(widest, painter.width);
+        painter.dispose();
+      }
+      return widest;
+    });
     return SizedBox(
       width: min(width.ceilToDouble(), maxWidth),
       child: FittedBox(

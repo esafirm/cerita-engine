@@ -171,7 +171,7 @@ class _PictureRoute extends PopupRoute<void> {
     Widget child,
   ) {
     final frame = FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: const Interval(0, 0.6, curve: Curves.easeOut)),
+      opacity: animation.drive(CurveTween(curve: const Interval(0, 0.6, curve: Curves.easeOut))),
       child: child,
     );
     final flight = this.flight;
@@ -228,7 +228,8 @@ class _FlightState extends State<_Flight> {
     final animation = widget.animation;
     return AnimatedBuilder(
       animation: Listenable.merge([animation, widget.flight.landing]),
-      builder: (context, _) {
+      child: Image.asset(widget.asset, fit: BoxFit.cover, gaplessPlayback: true),
+      builder: (context, image) {
         final box = widget.flight.landing.value;
         final status = animation.status;
         if (box == null || status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
@@ -246,7 +247,7 @@ class _FlightState extends State<_Flight> {
               rect: Rect.lerp(widget.flight.origin, landing, t)!,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8 * (1 - t)),
-                child: Image.asset(widget.asset, fit: BoxFit.cover, gaplessPlayback: true),
+                child: image,
               ),
             ),
           ],
@@ -297,10 +298,30 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
     super.initState();
     _player.setVolume(widget.audio?.voiceVolume ?? widget.volume ?? 1);
     _subscriptions.addAll([
-      _player.onPositionChanged.listen((position) => setState(() => _position = position)),
-      _player.onDurationChanged.listen((duration) => setState(() => _duration = duration)),
+      _player.onPositionChanged.listen((position) {
+        if (mounted) setState(() => _position = position);
+      }),
+      _player.onDurationChanged.listen((duration) {
+        if (mounted) setState(() => _duration = duration);
+      }),
       _player.onPlayerComplete.listen((_) => _setPlaying(false, reset: true)),
     ]);
+  }
+
+  @override
+  void didUpdateWidget(VoiceNotePlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final volume = widget.audio?.voiceVolume ?? widget.volume ?? 1;
+    final oldVolume = oldWidget.audio?.voiceVolume ?? oldWidget.volume ?? 1;
+    if (volume != oldVolume) _player.setVolume(volume);
+    if (oldWidget.asset != widget.asset) {
+      if (_playing) {
+        _player.stop();
+        _setPlaying(false, reset: true);
+      }
+      _source = null;
+      _load(StoryLanguage.of(context).localizer.activeLocale);
+    }
   }
 
   @override
@@ -377,11 +398,12 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
               child: _Waveform(progress: progress.clamp(0, 1), color: color),
             ),
             const SizedBox(width: 8),
-            Text(_format(_playing ? _position : _duration), style: const TextStyle(fontSize: 12)),
+            Text(_format(_playing ? _position : _duration), style: TextStyle(fontSize: 12, color: widget.color)),
           ],
         ),
         if (widget.transcript != null)
           TextButton.icon(
+            style: widget.color == null ? null : TextButton.styleFrom(foregroundColor: widget.color),
             onPressed: () => setState(() => _showTranscript = !_showTranscript),
             icon: const Icon(Icons.subtitles_outlined, size: 16),
             label: Text(_showTranscript ? strings.hideTranscript : strings.showTranscript),
@@ -389,7 +411,7 @@ class _VoiceNotePlayerState extends State<VoiceNotePlayer> {
         if (_showTranscript && widget.transcript != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Text(widget.transcript!, style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 13)),
+            child: Text(widget.transcript!, style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13, color: widget.color)),
           ),
       ],
     );

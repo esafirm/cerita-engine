@@ -43,6 +43,7 @@ class _MusicRoomScreenState extends State<MusicRoomScreen> {
     _audio.addObserver();
     final settings = widget.setup.settings;
     settings.load().then((_) {
+      if (!mounted) return;
       final value = settings.value;
       _audio.setVolumes(music: value.musicVolume, sound: value.soundVolume, voice: value.voiceVolume);
     });
@@ -50,9 +51,7 @@ class _MusicRoomScreenState extends State<MusicRoomScreen> {
 
   @override
   void dispose() {
-    _audio
-      ..stopAll()
-      ..removeObserver();
+    _audio.removeObserver();
     super.dispose();
   }
 

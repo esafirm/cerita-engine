@@ -25,8 +25,16 @@ class LocalizedAssets {
     return (_assets?.contains(localized) ?? false) ? localized : path;
   }
 
+  /// Clears the cached manifest, e.g. on hot reload.
+  void clearCache() {
+    _loading = null;
+    _assets = null;
+  }
+
   Future<Set<String>> _manifest() => _loading ??= AssetManifest.loadFromAssetBundle(bundle)
-      .then((manifest) => manifest.listAssets().toSet())
-      .catchError((Object _) => <String>{})
-      .then((assets) => _assets = assets);
+      .then((manifest) => _assets = manifest.listAssets().toSet())
+      .catchError((Object _) {
+        _loading = null;
+        return <String>{};
+      });
 }

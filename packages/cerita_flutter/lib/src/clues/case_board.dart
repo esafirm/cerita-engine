@@ -221,8 +221,9 @@ class EvidencePicker extends StatefulWidget {
   final StoryController controller;
   final EvidenceItemType item;
   final bool dark;
+  final bool paused;
 
-  const EvidencePicker({super.key, required this.controller, required this.item, this.dark = false});
+  const EvidencePicker({super.key, required this.controller, required this.item, this.dark = false, this.paused = false});
 
   @override
   State<EvidencePicker> createState() => _EvidencePickerState();
@@ -237,12 +238,25 @@ class _EvidencePickerState extends State<EvidencePicker> with SingleTickerProvid
     super.initState();
     final timeout = widget.item.timeoutMs;
     if (timeout != null && timeout > 0) {
-      _countdown = AnimationController(vsync: this, duration: Duration(milliseconds: timeout))
+      _countdown = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: timeout),
+        animationBehavior: AnimationBehavior.preserve,
+      )
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) widget.controller.evidenceTimedOut();
         })
         ..forward();
+      if (widget.paused) _countdown!.stop();
     }
+  }
+
+  @override
+  void didUpdateWidget(EvidencePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final countdown = _countdown;
+    if (countdown == null || widget.paused == oldWidget.paused || countdown.isCompleted) return;
+    widget.paused ? countdown.stop() : countdown.forward();
   }
 
   @override

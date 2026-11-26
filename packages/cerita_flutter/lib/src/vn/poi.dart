@@ -553,10 +553,12 @@ class _SpriteSlotState extends State<_SpriteSlot> {
           key: ValueKey(_shown),
           tween: Tween(end: active ? 0 : 0.45),
           duration: const Duration(milliseconds: 250),
-          builder: (context, dim, child) => ColorFiltered(
-            colorFilter: ColorFilter.mode(Colors.black.withAlpha((dim * 255).round()), BlendMode.srcATop),
-            child: child,
-          ),
+          builder: (context, dim, child) => dim <= 0
+              ? child!
+              : ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.black.withAlpha((dim * 255).round()), BlendMode.srcATop),
+                  child: child,
+                ),
           child: Image.asset(
             _shown,
             fit: BoxFit.contain,

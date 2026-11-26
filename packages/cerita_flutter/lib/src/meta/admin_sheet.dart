@@ -28,6 +28,12 @@ class _AdminSheetState extends State<AdminSheet> {
   bool _unlocking = false;
   String? _result;
 
+  @override
+  void initState() {
+    super.initState();
+    widget.setup.settings.load();
+  }
+
   Future<void> _unlockAll() async {
     setState(() => _unlocking = true);
     final storage = widget.setup.storage;

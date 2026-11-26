@@ -35,15 +35,25 @@ class SharedPrefsStoryStorage extends StoryStorage {
     return raw == null ? null : SaveSlot.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
+  bool _isOwnSlotKey(String key) {
+    final prefix = "$_slotPrefix$namespace.";
+    return key.startsWith(prefix) && int.tryParse(key.substring(prefix.length)) != null;
+  }
+
   @override
   Future<List<SaveSlot>> listSlots() async {
     final prefs = await _prefs;
-    final prefix = "$_slotPrefix$namespace.";
-    final slots = prefs
-        .getKeys()
-        .where((key) => key.startsWith(prefix))
-        .map((key) => SaveSlot.fromJson(jsonDecode(prefs.getString(key)!) as Map<String, dynamic>))
-        .toList();
+    final slots = <SaveSlot>[];
+    for (final key in prefs.getKeys()) {
+      if (!_isOwnSlotKey(key)) continue;
+      final raw = prefs.getString(key);
+      if (raw == null) continue;
+      try {
+        slots.add(SaveSlot.fromJson(jsonDecode(raw) as Map<String, dynamic>));
+      } catch (_) {
+        // Ignore a corrupted slot rather than hiding every other save.
+      }
+    }
     return slots..sort((a, b) => a.slotId.compareTo(b.slotId));
   }
 
@@ -67,9 +77,7 @@ class SharedPrefsStoryStorage extends StoryStorage {
   @override
   Future<void> clear() async {
     final prefs = await _prefs;
-    final keys = prefs.getKeys().where((key) => key == _meta || key.startsWith("$_slotPrefix$namespace."));
-    for (final key in keys.toList()) {
-      await prefs.remove(key);
-    }
+    final keys = prefs.getKeys().where((key) => key == _meta || _isOwnSlotKey(key)).toList();
+    await Future.wait([for (final key in keys) prefs.remove(key)]);
   }
 }

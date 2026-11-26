@@ -15,29 +15,35 @@ class BacklogSheet extends StatelessWidget {
   const BacklogSheet({super.key, required this.controller});
 
   /// Opens the backlog in a [StorySheet]: as tall as its lines, up to most of the screen.
-  static Future<void> show(BuildContext context, StoryController controller) => StorySheet.show(
-    context,
-    title: StoryLanguage.of(context).strings.backlog,
-    icon: Icons.history,
-    builder: (_) => BacklogSheet(controller: controller),
-  );
+  static Future<void> show(BuildContext context, StoryController controller) async {
+    controller.holdStory(true);
+    try {
+      await StorySheet.show<void>(
+        context,
+        title: StoryLanguage.of(context).strings.backlog,
+        icon: Icons.history,
+        builder: (_) => BacklogSheet(controller: controller),
+      );
+    } finally {
+      Future<void>.microtask(() => controller.holdStory(false));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // With their transcript index, which rollback uses.
     final lines = controller.history.indexed.where((line) {
       final (_, entry) = line;
-      final item = entry.itemType;
+      final item = controller.itemOf(entry);
       return entry.isPlayer || item is TextItemType || item is NarrationItemType || item is MediaItemType;
     }).toList();
     final theme = Theme.of(context);
     final strings = StoryLanguage.of(context).strings;
 
-    // As tall as its lines: the sheet sizes to it, up to its height, and it scrolls from there. The newest line is
-    // at the bottom.
+    // Short backlogs shrink to fit the sheet; long ones fill the sheet anyway and virtualize.
     return ListView.separated(
       reverse: true,
-      shrinkWrap: true,
+      shrinkWrap: lines.length <= 20,
       padding: const EdgeInsets.all(16),
       itemCount: lines.length,
       separatorBuilder: (_, _) => const Divider(height: 20),

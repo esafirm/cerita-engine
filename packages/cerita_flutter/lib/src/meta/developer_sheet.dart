@@ -39,11 +39,11 @@ class DeveloperSheet extends StatelessWidget {
       length: 3,
       child: Column(
         children: [
-          Row(
-            children: [
-              const SizedBox(width: 16),
-              Expanded(child: Text("Developer", style: Theme.of(context).textTheme.titleLarge)),
-              TextButton.icon(
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: TextButton.icon(
                 icon: const Icon(Icons.refresh),
                 label: const Text("Reload story"),
                 onPressed: () {
@@ -51,8 +51,7 @@ class DeveloperSheet extends StatelessWidget {
                   controller.reloadStory();
                 },
               ),
-              const SizedBox(width: 8),
-            ],
+            ),
           ),
           const TabBar(tabs: [Tab(text: "Variables"), Tab(text: "Jump"), Tab(text: "Check")]),
           Expanded(
@@ -70,39 +69,67 @@ class DeveloperSheet extends StatelessWidget {
   }
 }
 
+class _VariableDialog extends StatefulWidget {
+  final String? name;
+  final dynamic value;
+
+  const _VariableDialog({this.name, this.value});
+
+  @override
+  State<_VariableDialog> createState() => _VariableDialogState();
+}
+
+class _VariableDialogState extends State<_VariableDialog> {
+  late final TextEditingController _name = TextEditingController(text: widget.name);
+  late final TextEditingController _value =
+      TextEditingController(text: widget.value is String ? '"${widget.value}"' : widget.value?.toString() ?? "");
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _value.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.name ?? "New variable"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.name == null)
+            TextField(controller: _name, autofocus: true, decoration: const InputDecoration(labelText: "Name")),
+          TextField(
+            controller: _value,
+            autofocus: widget.name != null,
+            decoration: const InputDecoration(labelText: "Value", helperText: "true, false, a number, or text"),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop((_name.text.trim(), _value.text)),
+          child: const Text("Set"),
+        ),
+      ],
+    );
+  }
+}
+
 class _Variables extends StatelessWidget {
   final StoryController controller;
 
   const _Variables({required this.controller});
 
   Future<void> _edit(BuildContext context, {String? name, dynamic value}) async {
-    final nameField = TextEditingController(text: name);
-    final valueField = TextEditingController(text: value is String ? '"$value"' : value?.toString() ?? "");
-    final saved = await showDialog<bool>(
+    final result = await showDialog<(String, String)>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(name ?? "New variable"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (name == null)
-              TextField(controller: nameField, autofocus: true, decoration: const InputDecoration(labelText: "Name")),
-            TextField(
-              controller: valueField,
-              autofocus: name != null,
-              decoration: const InputDecoration(labelText: "Value", helperText: "true, false, a number, or text"),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text("Cancel")),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text("Set")),
-        ],
-      ),
+      builder: (_) => _VariableDialog(name: name, value: value),
     );
-    final variable = nameField.text.trim();
-    if (saved == true && variable.isNotEmpty) {
-      await controller.setVariable(variable, DeveloperSheet.parseValue(valueField.text));
+    if (result != null && result.$1.isNotEmpty) {
+      await controller.setVariable(result.$1, DeveloperSheet.parseValue(result.$2));
     }
   }
 

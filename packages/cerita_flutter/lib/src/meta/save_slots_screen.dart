@@ -32,13 +32,15 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
   late final Future<ProfileData?> _profiles =
       widget.setup.loader.initialLoad().then<ProfileData?>((package) => package.profiles).catchError((_) => null);
 
+  late Future<List<Object?>> _loaded = Future.wait([_slots, _profiles]);
+
   bool get _saving => widget.onSave != null;
 
   String _describe(SaveSlot slot, StoryLanguage language) {
     final time = slot.updatedAt.toLocal();
     final stamp = "${time.year}-${_two(time.month)}-${_two(time.day)} ${_two(time.hour)}:${_two(time.minute)}";
     final label = [slot.chapter, slot.title].whereType<LocalizedText>().map(language.text).join(" · ");
-    return "$label\n$stamp";
+    return label.isEmpty ? stamp : "$label\n$stamp";
   }
 
   String _two(int value) => value.toString().padLeft(2, "0");
@@ -51,6 +53,7 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
 
   void _reload() => setState(() {
         _slots = widget.setup.storage.listSlots();
+        _loaded = Future.wait([_slots, _profiles]);
       });
 
   /// Asks before [action] replaces or removes the save in a slot. True when the player agrees.
@@ -93,11 +96,13 @@ class _SaveSlotsScreenState extends State<SaveSlotsScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(_saving ? strings.saveGame : strings.loadGame)),
       body: FutureBuilder(
-        future: Future.wait([_slots, _profiles]),
+        future: _loaded,
         builder: (context, snapshot) {
-          final data = snapshot.data;
-          final slots = {for (final slot in data?[0] as List<SaveSlot>? ?? const <SaveSlot>[]) slot.slotId: slot};
-          final profiles = data?[1] as ProfileData?;
+          if (snapshot.hasError) return Center(child: Text("${snapshot.error}"));
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          final data = snapshot.data!;
+          final slots = {for (final slot in data[0] as List<SaveSlot>) slot.slotId: slot};
+          final profiles = data[1] as ProfileData?;
           final ids = [if (!_saving) ...[SaveSlot.autoSlotId, SaveSlot.quickSlotId], ...widget.slots];
           return ListView(
             padding: const EdgeInsets.all(12),
@@ -203,9 +208,11 @@ class SaveThumbnail extends StatelessWidget {
         ),
       );
     }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: SizedBox.fromSize(size: size, child: child),
+    return RepaintBoundary(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox.fromSize(size: size, child: child),
+      ),
     );
   }
 }

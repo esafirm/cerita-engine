@@ -40,7 +40,12 @@ class RouteFlowchart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (map.rows.isEmpty) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
+    final language = StoryLanguage.of(context);
+    final checkpointTexts = <RouteNode, (String, String?, String?)>{};
+    (String, String?, String?) checkpointTextOf(RouteNode node) =>
+        checkpointTexts[node] ??= _checkpointText(language, node);
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -49,7 +54,7 @@ class RouteFlowchart extends StatelessWidget {
         final fit = max(1, ((available + columnGap) / (minNodeWidth + columnGap)).floor());
         final columns = min(fit, widest);
         final nodeWidth = min(maxNodeWidth, (available - (columns - 1) * columnGap) / columns);
-        final nodeHeight = _nodeHeight(context, nodeWidth - _nodePadding.horizontal);
+        final nodeHeight = _nodeHeight(context, nodeWidth - _nodePadding.horizontal, checkpointTextOf);
 
         // The gaps between the columns of a full line, or the left margin with one column.
         final lineLeft = (width - columns * nodeWidth - (columns - 1) * columnGap) / 2;
@@ -128,12 +133,14 @@ class RouteFlowchart extends StatelessWidget {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: CustomPaint(
-                    painter: _EdgePainter(lines, taken: scheme.primary, open: scheme.outlineVariant),
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: _EdgePainter(lines, taken: scheme.primary, open: scheme.outlineVariant),
+                    ),
                   ),
                 ),
                 for (final MapEntry(key: node, value: box) in boxes.entries)
-                  Positioned.fromRect(rect: box, child: _node(context, node)),
+                  Positioned.fromRect(rect: box, child: _node(context, node, checkpointTextOf)),
               ],
             ),
           ),
@@ -144,7 +151,11 @@ class RouteFlowchart extends StatelessWidget {
 
   /// One height for every node: the tallest reached node's text laid out at [contentWidth], in the player's
   /// language and text size.
-  double _nodeHeight(BuildContext context, double contentWidth) {
+  double _nodeHeight(
+    BuildContext context,
+    double contentWidth,
+    (String, String?, String?) Function(RouteNode) checkpointTextOf,
+  ) {
     final styles = _Styles.of(context);
     final language = StoryLanguage.of(context);
     final base = DefaultTextStyle.of(context).style;
@@ -171,7 +182,7 @@ class RouteFlowchart extends StatelessWidget {
         final badge = measure(language.strings.endingBadge(localized.category), EndingBadge.textStyle, wraps: false);
         content = max(content, badge + EndingBadge.padding.vertical + 4 + measure(localized.title, styles.small, maxLines: 2));
       } else {
-        final (chapter, title, found) = _checkpointText(language, node);
+        final (chapter, title, found) = checkpointTextOf(node);
         content = max(
           content,
           measure(chapter, styles.chapter, maxLines: 1) +
@@ -193,7 +204,11 @@ class RouteFlowchart extends StatelessWidget {
     return (chapter, conversation.title, endings.isEmpty ? null : language.strings.endingsFound(found, endings.length));
   }
 
-  Widget _node(BuildContext context, RouteNode node) {
+  Widget _node(
+    BuildContext context,
+    RouteNode node,
+    (String, String?, String?) Function(RouteNode) checkpointTextOf,
+  ) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final language = StoryLanguage.of(context);
@@ -252,7 +267,7 @@ class RouteFlowchart extends StatelessWidget {
       );
     }
 
-    final (chapter, title, found) = _checkpointText(language, node);
+    final (chapter, title, found) = checkpointTextOf(node);
     return card(
       color: scheme.primaryContainer,
       onTap: () => _offer(context, meta.unlockedCheckpoints[node.id]!, chapter, title),

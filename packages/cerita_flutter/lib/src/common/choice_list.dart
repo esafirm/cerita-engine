@@ -27,7 +27,11 @@ class _ChoiceListState extends State<ChoiceList> with SingleTickerProviderStateM
     super.initState();
     final timeout = widget.item.timeoutMs;
     if (timeout != null && timeout > 0) {
-      _countdown = AnimationController(vsync: this, duration: Duration(milliseconds: timeout))
+      _countdown = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: timeout),
+        animationBehavior: AnimationBehavior.preserve,
+      )
         ..addStatusListener((status) {
           final fallback = widget.item.timeoutChoice;
           if (status == AnimationStatus.completed && fallback != null) widget.onSelected(fallback);

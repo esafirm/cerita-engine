@@ -175,13 +175,14 @@ class _VnStageState extends State<VnStage> {
         child: StorySkin.of(context).vnHud(
           context,
           VnHud(
-            label: scene.day != null || scene.time != null
-                ? [
-                    if (controller.conversation?.chapter != null) controller.conversation!.chapter!,
-                    // The same clock as chat headers and story timestamps: "9:40 PM", "21.40".
-                    if (scene.time != null) StoryLanguage.of(context).strings.sceneTime(scene.time!),
-                  ].join(" · ")
-                : null,
+            label: () {
+              final parts = [
+                ?controller.conversation?.chapter,
+                // The same clock as chat headers and story timestamps: "9:40 PM", "21.40".
+                if (scene.time case final time?) StoryLanguage.of(context).strings.sceneTime(time),
+              ];
+              return parts.isEmpty ? null : parts.join(" · ");
+            }(),
             autoMode: controller.autoMode,
             skipMode: controller.skipMode,
             onBacklog: () => BacklogSheet.show(context, controller),
@@ -275,7 +276,12 @@ class _VnStageState extends State<VnStage> {
                                   minimum: const EdgeInsets.all(16),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                                    child: EvidencePicker(
+                                      key: ValueKey(item),
+                                      controller: controller,
+                                      item: item,
+                                      paused: controller.storyHeld,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -299,7 +305,7 @@ class _VnStageState extends State<VnStage> {
                         child: Card(
                           child: Padding(
                             padding: const EdgeInsets.all(20),
-                            child: InputPrompt(item: item, onSubmit: controller.submitInput),
+                            child: InputPrompt(key: ValueKey(item), item: item, onSubmit: controller.submitInput),
                           ),
                         ),
                       ),

@@ -17,24 +17,30 @@ class WeatherLayer extends StatefulWidget {
 }
 
 class _WeatherLayerState extends State<WeatherLayer> with SingleTickerProviderStateMixin {
+  static const _supported = {"rain", "snow", "sakura"};
+
   final _random = Random();
   final _elapsed = ValueNotifier(Duration.zero);
+  Duration _accumulated = Duration.zero;
   late final Ticker _ticker;
   late List<_Particle> _particles;
+
+  bool get _active => !widget.still && _supported.contains(widget.weather);
 
   @override
   void initState() {
     super.initState();
     _particles = _spawn();
-    _ticker = createTicker((elapsed) => _elapsed.value = elapsed);
-    if (!widget.still) _ticker.start();
+    _ticker = createTicker((elapsed) => _elapsed.value = _accumulated + elapsed);
+    if (_active) _ticker.start();
   }
 
   List<_Particle> _spawn() {
     final count = switch (widget.weather) {
       "rain" => 120,
       "snow" => 80,
-      _ => 36,
+      "sakura" => 36,
+      _ => 0,
     };
     return List.generate(count, (_) => _Particle.random(_random));
   }
@@ -43,8 +49,12 @@ class _WeatherLayerState extends State<WeatherLayer> with SingleTickerProviderSt
   void didUpdateWidget(WeatherLayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.weather != widget.weather) _particles = _spawn();
-    if (widget.still && _ticker.isActive) _ticker.stop();
-    if (!widget.still && !_ticker.isActive) _ticker.start();
+    if (!_active && _ticker.isActive) {
+      _accumulated = _elapsed.value;
+      _ticker.stop();
+    } else if (_active && !_ticker.isActive) {
+      _ticker.start();
+    }
   }
 
   @override
@@ -56,6 +66,7 @@ class _WeatherLayerState extends State<WeatherLayer> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    if (_particles.isEmpty) return const SizedBox.shrink();
     return IgnorePointer(
       child: RepaintBoundary(
         child: CustomPaint(
@@ -87,6 +98,12 @@ class _Particle {
 }
 
 class _WeatherPainter extends CustomPainter {
+  static final _rainPaint = Paint()
+    ..color = Colors.white.withAlpha(110)
+    ..strokeWidth = 1.2;
+  static final _snowPaint = Paint()..color = Colors.white.withAlpha(200);
+  static final _sakuraPaint = Paint()..color = const Color(0xFFFFB7C9).withAlpha(210);
+
   final String weather;
   final List<_Particle> particles;
   final ValueNotifier<Duration> elapsed;
@@ -98,24 +115,19 @@ class _WeatherPainter extends CustomPainter {
     final seconds = elapsed.value.inMicroseconds / Duration.microsecondsPerSecond;
     switch (weather) {
       case "rain":
-        final paint = Paint()
-          ..color = Colors.white.withAlpha(110)
-          ..strokeWidth = 1.2;
         for (final p in particles) {
           final y = (p.y + seconds * 1.6 * p.speed) % 1.0;
           final x = (p.x + y * 0.08) % 1.0;
           final start = Offset(x * size.width, y * size.height);
-          canvas.drawLine(start, start + Offset(3, 18 * p.size), paint);
+          canvas.drawLine(start, start + Offset(3, 18 * p.size), _rainPaint);
         }
       case "snow":
-        final paint = Paint()..color = Colors.white.withAlpha(200);
         for (final p in particles) {
           final y = (p.y + seconds * 0.08 * p.speed) % 1.0;
           final x = (p.x + sin(seconds * p.speed + p.phase) * 0.02) % 1.0;
-          canvas.drawCircle(Offset(x * size.width, y * size.height), 2.2 * p.size, paint);
+          canvas.drawCircle(Offset(x * size.width, y * size.height), 2.2 * p.size, _snowPaint);
         }
       case "sakura":
-        final paint = Paint()..color = const Color(0xFFFFB7C9).withAlpha(210);
         for (final p in particles) {
           final y = (p.y + seconds * 0.07 * p.speed) % 1.0;
           final x = (p.x + seconds * 0.03 + sin(seconds * p.speed + p.phase) * 0.03) % 1.0;
@@ -123,7 +135,7 @@ class _WeatherPainter extends CustomPainter {
             ..save()
             ..translate(x * size.width, y * size.height)
             ..rotate(seconds * p.speed + p.phase)
-            ..drawOval(Rect.fromCenter(center: Offset.zero, width: 10 * p.size, height: 6 * p.size), paint)
+            ..drawOval(Rect.fromCenter(center: Offset.zero, width: 10 * p.size, height: 6 * p.size), _sakuraPaint)
             ..restore();
         }
     }

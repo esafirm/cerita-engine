@@ -31,6 +31,10 @@ class AudioHelper with WidgetsBindingObserver {
 
   int _nextSfx = 0;
   int _duckCount = 0;
+  bool _voiceDucked = false;
+  int _voiceGeneration = 0;
+  bool _disposed = false;
+  late final StreamSubscription<void> _voiceComplete;
   double _musicVolume = 1;
   double _soundVolume = 1;
   double _voiceVolume = 1;
@@ -57,11 +61,18 @@ class AudioHelper with WidgetsBindingObserver {
   }
 
   AudioHelper() {
-    _voice.onPlayerComplete.listen((_) => unduck());
+    _voiceComplete = _voice.onPlayerComplete.listen((_) => _unduckVoice());
+  }
+
+  void _unduckVoice() {
+    if (!_voiceDucked) return;
+    _voiceDucked = false;
+    unduck();
   }
 
   /// Channel volumes, `0.0` to `1.0`. Ducking lowers the music relative to [music]. Ambience follows [sound].
   void setVolumes({required double music, required double sound, required double voice}) {
+    if (_disposed) return;
     _musicVolume = music;
     _soundVolume = sound;
     _voiceVolume = voice;
@@ -79,7 +90,10 @@ class AudioHelper with WidgetsBindingObserver {
   }
 
   void removeObserver() {
+    if (_disposed) return;
+    _disposed = true;
     WidgetsBinding.instance.removeObserver(this);
+    _voiceComplete.cancel();
     _bgmChannel.cancel();
     _ambienceChannel.cancel();
     for (final player in [_bgm, _ambience, ..._sfx, _voice, _ring]) {
@@ -102,14 +116,22 @@ class AudioHelper with WidgetsBindingObserver {
 
   /// Plays a voice line at the voice volume times [character], the speaker's own volume.
   Future<void> playVoice(String path, {double character = 1}) async {
+    if (_disposed) return;
+    final generation = ++_voiceGeneration;
     await stopVoice();
+    if (_disposed || generation != _voiceGeneration) return;
     _voiceCharacter = character;
-    duck();
-    await _safePlay(_voice, path, _voiceVolume * character);
+    if (!_voiceDucked) {
+      _voiceDucked = true;
+      duck();
+    }
+    final ok = await _safePlay(_voice, path, _voiceVolume * character);
+    if (!ok && generation == _voiceGeneration) _unduckVoice();
   }
 
   Future<void> stopVoice() async {
-    if (_voice.state == PlayerState.playing) unduck();
+    _unduckVoice();
+    if (_disposed) return;
     await _voice.stop();
   }
 
@@ -137,7 +159,9 @@ class AudioHelper with WidgetsBindingObserver {
   }
 
   Future<void> stopAll() async {
+    if (_disposed) return;
     _duckCount = 0;
+    _voiceDucked = false;
     _ringing = false;
     await Future.wait([
       _bgmChannel.play(null, 0),
@@ -163,12 +187,14 @@ class AudioHelper with WidgetsBindingObserver {
   }
 }
 
-Future<void> _safePlay(AudioPlayer player, String path, double volume) async {
+Future<bool> _safePlay(AudioPlayer player, String path, double volume) async {
   try {
     await player.play(AssetSource(path), volume: volume);
+    return true;
   } catch (error) {
     // Autoplay restrictions (web) or a missing file should not break the story.
     debugPrint("AudioHelper: can't play $path: $error");
+    return false;
   }
 }
 
@@ -197,6 +223,7 @@ class _LoopChannel {
 
   Future<void> play(String? path, int fadeMs) async {
     if (path == _current) return;
+    _stopFade();
     final wasPlaying = _current != null;
     _current = path;
     final generation = ++_generation;
@@ -211,7 +238,11 @@ class _LoopChannel {
     if (path == null || generation != _generation) return;
     await player.setReleaseMode(ReleaseMode.loop);
     _gain = half > Duration.zero ? 0 : 1;
-    await _safePlay(player, path, level() * _gain);
+    final ok = await _safePlay(player, path, level() * _gain);
+    if (!ok) {
+      if (generation == _generation) _current = null;
+      return;
+    }
     if (generation != _generation || half == Duration.zero) return;
     await _fade(to: 1, over: half);
   }

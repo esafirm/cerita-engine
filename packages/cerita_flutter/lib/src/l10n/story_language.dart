@@ -40,7 +40,15 @@ class StoryLanguage extends ChangeNotifier {
   /// Engine strings in the active locale, else English.
   CeritaStrings get strings => stringsFor(_locale);
 
-  CeritaStrings stringsFor(String? locale) => _strings[locale] ?? _strings["en"] ?? CeritaStrings.en;
+  CeritaStrings stringsFor(String? locale) {
+    if (locale == null) return _strings["en"] ?? CeritaStrings.en;
+    if (_strings[locale] case final exact?) return exact;
+    final dash = locale.indexOf("-");
+    if (dash > 0) {
+      if (_strings[locale.substring(0, dash)] case final base?) return base;
+    }
+    return _strings["en"] ?? CeritaStrings.en;
+  }
 
   /// [locale]'s own name, or its code when no engine strings exist for it.
   String languageName(String locale) => _strings[locale]?.languageName ?? locale;

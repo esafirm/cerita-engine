@@ -297,8 +297,7 @@ class _GlyphLine extends StatefulWidget {
 }
 
 class _GlyphLineState extends State<_GlyphLine> with SingleTickerProviderStateMixin {
-  late final AnimationController _motion =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+  AnimationController? _motion;
 
   bool get _moves => widget.glyphs.any((glyph) => glyph.style.effect != MarkupEffect.none);
 
@@ -316,15 +315,16 @@ class _GlyphLineState extends State<_GlyphLine> with SingleTickerProviderStateMi
 
   void _updateMotion() {
     if (_moves && !reduceMotion) {
-      if (!_motion.isAnimating) _motion.repeat();
+      final motion = _motion ??= AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+      if (!motion.isAnimating) motion.repeat();
     } else {
-      _motion.stop();
+      _motion?.stop();
     }
   }
 
   @override
   void dispose() {
-    _motion.dispose();
+    _motion?.dispose();
     super.dispose();
   }
 
@@ -400,10 +400,13 @@ class _GlyphLineState extends State<_GlyphLine> with SingleTickerProviderStateMi
       return TextSpan(children: children);
     }
 
-    if (!moving) return Text.rich(spans(0), style: widget.style, textAlign: widget.textAlign);
-    return AnimatedBuilder(
-      animation: _motion,
-      builder: (context, _) => Text.rich(spans(_motion.value), style: widget.style, textAlign: widget.textAlign),
+    final motion = _motion;
+    if (!moving || motion == null) return Text.rich(spans(0), style: widget.style, textAlign: widget.textAlign);
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: motion,
+        builder: (context, _) => Text.rich(spans(motion.value), style: widget.style, textAlign: widget.textAlign),
+      ),
     );
   }
 }

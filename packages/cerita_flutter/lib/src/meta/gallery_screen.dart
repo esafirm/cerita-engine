@@ -31,9 +31,10 @@ class GalleryScreen extends StatelessWidget {
       body: MetaLoader(
         setup: setup,
         builder: (context, catalog, meta) {
+          final allMedia = catalog.media;
           final tabs = [
             for (final (label, icon, types) in kinds)
-              if (catalog.media.where((entry) => types.contains(entry.item.mediaType)).toList() case final entries
+              if (allMedia.where((entry) => types.contains(entry.item.mediaType)).toList() case final entries
                   when entries.isNotEmpty)
                 (label, icon, entries),
           ];
@@ -113,17 +114,20 @@ class _GalleryGrid extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+            ),
             padding: const EdgeInsets.all(12),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: [
-              for (final entry in entries)
-                unlocked.contains(entry.item.unlockId)
-                    ? _UnlockedTile(setup: setup, audio: audio, item: entry.item.localized(language.localizer))
-                    : _LockedTile(hint: language.strings.unlockedIn(_chapterOf(entry.source, language.localizer))),
-            ],
+            itemCount: entries.length,
+            itemBuilder: (context, index) {
+              final entry = entries[index];
+              return unlocked.contains(entry.item.unlockId)
+                  ? _UnlockedTile(setup: setup, audio: audio, item: entry.item.localized(language.localizer))
+                  : _LockedTile(hint: language.strings.unlockedIn(_chapterOf(entry.source, language.localizer)));
+            },
           ),
         ),
       ],
@@ -171,7 +175,7 @@ class _UnlockedTile extends StatelessWidget {
 
     final (Widget preview, VoidCallback onTap) = switch (item.mediaType) {
       MediaType.image || MediaType.cg => (
-          Image.asset(path, fit: BoxFit.cover),
+          Image.asset(path, fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
           () => ImageViewerPage.open(context, path, caption: item.caption, from: context),
         ),
       MediaType.audio => (
@@ -191,7 +195,7 @@ class _UnlockedTile extends StatelessWidget {
         ),
       MediaType.video => (
           const ColoredBox(color: Color(0xFF1B2440), child: Icon(Icons.play_circle_outline, size: 48, color: Colors.white)),
-          () => VideoPlayerPage.open(context, path, caption: item.caption),
+          () => VideoPlayerPage.open(context, path, caption: item.caption, audio: audio),
         ),
     };
 

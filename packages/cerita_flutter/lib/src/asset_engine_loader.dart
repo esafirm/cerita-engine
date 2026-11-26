@@ -8,26 +8,26 @@ class AssetEngineLoader extends EngineLoader {
 
   final LoaderConfig config;
   final AssetBundle bundle;
+  Future<Set<String>>? _manifestAssets;
 
   AssetEngineLoader(this.config, {AssetBundle? bundle}) : bundle = bundle ?? rootBundle;
 
   Future<Map<String, dynamic>> _loadJson(String path) async =>
       jsonDecode(await bundle.loadString(path)) as Map<String, dynamic>;
 
+  Future<Set<String>> _assets() =>
+      _manifestAssets ??= AssetManifest.loadFromAssetBundle(bundle).then((manifest) => manifest.listAssets().toSet());
+
   @override
   Future<EnginePackage> initialLoad() async {
     final profiles = await _loadJson("${config.storyDir}/profiles.json");
     final conversation = await loadConversation(Conversation.indexKey);
+    final assets = await _assets();
 
-    List<Channel> channels = const [];
-    try {
-      channels = Channel.listFromJson(await _loadJson("${config.storyDir}/channels.json"));
-    } catch (_) {
-      // channels.json is optional
-    }
+    // channels.json and clues.json are optional, but broken ones should fail loudly.
+    final channelsPath = "${config.storyDir}/channels.json";
+    final channels = assets.contains(channelsPath) ? Channel.listFromJson(await _loadJson(channelsPath)) : const <Channel>[];
 
-    // clues.json is optional, but a broken one should fail loudly.
-    final assets = (await AssetManifest.loadFromAssetBundle(bundle)).listAssets();
     final cluesPath = "${config.storyDir}/clues.json";
     final clues = assets.contains(cluesPath) ? ClueCatalog.fromJson(await _loadJson(cluesPath)) : ClueCatalog.empty;
 
@@ -50,12 +50,15 @@ class AssetEngineLoader extends EngineLoader {
 
   /// Clears the bundle's cache. With `flutter run`, a hot reload has copied the edited files already.
   @override
-  void clearCache() => bundle.clear();
+  void clearCache() {
+    _manifestAssets = null;
+    bundle.clear();
+  }
 
   /// The bundled files, from the asset manifest.
   @override
   Future<bool Function(String path)?> assetChecker() async {
-    final assets = (await AssetManifest.loadFromAssetBundle(bundle)).listAssets().toSet();
+    final assets = await _assets();
     return assets.contains;
   }
 
@@ -63,16 +66,15 @@ class AssetEngineLoader extends EngineLoader {
   @override
   Future<Credits?> loadCredits() async {
     final path = "${config.storyDir}/credits.json";
-    if (!(await AssetManifest.loadFromAssetBundle(bundle)).listAssets().contains(path)) return null;
+    if (!(await _assets()).contains(path)) return null;
     return Credits.fromJson(await _loadJson(path));
   }
 
   @override
   Future<List<String>> listConversationKeys() async {
-    final manifest = await AssetManifest.loadFromAssetBundle(bundle);
+    final assets = await _assets();
     final prefix = "${config.storyDir}/$_prefixConversation";
-    final keys = manifest
-        .listAssets()
+    final keys = assets
         .where((path) => path.startsWith(prefix) && path.endsWith(".json"))
         .map((path) => path.substring(prefix.length, path.length - ".json".length))
         .toList()

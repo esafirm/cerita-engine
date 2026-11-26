@@ -9,6 +9,7 @@ import '../clues/case_board.dart';
 import '../common/avatar.dart';
 import '../common/choice_list.dart';
 import '../common/input_prompt.dart';
+import '../common/motion.dart';
 import '../common/tagged_text.dart';
 import '../common/tap_to_continue.dart';
 import '../l10n/story_language.dart';
@@ -47,7 +48,9 @@ class _CallViewState extends State<CallView> {
     _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
       // A ringing phone vibrates every other second.
       if (controller.callState == CallState.ringing && timer.tick.isEven) HapticFeedback.vibrate();
-      setState(() {});
+      if (controller.callState == CallState.connected && _stopwatch.isRunning && !controller.onHold) {
+        setState(() {});
+      }
     });
   }
 
@@ -90,7 +93,22 @@ class _CallViewState extends State<CallView> {
     final item = controller.current;
     final memberId = controller.channel?.members.firstOrNull;
     final strings = StoryLanguage.of(context).strings;
-    final caller = memberId == null ? controller.currentProfile : controller.profileById(memberId);
+    Profile? caller = memberId == null ? null : controller.profileById(memberId);
+    if (caller == null) {
+      final current = controller.currentProfile;
+      if (current != null && !current.isPlayer) {
+        caller = current;
+      } else {
+        for (final entry in controller.history.reversed) {
+          final entryItem = controller.itemOf(entry);
+          final profile = entryItem == null ? null : controller.profileOf(entryItem);
+          if (profile != null && !profile.isPlayer) {
+            caller = profile;
+            break;
+          }
+        }
+      }
+    }
     final state = controller.callState;
     final connected = state == CallState.connected;
 
@@ -103,6 +121,7 @@ class _CallViewState extends State<CallView> {
       _stopwatch.start();
     }
     final elapsed = _stopwatch.elapsed;
+    final narrationStatus = connected && !controller.onHold && item is NarrationItemType ? item.text : null;
     final status = switch (item) {
       _ when state == CallState.ringing => strings.incomingCall,
       _ when state == CallState.ended => strings.callEnded,
@@ -114,7 +133,7 @@ class _CallViewState extends State<CallView> {
     };
     // Keep the last spoken line on screen while the player picks a reply.
     final spoken = controller.history.lastWhere(
-      (entry) => entry.conversationKey == controller.conversation?.key && entry.itemType is TextItemType,
+      (entry) => entry.conversationKey == controller.conversation?.key && controller.itemOf(entry) is TextItemType,
       orElse: () => const TranscriptEntry(conversationKey: "", mode: SceneMode.call),
     );
     final caption = connected ? controller.itemOf(spoken)?.getText() : null;
@@ -125,10 +144,22 @@ class _CallViewState extends State<CallView> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (scene.background != null) Image.asset(config.bg(scene.background!), fit: BoxFit.cover),
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: Container(color: const Color(0xCC0B1020)),
+          RepaintBoundary(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (scene.background != null)
+                  Image.asset(
+                    config.bg(scene.background!),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: Container(color: const Color(0xCC0B1020)),
+                ),
+              ],
+            ),
           ),
           SafeArea(
             child: Column(
@@ -166,7 +197,9 @@ class _CallViewState extends State<CallView> {
                       const SizedBox(width: 6),
                     ],
                     Flexible(
-                      child: Text(status, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+                      child: narrationStatus != null
+                          ? TaggedText(narrationStatus, style: const TextStyle(color: Colors.white70, fontSize: 16))
+                          : Text(status, style: const TextStyle(color: Colors.white70, fontSize: 16)),
                     ),
                   ],
                 ),
@@ -202,7 +235,7 @@ class _CallViewState extends State<CallView> {
                   },
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(context).bottom),
                   child: switch (controller.phase) {
                     _ when state == CallState.ringing => _RingingButtons(
                       strings: (answer: strings.answer, decline: strings.decline),
@@ -215,19 +248,40 @@ class _CallViewState extends State<CallView> {
                       height: MediaQuery.sizeOf(context).height * 0.55,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+                        child: EvidencePicker(
+                          key: ValueKey(item),
+                          controller: controller,
+                          item: item,
+                          paused: controller.storyHeld || controller.onHold,
+                        ),
                       ),
                     ),
-                    StoryPhase.choice when item is ChoiceItemType => ChoiceList(
-                      key: ValueKey(item),
-                      item: item,
-                      dark: true,
-                      onSelected: controller.choose,
+                    StoryPhase.choice when item is ChoiceItemType => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (item.text.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: TaggedText(
+                              item.text,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white70, fontSize: 15),
+                            ),
+                          ),
+                        ChoiceList(
+                          key: ValueKey(item),
+                          item: item,
+                          dark: true,
+                          paused: controller.storyHeld || controller.onHold,
+                          onSelected: controller.choose,
+                        ),
+                      ],
                     ),
                     StoryPhase.input when item is InputItemType => Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: InputPrompt(item: item, onSubmit: controller.submitInput),
+                        child: InputPrompt(key: ValueKey(item), item: item, onSubmit: controller.submitInput),
                       ),
                     ),
                     _ => Column(
@@ -496,33 +550,62 @@ class _Pulse extends StatefulWidget {
 }
 
 class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
-  late final AnimationController _animation = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1400),
-  )..repeat();
+  AnimationController? _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(_Pulse oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active != widget.active) _sync();
+  }
+
+  void _sync() {
+    if (widget.active && !reduceMotion) {
+      final controller = _animation ??= AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+      if (!controller.isAnimating) controller.repeat();
+    } else {
+      _animation?.stop();
+    }
+  }
 
   @override
   void dispose() {
-    _animation.dispose();
+    _animation?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) => Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withAlpha(widget.active ? (120 * (1 - _animation.value)).round() : 40),
-            width: 2 + (widget.active ? 10 * _animation.value : 0),
+    final animation = _animation;
+    Widget ring(double value) {
+      final width = 2.0 + (widget.active && !reduceMotion ? 10.0 * value : 0.0);
+      // Keep the outer box size constant so pulsing never triggers full-screen relayout.
+      return Padding(
+        padding: EdgeInsets.all(12 - width),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withAlpha(widget.active ? (120 * (1 - value)).round() : 40),
+              width: width,
+            ),
           ),
+          child: Padding(padding: const EdgeInsets.all(10), child: widget.child),
         ),
-        child: child,
+      );
+    }
+
+    if (!widget.active || animation == null || reduceMotion) return RepaintBoundary(child: ring(0));
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, _) => ring(animation.value),
       ),
-      child: widget.child,
     );
   }
 }

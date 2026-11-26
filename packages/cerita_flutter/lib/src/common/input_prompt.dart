@@ -24,9 +24,9 @@ class _InputPromptState extends State<InputPrompt> {
   final _controller = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_changed);
+  void didUpdateWidget(InputPrompt oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item != widget.item) _controller.clear();
   }
 
   @override
@@ -34,8 +34,6 @@ class _InputPromptState extends State<InputPrompt> {
     _controller.dispose();
     super.dispose();
   }
-
-  void _changed() => setState(() {});
 
   bool get _canSubmit => widget.item.accepts(_controller.text.trim());
 
@@ -47,6 +45,7 @@ class _InputPromptState extends State<InputPrompt> {
   Widget build(BuildContext context) {
     final item = widget.item;
     final digits = item.keyboard == InputKeyboard.digits;
+    final strings = StoryLanguage.of(context).strings;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,7 +71,7 @@ class _InputPromptState extends State<InputPrompt> {
                 // Keep the keyboard up when the answer can't be sent yet.
                 onEditingComplete: () {},
                 decoration: InputDecoration(
-                  hintText: item.defaultValue ?? StoryLanguage.of(context).strings.typeHere,
+                  hintText: item.defaultValue ?? strings.typeHere,
                   filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -80,10 +79,13 @@ class _InputPromptState extends State<InputPrompt> {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(
-              tooltip: StoryLanguage.of(context).strings.send,
-              onPressed: _canSubmit ? _submit : null,
-              icon: const Icon(Icons.send),
+            ValueListenableBuilder(
+              valueListenable: _controller,
+              builder: (context, _, _) => IconButton.filled(
+                tooltip: strings.send,
+                onPressed: _canSubmit ? _submit : null,
+                icon: const Icon(Icons.send),
+              ),
             ),
           ],
         ),

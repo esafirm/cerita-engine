@@ -7,10 +7,23 @@ import '../story_setup.dart';
 
 /// The story's credits (`credits.json`, data schema §9) and a link to the open-source licenses. Apps show it
 /// from the title screen when `setup.loader.loadCredits()` finds credits.
-class CreditsScreen extends StatelessWidget {
+class CreditsScreen extends StatefulWidget {
   final StorySetup setup;
 
   const CreditsScreen({super.key, required this.setup});
+
+  @override
+  State<CreditsScreen> createState() => _CreditsScreenState();
+}
+
+class _CreditsScreenState extends State<CreditsScreen> {
+  late Future<Credits?> _credits = widget.setup.loader.loadCredits();
+
+  @override
+  void didUpdateWidget(CreditsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.setup != widget.setup) _credits = widget.setup.loader.loadCredits();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +31,7 @@ class CreditsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(strings.credits)),
       body: FutureBuilder(
-        future: setup.loader.loadCredits(),
+        future: _credits,
         builder: (context, snapshot) {
           if (snapshot.hasError) return Center(child: Text("${snapshot.error}"));
           if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());

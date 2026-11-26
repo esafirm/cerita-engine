@@ -162,6 +162,13 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   Stream<String> get toasts => _toasts.stream;
 
+  void _toast(String message) {
+    if (!_toasts.isClosed) _toasts.add(message);
+  }
+
+  /// Cached localized [ItemType] per [TranscriptEntry] for the active language, cleared on locale switch or reset.
+  final Map<TranscriptEntry, ItemType> _itemCache = Map.identity();
+
   final StreamController<Clue> _cluesFound = StreamController.broadcast();
 
   /// Clues as the story finds them, for the clue notification.
@@ -215,7 +222,10 @@ class StoryController extends ChangeNotifier with EngineListener {
   Localizer get localizer => engine.localizer;
 
   /// A delivered item in the active language.
-  ItemType? itemOf(TranscriptEntry entry) => entry.itemIn(localizer);
+  ItemType? itemOf(TranscriptEntry entry) {
+    if (entry.item == null) return null;
+    return _itemCache[entry] ??= entry.itemIn(localizer)!;
+  }
 
   /// The player's reply of [entry] in the active language. A presented clue reads "Presented: <title>".
   String? playerTextOf(TranscriptEntry entry) {
@@ -307,11 +317,11 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> quickLoad() async {
     final save = await engine.storage?.loadSlot(SaveSlot.quickSlotId);
     if (save == null) {
-      _toasts.add(strings.noQuickSave);
+      _toast(strings.noQuickSave);
       return;
     }
     await load(save);
-    _toasts.add(strings.quickLoaded);
+    _toast(strings.quickLoaded);
   }
 
   /// Developer panel: continues the story at [target], keeping the variables.
@@ -321,6 +331,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     _autoTimer?.cancel();
     autoMode = false;
     skipMode = false;
+    _pacingHeld = false;
     notification = null;
     rolledBack = false;
     _resetCall();
@@ -346,6 +357,8 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> reloadStory() async {
     if (_busy || phase == StoryPhase.idle) return;
     engine.loader.clearCache();
+    assets.clearCache();
+    _itemCache.clear();
     final item = await engine.reloadCurrent();
     if (item == null || _disposed) return;
     _epoch++;
@@ -355,7 +368,7 @@ class StoryController extends ChangeNotifier with EngineListener {
       rolledBack = true;
       _show(item);
     }
-    _toasts.add(strings.storyReloaded);
+    _toast(strings.storyReloaded);
   }
 
   /// Goes back to the previous line, or to the transcript line at [historyIndex]. A choice there can be
@@ -368,6 +381,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     _autoTimer?.cancel();
     autoMode = false;
     skipMode = false;
+    _pacingHeld = false;
     notification = null;
     direction = null;
     await audio.stopVoice();
@@ -381,9 +395,11 @@ class StoryController extends ChangeNotifier with EngineListener {
   Future<void> _begin({SaveSlot? save, Checkpoint? checkpoint, bool replay = false}) async {
     _epoch++;
     _autoTimer?.cancel();
+    _itemCache.clear();
     this.replay = replay;
     autoMode = false;
     skipMode = false;
+    _pacingHeld = false;
     rolledBack = false;
     notification = null;
     direction = null;
@@ -524,9 +540,9 @@ class StoryController extends ChangeNotifier with EngineListener {
       case SaveSlot.autoSlotId:
         break;
       case SaveSlot.quickSlotId:
-        _toasts.add(strings.quickSaved);
+        _toast(strings.quickSaved);
       default:
-        _toasts.add(strings.savedToSlot(slotId));
+        _toast(strings.savedToSlot(slotId));
     }
   }
 
@@ -688,6 +704,7 @@ class StoryController extends ChangeNotifier with EngineListener {
     engine.playerFallbackName = strings.you;
     if (engine.locale == language.locale) return;
     engine.locale = language.locale;
+    _itemCache.clear();
     final item = current?.localized(localizer);
     current = item;
     if (item != null) currentProfile = engine.getProfile(item);
@@ -878,7 +895,7 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   @override
   void onMediaUnlocked(MediaItemType item) =>
-      _toasts.add(strings.galleryUnlocked(item.title ?? item.caption ?? strings.newGalleryItem));
+      _toast(strings.galleryUnlocked(item.title ?? item.caption ?? strings.newGalleryItem));
 
   @override
   void onClueFound(Clue clue) {
@@ -887,7 +904,7 @@ class StoryController extends ChangeNotifier with EngineListener {
 
   @override
   void onCheckpointUnlocked(Checkpoint checkpoint) {
-    _toasts.add(strings.checkpoint(localizer.maybe(checkpoint.chapter) ?? checkpoint.conversationKey));
+    _toast(strings.checkpoint(localizer.maybe(checkpoint.chapter) ?? checkpoint.conversationKey));
   }
 
   void _notify() {

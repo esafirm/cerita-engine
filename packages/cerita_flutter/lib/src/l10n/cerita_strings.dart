@@ -50,9 +50,11 @@ abstract class CeritaStrings {
   /// An in-world time of day, as the story's timestamps write it: "11:58 PM" in English, "23.58" in Indonesian.
   String clock(int hour, int minute);
 
+  static final _sceneTimePattern = RegExp(r"^(\d{1,2})[:.](\d{2})$");
+
   /// A scene's `time` ("23:58" or "23.58") in [clock]'s format. Any other text is shown as written.
   String sceneTime(String time) {
-    final match = RegExp(r"^(\d{1,2})[:.](\d{2})$").firstMatch(time.trim());
+    final match = _sceneTimePattern.firstMatch(time.trim());
     if (match == null) return time;
     final hour = int.parse(match.group(1)!);
     final minute = int.parse(match.group(2)!);

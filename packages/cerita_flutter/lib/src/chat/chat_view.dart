@@ -192,7 +192,7 @@ class _InteractionTray extends StatelessWidget {
           height: MediaQuery.sizeOf(context).height * 0.55,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: EvidencePicker(key: ValueKey(item), controller: controller, item: item),
+            child: EvidencePicker(key: ValueKey(item), controller: controller, item: item, paused: controller.storyHeld),
           ),
         ),
       StoryPhase.choice when item is ChoiceItemType => Column(
@@ -274,6 +274,12 @@ class _PacingGateState extends State<_PacingGate> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     widget.controller.holdPacing(ChapterCardOverlay.holdsDialogue(context));
+  }
+
+  @override
+  void dispose() {
+    widget.controller.holdPacing(false);
+    super.dispose();
   }
 
   @override
