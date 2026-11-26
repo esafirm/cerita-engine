@@ -32,6 +32,9 @@ class RollbackFrame {
   /// Position in the [RollLog] when the item was delivered.
   final int roll;
 
+  /// In-memory playthrough variables before a pending CHOICE / INPUT applied its item-level effects.
+  final Map<String, dynamic>? preAwaitingDataMap;
+
   const RollbackFrame({
     required this.item,
     required this.conversationKey,
@@ -47,6 +50,7 @@ class RollbackFrame {
     required this.lastItemKey,
     required this.previouslySeen,
     required this.roll,
+    this.preAwaitingDataMap,
   });
 
   /// A line of a VN scene. Stage directions and waits are passed over, and chat / call threads
@@ -204,4 +208,35 @@ class RollLog implements Random {
     _base = base;
     this.position = position ?? base;
   }
+
+  /// A read-only cursor over already-recorded rolls from [position] onward. Calls [onUndetermined] if an
+  /// unrecorded roll is requested, so previews never consume or diverge from live randomness.
+  Random preview(Never Function() onUndetermined) => _RollPreview(this, onUndetermined);
+}
+
+class _RollPreview implements Random {
+  final RollLog _log;
+  final Never Function() _onUndetermined;
+  int _position;
+
+  _RollPreview(this._log, this._onUndetermined) : _position = _log.position;
+
+  @override
+  int nextInt(int max) {
+    final index = _position - _log._base;
+    if (index >= 0 && index < _log._rolls.length) {
+      final roll = _log._rolls[index];
+      if (roll.max == max) {
+        _position++;
+        return roll.value;
+      }
+    }
+    _onUndetermined();
+  }
+
+  @override
+  double nextDouble() => _onUndetermined();
+
+  @override
+  bool nextBool() => _onUndetermined();
 }

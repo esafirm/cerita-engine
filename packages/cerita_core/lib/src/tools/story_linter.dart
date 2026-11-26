@@ -416,6 +416,8 @@ class StoryLinter {
                   asset(key, index, image, config.bg, "background", at);
                 case CgAction(:final image):
                   asset(key, index, image, config.bg, "cg", at);
+                  final raw = (item.json["actions"] as List)[actionIndex] as Map;
+                  text(key, index, Map<String, dynamic>.from(raw), at);
                 case MusicAction(:final file) || AmbienceAction(:final file):
                   asset(key, index, file, config.music, "music", at);
                 case SoundAction(:final file):
@@ -773,6 +775,7 @@ class StoryLinter {
           if (calls.isEmpty) return false;
           (current, at) = calls.removeLast();
         case BranchItemType(:final branches, :final fallbackTarget):
+          _applyKnown(item.effects, known);
           String? next;
           for (final branch in branches) {
             final taken = _holds(branch.condition, known);

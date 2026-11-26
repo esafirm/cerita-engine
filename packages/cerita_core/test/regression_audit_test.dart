@@ -237,5 +237,326 @@ void main() {
       expect(messages, contains(contains("Unknown character 'ghost2'")));
       expect(messages, contains(contains("Missing avatar file")));
     });
+
+    test('ChoiceItemType skips when its own effects lock every option', () async {
+      final engine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "conversations": [
+              {
+                "type": "SET",
+                "effects": [
+                  {"variable": "tickets", "op": "set", "value": 1},
+                ],
+              },
+              {
+                "type": "CHOICE",
+                "text": "Pick",
+                "effects": [
+                  {"variable": "tickets", "op": "set", "value": 0},
+                ],
+                "choices": [
+                  {"text": "Use ticket", "condition": "tickets > 0"},
+                ],
+              },
+              {"type": "TEXT", "text": "Moved on"},
+            ],
+          },
+        }),
+      );
+      final item = await engine.next();
+      expect(item, isA<TextItemType>());
+      expect(item.getText(), "Moved on");
+    });
+
+    test('snapshot on a pending CHOICE does not replay its item-level effects on reload', () async {
+      final loader = _MapLoader({
+        "index": {
+          "conversation_id": "index",
+          "conversations": [
+            {
+              "type": "CHOICE",
+              "text": "Pick",
+              "effects": [
+                {"variable": "visits", "op": "add", "value": 1},
+              ],
+              "choices": [
+                {"text": "Go"},
+              ],
+            },
+            {"type": "TEXT", "text": "Visits: {{visits}}"},
+          ],
+        },
+      });
+      final engine = RealFsseEngine(loader);
+      await engine.next();
+      expect(engine.dataMap["visits"], 1);
+      final saved = engine.snapshot(slotId: 1);
+
+      final restored = RealFsseEngine(loader);
+      await restored.start(save: saved);
+      final choice = await restored.next() as ChoiceItemType;
+      expect(restored.dataMap["visits"], 1);
+      final after = await restored.next(prevResult: ItemResult.choice(choice.variable, choice.choices.first));
+      expect(after.getText(), "Visits: 1");
+    });
+
+    test('final silent SET meta_set flushes meta-state when hitting EndOfStoryException', () async {
+      final storage = InMemoryStoryStorage();
+      final engine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "conversations": [
+              {"type": "TEXT", "text": "Last line"},
+              {
+                "type": "SET",
+                "effects": [
+                  {"variable": "saw_final", "op": "meta_set"},
+                  {"variable": "persistent.runs", "op": "add", "value": 1},
+                ],
+              },
+            ],
+          },
+        }),
+        storage: storage,
+      );
+      await engine.next();
+      await expectLater(engine.next(), throwsA(isA<EndOfStoryException>()));
+      final meta = await storage.loadMeta();
+      expect(meta.rememberedFacts, contains("saw_final"));
+      expect(meta.persistent["runs"], 1);
+    });
+
+    test('replay stays in chapter when a continuation omits a secondary translation', () async {
+      final engine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "source_locale": "id",
+            "locales": ["id", "en"],
+            "chapter": {"id": "Hari 1", "en": "Day 1"},
+            "checkpoint": true,
+            "conversations": [
+              {"type": "TEXT", "text": "Line 1"},
+              {"type": "JUMP", "target": "part2"},
+            ],
+          },
+          "part2": {
+            "conversation_id": "part2",
+            "chapter": {"id": "Hari 1"},
+            "conversations": [
+              {"type": "TEXT", "text": "Line 2"},
+            ],
+          },
+        }),
+      );
+      engine.locale = "en";
+      await engine.start(
+        checkpoint: Checkpoint(conversationKey: "index", dataMap: const {}, unlockedAt: DateTime(2026)),
+        replay: true,
+      );
+      expect((await engine.next()).getText(), "Line 1");
+      expect((await engine.next()).getText(), "Line 2");
+    });
+
+    test('reloadCurrent clears loader cache before reloading', () async {
+      var cleared = 0;
+      final files = <String, Map<String, dynamic>>{
+        "index": {
+          "conversation_id": "index",
+          "conversations": [
+            {"type": "TEXT", "text": "Old"},
+          ],
+        },
+      };
+      final engine = RealFsseEngine(
+        _ClearTrackingLoader(files, onClear: () => cleared++),
+      );
+      expect((await engine.next()).getText(), "Old");
+      files["index"] = {
+        "conversation_id": "index",
+        "conversations": [
+          {"type": "TEXT", "text": "New"},
+        ],
+      };
+      final reloaded = await engine.reloadCurrent();
+      expect(cleared, 1);
+      expect(reloaded?.getText(), "New");
+    });
+
+    test('StoryLinter checks CgAction text without treating scene stay/status as interpolated reads', () async {
+      final loader = _MapLoader({
+        "index": {
+          "conversation_id": "index",
+          "scene": {
+            "mode": "CALL",
+            "stay": "Wait {{NEVER_READ}}",
+            "status": "Status {literal}",
+          },
+          "conversations": [
+            {
+              "type": "STAGE",
+              "actions": [
+                {
+                  "action": "cg",
+                  "image": "cg.png",
+                  "unlock_id": "cg_1",
+                  "title": "CG {badcg}",
+                  "caption": "By {{UNSET_CG}}",
+                },
+              ],
+            },
+            {"type": "ENDING", "ending_id": "e1", "title": "Done"},
+          ],
+        },
+      });
+      final issues = await StoryLinter(loader).lint();
+      final messages = issues.map((i) => i.message).toList();
+      expect(messages, contains(contains("Unknown text tag '{badcg}'")));
+      expect(messages, contains(contains("UNSET_CG")));
+      expect(messages.any((m) => m.contains("NEVER_READ") || m.contains("{literal}")), isFalse);
+    });
+
+    test('skipped ChoiceItemType does not commit item-level effects', () async {
+      final storage = InMemoryStoryStorage();
+      final engine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "conversations": [
+              {
+                "type": "SET",
+                "effects": [
+                  {"variable": "tickets", "op": "set", "value": 1},
+                ],
+              },
+              {
+                "type": "CHOICE",
+                "text": "Pick",
+                "effects": [
+                  {"variable": "tickets", "op": "set", "value": 0},
+                  {"variable": "persistent.tries", "op": "add", "value": 1},
+                ],
+                "choices": [
+                  {"text": "Use ticket", "condition": "tickets > 0"},
+                ],
+              },
+              {"type": "TEXT", "text": "Skipped"},
+            ],
+          },
+        }),
+        storage: storage,
+      );
+      expect((await engine.next()).getText(), "Skipped");
+      expect(engine.dataMap["tickets"], 1);
+      expect((await storage.loadMeta()).persistent["tries"], isNull);
+    });
+
+    test('peekExit applies preceding SET before BRANCH and defers on unrecorded random()', () async {
+      final engine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "conversations": [
+              {"type": "TEXT", "text": "Start"},
+              {
+                "type": "SET",
+                "effects": [
+                  {"variable": "divisor", "op": "set", "value": 1},
+                ],
+              },
+              {
+                "type": "BRANCH",
+                "effects": [
+                  {"variable": "ratio", "op": "set", "expr": "10 / divisor"},
+                ],
+                "branches": [
+                  {"condition": "ratio == 10", "target": "next_conv"},
+                ],
+              },
+            ],
+          },
+          "next_conv": {
+            "conversation_id": "next_conv",
+            "conversations": [
+              {"type": "TEXT", "text": "Arrived"},
+            ],
+          },
+        }),
+      );
+      await engine.next();
+      final exit = await engine.peekExit();
+      expect(exit?.next?.key, "next_conv");
+      expect(engine.dataMap["divisor"], isNull, reason: "peekExit must not mutate live state");
+
+      final randomEngine = RealFsseEngine(
+        _MapLoader({
+          "index": {
+            "conversation_id": "index",
+            "conversations": [
+              {"type": "TEXT", "text": "Before roll"},
+              {
+                "type": "BRANCH",
+                "branches": [
+                  {"condition": "random(1, 2) == 1", "target": "next_conv"},
+                ],
+                "fallback_target": "next_conv",
+              },
+            ],
+          },
+          "next_conv": {
+            "conversation_id": "next_conv",
+            "conversations": [
+              {"type": "TEXT", "text": "After roll"},
+            ],
+          },
+        }),
+      );
+      await randomEngine.next();
+      expect(await randomEngine.peekExit(), isNull, reason: "unrecorded random() defers prediction");
+    });
+
+    test('rollback to pending CHOICE preserves pre-effect snapshot state across save/load', () async {
+      final loader = _MapLoader({
+        "index": {
+          "conversation_id": "index",
+          "scene": {"mode": "VN"},
+          "conversations": [
+            {
+              "type": "CHOICE",
+              "text": "Pick",
+              "effects": [
+                {"variable": "visits", "op": "add", "value": 1},
+              ],
+              "choices": [
+                {"text": "Go"},
+              ],
+            },
+            {"type": "TEXT", "text": "After"},
+          ],
+        },
+      });
+      final engine = RealFsseEngine(loader);
+      final choice = await engine.next() as ChoiceItemType;
+      await engine.next(prevResult: ItemResult.choice(choice.variable, choice.choices.first));
+      engine.rollback();
+      final saved = engine.snapshot(slotId: 1);
+
+      final restored = RealFsseEngine(loader);
+      await restored.start(save: saved);
+      await restored.next();
+      expect(restored.dataMap["visits"], 1);
+    });
   });
+}
+
+class _ClearTrackingLoader extends _MapLoader {
+  final void Function() onClear;
+
+  _ClearTrackingLoader(super.files, {required this.onClear});
+
+  @override
+  void clearCache() => onClear();
 }

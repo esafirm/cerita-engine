@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:developer' as developer;
 
 import 'data/channel.dart';
@@ -170,8 +171,9 @@ class RealFsseEngine extends FsseEngine {
 
   bool _replay = false;
 
-  /// The chapter being replayed. Entering a conversation of another chapter ends the replay.
-  LocalizedText? _replayChapter;
+  /// The chapter being replayed (in the story's source language). Entering a conversation of another chapter ends
+  /// the replay.
+  String? _replayChapter;
 
   /// Whether the last item returned by [next] had been delivered in an earlier playthrough.
   bool lastItemPreviouslySeen = false;
@@ -179,13 +181,21 @@ class RealFsseEngine extends FsseEngine {
   /// True while the last returned item is a CHOICE / INPUT waiting for its [ItemResult].
   bool _awaitingResult = false;
 
+  /// Playthrough variables before a pending CHOICE / INPUT applied its item-level effects, so [snapshot] doesn't
+  /// replay those effects when the prompt is reissued on load.
+  Map<String, dynamic>? _preAwaitingDataMap;
+
+  /// Set by [_enterConversation] when a new scene becomes active, read by [nextOrPause].
+  bool _enteredNewScene = false;
+
   /// `<conversation_key>#<index>` of the last returned item.
   String? _lastItemKey;
 
   bool _metaDirty = false;
+  bool _seenDirty = false;
   bool _started = false;
 
-  List<TranscriptEntry> get history => List.unmodifiable(_history);
+  late final List<TranscriptEntry> history = UnmodifiableListView(_history);
 
   Scene? get currentScene => _scene;
 
@@ -204,6 +214,10 @@ class RealFsseEngine extends FsseEngine {
   }
 
   Localizer get localizer => Localizer(locale: _locale, sourceLocale: storyLocales.source);
+
+  /// Source-language chapter heading, used for replay boundaries regardless of active locale or partial translations.
+  String? _sourceChapter(Conversation conversation) =>
+      conversation.chapterText?.resolve(storyLocales.source, source: storyLocales.source);
 
   /// Starts a playthrough: fresh from `index.json`, from a [save] slot, or from a [checkpoint].
   /// With [replay], only the [checkpoint]'s chapter is played: entering a conversation of another
@@ -235,6 +249,7 @@ class RealFsseEngine extends FsseEngine {
     currentConversation = null;
     _scene = null;
     _awaitingResult = false;
+    _preAwaitingDataMap = null;
     _started = true;
 
     if (save != null) {
@@ -267,7 +282,7 @@ class RealFsseEngine extends FsseEngine {
       final conversation = await loader.loadConversation(checkpoint.conversationKey);
       if (replay) {
         _replay = true;
-        _replayChapter = conversation.chapterText;
+        _replayChapter = _sourceChapter(conversation);
       }
       await _enterConversation(conversation);
     } else {
@@ -277,28 +292,64 @@ class RealFsseEngine extends FsseEngine {
   }
 
   @override
-  Future<ItemType> next({ItemResult? prevResult}) async {
+  Future<ItemType> next({ItemResult? prevResult}) async => (await nextOrPause(prevResult: prevResult))!;
+
+  /// Advances the story like [next], but stops before resolving or executing items in a newly entered scene when
+  /// [stopAtScene] returns true (e.g. a ringing call waiting to be answered). Returns `null` when paused there so
+  /// the next [next] / [nextOrPause] call executes that scene's first item. With [deferSeenFlush], newly seen item
+  /// flags are buffered until the next [saveTo], [flushMeta], urgent meta change, or end of story.
+  Future<ItemType?> nextOrPause({
+    ItemResult? prevResult,
+    bool Function(Scene scene)? stopAtScene,
+    bool deferSeenFlush = false,
+  }) async {
     developer.log("Request next with index: $dialogIndex", name: _tag);
 
     await _ensureStarted();
     final found = _foundIds();
-    await _handleResult(prevResult);
-
-    final (item, prePrepared) = await _resolveCurrentItem();
-    final executed = await _execute(item, prePrepared: prePrepared);
-    _pushFrame(executed);
-    await _flushMeta();
-    for (final clue in clues.clues) {
-      if (isClueFound(clue) && !found.contains(clue.id)) listener?.onClueFound(clue);
+    void notifyNewClues() {
+      for (final clue in clues.clues) {
+        if (isClueFound(clue) && !found.contains(clue.id)) listener?.onClueFound(clue);
+      }
     }
-    return executed;
+
+    try {
+      _enteredNewScene = false;
+      await _handleResult(prevResult);
+      if (stopAtScene != null && _enteredNewScene && _scene != null && stopAtScene(_scene!)) {
+        await _flushMeta();
+        notifyNewClues();
+        return null;
+      }
+
+      final resolved = await _resolveCurrentItem(execute: true, stopAtScene: stopAtScene);
+      if (resolved == null) {
+        await _flushMeta();
+        notifyNewClues();
+        return null;
+      }
+      final (item, prePrepared, effectsApplied) = resolved;
+      final executed = await _execute(item, prePrepared: prePrepared, effectsApplied: effectsApplied);
+      _pushFrame(executed);
+      await _flushMeta(includeSeen: !deferSeenFlush);
+      notifyNewClues();
+      return executed;
+    } on EndOfStoryException {
+      await _flushMeta();
+      notifyNewClues();
+      rethrow;
+    }
   }
+
+  /// Writes any buffered meta-state changes (such as deferred `seenItems` during skip mode) to storage.
+  Future<void> flushMeta() => _flushMeta();
 
   /// Continues the story at [target] (`conv`, `#label` or `conv#label`), keeping the variables. For the
   /// developer panel: the next [next] returns the item there.
   Future<void> jumpTo(String target) async {
     await _ensureStarted();
     _awaitingResult = false;
+    _preAwaitingDataMap = null;
     await _jump(target);
   }
 
@@ -309,6 +360,7 @@ class RealFsseEngine extends FsseEngine {
   Future<ItemType?> reloadCurrent() async {
     final current = currentConversation;
     if (current == null) return null;
+    loader.clearCache();
     final conversation = await loader.loadConversation(current.key);
     currentConversation = conversation;
     _conversations[conversation.key] = conversation;
@@ -328,12 +380,16 @@ class RealFsseEngine extends FsseEngine {
       );
     }
     _awaitingResult = item is ChoiceItemType || item is InputItemType;
+    if (!_awaitingResult) _preAwaitingDataMap = null;
     return item;
   }
 
   /// Sets [variable], a playthrough or `persistent.*` one, from the developer panel.
   Future<void> setVariable(String variable, dynamic value) async {
     state[variable] = value;
+    if (_preAwaitingDataMap != null && !StoryState.isPersistent(variable) && !StoryState.isMeta(variable)) {
+      _preAwaitingDataMap![variable] = value;
+    }
     await _flushMeta();
   }
 
@@ -368,66 +424,100 @@ class RealFsseEngine extends FsseEngine {
     var index = dialogIndex;
     var scene = _scene;
     final callStack = _callStack.toList();
+    // Isolated evaluator over recorded rolls only, so preview never consumes or guesses live randomness.
+    final previewEvaluator = ConditionEvaluator(_rolls.preview(() => throw const _UndeterminedPreview()));
+    final previewData = Map.of(dataMap);
+    GlobalMetaState? previewMeta;
+    final previewState = StoryState(previewData, () => previewMeta ?? meta);
+
+    void applyPreviewEffects(List<Effect> effects) {
+      for (final effect in effects) {
+        if (effect.op == EffectOp.metaSet || StoryState.isPersistent(effect.variable)) {
+          previewMeta ??= GlobalMetaState.fromJson(meta.toJson());
+        }
+        if (effect.op == EffectOp.metaSet) {
+          previewMeta!.rememberedFacts.add(effect.variable);
+        } else {
+          effect.apply(previewState, previewEvaluator);
+        }
+      }
+    }
 
     Future<bool> enter(String key, int at) async {
       final entered = _conversations[key] ?? await loader.loadConversation(key);
       final chapter = _replayChapter;
-      if (chapter != null && entered.chapterText != null && entered.chapterText != chapter) return false;
+      final enteredChapter = _sourceChapter(entered);
+      if (chapter != null && enteredChapter != null && enteredChapter != chapter) return false;
       conversation = entered;
       index = at;
       if (entered.hasScene) scene = entered.scene;
       return true;
     }
 
-    for (var steps = 0; steps < _maxJumps; steps++) {
-      final current = conversation!;
-      if (index >= current.conversations.length) {
-        if (callStack.isEmpty) return (next: null, scene: null);
-        final frame = callStack.removeLast();
-        if (!await enter(frame.conversationKey, frame.dialogIndex)) return (next: null, scene: null);
-        continue;
-      }
-      final item = current.conversations[index];
-      if (!evaluate(item.condition)) {
-        index++;
-        continue;
-      }
-      final String target;
-      switch (item) {
-        case BranchItemType():
-          final branch =
-              item.branches.where((branch) => evaluate(branch.condition)).firstOrNull?.target ?? item.fallbackTarget;
-          if (branch == null) {
-            index++;
-            continue;
-          }
-          target = branch;
-        case JumpItemType():
-          target = item.target;
-        case CallItemType():
-          callStack.add(CallFrame(current.key, index + 1));
-          target = item.target;
-        case ReturnItemType():
+    try {
+      for (var steps = 0; steps < _maxJumps; steps++) {
+        final current = conversation!;
+        if (index >= current.conversations.length) {
           if (callStack.isEmpty) return (next: null, scene: null);
           final frame = callStack.removeLast();
           if (!await enter(frame.conversationKey, frame.dialogIndex)) return (next: null, scene: null);
           continue;
-        case FlowItemType():
+        }
+        final item = current.conversations[index];
+        if (!previewEvaluator.evaluate(item.condition, previewState)) {
           index++;
           continue;
-        default:
-          return identical(current, currentConversation) ? null : (next: current, scene: scene);
+        }
+        final String target;
+        switch (item) {
+          case BranchItemType():
+            applyPreviewEffects(item.effects);
+            final branch =
+                item.branches
+                    .where((branch) => previewEvaluator.evaluate(branch.condition, previewState))
+                    .firstOrNull
+                    ?.target ??
+                item.fallbackTarget;
+            if (branch == null) {
+              index++;
+              continue;
+            }
+            target = branch;
+          case JumpItemType():
+            applyPreviewEffects(item.effects);
+            target = item.target;
+          case CallItemType():
+            applyPreviewEffects(item.effects);
+            callStack.add(CallFrame(current.key, index + 1));
+            target = item.target;
+          case ReturnItemType():
+            applyPreviewEffects(item.effects);
+            if (callStack.isEmpty) return (next: null, scene: null);
+            final frame = callStack.removeLast();
+            if (!await enter(frame.conversationKey, frame.dialogIndex)) return (next: null, scene: null);
+            continue;
+          case FlowItemType():
+            applyPreviewEffects(item.effects);
+            index++;
+            continue;
+          default:
+            return identical(current, currentConversation) ? null : (next: current, scene: scene);
+        }
+        final hash = target.indexOf("#");
+        final key = hash < 0 ? target : target.substring(0, hash);
+        final label = hash < 0 ? null : target.substring(hash + 1);
+        if (key.isNotEmpty && !await enter(key, 0)) return (next: null, scene: null);
+        if (label != null) {
+          index = conversation!.conversations.indexWhere((item) => item.id == label);
+          if (index < 0) return null;
+        } else if (key.isEmpty) {
+          index = 0;
+        }
       }
-      final hash = target.indexOf("#");
-      final key = hash < 0 ? target : target.substring(0, hash);
-      final label = hash < 0 ? null : target.substring(hash + 1);
-      if (key.isNotEmpty && !await enter(key, 0)) return (next: null, scene: null);
-      if (label != null) {
-        index = conversation!.conversations.indexWhere((item) => item.id == label);
-        if (index < 0) return null;
-      } else if (key.isEmpty) {
-        index = 0;
-      }
+    } on _UndeterminedPreview {
+      return null;
+    } on ConditionException {
+      return null;
     }
     return null;
   }
@@ -469,6 +559,7 @@ class RealFsseEngine extends FsseEngine {
       ..addAll(frame.evidenceTries);
     stage = _copyStage(frame.stage);
     _awaitingResult = frame.awaitingResult;
+    _preAwaitingDataMap = frame.preAwaitingDataMap == null ? null : Map.of(frame.preAwaitingDataMap!);
     _lastItemKey = frame.lastItemKey;
     lastItemPreviouslySeen = frame.previouslySeen;
     _rolls.position = frame.roll;
@@ -503,6 +594,7 @@ class RealFsseEngine extends FsseEngine {
       lastItemKey: _lastItemKey,
       previouslySeen: lastItemPreviouslySeen,
       roll: _rolls.position,
+      preAwaitingDataMap: _preAwaitingDataMap == null ? null : Map.of(_preAwaitingDataMap!),
     ));
     if (_frames.length > _maxRollback) {
       _frames.removeAt(0);
@@ -537,10 +629,15 @@ class RealFsseEngine extends FsseEngine {
   Future<ItemType> get() async {
     developer.log("Request get with index: $dialogIndex", name: _tag);
     await _ensureStarted();
-    final (raw, prePrepared) = await _resolveCurrentItem();
-    final item = prePrepared ?? _prepare(raw);
-    await _flushMeta();
-    return item;
+    try {
+      final (raw, prePrepared, _) = (await _resolveCurrentItem(execute: false))!;
+      final item = prePrepared ?? _prepare(raw);
+      await _flushMeta();
+      return item;
+    } on EndOfStoryException {
+      await _flushMeta();
+      rethrow;
+    }
   }
 
   @override
@@ -585,7 +682,7 @@ class RealFsseEngine extends FsseEngine {
       slotId: slotId,
       conversationKey: conversation.key,
       dialogIndex: index,
-      dataMap: Map.of(dataMap),
+      dataMap: Map.of(_awaitingResult && _preAwaitingDataMap != null ? _preAwaitingDataMap! : dataMap),
       history: history,
       updatedAt: DateTime.now(),
       callStack: _callStack.toList(),
@@ -631,18 +728,24 @@ class RealFsseEngine extends FsseEngine {
 
   Future<void> _saveMetaNow() async {
     _metaDirty = false;
+    _seenDirty = false;
     state.persistentDirty = false;
     await storage?.saveMeta(meta);
   }
 
-  Future<void> _flushMeta() async {
-    if (!_metaDirty && !state.persistentDirty) return;
+  Future<void> _flushMeta({bool includeSeen = true}) async {
+    if (!_metaDirty && !state.persistentDirty && !(includeSeen && _seenDirty)) return;
     await _saveMetaNow();
   }
 
   /// Skips items whose condition fails or that have nothing to pick, and follows
   /// BRANCH / JUMP / CALL / RETURN / SET.
-  Future<(ItemType, ItemType?)> _resolveCurrentItem() async {
+  Future<(ItemType, ItemType?, bool)?> _resolveCurrentItem({
+    required bool execute,
+    bool Function(Scene scene)? stopAtScene,
+  }) async {
+    bool shouldPause() => stopAtScene != null && _enteredNewScene && _scene != null && stopAtScene(_scene!);
+
     for (var jumps = 0; jumps < _maxJumps;) {
       final conversation = currentConversation;
       if (conversation == null) {
@@ -650,7 +753,9 @@ class RealFsseEngine extends FsseEngine {
       }
       if (dialogIndex >= conversation.conversations.length) {
         if (_callStack.isEmpty) throw EndOfStoryException(conversation.key);
+        _enteredNewScene = false;
         await _return();
+        if (shouldPause()) return null;
         jumps++;
         continue;
       }
@@ -669,7 +774,9 @@ class RealFsseEngine extends FsseEngine {
           if (target == null) {
             dialogIndex += 1;
           } else {
+            _enteredNewScene = false;
             await _jump(target);
+            if (shouldPause()) return null;
             jumps++;
           }
           continue;
@@ -678,15 +785,21 @@ class RealFsseEngine extends FsseEngine {
           dialogIndex += 1;
           switch (item) {
             case JumpItemType(:final target):
+              _enteredNewScene = false;
               await _jump(target);
+              if (shouldPause()) return null;
               jumps++;
             case CallItemType(:final target):
               _callStack.add(CallFrame(conversation.key, dialogIndex));
+              _enteredNewScene = false;
               await _jump(target);
+              if (shouldPause()) return null;
               jumps++;
             case ReturnItemType():
               if (_callStack.isEmpty) throw EndOfStoryException(conversation.key);
+              _enteredNewScene = false;
               await _return();
+              if (shouldPause()) return null;
               jumps++;
           }
           continue;
@@ -694,21 +807,75 @@ class RealFsseEngine extends FsseEngine {
         case EvidenceItemType(:final fallback) when !clues.clues.any(isClueFound):
           _evidenceTries.remove("${conversation.key}#$dialogIndex");
           dialogIndex += 1;
-          if (await _playOutcome(fallback)) jumps++;
+          _enteredNewScene = false;
+          if (await _playOutcome(fallback)) {
+            if (shouldPause()) return null;
+            jumps++;
+          }
           continue;
         case EvidenceItemType():
           break;
         case ChoiceItemType():
-          final prepared = _prepare(item) as ChoiceItemType;
-          if (prepared.availableChoices.isEmpty) {
+          if (item.effects.isEmpty) {
+            final prepared = _prepare(item) as ChoiceItemType;
+            if (prepared.availableChoices.isEmpty) {
+              dialogIndex += 1;
+              continue;
+            }
+            return (item, prepared, false);
+          }
+          final available = _choiceHasAvailableOptions(item);
+          if (available == false) {
             dialogIndex += 1;
             continue;
           }
-          return (item, item.effects.isEmpty ? prepared : null);
+          if (available == null && execute) {
+            _preAwaitingDataMap = Map.of(dataMap);
+            _applyEffects(item.effects);
+            final prepared = _prepare(item) as ChoiceItemType;
+            if (prepared.availableChoices.isEmpty) {
+              _preAwaitingDataMap = null;
+              dialogIndex += 1;
+              continue;
+            }
+            return (item, prepared, true);
+          }
+          return (item, null, false);
       }
-      return (item, null);
+      return (item, null, false);
     }
     throw Exception("Too many jumps. Is there a loop in the story?");
+  }
+
+  /// Checks whether [item] will have at least one selectable option after its item-level effects, using scratch
+  /// state so a skipped choice never mutates live playthrough variables, meta-state, or random rolls. Returns `null`
+  /// when an unrecorded `random()` makes availability undetermined until execution.
+  bool? _choiceHasAvailableOptions(ChoiceItemType item) {
+    final scratchData = Map.of(dataMap);
+    GlobalMetaState? scratchMeta;
+    final scratchState = StoryState(scratchData, () => scratchMeta ?? meta);
+    final scratchEval = ConditionEvaluator(_rolls.preview(() => throw const _UndeterminedPreview()));
+    try {
+      for (final effect in item.effects) {
+        if (effect.op == EffectOp.metaSet || StoryState.isPersistent(effect.variable)) {
+          scratchMeta ??= GlobalMetaState.fromJson(meta.toJson());
+        }
+        if (effect.op == EffectOp.metaSet) {
+          scratchMeta!.rememberedFacts.add(effect.variable);
+        } else {
+          effect.apply(scratchState, scratchEval);
+        }
+      }
+      final itemKey = "${currentConversation!.key}#$dialogIndex";
+      for (final choice in item.choices) {
+        final key = "$itemKey#${choice.index}";
+        if (choice.once && _chosen.contains(key)) continue;
+        if (scratchEval.evaluate(choice.condition, scratchState)) return true;
+      }
+      return false;
+    } on _UndeterminedPreview {
+      return null;
+    }
   }
 
   /// Interpolates [item] and, for a CHOICE, hides picked `once` choices and locked memory-gated ones, and flags
@@ -730,8 +897,12 @@ class RealFsseEngine extends FsseEngine {
     return cloned.withChoices(choices);
   }
 
-  Future<ItemType> _execute(ItemType item, {ItemType? prePrepared}) async {
-    _applyEffects(item.effects);
+  Future<ItemType> _execute(ItemType item, {ItemType? prePrepared, bool effectsApplied = false}) async {
+    if (!effectsApplied) {
+      _preAwaitingDataMap =
+          (item is ChoiceItemType || item is InputItemType) && item.effects.isNotEmpty ? Map.of(dataMap) : null;
+      _applyEffects(item.effects);
+    }
     final prepared = prePrepared ?? _prepare(item);
     final conversation = currentConversation!;
     _lastItemKey = "${conversation.key}#$dialogIndex";
@@ -753,7 +924,7 @@ class RealFsseEngine extends FsseEngine {
     }
     if (meta.seenItems.add(_lastItemKey!)) {
       lastItemPreviouslySeen = false;
-      _metaDirty = true;
+      _seenDirty = true;
     } else {
       lastItemPreviouslySeen = true;
     }
@@ -804,6 +975,7 @@ class RealFsseEngine extends FsseEngine {
   Future<void> _handleResult(ItemResult? itemResult) async {
     if (itemResult == null) return;
     _awaitingResult = false;
+    _preAwaitingDataMap = null;
     if (itemResult.presentedClue != null || itemResult.evidenceTimedOut) return _answerEvidence(itemResult);
 
     if (itemResult.variable != null) {
@@ -928,7 +1100,8 @@ class RealFsseEngine extends FsseEngine {
   /// Called after initial load and after a new conversation is loaded.
   Future<void> _enterConversation(Conversation conversation, {int index = 0}) async {
     final chapter = _replayChapter;
-    if (chapter != null && conversation.chapterText != null && conversation.chapterText != chapter) {
+    final enteredChapter = _sourceChapter(conversation);
+    if (chapter != null && enteredChapter != null && enteredChapter != chapter) {
       throw EndOfStoryException(conversation.key);
     }
     // Before anything changes, so a closed conversation is never current and its checkpoint stays locked.
@@ -940,6 +1113,7 @@ class RealFsseEngine extends FsseEngine {
     dialogIndex = index;
     if (conversation.hasScene || previous == null) {
       _scene = conversation.scene;
+      _enteredNewScene = true;
       stage.enterScene(conversation.scene, previous: previous);
       stage.pageStart = _history.length;
       _hearMusic();
@@ -961,4 +1135,8 @@ class RealFsseEngine extends FsseEngine {
       listener?.onCheckpointUnlocked(checkpoint);
     }
   }
+}
+
+class _UndeterminedPreview implements Exception {
+  const _UndeterminedPreview();
 }
