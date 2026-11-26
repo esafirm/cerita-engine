@@ -369,6 +369,22 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.textContaining("Izinkan di pengaturan HP"), findsOneWidget);
     });
+
+    testWidgets('says saving is mobile-only when unsupported', (tester) async {
+      await pump(
+        tester,
+        owned: true,
+        save: (bytes, name) async => throw const WallpaperSaveException(unsupported: true),
+      );
+      await tester.tap(find.text("Tak Terkirim"));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        await tester.tap(find.text("SIMPAN KE GALERI"));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pumpAndSettle();
+      expect(find.textContaining("hanya tersedia di aplikasi HP"), findsOneWidget);
+    });
   });
 
   group('app icons', () {

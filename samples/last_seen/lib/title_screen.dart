@@ -128,6 +128,7 @@ class _TitleScreenState extends State<TitleScreen> {
     if (_extras) {
       return [
         (strings.gallery, () => _push(GalleryScreen(setup: setup))),
+        (strings.musicRoom, () => _push(MusicRoomScreen(setup: setup))),
         (
           en ? "Wallpapers" : "Wallpaper",
           () => _push(WallpapersScreen(fullGame: widget.fullGame, onLocked: _openPaywall)),

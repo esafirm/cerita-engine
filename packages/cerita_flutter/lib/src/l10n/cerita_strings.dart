@@ -728,7 +728,7 @@ class IndonesianCeritaStrings extends CeritaStrings {
   @override
   String get endOfReplay => "Akhir putar ulang";
   @override
-  String get storyClosed => "Bagian cerita ini belum tersedia";
+  String get storyClosed => "Bagian cerita ini tidak tersedia";
   @override
   String get memoryMarker => "Terbuka dari permainan sebelumnya";
   @override

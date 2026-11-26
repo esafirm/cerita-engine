@@ -1,4 +1,5 @@
 import 'package:cerita_flutter/cerita_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
@@ -41,10 +42,14 @@ class WallpaperSaveException implements Exception {
   /// True when the player said no to photo access, so the message can say how to fix it.
   final bool denied;
 
-  const WallpaperSaveException({this.denied = false});
+  /// True on platforms where saving straight to the device gallery isn't supported (e.g. web).
+  final bool unsupported;
+
+  const WallpaperSaveException({this.denied = false, this.unsupported = false});
 }
 
 Future<void> saveToPhotos(Uint8List bytes, String name) async {
+  if (kIsWeb) throw const WallpaperSaveException(unsupported: true);
   try {
     if (!await Gal.hasAccess() && !await Gal.requestAccess()) throw const WallpaperSaveException(denied: true);
     await Gal.putImageBytes(bytes, name: name);
@@ -187,7 +192,11 @@ class _WallpaperViewerState extends State<WallpaperViewer> {
       await widget.save(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes), widget.wallpaper.name);
       message = text.saved;
     } on WallpaperSaveException catch (error) {
-      message = error.denied ? text.denied : text.failed;
+      message = error.unsupported
+          ? text.unsupported
+          : error.denied
+          ? text.denied
+          : text.failed;
     }
     if (!mounted) return;
     setState(() {
@@ -274,6 +283,8 @@ class _Text {
   String get denied => en
       ? "No access to your photos. Allow it in the phone's settings."
       : "Tidak ada akses ke galeri. Izinkan di pengaturan HP.";
+  String get unsupported =>
+      en ? "Saving to photos is only available in the mobile app." : "Simpan ke galeri hanya tersedia di aplikasi HP.";
   String get failed => en ? "Couldn't save the wallpaper." : "Gagal menyimpan wallpaper.";
   String get back => en ? "Back" : "Kembali";
 }
