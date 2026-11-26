@@ -47,9 +47,11 @@ class _CeritaTitleScreenState extends State<CeritaTitleScreen> with TickerProvid
   late final AnimationController _ambient = AnimationController(vsync: this, duration: const Duration(seconds: 24));
 
   @override
-  void initState() {
-    super.initState();
-    if (!WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _ambient.stop();
+    } else if (!_ambient.isAnimating) {
       _ambient.repeat(reverse: true);
     }
   }
@@ -94,30 +96,44 @@ class _CeritaTitleScreenState extends State<CeritaTitleScreen> with TickerProvid
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(28, 40, 28, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FadeTransition(
-                    opacity: titleIn,
-                    child: SlideTransition(
-                      position: Tween(begin: const Offset(0, -0.3), end: Offset.zero).animate(titleIn),
-                      child: _Title(title: widget.title, subtitle: widget.subtitle),
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(28, 40, 28, 28),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        FadeTransition(
+                          opacity: titleIn,
+                          child: SlideTransition(
+                            position: Tween(begin: const Offset(0, -0.3), end: Offset.zero).animate(titleIn),
+                            child: _Title(title: widget.title, subtitle: widget.subtitle),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final (index, (entry, primary)) in entries.indexed)
+                              _SlideUp(
+                                animation: _interval(0.45 + index * 0.1, min(1, 0.85 + index * 0.1)),
+                                child: primary
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(bottom: 12),
+                                        child: _PrimaryButton(entry: entry!, highlighted: index == 0),
+                                      )
+                                    : _SecondaryRow(entries: widget.secondary),
+                              ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const Spacer(),
-                  for (final (index, (entry, primary)) in entries.indexed)
-                    _SlideUp(
-                      animation: _interval(0.45 + index * 0.1, min(1, 0.85 + index * 0.1)),
-                      child: primary
-                          ? Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: _PrimaryButton(entry: entry!, highlighted: index == 0),
-                            )
-                          : _SecondaryRow(entries: widget.secondary),
-                    ),
-                ],
+                ),
               ),
             ),
           ),

@@ -96,4 +96,53 @@ void main() {
     expect(started, isTrue);
     expect(find.text('Gallery'), findsOneWidget);
   });
+
+  testWidgets('title screen scrolls instead of overflowing on short viewports', (tester) async {
+    tester.view.physicalSize = const Size(360, 240);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: CeritaTheme.dark(),
+        home: CeritaTitleScreen(
+          title: 'Wrong Number',
+          subtitle: 'Interactive Mystery',
+          art: const ColoredBox(color: Colors.black),
+          primary: [
+            TitleMenuEntry(label: 'Continue', icon: Icons.play_arrow, onTap: () {}),
+            TitleMenuEntry(label: 'New game', icon: Icons.fiber_new, onTap: () {}),
+          ],
+          secondary: [
+            TitleMenuEntry(label: 'Load', icon: Icons.folder_open, onTap: () {}),
+            TitleMenuEntry(label: 'Gallery', icon: Icons.photo, onTap: () {}),
+            TitleMenuEntry(label: 'Settings', icon: Icons.settings, onTap: () {}),
+          ],
+        ),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 2));
+    expect(tester.takeException(), isNull);
+  });
+
+  test('DirectionalCurveTween uses distinct forward and reverse curves without listeners', () {
+    final controller = AnimationController(vsync: const TestVSync(), duration: const Duration(milliseconds: 200));
+    addTearDown(controller.dispose);
+    final tween = DirectionalCurveTween(
+      curve: const Interval(0.5, 1, curve: Curves.easeOutCubic),
+      reverseCurve: const Interval(0.5, 1, curve: Curves.easeInCubic),
+    );
+    final driven = controller.drive(tween);
+
+    controller.value = 0.75;
+    controller.forward(from: 0.75);
+    final forwardValue = driven.value;
+    controller.reverse(from: 0.75);
+    final reverseValue = driven.value;
+
+    expect(forwardValue, greaterThan(0.5));
+    expect(reverseValue, lessThan(0.5));
+    controller.reverse(from: 0.4);
+    expect(driven.value, 0.0);
+  });
 }

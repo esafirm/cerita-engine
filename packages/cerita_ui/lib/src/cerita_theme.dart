@@ -55,6 +55,25 @@ abstract final class CeritaTheme {
   }
 }
 
+/// Leak-free [Animatable] that applies [curve] while animating forward and [reverseCurve] while reversing,
+/// without attaching status listeners to the parent animation (unlike [CurvedAnimation]).
+class DirectionalCurveTween extends Animatable<double> {
+  final Curve curve;
+  final Curve reverseCurve;
+
+  const DirectionalCurveTween({required this.curve, required this.reverseCurve});
+
+  @override
+  double transform(double t) => curve.transform(t);
+
+  @override
+  double evaluate(Animation<double> animation) {
+    final t = animation.value;
+    if (t == 0.0 || t == 1.0) return t;
+    return animation.status == AnimationStatus.reverse ? reverseCurve.transform(t) : curve.transform(t);
+  }
+}
+
 /// Menu-to-menu transition: the new page fades in while settling from a slight zoom,
 /// the page underneath recedes and dims.
 class CeritaPageTransitionsBuilder extends PageTransitionsBuilder {

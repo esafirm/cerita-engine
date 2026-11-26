@@ -15,7 +15,12 @@ class AnimeVnSkin extends StorySkin {
   Widget sceneTransition(SceneMode mode, Animation<double> animation, Widget child) {
     // Every switch dips to black: the outgoing scene runs the reverse animation, so it is gone by
     // the midpoint and the incoming one only appears in the second half. The two never overlap.
-    final fadeThrough = animation.drive(CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeOutCubic)));
+    final fadeThrough = animation.drive(
+      const DirectionalCurveTween(
+        curve: Interval(0.5, 1, curve: Curves.easeOutCubic),
+        reverseCurve: Interval(0.5, 1, curve: Curves.easeInCubic),
+      ),
+    );
     return FadeTransition(
       opacity: fadeThrough,
       child: switch (mode) {
@@ -48,7 +53,9 @@ class AnimeVnSkin extends StorySkin {
 
   @override
   Widget spriteTransition(Animation<double> animation, Widget child) {
-    final curved = animation.drive(CurveTween(curve: Curves.easeOutBack));
+    final curved = animation.drive(
+      DirectionalCurveTween(curve: Curves.easeOutBack, reverseCurve: Curves.easeIn.flipped),
+    );
     return FadeTransition(
       opacity: animation.drive(CurveTween(curve: Curves.easeOut)),
       child: SlideTransition(
@@ -227,10 +234,12 @@ class _NextIndicator extends StatefulWidget {
 
 class _NextIndicatorState extends State<_NextIndicator> with SingleTickerProviderStateMixin {
   AnimationController? _bob;
+  bool _reduced = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduced = MediaQuery.disableAnimationsOf(context);
     _sync();
   }
 
@@ -239,8 +248,6 @@ class _NextIndicatorState extends State<_NextIndicator> with SingleTickerProvide
     super.didUpdateWidget(oldWidget);
     if (oldWidget.active != widget.active) _sync();
   }
-
-  bool get _reduced => WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
 
   void _sync() {
     if (widget.active && !_reduced) {
